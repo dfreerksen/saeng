@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <title>Saeng</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- Custom titlebar -->
+  <div class="titlebar">
+    <span class="titlebar-title">Saeng</span>
+    <div class="titlebar-spacer"></div>
+    <div class="status-pill">
+      <span class="status-dot stopped" id="statusDot"></span>
+      <span id="statusText">Proxy stopped</span>
+    </div>
+  </div>
+
+  <div class="main-layout">
+
+    <!-- Sidebar navigation -->
+    <nav class="sidebar">
+      <button class="nav-item active" data-view="mappings">
+        <span class="nav-icon">⇄</span> Mappings
+      </button>
+      <button class="nav-item" data-view="settings">
+        <span class="nav-icon">⚙</span> Settings
+      </button>
+
+      <div class="sidebar-footer">
+        <button class="proxy-toggle-btn" id="proxyToggleBtn">Start Proxy</button>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="content">
+
+      <!-- ── Mappings view ── -->
+      <div class="view active" id="view-mappings">
+        <div class="view-header">
+          <div>
+            <div class="view-title">Domain Mappings</div>
+            <div class="view-subtitle">Route .local domains to local ports</div>
+          </div>
+          <button class="btn btn-primary" id="addMappingBtn">+ Add Mapping</button>
+        </div>
+
+        <div class="table-wrap" id="mappingsTableWrap">
+          <table id="mappingsTable">
+            <thead>
+              <tr>
+                <th>Domain</th>
+                <th>Target Port</th>
+                <th>Protocol</th>
+                <th>Label</th>
+                <th>Enabled</th>
+                <th style="text-align:right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="mappingsTbody"></tbody>
+          </table>
+          <div class="empty-state hidden" id="emptyState">
+            <div class="empty-state-icon">⇄</div>
+            <div class="empty-state-text">No mappings yet</div>
+            <div class="empty-state-hint">Click "Add Mapping" to route a .local domain to a port.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Settings view ── -->
+      <div class="view" id="view-settings">
+        <div class="view-header">
+          <div>
+            <div class="view-title">Settings</div>
+            <div class="view-subtitle">Configure proxy behaviour and SSL certificates</div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Proxy</div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">Enable HTTPS (SSL termination)</div>
+              <div class="setting-desc">Intercept HTTPS traffic with a local CA cert. Requires browser trust step below.</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="httpsEnabledToggle">
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">Start proxy on launch</div>
+              <div class="setting-desc">Automatically start the proxy when Saeng opens.</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="startOnLaunchToggle">
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">SSL Certificate Authority</div>
+
+          <p style="font-size:13px; color:var(--text-secondary); margin-bottom:12px; line-height:1.6">
+            To serve HTTPS on <code>.local</code> domains, Saeng generates a local CA certificate.
+            You must install and trust it in your system keychain once.
+          </p>
+
+          <div class="ca-info-box" id="caPathBox">Generating CA certificate…</div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px">
+            <button class="btn btn-ghost" id="revealCaBtn">Show in Finder / Explorer</button>
+            <button class="btn btn-primary" id="trustCaBtn">Install &amp; Trust CA Certificate</button>
+          </div>
+
+          <p style="font-size:11px; color:var(--text-muted); margin-top:10px">
+            On macOS: installs into System Keychain (requires your password).<br>
+            On Windows: runs certutil with UAC elevation.
+          </p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── Add mapping modal ── -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Add Domain Mapping</div>
+
+    <form id="addForm" novalidate>
+
+      <div class="form-group">
+        <label class="form-label">Domain <span style="color:var(--text-muted)">(required)</span></label>
+        <div class="domain-row">
+          <input class="form-input" id="subdomainInput"
+            placeholder="api" autocomplete="off" spellcheck="false"
+            style="flex:1; min-width:0"
+          >
+          <span class="domain-sep">.</span>
+          <input class="form-input" id="domainInput"
+            placeholder="myapp" autocomplete="off" spellcheck="false"
+            required style="flex:1.5; min-width:0"
+          >
+          <span class="domain-suffix">.local</span>
+        </div>
+        <div class="form-hint">Subdomain is optional. Only <strong>.local</strong> TLD is supported.</div>
+        <div class="form-error" id="domainError">Please enter a valid domain name.</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Target Port <span style="color:var(--text-muted)">(required)</span></label>
+        <input class="form-input" id="portInput"
+          type="number" min="1" max="65535"
+          placeholder="3000" required
+        >
+        <div class="form-hint">The localhost port your service listens on.</div>
+        <div class="form-error" id="portError">Please enter a port between 1 and 65535.</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Label <span style="color:var(--text-muted)">(optional)</span></label>
+        <input class="form-input" id="labelInput"
+          placeholder="My API server" maxlength="60"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-row">
+          <input type="checkbox" id="httpsInput">
+          <span>Enable HTTPS for this domain</span>
+        </label>
+        <div class="form-hint" style="margin-top:6px">
+          Requires HTTPS enabled in Settings and CA certificate trusted.
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="cancelAddBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="formSubmitBtn">Add Mapping</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script src="renderer.js"></script>
+</body>
+</html>
