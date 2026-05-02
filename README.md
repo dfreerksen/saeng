@@ -1,0 +1,67 @@
+# Saeng
+
+Local domain proxy manager for `.local` development domains.
+
+Saeng routes `.local` domains to localhost ports using a PAC (Proxy Auto-Config) file — no `/etc/hosts` edits, no elevated port binding, no `sudo`. Add a mapping, start the proxy, and `http://myapp.local` goes straight to your local server.
+
+## Features
+
+- Map any `.local` domain (or subdomain) to a local port
+- Enable/disable individual mappings without removing them
+- HTTPS support via a local CA certificate (with MITM SSL termination)
+- WebSocket pass-through
+- Start proxy automatically on launch
+- System tray integration on macOS and Windows
+
+## Requirements
+
+- Node.js >= 24.11.1
+- npm >= 11.6.4
+
+## Development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run in development:
+
+```bash
+npm start
+```
+
+Build for distribution:
+
+```bash
+npm run build
+```
+
+Build without creating an installer:
+
+```bash
+npm run pack
+```
+
+## How it works
+
+1. Saeng starts a local PAC file server on port `8181` and configures the OS system proxy to point to it.
+2. When a browser navigates to a `.local` domain, the PAC file tells it to route through Saeng's HTTP proxy.
+3. The proxy looks up the domain in your mappings and forwards the request to `localhost:<port>`.
+4. On quit, the system proxy setting is restored.
+
+HTTPS works by intercepting `CONNECT` tunnel requests and terminating TLS using a locally generated CA certificate. You install that CA cert into your OS trust store once; Saeng handles per-domain leaf certificates automatically.
+
+## HTTPS setup
+
+1. Open **Settings** and enable **Enable HTTPS (SSL termination)**.
+2. Click **Install & Trust CA Certificate** and follow the system prompt.
+3. Restart the proxy.
+4. Enable the **HTTPS** toggle on any mapping whose backend speaks HTTPS.
+
+> The HTTPS toggle on a mapping controls whether Saeng connects to the *backend* using HTTPS — not whether the `.local` domain is served over HTTPS. Global HTTPS must be enabled in Settings for the browser-to-proxy leg to use TLS.
+
+## License
+
+MIT © [David Freerksen](https://github.com/dfreerksen)

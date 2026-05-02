@@ -3,4 +3,5 @@ out/
 .DS_Store
 Thumbs.db
 *.log
+dist/*
 !dist/.keep

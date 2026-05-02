@@ -6,6 +6,14 @@ let tray = null;
 let store = null;
 let proxyManager = null;
 
+app.setAboutPanelOptions({
+  applicationName: 'Saeng',
+  applicationVersion: require('./package.json').version,
+  copyright: `© ${new Date().getFullYear()} ${require('./package.json').author.name}`,
+  credits: require('./package.json').description,
+  iconPath: path.join(__dirname, 'resources/icons/icon.png')
+});
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 940,
@@ -197,6 +205,7 @@ app.whenReady().then(async () => {
   if (store.getSettings().startOnLaunch) {
     proxyManager.start(store.getMappings(), store.getSettings()).then(() => {
       updateTrayMenu(true);
+      mainWindow?.webContents.send('proxy:status', { running: true });
     }).catch(() => {});
   }
 });

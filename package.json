@@ -1,8 +1,31 @@
 {
   "name": "saeng",
   "version": "1.0.0",
+  "author": {
+    "name": "David Freerksen",
+    "email": "dfreerksen@gmail.com",
+    "url": "https://github.com/dfreerksen"
+  },
   "description": "Local domain proxy manager for .local development domains",
+  "keywords": [
+    "mac",
+    "windows",
+    "electron",
+    "local",
+    "proxy",
+    "manager",
+    "development",
+    "domains"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dfreerksen"
+  },
   "main": "main.js",
+  "engines": {
+    "node": ">=24.11.1",
+    "npm": ">=11.6.4"
+  },
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
