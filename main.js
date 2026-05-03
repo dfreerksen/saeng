@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, shell, Tray, Menu, nativeImage } = require('electron');
 const path = require('path');
+const i18n = require('./src/i18n/i18n');
 
 let mainWindow = null;
 let tray = null;
@@ -62,10 +63,10 @@ function createTray() {
 
 function updateTrayMenu(running) {
   if (!tray) return;
-  tray.setToolTip(`Saeng — Proxy ${running ? 'running' : 'stopped'}`);
+  tray.setToolTip(i18n.t(running ? 'tray.tooltip.running' : 'tray.tooltip.stopped'));
   const menu = Menu.buildFromTemplate([
     {
-      label: 'Open Saeng',
+      label: i18n.t('tray.open'),
       click() {
         if (!mainWindow) createWindow();
         else mainWindow.show();
@@ -73,7 +74,7 @@ function updateTrayMenu(running) {
     },
     { type: 'separator' },
     {
-      label: running ? 'Stop Proxy' : 'Start Proxy',
+      label: i18n.t(running ? 'tray.stopProxy' : 'tray.startProxy'),
       async click() {
         if (running) {
           await proxyManager.stop();
@@ -90,7 +91,7 @@ function updateTrayMenu(running) {
     },
     { type: 'separator' },
     {
-      label: 'Quit Saeng',
+      label: i18n.t('tray.quit'),
       click() {
         app.quit();
       },
@@ -180,12 +181,16 @@ function setupIPC() {
     const { CertManager } = require('./src/proxy/certManager');
     return trustCA(CertManager.getInstance(store.getCertDir()).getCAPath());
   });
+
+  ipcMain.handle('i18n:get-strings', () => i18n.getStrings());
 }
 
 app.whenReady().then(async () => {
   const AppStore = require('./src/store');
   const { ProxyManager } = require('./src/proxy/manager');
   const { clearSystemProxy } = require('./src/systemProxy');
+
+  i18n.load(app.getLocale());
 
   store = new AppStore();
   proxyManager = new ProxyManager(store);

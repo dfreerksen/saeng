@@ -1,5 +1,31 @@
 /* global electronAPI */
 
+// ── i18n ───────────────────────────────────────────────────────────
+
+let strings = {};
+
+function t(key, vars) {
+  let str = strings[key] ?? key;
+  if (vars) {
+    for (const [k, v] of Object.entries(vars)) {
+      str = str.replaceAll(`{${k}}`, String(v));
+    }
+  }
+  return str;
+}
+
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach((el) => {
+    el.innerHTML = t(el.dataset.i18nHtml);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+    el.placeholder = t(el.dataset.i18nPlaceholder);
+  });
+}
+
 // ── Toast ──────────────────────────────────────────────────────────
 
 function showToast(message, type = 'info', duration = 3500) {
@@ -38,8 +64,8 @@ let proxyRunning = false;
 function setProxyStatus(running) {
   proxyRunning = running;
   statusDot.className = `status-dot ${running ? 'running' : 'stopped'}`;
-  statusText.textContent = running ? 'Proxy running' : 'Proxy stopped';
-  proxyToggleBtn.textContent = running ? 'Stop Proxy' : 'Start Proxy';
+  statusText.textContent = running ? t('proxy.status.running') : t('proxy.status.stopped');
+  proxyToggleBtn.textContent = running ? t('proxy.stop') : t('proxy.start');
   proxyToggleBtn.className = `proxy-toggle-btn${running ? ' running' : ''}`;
 }
 
@@ -49,17 +75,17 @@ proxyToggleBtn.addEventListener('click', async () => {
     const result = await electronAPI.proxy.stop();
     if (result.success) {
       setProxyStatus(false);
-      showToast('Proxy stopped.', 'info');
+      showToast(t('toast.proxyStopped'), 'info');
     } else {
-      showToast(`Failed to stop: ${result.error}`, 'error');
+      showToast(t('toast.proxyStopFailed', { error: result.error }), 'error');
     }
   } else {
     const result = await electronAPI.proxy.start();
     if (result.success) {
       setProxyStatus(true);
-      showToast('Proxy started. System proxy configured.', 'success');
+      showToast(t('toast.proxyStarted'), 'success');
     } else {
-      showToast(`Failed to start: ${result.error}`, 'error');
+      showToast(t('toast.proxyStartFailed', { error: result.error }), 'error');
     }
   }
   proxyToggleBtn.disabled = false;
@@ -112,8 +138,8 @@ function renderMappings() {
       </td>
       <td>
         <div class="actions-cell">
-          <button class="icon-btn edit" data-id="${m.id}" title="Edit">✎</button>
-          <button class="icon-btn delete" data-id="${m.id}" title="Remove">✕</button>
+          <button class="icon-btn edit" data-id="${m.id}" title="${escapeHtml(t('table.editTitle'))}">✎</button>
+          <button class="icon-btn delete" data-id="${m.id}" title="${escapeHtml(t('table.deleteTitle'))}">✕</button>
         </div>
       </td>
     `;
@@ -134,7 +160,7 @@ function renderMappings() {
       const id = e.currentTarget.dataset.id;
       const mapping = mappings.find((x) => x.id === id);
       if (!mapping) return;
-      if (!confirm(`Remove ${mapping.domain}?`)) return;
+      if (!confirm(t('confirm.removeMapping', { domain: mapping.domain }))) return;
       mappings = await electronAPI.mappings.remove(id);
       renderMappings();
     });
@@ -169,8 +195,8 @@ function openAddModal() {
   editingId = null;
   addForm.reset();
   clearFormErrors();
-  document.getElementById('modalTitle').textContent = 'Add Domain Mapping';
-  document.getElementById('formSubmitBtn').textContent = 'Add Mapping';
+  document.getElementById('modalTitle').textContent = t('modal.addTitle');
+  document.getElementById('formSubmitBtn').textContent = t('modal.addSubmit');
   addModal.classList.add('open');
   document.getElementById('domainInput').focus();
 }
@@ -185,8 +211,8 @@ function openEditModal(mapping) {
   document.getElementById('portInput').value = mapping.port;
   document.getElementById('httpsInput').checked = !!mapping.https;
   document.getElementById('labelInput').value = mapping.label || '';
-  document.getElementById('modalTitle').textContent = 'Edit Mapping';
-  document.getElementById('formSubmitBtn').textContent = 'Save Changes';
+  document.getElementById('modalTitle').textContent = t('modal.editTitle');
+  document.getElementById('formSubmitBtn').textContent = t('modal.editSubmit');
   addModal.classList.add('open');
   document.getElementById('domainInput').focus();
 }
@@ -222,13 +248,13 @@ addForm.addEventListener('submit', async (e) => {
   let valid = true;
 
   if (!domain || !validateDomainPart(domain)) {
-    document.getElementById('domainError').textContent = 'Enter a valid domain name (letters, numbers, hyphens).';
+    document.getElementById('domainError').textContent = t('form.domainErrorInvalid');
     document.getElementById('domainError').classList.add('visible');
     valid = false;
   }
 
   if (subdomain && !validateDomainPart(subdomain)) {
-    document.getElementById('domainError').textContent = 'Subdomain must contain only letters, numbers, and hyphens.';
+    document.getElementById('domainError').textContent = t('form.subdomainError');
     document.getElementById('domainError').classList.add('visible');
     valid = false;
   }
@@ -244,7 +270,7 @@ addForm.addEventListener('submit', async (e) => {
 
   // Check for duplicates (exclude the mapping being edited)
   if (mappings.some((m) => m.domain === fullDomain && m.id !== editingId)) {
-    document.getElementById('domainError').textContent = `${fullDomain} is already mapped.`;
+    document.getElementById('domainError').textContent = t('form.domainErrorDuplicate', { domain: fullDomain });
     document.getElementById('domainError').classList.add('visible');
     return;
   }
@@ -253,12 +279,12 @@ addForm.addEventListener('submit', async (e) => {
     mappings = await electronAPI.mappings.update(editingId, { domain: fullDomain, port, https, label });
     renderMappings();
     addModal.classList.remove('open');
-    showToast(`Updated ${fullDomain} → :${port}`, 'success');
+    showToast(t('toast.mappingUpdated', { domain: fullDomain, port }), 'success');
   } else {
     mappings = await electronAPI.mappings.add({ domain: fullDomain, port, https, label });
     renderMappings();
     addModal.classList.remove('open');
-    showToast(`Added ${fullDomain} → :${port}`, 'success');
+    showToast(t('toast.mappingAdded', { domain: fullDomain, port }), 'success');
   }
 });
 
@@ -274,9 +300,7 @@ async function loadSettings() {
 document.getElementById('httpsEnabledToggle').addEventListener('change', async (e) => {
   await electronAPI.settings.set({ httpsEnabled: e.target.checked });
   showToast(
-    e.target.checked
-      ? 'HTTPS enabled. Restart the proxy for changes to take effect.'
-      : 'HTTPS disabled.',
+    e.target.checked ? t('toast.httpsEnabled') : t('toast.httpsDisabled'),
     'info'
   );
 });
@@ -291,15 +315,15 @@ document.getElementById('revealCaBtn').addEventListener('click', async () => {
 
 document.getElementById('trustCaBtn').addEventListener('click', async () => {
   document.getElementById('trustCaBtn').disabled = true;
-  document.getElementById('trustCaBtn').textContent = 'Installing…';
+  document.getElementById('trustCaBtn').textContent = t('settings.caInstalling');
 
   const result = await electronAPI.ssl.trustCA();
 
   document.getElementById('trustCaBtn').disabled = false;
-  document.getElementById('trustCaBtn').textContent = 'Install & Trust CA Certificate';
+  document.getElementById('trustCaBtn').textContent = t('settings.trustCa');
 
   if (result.success) {
-    showToast('CA certificate trusted successfully.', 'success', 5000);
+    showToast(t('toast.caTrusted'), 'success', 5000);
   } else {
     showToast(result.message, 'error', 6000);
   }
@@ -308,18 +332,17 @@ document.getElementById('trustCaBtn').addEventListener('click', async () => {
 // ── Init ───────────────────────────────────────────────────────────
 
 async function init() {
-  // Load proxy status
+  strings = await electronAPI.i18n.getStrings();
+  applyTranslations();
+
   const status = await electronAPI.proxy.status();
   setProxyStatus(status.running);
 
-  // Load mappings
   mappings = await electronAPI.mappings.list();
   renderMappings();
 
-  // Load settings
   await loadSettings();
 
-  // Load CA path
   const caPath = await electronAPI.ssl.getCAPath();
   document.getElementById('caPathBox').textContent = caPath;
 }
