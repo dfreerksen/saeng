@@ -348,3 +348,6 @@ async function init() {
 }
 
 init();
+
+(() => {
+})();

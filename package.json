@@ -27,9 +27,13 @@
     "npm": ">=11.6.4"
   },
   "scripts": {
-    "start": "electron .",
-    "build": "electron-builder",
-    "pack": "electron-builder --dir"
+    "start": "npm run sass:build && npm run js:build && electron .",
+    "build": "npm run sass:build && npm run js:build && electron-builder",
+    "pack": "npm run sass:build && npm run js:build && electron-builder --dir",
+    "sass:build": "sass src/renderer/scss:src/renderer --no-source-map",
+    "sass:watch": "sass --watch src/renderer/scss:src/renderer --no-source-map",
+    "js:build": "esbuild src/renderer/js/renderer.js --bundle --outfile=src/renderer/renderer.js",
+    "js:watch": "esbuild src/renderer/js/renderer.js --bundle --outfile=src/renderer/renderer.js --watch"
   },
   "dependencies": {
     "electron-store": "^8.2.0",
@@ -37,7 +41,9 @@
   },
   "devDependencies": {
     "electron": "^33.0.0",
-    "electron-builder": "^24.13.3"
+    "electron-builder": "^24.13.3",
+    "esbuild": "^0.28.0",
+    "sass": "^1.99.0"
   },
   "build": {
     "appId": "com.saeng.app",
