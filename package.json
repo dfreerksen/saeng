@@ -10,6 +10,7 @@
   "keywords": [
     "mac",
     "windows",
+    "linux",
     "electron",
     "local",
     "proxy",
@@ -31,9 +32,7 @@
     "build": "npm run sass:build && npm run js:build && electron-builder",
     "pack": "npm run sass:build && npm run js:build && electron-builder --dir",
     "sass:build": "sass src/renderer/scss:src/renderer --no-source-map",
-    "sass:watch": "sass --watch src/renderer/scss:src/renderer --no-source-map",
-    "js:build": "esbuild src/renderer/js/renderer.js --bundle --outfile=src/renderer/renderer.js",
-    "js:watch": "esbuild src/renderer/js/renderer.js --bundle --outfile=src/renderer/renderer.js --watch"
+    "js:build": "esbuild src/renderer/js/scripts.js --bundle --outfile=src/renderer/scripts.js"
   },
   "dependencies": {
     "electron-store": "^8.2.0",
@@ -63,9 +62,16 @@
       ]
     },
     "win": {
-      "icon": "assets/icons/icon.ico",
+      "icon": "assets/icons/win/icon.png",
       "target": [
         "nsis"
+      ]
+    },
+    "linux": {
+      "icon": "assets/icons",
+      "target": [
+        "AppImage",
+        "deb"
       ]
     }
   }

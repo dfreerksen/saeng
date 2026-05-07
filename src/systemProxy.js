@@ -17,6 +17,16 @@ async function getMacNetworkServices() {
   }
 }
 
+async function getMacAutoproxyUrl(service) {
+  try {
+    const { stdout } = await execAsync('/usr/sbin/networksetup', ['-getautoproxyurl', service]);
+    const match = stdout.match(/^URL:\s*(.+)$/m);
+    return match ? match[1].trim() : null;
+  } catch (_) {
+    return null;
+  }
+}
+
 async function setSystemProxy(pacUrl) {
   if (process.platform === 'darwin') {
     const services = await getMacNetworkServices();
@@ -41,9 +51,13 @@ async function setSystemProxy(pacUrl) {
   }
 }
 
-async function clearSystemProxy() {
+async function clearSystemProxy({ onlyIfUrl } = {}) {
   if (process.platform === 'darwin') {
-    const services = await getMacNetworkServices();
+    let services = await getMacNetworkServices();
+    if (onlyIfUrl) {
+      const urls = await Promise.all(services.map((s) => getMacAutoproxyUrl(s)));
+      services = services.filter((_, i) => urls[i] === onlyIfUrl);
+    }
     await Promise.allSettled(
       services.map((service) =>
         execAsync('/usr/sbin/networksetup', ['-setautoproxystate', service, 'off'])

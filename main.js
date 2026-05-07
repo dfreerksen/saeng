@@ -1,6 +1,13 @@
-const { app, BrowserWindow, ipcMain, shell, Tray, Menu, nativeImage } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, Tray, Menu, nativeImage, protocol, net } = require('electron');
 const path = require('path');
+const { randomBytes } = require('crypto');
+const { pathToFileURL } = require('url');
+const fs = require('fs');
 const i18n = require('./src/i18n/i18n');
+
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true } },
+]);
 
 let mainWindow = null;
 let tray = null;
@@ -32,7 +39,7 @@ function createWindow() {
     backgroundColor: '#0f1117',
   });
 
-  mainWindow.loadFile(path.join(__dirname, 'src/renderer/index.html'));
+  mainWindow.loadURL('app://saeng/index.html');
 
   mainWindow.once('ready-to-show', () => mainWindow.show());
 
@@ -195,12 +202,26 @@ app.whenReady().then(async () => {
   store = new AppStore();
   proxyManager = new ProxyManager(store);
 
-  // Clear any leftover proxy config from a previous run (crash / force-quit)
-  await clearSystemProxy().catch(() => {});
+  // Clear any leftover proxy config from a previous run (crash / force-quit).
+  // Only touch services already pointing at our PAC URL so VPN-managed proxy
+  // settings on other interfaces are left intact.
+  await clearSystemProxy({ onlyIfUrl: 'http://127.0.0.1:8181/proxy.pac' }).catch(() => {});
 
   // Pre-warm the CA cert so the first HTTPS connection is fast
   const { CertManager } = require('./src/proxy/certManager');
   CertManager.getInstance(store.getCertDir());
+
+  const nonce = randomBytes(16).toString('base64');
+  protocol.handle('app', (request) => {
+    const url = new URL(request.url);
+    const filePath = path.join(__dirname, 'src/renderer', url.pathname.slice(1));
+    if (url.pathname === '/index.html') {
+      const html = fs.readFileSync(path.join(__dirname, 'src/renderer/index.html'), 'utf8')
+        .replaceAll('__NONCE__', nonce);
+      return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+    }
+    return net.fetch(pathToFileURL(filePath).href);
+  });
 
   setupIPC();
   createWindow();

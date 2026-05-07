@@ -1,42 +1,5 @@
-/* global electronAPI */
-
-// ── i18n ───────────────────────────────────────────────────────────
-
-let strings = {};
-
-function t(key, vars) {
-  let str = strings[key] ?? key;
-  if (vars) {
-    for (const [k, v] of Object.entries(vars)) {
-      str = str.replaceAll(`{${k}}`, String(v));
-    }
-  }
-  return str;
-}
-
-function applyTranslations() {
-  document.querySelectorAll('[data-i18n]').forEach((el) => {
-    el.textContent = t(el.dataset.i18n);
-  });
-  document.querySelectorAll('[data-i18n-html]').forEach((el) => {
-    el.innerHTML = t(el.dataset.i18nHtml);
-  });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
-    el.placeholder = t(el.dataset.i18nPlaceholder);
-  });
-}
-
-// ── Toast ──────────────────────────────────────────────────────────
-
-function showToast(message, type = 'info', duration = 3500) {
-  const icons = { success: '✓', error: '✕', info: 'ℹ' };
-  const container = document.getElementById('toast-container');
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.innerHTML = `<span class="toast-icon">${icons[type]}</span><span>${message}</span>`;
-  container.appendChild(el);
-  setTimeout(() => el.remove(), duration);
-}
+import { t, applyTranslations, initI18n } from './i18n';
+import { showToast } from './toast';
 
 // ── Navigation ─────────────────────────────────────────────────────
 
@@ -332,8 +295,7 @@ document.getElementById('trustCaBtn').addEventListener('click', async () => {
 // ── Init ───────────────────────────────────────────────────────────
 
 async function init() {
-  strings = await electronAPI.i18n.getStrings();
-  applyTranslations();
+  initI18n();
 
   const status = await electronAPI.proxy.status();
   setProxyStatus(status.running);
