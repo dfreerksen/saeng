@@ -1,29 +1,32 @@
-/* ── Content area ────────────────────────────────────── */
-
 .content {
   flex: 1;
   overflow-y: auto;
   padding: 24px 28px;
 }
 
-.view { display: none; }
-.view.active { display: block; }
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
 
 .view-header {
-  display: flex;
   align-items: center;
+  display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
 .view-title {
+  color: var(--text-primary);
   font-size: 18px;
   font-weight: 600;
-  color: var(--text-primary);
 }
 
 .view-subtitle {
-  font-size: 13px;
   color: var(--text-secondary);
+  font-size: 13px;
   margin-top: 2px;
 }

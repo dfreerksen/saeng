@@ -140,74 +140,74 @@
 
       <!-- ── Add mapping modal ── -->
       <div class="modal-overlay" id="addModal">
-            <div class="modal">
-              <div class="modal-title" id="modalTitle">Add Domain Mapping</div>
+      <div class="modal">
+        <div class="modal-title" id="modalTitle">Add Domain Mapping</div>
 
-              <form id="addForm" novalidate>
+        <form id="addForm" novalidate>
 
-                <div class="form-group">
-                  <label class="form-label">
-                    <span data-i18n="form.domain">Domain</span>
-                    <span style="color:var(--text-muted)" data-i18n="form.required">(required)</span>
-                  </label>
-                  <div class="domain-row">
-                    <input class="form-input" id="subdomainInput"
-                      placeholder="api" data-i18n-placeholder="form.subdomainPlaceholder"
-                      autocomplete="off" spellcheck="false"
-                      style="flex:1; min-width:0"
-                    >
-                    <span class="domain-sep">.</span>
-                    <input class="form-input" id="domainInput"
-                      placeholder="myapp" data-i18n-placeholder="form.domainPlaceholder"
-                      autocomplete="off" spellcheck="false"
-                      required style="flex:1.5; min-width:0"
-                    >
-                    <span class="domain-suffix">.local</span>
-                  </div>
-                  <div class="form-hint" data-i18n-html="form.domainHint">Subdomain is optional. Only <strong>.local</strong> TLD is supported.</div>
-                  <div class="form-error" id="domainError" data-i18n="form.domainError">Please enter a valid domain name.</div>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">
-                    <span data-i18n="form.port">Target Port</span>
-                    <span style="color:var(--text-muted)" data-i18n="form.required">(required)</span>
-                  </label>
-                  <input class="form-input" id="portInput"
-                    type="number" min="1" max="65535"
-                    placeholder="3000" data-i18n-placeholder="form.portPlaceholder" required
-                  >
-                  <div class="form-hint" data-i18n="form.portHint">The localhost port your service listens on.</div>
-                  <div class="form-error" id="portError" data-i18n="form.portError">Please enter a port between 1 and 65535.</div>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">
-                    <span data-i18n="form.label">Label</span>
-                    <span style="color:var(--text-muted)" data-i18n="form.optional">(optional)</span>
-                  </label>
-                  <input class="form-input" id="labelInput"
-                    placeholder="My API server" data-i18n-placeholder="form.labelPlaceholder"
-                    autocomplete="off" maxlength="60"
-                  >
-                </div>
-
-                <div class="form-group">
-                  <label class="checkbox-row">
-                    <input type="checkbox" id="httpsInput">
-                    <span data-i18n="form.httpsLabel">Enable HTTPS for this domain</span>
-                  </label>
-                  <div class="form-hint" style="margin-top:6px" data-i18n="form.httpsHint">
-                    Requires HTTPS enabled in Settings and CA certificate trusted.
-                  </div>
-                </div>
-
-                <div class="modal-actions">
-                  <button type="button" class="btn btn-ghost" id="cancelAddBtn" data-i18n="modal.cancel">Cancel</button>
-                  <button type="submit" class="btn btn-primary" id="formSubmitBtn">Add Mapping</button>
-                </div>
-              </form>
+          <div class="form-group">
+            <label class="form-label">
+              <span data-i18n="form.domain">Domain</span>
+              <span style="color:var(--text-muted)" data-i18n="form.required">(required)</span>
+            </label>
+            <div class="domain-row">
+              <input class="form-input" id="subdomainInput"
+                placeholder="api" data-i18n-placeholder="form.subdomainPlaceholder"
+                autocomplete="off" spellcheck="false"
+                style="flex:1; min-width:0"
+              >
+              <span class="domain-sep">.</span>
+              <input class="form-input" id="domainInput"
+                placeholder="myapp" data-i18n-placeholder="form.domainPlaceholder"
+                autocomplete="off" spellcheck="false"
+                required style="flex:1.5; min-width:0"
+              >
+              <span class="domain-suffix">.local</span>
             </div>
+            <div class="form-hint" data-i18n-html="form.domainHint">Subdomain is optional. Only <strong>.local</strong> TLD is supported.</div>
+            <div class="form-error" id="domainError" data-i18n="form.domainError">Please enter a valid domain name.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <span data-i18n="form.port">Target Port</span>
+              <span style="color:var(--text-muted)" data-i18n="form.required">(required)</span>
+            </label>
+            <input class="form-input" id="portInput"
+              type="number" min="1" max="65535"
+              placeholder="3000" data-i18n-placeholder="form.portPlaceholder" required
+            >
+            <div class="form-hint" data-i18n="form.portHint">The localhost port your service listens on.</div>
+            <div class="form-error" id="portError" data-i18n="form.portError">Please enter a port between 1 and 65535.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <span data-i18n="form.label">Label</span>
+              <span style="color:var(--text-muted)" data-i18n="form.optional">(optional)</span>
+            </label>
+            <input class="form-input" id="labelInput"
+              placeholder="My API server" data-i18n-placeholder="form.labelPlaceholder"
+              autocomplete="off" maxlength="60"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-row">
+              <input type="checkbox" id="httpsInput">
+              <span data-i18n="form.httpsLabel">Enable HTTPS for this domain</span>
+            </label>
+            <div class="form-hint" style="margin-top:6px" data-i18n="form.httpsHint">
+              Requires HTTPS enabled in Settings and CA certificate trusted.
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" id="cancelAddBtn" data-i18n="modal.cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="formSubmitBtn">Add Mapping</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <div id="toast"></div>

@@ -1,31 +1,28 @@
-
-/* ── Sidebar ─────────────────────────────────────────── */
-
 .sidebar {
-  width: 200px;
   background: var(--bg-surface);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  padding: 16px 8px;
   flex-shrink: 0;
+  padding: 16px 8px;
+  width: 200px;
 }
 
 .nav-item {
-  display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
+  background: none;
+  border: none;
   border-radius: var(--radius-sm);
-  cursor: pointer;
   color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
   font-size: 13px;
   font-weight: 500;
-  border: none;
-  background: none;
-  width: 100%;
+  gap: 10px;
+  padding: 9px 12px;
   text-align: left;
   transition: background 0.15s, color 0.15s;
+  width: 100%;
 }
 
 .nav-item:hover {
@@ -38,25 +35,28 @@
   color: var(--accent);
 }
 
-.nav-icon { font-size: 15px; opacity: 0.8; }
+.nav-icon {
+  font-size: 15px;
+  opacity: 0.8;
+}
 
 .sidebar-footer {
+  border-top: 1px solid var(--border);
   margin-top: auto;
   padding: 8px 4px 0;
-  border-top: 1px solid var(--border);
 }
 
 .proxy-toggle-btn {
-  width: 100%;
-  padding: 9px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--accent);
   background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
   color: var(--accent);
+  cursor: pointer;
   font-size: 13px;
   font-weight: 600;
-  cursor: pointer;
+  padding: 9px;
   transition: background 0.15s, color 0.15s;
+  width: 100%;
 }
 
 .proxy-toggle-btn:hover {
@@ -75,6 +75,6 @@
 }
 
 .proxy-toggle-btn:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  opacity: 0.5;
 }

@@ -1,9 +1,10 @@
-html, body {
-  height: 100%;
+html,
+body {
   background: var(--bg-base);
   color: var(--text-primary);
   font-family: var(--font);
   font-size: 14px;
-  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  height: 100%;
+  line-height: 1.5;
 }

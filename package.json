@@ -42,7 +42,11 @@
     "electron": "^33.0.0",
     "electron-builder": "^24.13.3",
     "esbuild": "^0.28.0",
-    "sass": "^1.99.0"
+    "sass": "^1.99.0",
+    "stylelint": "^17.11.0",
+    "stylelint-config-standard": "^40.0.0",
+    "stylelint-config-standard-scss": "^17.0.0",
+    "stylelint-order": "^8.1.1"
   },
   "build": {
     "appId": "com.saeng.app",
