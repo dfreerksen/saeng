@@ -13,6 +13,7 @@ let mainWindow = null;
 let tray = null;
 let store = null;
 let proxyManager = null;
+let isQuitting = false;
 
 app.setAboutPanelOptions({
   applicationName: 'Saeng',
@@ -44,7 +45,7 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => mainWindow.show());
 
   mainWindow.on('close', (event) => {
-    if (process.platform === 'darwin' && tray) {
+    if (process.platform === 'darwin' && !isQuitting) {
       event.preventDefault();
       mainWindow.hide();
     }
@@ -280,9 +281,11 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.on('before-quit', async () => {
+app.on('before-quit', (event) => {
+  if (isQuitting) return;
+  isQuitting = true;
+  event.preventDefault();
   tray?.destroy();
-  if (proxyManager?.isRunning()) {
-    await proxyManager.stop();
-  }
+  const cleanup = proxyManager?.isRunning() ? proxyManager.stop() : Promise.resolve();
+  cleanup.catch(() => {}).finally(() => app.quit());
 });

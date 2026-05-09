@@ -8,7 +8,7 @@ async function untrustCA(certPath) {
     try {
       await execAsync('/usr/bin/security', ['remove-trusted-cert', certPath]);
     } catch {
-      // Not trusted or already removed — not an error
+      console.error('Failed to untrust CA on macOS. This is not an error');
     }
   }
   // Windows trust removal not yet supported

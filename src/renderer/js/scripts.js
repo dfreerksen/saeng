@@ -2,6 +2,16 @@
 import { t, initI18n, loadStrings } from './i18n';
 import { showToast } from './toast';
 // import { getOS, isLinux, isMac, isWindows } from './os';
+// import * as bootstrap from 'bootstrap';
+// import * as Popper from "@popperjs/core";
+
+// ── Bootstrap ──────────────────────────────────────────────────────
+
+// const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+// const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+
+// const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+// const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
 // ── Navigation ─────────────────────────────────────────────────────
 
