@@ -3,6 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+const CA_LIFETIME_YEARS = 10;
+
 class CertManager {
   static instance = null;
 
@@ -43,7 +45,7 @@ class CertManager {
     cert.serialNumber = '01';
     cert.validity.notBefore = new Date();
     cert.validity.notAfter = new Date();
-    cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 10);
+    cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + CA_LIFETIME_YEARS);
 
     const attrs = [
       { name: 'commonName', value: 'Saeng Local Proxy CA' },
@@ -132,6 +134,37 @@ class CertManager {
     const keyPath = path.join(this.certDir, `${hostname}.key`);
     if (fs.existsSync(certPath)) fs.unlinkSync(certPath);
     if (fs.existsSync(keyPath)) fs.unlinkSync(keyPath);
+  }
+
+  deleteCA() {
+    for (const file of fs.readdirSync(this.certDir)) {
+      if (file.endsWith('.crt') || file.endsWith('.key')) {
+        fs.unlinkSync(path.join(this.certDir, file));
+      }
+    }
+    this.cache.clear();
+    this.ca = null;
+    this.caKey = null;
+  }
+
+  regenerateCA() {
+    const caPath = path.join(this.certDir, 'ca.crt');
+    const caKeyPath = path.join(this.certDir, 'ca.key');
+
+    // Delete the CA and all per-domain certs (they were signed by the old CA)
+    for (const file of fs.readdirSync(this.certDir)) {
+      if (file.endsWith('.crt') || file.endsWith('.key')) {
+        fs.unlinkSync(path.join(this.certDir, file));
+      }
+    }
+    this.cache.clear();
+
+    this._loadOrCreateCA();
+    return this.getCAExpiry();
+  }
+
+  getCAExpiry() {
+    return this.ca.validity.notAfter.toISOString();
   }
 
   getCAPath() {

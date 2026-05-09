@@ -22,6 +22,11 @@ export function applyTranslations() {
   });
 }
 
+export function loadStrings(strings) {
+  i18nStrings = strings;
+  applyTranslations();
+}
+
 export async function initI18n() {
   i18nStrings = await electronAPI.i18n.getStrings();
   applyTranslations();

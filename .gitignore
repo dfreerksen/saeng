@@ -7,3 +7,4 @@ dist/*
 !dist/.keep
 src/renderer/*.js
 src/renderer/*.css
+.claude/settings.local.json

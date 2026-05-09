@@ -2,7 +2,7 @@ const http = require('http');
 const https = require('https');
 const net = require('net');
 const tls = require('tls');
-const url = require('url');
+// const url = require('url');
 
 class HttpProxy {
   constructor(certManager) {
@@ -50,6 +50,7 @@ class HttpProxy {
             const certData = this.certManager.getCert(hostname);
             cb(null, tls.createSecureContext({ cert: certData.cert, key: certData.key }));
           } catch (err) {
+            console.error(`Failed to get cert for ${hostname}:`, err);
             cb(err);
           }
         },
@@ -110,7 +111,8 @@ class HttpProxy {
       try {
         const parsed = new URL(reqPath);
         reqPath = parsed.pathname + parsed.search;
-      } catch (_) {
+      } catch (err) {
+        console.error(`Failed to parse URL ${reqPath}:`, err);
         // fall through with original
       }
     }

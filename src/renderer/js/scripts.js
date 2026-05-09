@@ -1,5 +1,7 @@
-import { t, applyTranslations, initI18n } from './i18n';
+// import { t, applyTranslations, initI18n } from './i18n';
+import { t, initI18n, loadStrings } from './i18n';
 import { showToast } from './toast';
+// import { getOS, isLinux, isMac, isWindows } from './os';
 
 // ── Navigation ─────────────────────────────────────────────────────
 
@@ -62,9 +64,9 @@ electronAPI.proxy.onStatusChanged((data) => {
 
 let mappings = [];
 
-function buildDomainFromMapping(m) {
-  return m.domain;
-}
+// function buildDomainFromMapping(m) {
+//   return m.domain;
+// }
 
 function renderMappings() {
   const tbody = document.getElementById('mappingsTbody');
@@ -101,8 +103,12 @@ function renderMappings() {
       </td>
       <td>
         <div class="actions-cell">
-          <button class="icon-btn edit" data-id="${m.id}" title="${escapeHtml(t('table.editTitle'))}">✎</button>
-          <button class="icon-btn delete" data-id="${m.id}" title="${escapeHtml(t('table.deleteTitle'))}">✕</button>
+          <button class="icon-btn edit" data-id="${m.id}" title="${escapeHtml(t('table.editTitle'))}">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="icon-btn delete" data-id="${m.id}" title="${escapeHtml(t('table.deleteTitle'))}">
+            <i class="bi bi-trash"></i>
+          </button>
         </div>
       </td>
     `;
@@ -147,11 +153,31 @@ const addForm = document.getElementById('addForm');
 
 let editingId = null;
 
+const DOMAIN_SUFFIXES = ['.local', '.test', '.localhost', '.co.local', '.co.test'];
+const DEFAULT_SUFFIX = '.local';
+
+const suffixSelect = document.getElementById('suffixSelect');
+DOMAIN_SUFFIXES.forEach((s) => {
+  const opt = document.createElement('option');
+  opt.value = s;
+  opt.textContent = s;
+  if (s === DEFAULT_SUFFIX) opt.selected = true;
+  suffixSelect.appendChild(opt);
+});
+
 function splitDomain(fullDomain) {
-  const withoutLocal = fullDomain.replace(/\.local$/, '');
-  const dot = withoutLocal.indexOf('.');
-  if (dot === -1) return { subdomain: '', domain: withoutLocal };
-  return { subdomain: withoutLocal.slice(0, dot), domain: withoutLocal.slice(dot + 1) };
+  let base = fullDomain;
+  let suffix = DEFAULT_SUFFIX;
+  for (const s of DOMAIN_SUFFIXES) {
+    if (fullDomain.endsWith(s)) {
+      base = fullDomain.slice(0, -s.length);
+      suffix = s;
+      break;
+    }
+  }
+  const dot = base.indexOf('.');
+  if (dot === -1) return { subdomain: '', domain: base, suffix };
+  return { subdomain: base.slice(0, dot), domain: base.slice(dot + 1), suffix };
 }
 
 function openAddModal() {
@@ -168,9 +194,10 @@ function openEditModal(mapping) {
   editingId = mapping.id;
   addForm.reset();
   clearFormErrors();
-  const { subdomain, domain } = splitDomain(mapping.domain);
+  const { subdomain, domain, suffix } = splitDomain(mapping.domain);
   document.getElementById('subdomainInput').value = subdomain;
   document.getElementById('domainInput').value = domain;
+  document.getElementById('suffixSelect').value = suffix;
   document.getElementById('portInput').value = mapping.port;
   document.getElementById('httpsInput').checked = !!mapping.https;
   document.getElementById('labelInput').value = mapping.label || '';
@@ -204,6 +231,7 @@ addForm.addEventListener('submit', async (e) => {
 
   const subdomain = document.getElementById('subdomainInput').value.trim();
   const domain = document.getElementById('domainInput').value.trim();
+  const suffix = document.getElementById('suffixSelect').value;
   const port = parseInt(document.getElementById('portInput').value.trim(), 10);
   const https = document.getElementById('httpsInput').checked;
   const label = document.getElementById('labelInput').value.trim();
@@ -229,7 +257,7 @@ addForm.addEventListener('submit', async (e) => {
 
   if (!valid) return;
 
-  const fullDomain = subdomain ? `${subdomain}.${domain}.local` : `${domain}.local`;
+  const fullDomain = subdomain ? `${subdomain}.${domain}${suffix}` : `${domain}${suffix}`;
 
   // Check for duplicates (exclude the mapping being edited)
   if (mappings.some((m) => m.domain === fullDomain && m.id !== editingId)) {
@@ -254,10 +282,29 @@ addForm.addEventListener('submit', async (e) => {
 // ── Settings ───────────────────────────────────────────────────────
 
 async function loadSettings() {
-  const settings = await electronAPI.settings.get();
+  const [settings, locales] = await Promise.all([
+    electronAPI.settings.get(),
+    electronAPI.i18n.getLocales(),
+  ]);
 
   document.getElementById('httpsEnabledToggle').checked = !!settings.httpsEnabled;
   document.getElementById('startOnLaunchToggle').checked = !!settings.startOnLaunch;
+
+  const currentLocale = settings.locale || 'en';
+  const currentDir = locales.find((l) => l.code === currentLocale)?.dir ?? 'ltr';
+  document.documentElement.lang = currentLocale;
+  document.documentElement.dir = currentDir;
+
+  const localeSelect = document.getElementById('localeSelect');
+  localeSelect.innerHTML = '';
+  for (const { code, name, dir } of locales) {
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = name;
+    opt.dataset.dir = dir;
+    localeSelect.appendChild(opt);
+  }
+  localeSelect.value = currentLocale;
 }
 
 document.getElementById('httpsEnabledToggle').addEventListener('change', async (e) => {
@@ -272,8 +319,54 @@ document.getElementById('startOnLaunchToggle').addEventListener('change', async 
   await electronAPI.settings.set({ startOnLaunch: e.target.checked });
 });
 
+document.getElementById('localeSelect').addEventListener('change', async (e) => {
+  const locale = e.target.value;
+  const dir = e.target.selectedOptions[0]?.dataset.dir ?? 'ltr';
+  const strings = await electronAPI.i18n.setLocale(locale);
+  document.documentElement.lang = locale;
+  document.documentElement.dir = dir;
+  loadStrings(strings);
+  setProxyStatus(proxyRunning);
+});
+
+function setExpiryDisplay(isoString) {
+  const el = document.getElementById('caExpiryBox');
+  const expiry = new Date(isoString);
+  const now = Date.now();
+  const msLeft = expiry - now;
+  const oneWeek = 7 * 24 * 60 * 60 * 1000;
+  const threeMonths = 90 * 24 * 60 * 60 * 1000;
+
+  const label = msLeft <= 0 ? 'Expired' : 'Expires';
+  el.textContent = `${label} ${expiry.toLocaleString()}`;
+  el.classList.remove('ca-expiry--warning', 'ca-expiry--danger');
+  if (msLeft <= oneWeek) {
+    el.classList.add('ca-expiry--danger');
+  } else if (msLeft <= threeMonths) {
+    el.classList.add('ca-expiry--warning');
+  }
+}
+
 document.getElementById('revealCaBtn').addEventListener('click', async () => {
   await electronAPI.ssl.revealCA();
+});
+
+document.getElementById('deleteCaBtn').addEventListener('click', async () => {
+  if (!confirm(t('settings.deleteCaConfirm'))) return;
+  document.getElementById('deleteCaBtn').disabled = true;
+  await electronAPI.ssl.deleteCA();
+  document.getElementById('caExpiryBox').textContent = '';
+  document.getElementById('deleteCaBtn').disabled = false;
+  showToast(t('toast.caDeleted'), 'info', 5000);
+});
+
+document.getElementById('regenerateCaBtn').addEventListener('click', async () => {
+  if (!confirm(t('settings.regenerateCaConfirm'))) return;
+  document.getElementById('regenerateCaBtn').disabled = true;
+  const newExpiry = await electronAPI.ssl.regenerateCA();
+  setExpiryDisplay(newExpiry);
+  document.getElementById('regenerateCaBtn').disabled = false;
+  showToast(t('toast.caRegenerated'), 'success', 5000);
 });
 
 document.getElementById('trustCaBtn').addEventListener('click', async () => {
@@ -295,7 +388,7 @@ document.getElementById('trustCaBtn').addEventListener('click', async () => {
 // ── Init ───────────────────────────────────────────────────────────
 
 async function init() {
-  initI18n();
+  await initI18n();
 
   const status = await electronAPI.proxy.status();
   setProxyStatus(status.running);
@@ -307,6 +400,9 @@ async function init() {
 
   const caPath = await electronAPI.ssl.getCAPath();
   document.getElementById('caPathBox').textContent = caPath;
+
+  const caExpiry = await electronAPI.ssl.getCAExpiry();
+  setExpiryDisplay(caExpiry);
 }
 
 init();

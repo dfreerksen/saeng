@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,10 +28,10 @@
         <!-- Sidebar navigation -->
         <nav class="sidebar">
           <button class="nav-item active" data-view="mappings">
-            <span class="nav-icon">⇄</span> <span data-i18n="nav.mappings">Mappings</span>
+            <i class="bi bi-arrow-left-right"></i> <span data-i18n="nav.mappings">Mappings</span>
           </button>
           <button class="nav-item" data-view="settings">
-            <span class="nav-icon">⚙</span> <span data-i18n="nav.settings">Settings</span>
+            <i class="bi bi-gear-wide-connected"></i> <span data-i18n="nav.settings">Settings</span>
           </button>
 
           <div class="sidebar-footer">
@@ -47,9 +47,12 @@
             <div class="view-header">
               <div>
                 <div class="view-title" data-i18n="mappings.title">Domain Mappings</div>
-                <div class="view-subtitle" data-i18n="mappings.subtitle">Route .local domains to local ports</div>
+                <div class="view-subtitle" data-i18n="mappings.subtitle">Route local domains to local ports</div>
               </div>
-              <button class="btn btn-primary" id="addMappingBtn" data-i18n="mappings.add">+ Add Mapping</button>
+              <button class="btn btn-primary" id="addMappingBtn">
+                <i class="bi bi-plus"></i>
+                <span data-i18n="mappings.add">Add Mapping</span>
+              </button>
             </div>
 
             <div class="table-wrap" id="mappingsTableWrap">
@@ -67,9 +70,9 @@
                 <tbody id="mappingsTbody"></tbody>
               </table>
               <div class="empty-state hidden" id="emptyState">
-                <div class="empty-state-icon">⇄</div>
+                <i class="bi bi-arrow-left-right" style="font-size: 2rem;"></i>
                 <div class="empty-state-text" data-i18n="mappings.empty">No mappings yet</div>
-                <div class="empty-state-hint" data-i18n="mappings.emptyHint">Click "Add Mapping" to route a .local domain to a port.</div>
+                <div class="empty-state-hint" data-i18n="mappings.emptyHint">Click "Add Mapping" to route a domain to a local port.</div>
               </div>
             </div>
           </div>
@@ -80,6 +83,17 @@
               <div>
                 <div class="view-title" data-i18n="settings.title">Settings</div>
                 <div class="view-subtitle" data-i18n="settings.subtitle">Configure proxy behaviour and SSL certificates</div>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <div class="settings-section-title" data-i18n="settings.language">Language</div>
+
+              <div class="setting-row">
+                <div class="setting-info">
+                  <div class="setting-desc" data-i18n="settings.languageDesc">Display language for the Saeng interface.</div>
+                </div>
+                <select id="localeSelect" class="locale-select"></select>
               </div>
             </div>
 
@@ -114,15 +128,30 @@
 
               <p style="font-size:13px; color:var(--text-secondary); margin-bottom:12px; line-height:1.6"
                 data-i18n-html="settings.caDesc">
-                To serve HTTPS on <code>.local</code> domains, Saeng generates a local CA certificate.
+                To serve HTTPS on local domains, Saeng generates a local CA certificate.
                 You must install and trust it in your system keychain once.
               </p>
 
               <div class="ca-info-box" id="caPathBox" data-i18n="settings.caGenerating">Generating CA certificate…</div>
+              <div class="ca-expiry" id="caExpiryBox"></div>
 
               <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px">
-                <button class="btn btn-ghost" id="revealCaBtn" data-i18n="settings.revealCa">Show in Finder / Explorer</button>
-                <button class="btn btn-primary" id="trustCaBtn" data-i18n="settings.trustCa">Install &amp; Trust CA Certificate</button>
+                <button class="btn btn-ghost" id="revealCaBtn">
+                  <i class="bi bi-folder2-open"></i>
+                  <span data-i18n="settings.revealCa">Show in Finder / Explorer</span>
+                </button>
+                <button class="btn btn-primary" id="trustCaBtn">
+                  <i class="bi bi-shield-check"></i>
+                  <span data-i18n="settings.trustCa">Install &amp; Trust CA Certificate</span>
+                </button>
+                <button class="btn btn-danger" id="regenerateCaBtn">
+                  <i class="bi bi-arrow-repeat"></i>
+                  <span data-i18n="settings.regenerateCa">Regenerate CA Certificate</span>
+                </button>
+                <button class="btn btn-danger" id="deleteCaBtn">
+                  <i class="bi bi-trash"></i>
+                  <span data-i18n="settings.deleteCa">Delete CA Certificate</span>
+                </button>
               </div>
 
               <p style="font-size:11px; color:var(--text-muted); margin-top:10px"
@@ -162,9 +191,10 @@
                 autocomplete="off" spellcheck="false"
                 required style="flex:1.5; min-width:0"
               >
-              <span class="domain-suffix">.local</span>
+              <select id="suffixSelect" class="domain-suffix-select" autocomplete="off"></select>
             </div>
-            <div class="form-hint" data-i18n-html="form.domainHint">Subdomain is optional. Only <strong>.local</strong> TLD is supported.</div>
+            <div class="form-hint" data-i18n="form.domainHint">Subdomain is optional.</div>
+
             <div class="form-error" id="domainError" data-i18n="form.domainError">Please enter a valid domain name.</div>
           </div>
 
@@ -174,8 +204,8 @@
               <span style="color:var(--text-muted)" data-i18n="form.required">(required)</span>
             </label>
             <input class="form-input" id="portInput"
-              type="number" min="1" max="65535"
-              placeholder="3000" data-i18n-placeholder="form.portPlaceholder" required
+              type="number" min="1" max="65535" value="3000"
+              required
             >
             <div class="form-hint" data-i18n="form.portHint">The localhost port your service listens on.</div>
             <div class="form-error" id="portError" data-i18n="form.portError">Please enter a port between 1 and 65535.</div>

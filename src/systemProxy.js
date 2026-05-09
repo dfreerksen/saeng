@@ -3,16 +3,28 @@ const util = require('util');
 
 const execAsync = util.promisify(execFile);
 
-// Returns a list of network service names on macOS (e.g. ["Wi-Fi", "Ethernet"])
+// VPN tunnel devices — modifying their proxy settings disrupts the VPN connection
+const VPN_DEVICE_RE = /^(utun|ppp|ipsec)/i;
+
+// Returns enabled non-VPN network service names on macOS (e.g. ["Wi-Fi", "Ethernet"])
 async function getMacNetworkServices() {
   try {
-    const { stdout } = await execAsync('/usr/sbin/networksetup', ['-listallnetworkservices']);
-    return stdout
-      .split('\n')
-      .slice(1) // skip the header line
-      .map((l) => l.trim())
-      .filter((l) => l && !l.startsWith('*'));
-  } catch (_) {
+    const { stdout } = await execAsync('/usr/sbin/networksetup', ['-listnetworkserviceorder']);
+    const services = [];
+    const lines = stdout.split('\n');
+    for (let i = 0; i < lines.length - 1; i++) {
+      const nameMatch = lines[i].match(/^\((\d+)\)\s+(.+)$/); // no leading * = enabled
+      if (!nameMatch) continue;
+      const name = nameMatch[2].trim();
+      const deviceMatch = (lines[i + 1] || '').match(/Device:\s*(\S+)\)/);
+      const device = deviceMatch ? deviceMatch[1] : null;
+      if (!device || !VPN_DEVICE_RE.test(device)) {
+        services.push(name);
+      }
+    }
+    return services;
+  } catch (err) {
+    console.error('Failed to get macOS network services:', err);
     return [];
   }
 }
@@ -22,7 +34,8 @@ async function getMacAutoproxyUrl(service) {
     const { stdout } = await execAsync('/usr/sbin/networksetup', ['-getautoproxyurl', service]);
     const match = stdout.match(/^URL:\s*(.+)$/m);
     return match ? match[1].trim() : null;
-  } catch (_) {
+  } catch (err) {
+    console.error(`Failed to get autoproxy URL for service ${service}:`, err);
     return null;
   }
 }

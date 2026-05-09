@@ -21,11 +21,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     set: (patch) => ipcRenderer.invoke('settings:set', patch),
   },
   ssl: {
+    deleteCA: () => ipcRenderer.invoke('ssl:delete-ca'),
+    getCAExpiry: () => ipcRenderer.invoke('ssl:get-ca-expiry'),
     getCAPath: () => ipcRenderer.invoke('ssl:get-ca-path'),
+    regenerateCA: () => ipcRenderer.invoke('ssl:regenerate-ca'),
     revealCA: () => ipcRenderer.invoke('ssl:reveal-ca'),
     trustCA: () => ipcRenderer.invoke('ssl:trust-ca'),
   },
   i18n: {
     getStrings: () => ipcRenderer.invoke('i18n:get-strings'),
+    getLocales: () => ipcRenderer.invoke('i18n:get-locales'),
+    setLocale: (locale) => ipcRenderer.invoke('i18n:set-locale', locale),
   },
 });

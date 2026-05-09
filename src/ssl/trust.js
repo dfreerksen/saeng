@@ -3,20 +3,33 @@ const util = require('util');
 
 const execAsync = util.promisify(execFile);
 
+async function untrustCA(certPath) {
+  if (process.platform === 'darwin') {
+    try {
+      await execAsync('/usr/bin/security', ['remove-trusted-cert', certPath]);
+    } catch {
+      // Not trusted or already removed — not an error
+    }
+  }
+  // Windows trust removal not yet supported
+}
+
 async function trustCA(certPath) {
   if (process.platform === 'darwin') {
     try {
-      // Uses macOS's native auth dialog to request password
+      // Targets the per-user trust settings domain (no -d, no -k).
+      // Running as the current user avoids the "no user interaction possible"
+      // error that occurs when security tries to authorize inside an elevated
+      // osascript shell. User-level trust is sufficient for local development
+      // and is respected by Safari, Chrome, and the macOS Security framework.
       await execAsync('/usr/bin/security', [
         'add-trusted-cert',
-        '-d',
         '-r', 'trustRoot',
-        '-k', '/Library/Keychains/System.keychain',
         certPath,
       ]);
       return { success: true, message: 'CA certificate trusted successfully.' };
     } catch (err) {
-      // User may have cancelled the auth dialog
+      console.error('Failed to trust CA on macOS:', err);
       const msg = err.stderr || err.message || 'Unknown error';
       return { success: false, message: `Failed to trust CA: ${msg}` };
     }
@@ -27,6 +40,7 @@ async function trustCA(certPath) {
       await execAsync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script]);
       return { success: true, message: 'CA certificate trusted successfully.' };
     } catch (err) {
+      console.error('Failed to trust CA on Windows:', err);
       const msg = err.stderr || err.message || 'Unknown error';
       return { success: false, message: `Failed to trust CA: ${msg}` };
     }
@@ -35,4 +49,4 @@ async function trustCA(certPath) {
   return { success: false, message: 'Unsupported platform.' };
 }
 
-module.exports = { trustCA };
+module.exports = { trustCA, untrustCA };

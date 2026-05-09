@@ -92,7 +92,9 @@ function updateTrayMenu(running) {
             await proxyManager.start(store.getMappings(), store.getSettings());
             mainWindow?.webContents.send('proxy:status', { running: true });
             updateTrayMenu(true);
-          } catch (_) {}
+          } catch (err) {
+            console.error('Error starting proxy:', err);
+          }
         }
       },
     },
@@ -111,7 +113,8 @@ function setupIPC() {
   ipcMain.handle('mappings:list', () => store.getMappings());
 
   ipcMain.handle('mappings:add', (_, data) => {
-    const mapping = store.addMapping(data);
+    // const mapping = store.addMapping(data);
+    store.addMapping(data);
     if (proxyManager.isRunning()) {
       proxyManager.updateMappings(store.getMappings());
     }
@@ -173,6 +176,25 @@ function setupIPC() {
     return store.setSettings(patch);
   });
 
+  ipcMain.handle('ssl:get-ca-expiry', () => {
+    const { CertManager } = require('./src/proxy/certManager');
+    return CertManager.getInstance(store.getCertDir()).getCAExpiry();
+  });
+
+  ipcMain.handle('ssl:regenerate-ca', () => {
+    const { CertManager } = require('./src/proxy/certManager');
+    return CertManager.getInstance(store.getCertDir()).regenerateCA();
+  });
+
+  ipcMain.handle('ssl:delete-ca', async () => {
+    const { CertManager } = require('./src/proxy/certManager');
+    const { untrustCA } = require('./src/ssl/trust');
+    const certManager = CertManager.getInstance(store.getCertDir());
+    await untrustCA(certManager.getCAPath());
+    certManager.deleteCA();
+    return { success: true };
+  });
+
   ipcMain.handle('ssl:get-ca-path', () => {
     const { CertManager } = require('./src/proxy/certManager');
     return CertManager.getInstance(store.getCertDir()).getCAPath();
@@ -190,6 +212,15 @@ function setupIPC() {
   });
 
   ipcMain.handle('i18n:get-strings', () => i18n.getStrings());
+
+  ipcMain.handle('i18n:get-locales', () => i18n.getSupportedLocales());
+
+  ipcMain.handle('i18n:set-locale', (_, locale) => {
+    store.setSettings({ locale });
+    i18n.load(locale);
+    updateTrayMenu(proxyManager.isRunning());
+    return i18n.getStrings();
+  });
 }
 
 app.whenReady().then(async () => {
@@ -197,9 +228,8 @@ app.whenReady().then(async () => {
   const { ProxyManager } = require('./src/proxy/manager');
   const { clearSystemProxy } = require('./src/systemProxy');
 
-  i18n.load(app.getLocale());
-
   store = new AppStore();
+  i18n.load(store.getSettings().locale || app.getLocale());
   proxyManager = new ProxyManager(store);
 
   // Clear any leftover proxy config from a previous run (crash / force-quit).
@@ -214,7 +244,10 @@ app.whenReady().then(async () => {
   const nonce = randomBytes(16).toString('base64');
   protocol.handle('app', (request) => {
     const url = new URL(request.url);
-    const filePath = path.join(__dirname, 'src/renderer', url.pathname.slice(1));
+    const pathname = url.pathname.slice(1);
+    const filePath = pathname.startsWith('node_modules/')
+      ? path.join(__dirname, pathname)
+      : path.join(__dirname, 'src/renderer', pathname);
     if (url.pathname === '/index.html') {
       const html = fs.readFileSync(path.join(__dirname, 'src/renderer/index.html'), 'utf8')
         .replaceAll('__NONCE__', nonce);

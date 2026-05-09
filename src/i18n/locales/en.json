@@ -8,10 +8,10 @@
   "nav.settings": "Settings",
 
   "mappings.title": "Domain Mappings",
-  "mappings.subtitle": "Route .local domains to local ports",
-  "mappings.add": "+ Add Mapping",
+  "mappings.subtitle": "Route local domains to local ports",
+  "mappings.add": "Add Mapping",
   "mappings.empty": "No mappings yet",
-  "mappings.emptyHint": "Click \"Add Mapping\" to route a .local domain to a port.",
+  "mappings.emptyHint": "Click \"Add Mapping\" to route a domain to a local port.",
 
   "table.domain": "Domain",
   "table.port": "Target Port",
@@ -24,17 +24,23 @@
 
   "settings.title": "Settings",
   "settings.subtitle": "Configure proxy behaviour and SSL certificates",
+  "settings.language": "Language",
+  "settings.languageDesc": "Display language for the Saeng interface.",
   "settings.proxy": "Proxy",
   "settings.httpsEnabled": "Enable HTTPS (SSL termination)",
   "settings.httpsEnabledDesc": "Intercept HTTPS traffic with a local CA cert. Requires browser trust step below.",
   "settings.startOnLaunch": "Start proxy on launch",
   "settings.startOnLaunchDesc": "Automatically start the proxy when Saeng opens.",
   "settings.caTitle": "SSL Certificate Authority",
-  "settings.caDesc": "To serve HTTPS on <code>.local</code> domains, Saeng generates a local CA certificate. You must install and trust it in your system keychain once.",
-  "settings.caGenerating": "Generating CA certificate…",
+  "settings.caDesc": "To serve HTTPS on local domains, Saeng generates a local CA certificate. You must install and trust it in your system keychain once.",
+  "settings.caGenerating": "Generating CA certificate...",
   "settings.revealCa": "Show in Finder / Explorer",
   "settings.trustCa": "Install & Trust CA Certificate",
-  "settings.caInstalling": "Installing…",
+  "settings.caInstalling": "Installing...",
+  "settings.regenerateCa": "Regenerate CA Certificate",
+  "settings.regenerateCaConfirm": "This will delete the current CA certificate and all per-domain certificates. You will need to re-trust the new certificate in your browser. Continue?",
+  "settings.deleteCa": "Delete CA Certificate",
+  "settings.deleteCaConfirm": "This will remove the CA certificate from your trust store and delete all certificate files. HTTPS will not work until you regenerate and re-trust a new certificate. Continue?",
   "settings.caPlatformNote": "On macOS: installs into System Keychain (requires your password).<br>On Windows: runs certutil with UAC elevation.",
 
   "modal.addTitle": "Add Domain Mapping",
@@ -50,12 +56,11 @@
   "form.optional": "(optional)",
   "form.subdomainPlaceholder": "api",
   "form.domainPlaceholder": "myapp",
-  "form.domainHint": "Subdomain is optional. Only <strong>.local</strong> TLD is supported.",
+  "form.domainHint": "Subdomain is optional.",
   "form.domainError": "Please enter a valid domain name.",
   "form.domainErrorInvalid": "Enter a valid domain name (letters, numbers, hyphens).",
   "form.subdomainError": "Subdomain must contain only letters, numbers, and hyphens.",
   "form.domainErrorDuplicate": "{domain} is already mapped.",
-  "form.portPlaceholder": "3000",
   "form.portHint": "The localhost port your service listens on.",
   "form.portError": "Please enter a port between 1 and 65535.",
   "form.labelPlaceholder": "My API server",
@@ -71,6 +76,8 @@
   "toast.httpsEnabled": "HTTPS enabled. Restart the proxy for changes to take effect.",
   "toast.httpsDisabled": "HTTPS disabled.",
   "toast.caTrusted": "CA certificate trusted successfully.",
+  "toast.caRegenerated": "CA certificate regenerated. Use Install & Trust to register it with your browser.",
+  "toast.caDeleted": "CA certificate deleted and removed from trust store.",
 
   "confirm.removeMapping": "Remove {domain}?",
 
@@ -78,6 +85,6 @@
   "tray.startProxy": "Start Proxy",
   "tray.stopProxy": "Stop Proxy",
   "tray.quit": "Quit Saeng",
-  "tray.tooltip.running": "Saeng — Proxy running",
-  "tray.tooltip.stopped": "Saeng — Proxy stopped"
+  "tray.tooltip.running": "Saeng - Proxy running",
+  "tray.tooltip.stopped": "Saeng - Proxy stopped"
 }
