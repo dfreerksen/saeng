@@ -1,5 +1,8 @@
-const path = require('path');
-const fs = require('fs');
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SUPPORTED_LOCALES = [
   { code: 'ar', name: 'العربية', dir: 'rtl' }, // Arabic
@@ -52,4 +55,4 @@ function getSupportedLocales() {
   return SUPPORTED_LOCALES;
 }
 
-module.exports = { load, t, getStrings, getSupportedLocales };
+export { load, t, getStrings, getSupportedLocales };

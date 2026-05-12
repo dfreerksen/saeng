@@ -1,7 +1,7 @@
-const ElectronStore = require('electron-store');
-const crypto = require('crypto');
-const path = require('path');
-const { app } = require('electron');
+import ElectronStore from 'electron-store';
+import { randomUUID } from 'crypto';
+import path from 'path';
+import { app } from 'electron';
 
 const schema = {
   mappings: {
@@ -41,7 +41,7 @@ class AppStore {
   addMapping(data) {
     const mappings = this.getMappings();
     const mapping = {
-      id: crypto.randomUUID(),
+      id: randomUUID(),
       domain: data.domain.toLowerCase().trim(),
       port: parseInt(data.port, 10),
       https: !!data.https,
@@ -98,4 +98,4 @@ class AppStore {
   }
 }
 
-module.exports = AppStore;
+export default AppStore;

@@ -1,7 +1,7 @@
-const { execFile } = require('child_process');
-const util = require('util');
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 
-const execAsync = util.promisify(execFile);
+const execAsync = promisify(execFile);
 
 // VPN tunnel devices — modifying their proxy settings disrupts the VPN connection
 const VPN_DEVICE_RE = /^(utun|ppp|ipsec)/i;
@@ -90,4 +90,4 @@ async function clearSystemProxy({ onlyIfUrl } = {}) {
   }
 }
 
-module.exports = { setSystemProxy, clearSystemProxy };
+export { setSystemProxy, clearSystemProxy };

@@ -1,7 +1,7 @@
-const forge = require('node-forge');
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
+import forge from 'node-forge';
+import fs from 'fs';
+import path from 'path';
+import { randomBytes } from 'crypto';
 
 const CA_LIFETIME_YEARS = 10;
 
@@ -94,7 +94,7 @@ class CertManager {
     const cert = forge.pki.createCertificate();
 
     cert.publicKey = keys.publicKey;
-    cert.serialNumber = crypto.randomBytes(16).toString('hex');
+    cert.serialNumber = randomBytes(16).toString('hex');
     cert.validity.notBefore = new Date();
     cert.validity.notAfter = new Date();
     cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 2);
@@ -176,4 +176,4 @@ class CertManager {
   }
 }
 
-module.exports = { CertManager };
+export { CertManager };

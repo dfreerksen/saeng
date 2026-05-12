@@ -1,9 +1,17 @@
-const { app, BrowserWindow, ipcMain, shell, Tray, Menu, nativeImage, protocol, net } = require('electron');
-const path = require('path');
-const { randomBytes } = require('crypto');
-const { pathToFileURL } = require('url');
-const fs = require('fs');
-const i18n = require('./src/i18n/i18n');
+import { app, BrowserWindow, ipcMain, shell, Tray, Menu, nativeImage, protocol, net } from 'electron';
+import path from 'path';
+import { randomBytes } from 'crypto';
+import { pathToFileURL, fileURLToPath } from 'url';
+import fs from 'fs';
+import * as i18n from './src/i18n/i18n.js';
+import AppStore from './src/store.js';
+import { ProxyManager } from './src/proxy/manager.js';
+import { CertManager } from './src/proxy/certManager.js';
+import { clearSystemProxy } from './src/systemProxy.js';
+import { trustCA, untrustCA } from './src/ssl/trust.js';
+import pkg from './package.json' with { type: 'json' };
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true } },
@@ -17,9 +25,9 @@ let isQuitting = false;
 
 app.setAboutPanelOptions({
   applicationName: 'Saeng',
-  applicationVersion: require('./package.json').version,
-  copyright: `© ${new Date().getFullYear()} ${require('./package.json').author.name}`,
-  credits: require('./package.json').description,
+  applicationVersion: pkg.version,
+  copyright: `© ${new Date().getFullYear()} ${pkg.author.name}`,
+  credits: pkg.description,
   iconPath: path.join(__dirname, 'resources/icons/icon.png')
 });
 
@@ -31,7 +39,7 @@ function createWindow() {
     minHeight: 520,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -114,7 +122,6 @@ function setupIPC() {
   ipcMain.handle('mappings:list', () => store.getMappings());
 
   ipcMain.handle('mappings:add', (_, data) => {
-    // const mapping = store.addMapping(data);
     store.addMapping(data);
     if (proxyManager.isRunning()) {
       proxyManager.updateMappings(store.getMappings());
@@ -177,40 +184,32 @@ function setupIPC() {
     return store.setSettings(patch);
   });
 
-  ipcMain.handle('ssl:get-ca-expiry', () => {
-    const { CertManager } = require('./src/proxy/certManager');
-    return CertManager.getInstance(store.getCertDir()).getCAExpiry();
-  });
+  ipcMain.handle('ssl:get-ca-expiry', () =>
+    CertManager.getInstance(store.getCertDir()).getCAExpiry()
+  );
 
-  ipcMain.handle('ssl:regenerate-ca', () => {
-    const { CertManager } = require('./src/proxy/certManager');
-    return CertManager.getInstance(store.getCertDir()).regenerateCA();
-  });
+  ipcMain.handle('ssl:regenerate-ca', () =>
+    CertManager.getInstance(store.getCertDir()).regenerateCA()
+  );
 
   ipcMain.handle('ssl:delete-ca', async () => {
-    const { CertManager } = require('./src/proxy/certManager');
-    const { untrustCA } = require('./src/ssl/trust');
     const certManager = CertManager.getInstance(store.getCertDir());
     await untrustCA(certManager.getCAPath());
     certManager.deleteCA();
     return { success: true };
   });
 
-  ipcMain.handle('ssl:get-ca-path', () => {
-    const { CertManager } = require('./src/proxy/certManager');
-    return CertManager.getInstance(store.getCertDir()).getCAPath();
-  });
+  ipcMain.handle('ssl:get-ca-path', () =>
+    CertManager.getInstance(store.getCertDir()).getCAPath()
+  );
 
-  ipcMain.handle('ssl:reveal-ca', () => {
-    const { CertManager } = require('./src/proxy/certManager');
-    shell.showItemInFolder(CertManager.getInstance(store.getCertDir()).getCAPath());
-  });
+  ipcMain.handle('ssl:reveal-ca', () =>
+    shell.showItemInFolder(CertManager.getInstance(store.getCertDir()).getCAPath())
+  );
 
-  ipcMain.handle('ssl:trust-ca', async () => {
-    const { trustCA } = require('./src/ssl/trust');
-    const { CertManager } = require('./src/proxy/certManager');
-    return trustCA(CertManager.getInstance(store.getCertDir()).getCAPath());
-  });
+  ipcMain.handle('ssl:trust-ca', () =>
+    trustCA(CertManager.getInstance(store.getCertDir()).getCAPath())
+  );
 
   ipcMain.handle('i18n:get-strings', () => i18n.getStrings());
 
@@ -225,10 +224,6 @@ function setupIPC() {
 }
 
 app.whenReady().then(async () => {
-  const AppStore = require('./src/store');
-  const { ProxyManager } = require('./src/proxy/manager');
-  const { clearSystemProxy } = require('./src/systemProxy');
-
   store = new AppStore();
   i18n.load(store.getSettings().locale || app.getLocale());
   proxyManager = new ProxyManager(store);
@@ -239,7 +234,6 @@ app.whenReady().then(async () => {
   await clearSystemProxy({ onlyIfUrl: 'http://127.0.0.1:8181/proxy.pac' }).catch(() => {});
 
   // Pre-warm the CA cert so the first HTTPS connection is fast
-  const { CertManager } = require('./src/proxy/certManager');
   CertManager.getInstance(store.getCertDir());
 
   const nonce = randomBytes(16).toString('base64');

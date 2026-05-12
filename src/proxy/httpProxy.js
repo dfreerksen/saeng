@@ -1,8 +1,7 @@
-const http = require('http');
-const https = require('https');
-const net = require('net');
-const tls = require('tls');
-// const url = require('url');
+import http from 'http';
+import https from 'https';
+import net from 'net';
+import tls from 'tls';
 
 class HttpProxy {
   constructor(certManager) {
@@ -269,4 +268,4 @@ class HttpProxy {
   }
 }
 
-module.exports = { HttpProxy };
+export { HttpProxy };

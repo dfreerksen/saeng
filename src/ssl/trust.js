@@ -1,7 +1,7 @@
-const { execFile } = require('child_process');
-const util = require('util');
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 
-const execAsync = util.promisify(execFile);
+const execAsync = promisify(execFile);
 
 async function untrustCA(certPath) {
   if (process.platform === 'darwin') {
@@ -49,4 +49,4 @@ async function trustCA(certPath) {
   return { success: false, message: 'Unsupported platform.' };
 }
 
-module.exports = { trustCA, untrustCA };
+export { trustCA, untrustCA };

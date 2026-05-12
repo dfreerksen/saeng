@@ -1,7 +1,7 @@
-const { HttpProxy } = require('./httpProxy');
-const { PacServer } = require('./pacServer');
-const { CertManager } = require('./certManager');
-const { setSystemProxy, clearSystemProxy } = require('../systemProxy');
+import { HttpProxy } from './httpProxy.js';
+import { PacServer } from './pacServer.js';
+import { CertManager } from './certManager.js';
+import { setSystemProxy, clearSystemProxy } from '../systemProxy.js';
 
 const PAC_PORT = 8181;
 
@@ -72,4 +72,4 @@ class ProxyManager {
   }
 }
 
-module.exports = { ProxyManager };
+export { ProxyManager };

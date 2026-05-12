@@ -1,4 +1,4 @@
-const http = require('http');
+import http from 'http';
 
 class PacServer {
   constructor(port) {
@@ -68,4 +68,4 @@ class PacServer {
   }
 }
 
-module.exports = { PacServer };
+export { PacServer };
