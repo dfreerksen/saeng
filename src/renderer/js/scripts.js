@@ -1,7 +1,7 @@
 // import { t, applyTranslations, initI18n } from './i18n';
 import { t, initI18n, loadStrings } from './i18n';
 import { showToast } from './toast';
-// import { getOS, isLinux, isMac, isWindows } from './os';
+import { getOS } from './os';
 // import * as bootstrap from 'bootstrap';
 // import * as Popper from "@popperjs/core";
 import { initTooltips } from "./bootstrap/tooltip";
@@ -9,6 +9,7 @@ import { initTooltips } from "./bootstrap/tooltip";
 // ── Initialize ─────────────────────────────────────────────────────
 
 initTooltips();
+document.body.classList.add(getOS());
 
 // ── Navigation ─────────────────────────────────────────────────────
 

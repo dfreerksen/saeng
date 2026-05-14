@@ -1,6 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  platform: process.platform,
   mappings: {
     list: () => ipcRenderer.invoke('mappings:list'),
     add: (data) => ipcRenderer.invoke('mappings:add', data),

@@ -70,7 +70,6 @@
       "icon": "assets/icons/mac/icon.icon",
       "target": [
         "dmg",
-        "mas",
         "zip"
       ]
     },

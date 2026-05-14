@@ -1,17 +1,17 @@
 export function getOS () {
-  const platform = process.platform.toLowerCase();
-  if (platform.includes('win')) return 'win32';
-  if (platform.includes('mac')) return 'darwin';
-  if (platform.includes('linux')) return 'linux';
+  const platform = window.electronAPI.platform;
+  if (platform === 'darwin') return 'mac';
+  if (platform === 'win32') return 'windows';
+  if (platform === 'linux') return 'linux';
   return 'unknown';
 }
 
 export function isWindows () {
-  return getOS() === 'win32';
+  return getOS() === 'windows';
 }
 
 export function isMac () {
-  return getOS() === 'darwin';
+  return getOS() === 'mac';
 }
 
 export function isLinux () {
