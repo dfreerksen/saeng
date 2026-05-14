@@ -1,19 +1,19 @@
-export function getOS() {
-  const platform = navigator.platform.toLowerCase();
-  if (platform.includes('win')) return 'windows';
-  if (platform.includes('mac')) return 'macos';
+export function getOS () {
+  const platform = process.platform.toLowerCase();
+  if (platform.includes('win')) return 'win32';
+  if (platform.includes('mac')) return 'darwin';
   if (platform.includes('linux')) return 'linux';
   return 'unknown';
 }
 
-export function isWindows() {
-  return getOS() === 'windows';
+export function isWindows () {
+  return getOS() === 'win32';
 }
 
-export function isMacOS() {
-  return getOS() === 'macos';
+export function isMac () {
+  return getOS() === 'darwin';
 }
 
-export function isLinux() {
+export function isLinux () {
   return getOS() === 'linux';
 }

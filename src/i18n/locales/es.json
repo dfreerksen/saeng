@@ -24,6 +24,12 @@
 
   "settings.title": "Configuración",
   "settings.subtitle": "Configurar el comportamiento del proxy y los certificados SSL",
+  "settings.preferences": "Preferencias",
+  "settings.colorMode": "Mode de Color",
+  "settings.colorModeDesc": "Mode de color utilizado en la interfaz.",
+  "settings.colorModeAuto": "Auto (seguir el sistema)",
+  "settings.colorModeLight": "Claro",
+  "settings.colorModeDark": "Oscuro",
   "settings.language": "Idioma",
   "settings.languageDesc": "Idioma de visualización de la interfaz Saeng.",
   "settings.proxy": "Apoderado",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "Certificado de CA confiable correctamente.",
   "toast.caRegenerated": "Certificado de CA regenerado. Utilice Install & Trust para registrarlo en su navegador.",
   "toast.caDeleted": "Certificado de CA eliminado y eliminado del almacén de confianza.",
+
+  "toast.error.untrustCaMac": "No se pudo eliminar la confianza en la CA en macOS. Esto no es un error.",
+  "toast.error.untrustCaWindows": "No se pudo eliminar la confianza en la CA en Windows. Esto no es un error.",
+  "toast.error.untrustCaLinux": "La eliminación de confianza en Linux aún no es compatible. Por favor, elimine manualmente el certificado de la CA del almacén de confianza de su sistema.",
+  "toast.error.untrustCaOther": "Plataforma no compatible para eliminar la confianza en el certificado de la CA. Por favor, elimine manualmente el certificado de la CA del almacén de confianza de su sistema.",
+
+  "toast.error.trustCaSuccess": "Certificado de la CA establecido como de confianza correctamente.",
+  "toast.error.trustCaMac": "No se pudo establecer la confianza en la CA: {error}",
+  "toast.error.trustCaWindows": "No se pudo establecer la confianza en la CA: {error}",
+  "toast.error.trustCaLinux": "La gestión de confianza en Linux no es compatible. Por favor, añada manualmente el certificado de la CA al almacén de confianza de su sistema.",
+  "toast.error.trustCaOther": "Plataforma no compatible.",
 
   "confirm.removeMapping": "¿Eliminar {domain}?",
 

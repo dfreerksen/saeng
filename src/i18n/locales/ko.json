@@ -24,6 +24,12 @@
 
   "settings.title": "설정",
   "settings.subtitle": "프록시 동작 및 SSL 인증서를 구성합니다.",
+  "settings.preferences": "환경 설정",
+  "settings.colorMode": "색상 모드",
+  "settings.colorModeDesc": "인터페이스에서 사용되는 색상 모드입니다.",
+  "settings.colorModeAuto": "자동 (시스템 설정 따름)",
+  "settings.colorModeLight": "밝은",
+  "settings.colorModeDark": "어두운",
   "settings.language": "언어",
   "settings.languageDesc": "Saeng 인터페이스의 표시 언어입니다.",
   "settings.proxy": "프록시",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "CA 인증서가 성공적으로 신뢰 등록되었습니다.",
   "toast.caRegenerated": "CA 인증서가 재생성되었습니다. 브라우저에 등록하려면 '설치 및 신뢰' 기능을 사용하세요.",
   "toast.caDeleted": "CA 인증서가 삭제되었으며 신뢰 저장소에서 제거되었습니다.",
+
+  "toast.error.untrustCaMac": "macOS에서 CA 신뢰 해제에 실패했습니다. 이는 오류가 아닙니다.",
+  "toast.error.untrustCaWindows": "Windows에서 CA 신뢰 해제에 실패했습니다. 이는 오류가 아닙니다.",
+  "toast.error.untrustCaLinux": "Linux에서의 신뢰 해제는 아직 지원되지 않습니다. 시스템의 신뢰 저장소에서 CA 인증서를 수동으로 제거해 주십시오.",
+  "toast.error.untrustCaOther": "CA 인증서 신뢰 해제를 지원하지 않는 플랫폼입니다. 시스템의 신뢰 저장소에서 CA 인증서를 수동으로 제거해 주십시오.",
+
+  "toast.error.trustCaSuccess": "CA 인증서 신뢰 설정이 완료되었습니다.",
+  "toast.error.trustCaMac": "CA 신뢰 설정에 실패했습니다: {error}",
+  "toast.error.trustCaWindows": "CA 신뢰 설정에 실패했습니다: {error}",
+  "toast.error.trustCaLinux": "Linux에서의 신뢰 관리는 지원되지 않습니다. 시스템의 신뢰 저장소에 CA 인증서를 수동으로 추가해 주십시오.",
+  "toast.error.trustCaOther": "지원되지 않는 플랫폼입니다.",
 
   "confirm.removeMapping": "{domain}을(를) 제거하시겠습니까?",
 

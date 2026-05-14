@@ -24,6 +24,12 @@
 
   "settings.title": "设置",
   "settings.subtitle": "配置代理行为与 SSL 证书",
+  "settings.preferences": "偏好设置",
+  "settings.colorMode": "颜色模式",
+  "settings.colorModeDesc": "界面中使用的颜色模式。",
+  "settings.colorModeAuto": "自动（跟随系统）",
+  "settings.colorModeLight": "浅色",
+  "settings.colorModeDark": "深色",
   "settings.language": "语言",
   "settings.languageDesc": "Saeng 界面的显示语言。",
   "settings.proxy": "代理",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "CA 证书已成功受信任。",
   "toast.caRegenerated": "CA 证书已重新生成。请使用“安装并信任”将其注册到您的浏览器中。",
   "toast.caDeleted": "CA 证书已删除，并已从信任存储中移除。",
+
+  "toast.error.untrustCaMac": "在 macOS 上取消信任 CA 失败。这并非错误。",
+  "toast.error.untrustCaWindows": "在 Windows 上取消信任 CA 失败。这并非错误。",
+  "toast.error.untrustCaLinux": "暂不支持在 Linux 上移除信任。请手动从系统信任存储中移除该 CA 证书。",
+  "toast.error.untrustCaOther": "当前平台不支持取消信任 CA 证书。请手动从系统信任存储中移除该 CA 证书。",
+
+  "toast.error.trustCaSuccess": "CA 证书已成功设置为受信任。",
+  "toast.error.trustCaMac": "信任 CA 失败：{error}",
+  "toast.error.trustCaWindows": "信任 CA 失败：{error}",
+  "toast.error.trustCaLinux": "暂不支持在 Linux 上管理信任。请手动将该 CA 证书添加到系统信任存储中。",
+  "toast.error.trustCaOther": "不支持的平台。",
 
   "confirm.removeMapping": "移除 {domain} 吗？",
 

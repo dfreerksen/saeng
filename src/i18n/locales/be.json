@@ -24,6 +24,12 @@
 
   "settings.title": "Налады",
   "settings.subtitle": "Канфігураваць паводзіны проксі і сертыфікаты SSL",
+  "settings.preferences": "Налады",
+  "settings.colorMode": "Каляровы рэжым",
+  "settings.colorModeDesc": "Каляровы рэжым, які выкарыстоўваецца ў інтэрфейсе.",
+  "settings.colorModeAuto": "Аўтаматычна (пры дапамозе сістэмных налад)",
+  "settings.colorModeLight": "Светлы",
+  "settings.colorModeDark": "Цёмны",
   "settings.language": "Мова",
   "settings.languageDesc": "Мова дысплея для інтэрфейсу Saeng.",
   "settings.proxy": "Проксі",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "Сертыфікат ЦС паспяхова давераны.",
   "toast.caRegenerated": "Сертыфікат ЦС адноўлены. Выкарыстоўвайце Install & Trust, каб зарэгістраваць яго ў вашым браўзеры.",
   "toast.caDeleted": "Сертыфікат ЦС выдалены і выдалены з сховішча давераных сертыфікатаў.",
+
+  "toast.error.untrustCaMac": "Не атрымалася адмяніць давер да ЦС на macOS. Гэта не памылка",
+  "toast.error.untrustCaWindows": "Не атрымалася адмяніць давер да ЦС на Windows. Гэта не памылка",
+  "toast.error.untrustCaLinux": "Выдаленне даверу Linux пакуль не падтрымліваецца. Калі ласка, выдаліце ​​сертыфікат ЦС з сістэмнага сховішча даверу ўручную.",
+  "toast.error.untrustCaOther": "Непадтрымліваемая платформа для адмены даверу да сертыфіката ЦС. Калі ласка, выдаліце ​​сертыфікат ЦС з сістэмнага сховішча даверу ўручную.",
+
+  "toast.error.trustCaSuccess": "Сертыфікат ЦС паспяхова давераны.",
+  "toast.error.trustCaMac": "Не атрымалася даверыць ЦС: {error}",
+  "toast.error.trustCaWindows": "Не атрымалася даверыць ЦС: {error}",
+  "toast.error.trustCaLinux": "Кіраванне даверам Linux не падтрымліваецца. Калі ласка, дадайце сертыфікат ЦС у сістэмнае сховішча даверу ўручную.",
+  "toast.error.trustCaOther": "Платформа не падтрымліваецца.",
 
   "confirm.removeMapping": "Выдаліць {domain}?",
 

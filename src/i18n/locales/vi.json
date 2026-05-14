@@ -24,6 +24,12 @@
 
   "settings.title": "Cài đặt",
   "settings.subtitle": "Cấu hình hành vi của proxy và các chứng chỉ SSL",
+  "settings.preferences": "Tùy chọn",
+  "settings.colorMode": "Chế độ màu",
+  "settings.colorModeDesc": "Chế độ màu được sử dụng trong giao diện.",
+  "settings.colorModeAuto": "Tự động (theo hệ thống)",
+  "settings.colorModeLight": "Sáng",
+  "settings.colorModeDark": "Tối",
   "settings.language": "Ngôn ngữ",
   "settings.languageDesc": "Ngôn ngữ hiển thị cho giao diện của Saeng.",
   "settings.proxy": "Proxy",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "Đã tin cậy chứng chỉ CA thành công.",
   "toast.caRegenerated": "Đã tạo lại chứng chỉ CA. Hãy sử dụng mục Cài đặt & Tin cậy để đăng ký chứng chỉ này với trình duyệt của bạn.",
   "toast.caDeleted": "Đã xóa chứng chỉ CA và gỡ bỏ khỏi kho lưu trữ tin cậy.",
+
+  "toast.error.untrustCaMac": "Không thể hủy tin cậy CA trên macOS. Đây không phải là lỗi.",
+  "toast.error.untrustCaWindows": "Không thể hủy tin cậy CA trên Windows. Đây không phải là lỗi.",
+  "toast.error.untrustCaLinux": "Tính năng hủy tin cậy trên Linux chưa được hỗ trợ. Vui lòng xóa chứng chỉ CA khỏi kho lưu trữ tin cậy của hệ thống theo cách thủ công.",
+  "toast.error.untrustCaOther": "Nền tảng này không hỗ trợ việc hủy tin cậy chứng chỉ CA. Vui lòng xóa chứng chỉ CA khỏi kho lưu trữ tin cậy của hệ thống theo cách thủ công.",
+
+  "toast.error.trustCaSuccess": "Đã thiết lập tin cậy chứng chỉ CA thành công.",
+  "toast.error.trustCaMac": "Không thể thiết lập tin cậy CA: {error}",
+  "toast.error.trustCaWindows": "Không thể thiết lập tin cậy CA: {error}",
+  "toast.error.trustCaLinux": "Tính năng quản lý tin cậy trên Linux chưa được hỗ trợ. Vui lòng thêm chứng chỉ CA vào kho lưu trữ tin cậy của hệ thống theo cách thủ công.",
+  "toast.error.trustCaOther": "Nền tảng này không được hỗ trợ.",
 
   "confirm.removeMapping": "Gỡ bỏ {domain}?",
 

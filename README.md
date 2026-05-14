@@ -4,6 +4,8 @@ Local domain proxy manager for local development domains. Saeng means "light," "
 
 Saeng routes local defined domains to localhost ports using a PAC (Proxy Auto-Config) file — no `/etc/hosts` edits, no elevated port binding, no `sudo`. Add a mapping, start the proxy, and `http://myapp.local` goes straight to your local server.
 
+Saeng primarily works for Mac, with plans to make it work for Windows and Linux
+
 ## Features
 
 * Map any local domain (with or without subdomain) to a local port
@@ -35,6 +37,7 @@ HTTPS works by intercepting `CONNECT` tunnel requests and terminating TLS using 
 
 * Node.js >= 24.11.1
 * npm >= 11.6.4
+* Xcode >= 26.0 (to create build)
 
 ## Development
 

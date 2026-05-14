@@ -70,6 +70,7 @@
       "icon": "assets/icons/mac/icon.icon",
       "target": [
         "dmg",
+        "mas",
         "zip"
       ]
     },
@@ -80,11 +81,12 @@
       ]
     },
     "linux": {
-      "icon": "assets/icons",
+      "icon": "assets/icons/linux/icon.png",
       "target": [
         "AppImage",
         "deb"
-      ]
+      ],
+      "category": "Developer Tools"
     }
   }
 }

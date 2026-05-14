@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" data-bs-theme="auto">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,6 +9,8 @@
     <title>Saeng</title>
 
     <link rel="stylesheet" href="styles.css">
+
+    <script src="color-mode.js" nonce="__NONCE__"></script>
   </head>
   <body>
 
@@ -60,12 +62,12 @@
               <table id="mappingsTable">
                 <thead>
                   <tr>
-                    <th data-i18n="table.domain">Domain</th>
-                    <th data-i18n="table.port">Target Port</th>
-                    <th data-i18n="table.protocol">Protocol</th>
-                    <th data-i18n="table.label">Label</th>
-                    <th data-i18n="table.enabled">Enabled</th>
-                    <th style="text-align:right" data-i18n="table.actions">Actions</th>
+                    <th scope="col" data-i18n="table.domain">Domain</th>
+                    <th scope="col" data-i18n="table.port">Target Port</th>
+                    <th scope="col" data-i18n="table.protocol">Protocol</th>
+                    <th scope="col" data-i18n="table.label">Label</th>
+                    <th scope="col" data-i18n="table.enabled">Enabled</th>
+                    <th scope="col" style="text-align:right" data-i18n="table.actions">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="mappingsTbody"></tbody>
@@ -88,10 +90,23 @@
             </div>
 
             <div class="settings-section">
-              <div class="settings-section-title" data-i18n="settings.language">Language</div>
+              <div class="settings-section-title" data-i18n="settings.preferences">Preferences</div>
 
               <div class="setting-row">
                 <div class="setting-info">
+                  <div class="setting-name" data-i18n="settings.colorMode">Color Mode</div>
+                  <div class="setting-desc" data-i18n="settings.colorModeDesc">Color mode used in the interface.</div>
+                </div>
+                <select id="colorModeSelect" class="color-mode-select">
+                  <option value="auto" data-i18n="settings.colorModeAuto">Auto (follow system)</option>
+                  <option value="light" data-i18n="settings.colorModeLight">Light</option>
+                  <option value="dark" data-i18n="settings.colorModeDark">Dark</option>
+                </select>
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-info">
+                  <div class="setting-name" data-i18n="settings.language">Language</div>
                   <div class="setting-desc" data-i18n="settings.languageDesc">Display language for the Saeng interface.</div>
                 </div>
                 <select id="localeSelect" class="locale-select"></select>
@@ -136,24 +151,22 @@
               <div class="ca-info-box" id="caPathBox" data-i18n="settings.caGenerating">Generating CA certificate…</div>
               <div class="ca-expiry" id="caExpiryBox"></div>
 
-              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px">
-                <button class="btn btn-ghost" id="revealCaBtn">
-                  <i class="bi bi-folder2-open"></i>
-                  <span data-i18n="settings.revealCa">Show in Finder / Explorer</span>
-                </button>
-                <button class="btn btn-primary" id="trustCaBtn">
-                  <i class="bi bi-shield-check"></i>
-                  <span data-i18n="settings.trustCa">Install &amp; Trust CA Certificate</span>
-                </button>
-                <button class="btn btn-danger" id="regenerateCaBtn">
-                  <i class="bi bi-arrow-repeat"></i>
-                  <span data-i18n="settings.regenerateCa">Regenerate CA Certificate</span>
-                </button>
-                <button class="btn btn-danger" id="deleteCaBtn">
-                  <i class="bi bi-trash"></i>
-                  <span data-i18n="settings.deleteCa">Delete CA Certificate</span>
-                </button>
-              </div>
+              <button class="btn btn-outline-secondary" id="revealCaBtn" data-bs-toggle="tooltip" data-bs-title="Show in Finder / Explorer">
+                <i class="bi bi-folder2-open"></i>
+                <span class="d-none d-md-inline" data-i18n="settings.revealCa">Show in Finder / Explorer</span>
+              </button>
+              <button class="btn btn-outline-primary" id="trustCaBtn" data-bs-toggle="tooltip" data-bs-title="Install & Trust CA Certificate">
+                <i class="bi bi-shield-check"></i>
+                <span class="d-none d-md-inline" data-i18n="settings.trustCa">Install &amp; Trust CA Certificate</span>
+              </button>
+              <button class="btn btn-outline-warning" id="regenerateCaBtn" data-bs-toggle="tooltip" data-bs-title="Regenerate CA Certificate">
+                <i class="bi bi-arrow-repeat"></i>
+                <span class="d-none d-md-inline" data-i18n="settings.regenerateCa">Regenerate CA Certificate</span>
+              </button>
+              <button class="btn btn-outline-danger" id="deleteCaBtn" data-bs-toggle="tooltip" data-bs-title="Delete CA Certificate">
+                <i class="bi bi-trash"></i>
+                <span class="d-none d-md-inline" data-i18n="settings.deleteCa">Delete CA Certificate</span>
+              </button>
 
               <p style="font-size:11px; color:var(--text-muted); margin-top:10px"
                 data-i18n-html="settings.caPlatformNote">
@@ -234,7 +247,7 @@
           </div>
 
           <div class="modal-actions">
-            <button type="button" class="btn btn-ghost" id="cancelAddBtn" data-i18n="modal.cancel">Cancel</button>
+            <button type="button" class="btn btn-secondary" id="cancelAddBtn" data-i18n="modal.cancel">Cancel</button>
             <button type="submit" class="btn btn-primary" id="formSubmitBtn">Add Mapping</button>
           </div>
         </form>

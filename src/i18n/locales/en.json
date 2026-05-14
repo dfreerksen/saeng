@@ -24,6 +24,12 @@
 
   "settings.title": "Settings",
   "settings.subtitle": "Configure proxy behaviour and SSL certificates",
+  "settings.preferences": "Preferences",
+  "settings.colorMode": "Color Mode",
+  "settings.colorModeDesc": "Color mode used in the interface.",
+  "settings.colorModeAuto": "Auto (follow system)",
+  "settings.colorModeLight": "Light",
+  "settings.colorModeDark": "Dark",
   "settings.language": "Language",
   "settings.languageDesc": "Display language for the Saeng interface.",
   "settings.proxy": "Proxy",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "CA certificate trusted successfully.",
   "toast.caRegenerated": "CA certificate regenerated. Use Install & Trust to register it with your browser.",
   "toast.caDeleted": "CA certificate deleted and removed from trust store.",
+
+  "toast.error.untrustCaMac": "Failed to untrust CA on macOS. This is not an error",
+  "toast.error.untrustCaWindows": "Failed to untrust CA on Windows. This is not an error",
+  "toast.error.untrustCaLinux": "Linux trust removal not yet supported. Please remove the CA certificate from your system trust store manually.",
+  "toast.error.untrustCaOther": "Unsupported platform for untrusting CA certificate. Please remove the CA certificate from your system trust store manually.",
+
+  "toast.error.trustCaSuccess": "CA certificate trusted successfully.",
+  "toast.error.trustCaMac": "Failed to trust CA: {error}",
+  "toast.error.trustCaWindows": "Failed to trust CA: {error}",
+  "toast.error.trustCaLinux": "Linux trust management not supported. Please add the CA certificate to your system trust store manually.",
+  "toast.error.trustCaOther": "Unsupported platform.",
 
   "confirm.removeMapping": "Remove {domain}?",
 

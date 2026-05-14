@@ -11,11 +11,13 @@ npm run pack       # Build without creating installer (outputs to dist/)
 node --check <file>  # Syntax-check a file without running it
 ```
 
-There is no test suite and no linter configured.
+There is no test suite. ESLint is configured (`eslint.config.mjs`) but has no npm script — run it directly with `npx eslint .`.
 
 ## Architecture
 
 Saeng is an Electron app that acts as a local reverse proxy, routing `.local` domains to localhost ports. The core approach uses a **PAC (Proxy Auto-Config) file** — the app configures the OS system proxy to point to a local PAC server, so browsers route matching `.local` domains through the app's HTTP proxy without requiring `/etc/hosts` edits or elevated port binding.
+
+The project uses **ESM throughout** (`"type": "module"` in `package.json`). The single exception is `preload.cjs`, which must stay CommonJS because Electron's preload sandbox does not honour `"type": "module"` — it always executes preload scripts as CommonJS regardless of the package type.
 
 ### Request flow
 
@@ -38,7 +40,7 @@ Saeng is an Electron app that acts as a local reverse proxy, routing `.local` do
 
 All logic runs in the **main process**. The renderer has no Node.js access.
 
-- `preload.js` — exposes `window.electronAPI` via `contextBridge`. All renderer↔main communication goes through this object.
+- `preload.cjs` — exposes `window.electronAPI` via `contextBridge`. All renderer↔main communication goes through this object. Uses `.cjs` extension because Electron's preload sandbox requires CommonJS (see note above).
 - `main.js` — wires IPC handlers in `setupIPC()`. Every `ipcMain.handle` channel is defined there.
 - `src/renderer/renderer.js` — calls `window.electronAPI.*` exclusively; never requires Node modules.
 
@@ -50,7 +52,7 @@ To make HTTPS work end-to-end the user must install the CA cert into the OS trus
 
 ### Persistence
 
-`src/store.js` wraps **electron-store v8** (CommonJS — do not upgrade to v9, which is ESM-only). The store file is `config.json` in `app.getPath('userData')`. The schema has two top-level keys: `mappings` (array) and `settings` (object).
+`src/store.js` wraps **electron-store v11** (ESM). The store file is `config.json` in `app.getPath('userData')`. The schema has two top-level keys: `mappings` (array) and `settings` (object).
 
 Mapping shape:
 ```js

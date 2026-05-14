@@ -24,6 +24,12 @@
 
   "settings.title": "Налаштування",
   "settings.subtitle": "Налаштувати поведінку проксі-сервера та SSL-сертифікати",
+  "settings.preferences": "Налаштування",
+  "settings.colorMode": "Режим кольору",
+  "settings.colorModeDesc": "Режим кольору, що використовується в інтерфейсі.",
+  "settings.colorModeAuto": "Авто (відповідно до системи)",
+  "settings.colorModeLight": "Світлий",
+  "settings.colorModeDark": "Темний",
   "settings.language": "Мова",
   "settings.languageDesc": "Мова відображення для інтерфейсу Saeng.",
   "settings.proxy": "Проксі-сервер",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "Сертифікат CA успішно довірено.",
   "toast.caRegenerated": "Сертифікат CA відновлено. Використайте функцію «Встановити та довіряти», щоб зареєструвати його у вашому браузері.",
   "toast.caDeleted": "Сертифікат CA видалено та видалено зі сховища довірених сертифікатів.",
+
+  "toast.error.untrustCaMac": "Не вдалося скасувати довіру CA на macOS. Це не помилка",
+  "toast.error.untrustCaWindows": "Не вдалося скасувати довіру CA на Windows. Це не помилка",
+  "toast.error.untrustCaLinux": "Видалення довіри Linux ще не підтримується. Будь ласка, видаліть сертифікат CA зі сховища довірених сертифікатів системи вручну.",
+  "toast.error.untrustCaOther": "Непідтримувана платформа для недовіри сертифікату CA. Будь ласка, видаліть сертифікат CA зі сховища довірених сертифікатів системи вручну.",
+
+  "toast.error.trustCaSuccess": "Сертифікату CA успішно довірено.",
+  "toast.error.trustCaMac": "Не вдалося довіряти CA: {error}",
+  "toast.error.trustCaWindows": "Не вдалося довіряти CA: {error}",
+  "toast.error.trustCaLinux": "Керування довірою Linux не підтримується. Будь ласка, додайте сертифікат CA до сховища довірених сертифікатів системи вручну.",
+  "toast.error.trustCaOther": "Непідтримувана платформа.",
 
   "confirm.removeMapping": "Видалити {domain}?",
 

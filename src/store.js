@@ -25,6 +25,8 @@ const schema = {
     default: {
       httpsEnabled: false,
       startOnLaunch: false,
+      colorMode: 'auto',
+      locale: 'en',
     },
   },
 };
@@ -83,7 +85,7 @@ class AppStore {
   }
 
   getSettings() {
-    return this.store.get('settings', { httpsEnabled: false, startOnLaunch: false });
+    return this.store.get('settings', { httpsEnabled: false, startOnLaunch: false, colorMode: 'auto', locale: 'en' });
   }
 
   setSettings(patch) {

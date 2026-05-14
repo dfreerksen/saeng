@@ -24,6 +24,12 @@
 
   "settings.title": "Einstellungen",
   "settings.subtitle": "Proxy-Verhalten und SSL-Zertifikate konfigurieren",
+  "settings.preferences": "Einstellungen",
+  "settings.colorMode": "Farbmodus",
+  "settings.colorModeDesc": "Im Interface verwendeter Farbmodus.",
+  "settings.colorModeAuto": "Auto (Systemeinstellungen folgen)",
+  "settings.colorModeLight": "Licht",
+  "settings.colorModeDark": "Dunkel",
   "settings.language": "Sprache",
   "settings.languageDesc": "Anzeigesprache für die Saeng-Benutzeroberfläche.",
   "settings.proxy": "Proxy",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "CA-Zertifikat erfolgreich vertrauenswürdig eingestellt.",
   "toast.caRegenerated": "CA-Zertifikat neu generiert. Verwenden Sie \"Installieren & Vertrauen\", um es mit Ihrem Browser zu registrieren.",
   "toast.caDeleted": "CA-Zertifikat gelöscht und aus dem Vertrauensspeicher entfernt.",
+
+  "toast.error.untrustCaMac": "Das Entfernen des Vertrauens zur CA unter macOS ist fehlgeschlagen. Dies stellt keinen Fehler dar.",
+  "toast.error.untrustCaWindows": "Das Entfernen des Vertrauens zur CA unter Windows ist fehlgeschlagen. Dies stellt keinen Fehler dar.",
+  "toast.error.untrustCaLinux": "Das Entfernen des Vertrauens unter Linux wird noch nicht unterstützt. Bitte entfernen Sie das CA-Zertifikat manuell aus dem Vertrauensspeicher Ihres Systems.",
+  "toast.error.untrustCaOther": "Nicht unterstützte Plattform für das Entfernen des Vertrauens zum CA-Zertifikat. Bitte entfernen Sie das CA-Zertifikat manuell aus dem Vertrauensspeicher Ihres Systems.",
+
+  "toast.error.trustCaSuccess": "Das CA-Zertifikat wurde erfolgreich als vertrauenswürdig eingestuft.",
+  "toast.error.trustCaMac": "Das Einstufen der CA als vertrauenswürdig ist fehlgeschlagen: {error}",
+  "toast.error.trustCaWindows": "Das Einstufen der CA als vertrauenswürdig ist fehlgeschlagen: {error}",
+  "toast.error.trustCaLinux": "Die Verwaltung des Vertrauens unter Linux wird nicht unterstützt. Bitte fügen Sie das CA-Zertifikat manuell dem Vertrauensspeicher Ihres Systems hinzu.",
+  "toast.error.trustCaOther": "Nicht unterstützte Plattform.",
 
   "confirm.removeMapping": "{domain} entfernen?",
 

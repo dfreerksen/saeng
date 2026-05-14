@@ -24,6 +24,12 @@
 
   "settings.title": "الإعدادات",
   "settings.subtitle": "تكوين سلوك الوكيل وشهادات SSL",
+  "settings.preferences": "التفضيلات",
+  "settings.colorMode": "وضع الألوان",
+  "settings.colorModeDesc": "وضع الألوان المستخدم في الواجهة.",
+  "settings.colorModeAuto": "تلقائي (اتباع إعدادات النظام)",
+  "settings.colorModeLight": "فاتح",
+  "settings.colorModeDark": "داكن",
   "settings.language": "اللغة",
   "settings.languageDesc": "لغة العرض لواجهة Saeng.",
   "settings.proxy": "الوكيل",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "تم الوثوق بشهادة المرجع المصدق (CA) بنجاح.",
   "toast.caRegenerated": "تم إعادة إنشاء شهادة المرجع المصدق (CA). استخدم خيار «تثبيت والوثوق» لتسجيلها في متصفحك.",
   "toast.caDeleted": "تم حذف شهادة المرجع المصدق (CA) وإزالتها من مخزن الثقة.",
+
+  "toast.error.untrustCaMac": "فشل إلغاء الثقة في مرجع التصديق (CA) على نظام macOS. هذا لا يُعد خطأً.",
+  "toast.error.untrustCaWindows": "فشل إلغاء الثقة في مرجع التصديق (CA) على نظام Windows. هذا لا يُعد خطأً.",
+  "toast.error.untrustCaLinux": "إزالة الثقة على نظام Linux غير مدعومة بعد. يرجى إزالة شهادة مرجع التصديق من مخزن الثقة الخاص بنظامك يدوياً.",
+  "toast.error.untrustCaOther": "منصة غير مدعومة لعملية إلغاء الثقة في شهادة مرجع التصديق. يرجى إزالة شهادة مرجع التصديق من مخزن الثقة الخاص بنظامك يدوياً.",
+
+  "toast.error.trustCaSuccess": "تمت الثقة في شهادة مرجع التصديق بنجاح.",
+  "toast.error.trustCaMac": "فشل منح الثقة لمرجع التصديق: {error}",
+  "toast.error.trustCaWindows": "فشل منح الثقة لمرجع التصديق: {error}",
+  "toast.error.trustCaLinux": "إدارة الثقة على نظام Linux غير مدعومة. يرجى إضافة شهادة مرجع التصديق إلى مخزن الثقة الخاص بنظامك يدوياً.",
+  "toast.error.trustCaOther": "منصة غير مدعومة.",
 
   "confirm.removeMapping": "هل تريد إزالة {domain}؟",
 

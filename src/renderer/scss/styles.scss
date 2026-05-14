@@ -1,16 +1,17 @@
-// @use 'bootstrap/dist/css/bootstrap';
-@use 'bootstrap-icons/font/bootstrap-icons' with (
-  $bootstrap-icons-font-dir: './node_modules/bootstrap-icons/font/fonts'
-);
-@use 'global';
-@use 'root';
-@use 'body';
-@use 'layout';
-@use 'sidebar';
-@use 'content';
-@use 'buttons';
-@use 'table';
-@use 'modal';
-@use 'settings';
-@use 'toast';
-@use 'scrollbar';
+@import 'bootstrap/dist/css/bootstrap';
+
+$bootstrap-icons-font-dir: "./node_modules/bootstrap-icons/font/fonts";
+@import 'bootstrap-icons/font/bootstrap-icons';
+
+@import 'global';
+@import 'root';
+@import 'body';
+@import 'layout';
+@import 'sidebar';
+@import 'content';
+@import 'buttons';
+@import 'table';
+@import 'modal';
+@import 'settings';
+@import 'toast';
+@import 'scrollbar';

@@ -24,6 +24,12 @@
 
   "settings.title": "Настройки",
   "settings.subtitle": "Настройка поведения прокси и SSL сертификатов",
+  "settings.preferences": "Настройки",
+  "settings.colorMode": "Режим цвета",
+  "settings.colorModeDesc": "Режим цвета, используемый в интерфейсе.",
+  "settings.colorModeAuto": "Авто (следовать системе)",
+  "settings.colorModeLight": "Светлый",
+  "settings.colorModeDark": "Темный",
   "settings.language": "Язык",
   "settings.languageDesc": "Язык отображения интерфейса Saeng.",
   "settings.proxy": "Прокси",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "Сертификат CA успешно доверен.",
   "toast.caRegenerated": "Сертификат CA восстановлен. Используйте \"Установить и доверять\", чтобы зарегистрировать его в вашем браузере.",
   "toast.caDeleted": "Сертификат CA удален и удален из хранилища доверенных сертификатов.",
+
+  "toast.error.untrustCaMac": "Не удалось отозвать доверие к ЦС в macOS. Это не является ошибкой.",
+  "toast.error.untrustCaWindows": "Не удалось отозвать доверие к ЦС в Windows. Это не является ошибкой.",
+  "toast.error.untrustCaLinux": "Удаление доверия в Linux пока не поддерживается. Пожалуйста, удалите сертификат ЦС из системного хранилища доверенных сертификатов вручную.",
+  "toast.error.untrustCaOther": "Платформа не поддерживает отзыв доверия к сертификату ЦС. Пожалуйста, удалите сертификат ЦС из системного хранилища доверенных сертификатов вручную.",
+
+  "toast.error.trustCaSuccess": "Доверие к сертификату ЦС успешно установлено.",
+  "toast.error.trustCaMac": "Не удалось установить доверие к ЦС: {error}",
+  "toast.error.trustCaWindows": "Не удалось установить доверие к ЦС: {error}",
+  "toast.error.trustCaLinux": "Управление доверием в Linux не поддерживается. Пожалуйста, добавьте сертификат ЦС в системное хранилище доверенных сертификатов вручную.",
+  "toast.error.trustCaOther": "Неподдерживаемая платформа.",
 
   "confirm.removeMapping": "Удалить {domain}?",
 

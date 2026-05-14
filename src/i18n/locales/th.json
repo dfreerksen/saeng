@@ -24,6 +24,12 @@
 
   "settings.title": "การตั้งค่า",
   "settings.subtitle": "กำหนดค่าลักษณะการทำงานของพร็อกซีและใบรับรอง SSL",
+  "settings.preferences": "การตั้งค่า",
+  "settings.colorMode": "โหมดสี",
+  "settings.colorModeDesc": "โหมดสีที่ใช้ในอินเทอร์เฟซ",
+  "settings.colorModeAuto": "อัตโนมัติ (ตามระบบ)",
+  "settings.colorModeLight": "สว่าง",
+  "settings.colorModeDark": "มืด",
   "settings.language": "ภาษา",
   "settings.languageDesc": "ภาษาที่แสดงสำหรับอินเทอร์เฟซ Saeng",
   "settings.proxy": "หนังสือมอบฉันทะ",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "เชื่อถือใบรับรอง CA สำเร็จแล้ว",
   "toast.caRegenerated": "สร้างใบรับรอง CA ใหม่แล้ว ใช้ Install & Trust เพื่อลงทะเบียนกับเบราว์เซอร์ของคุณ",
   "toast.caDeleted": "ใบรับรอง CA ถูกลบและลบออกจาก trust store",
+
+  "toast.error.untrustCaMac": "ไม่สามารถยกเลิกความน่าเชื่อถือของ CA บน macOS ได้ (นี่ไม่ใช่ข้อผิดพลาด)",
+  "toast.error.untrustCaWindows": "ไม่สามารถยกเลิกความน่าเชื่อถือของ CA บน Windows ได้ (นี่ไม่ใช่ข้อผิดพลาด)",
+  "toast.error.untrustCaLinux": "ยังไม่รองรับการยกเลิกความน่าเชื่อถือบน Linux โปรดลบใบรับรอง CA ออกจากพื้นที่เก็บใบรับรองที่เชื่อถือได้ (Trust Store) ของระบบด้วยตนเอง",
+  "toast.error.untrustCaOther": "แพลตฟอร์มนี้ไม่รองรับการยกเลิกความน่าเชื่อถือของใบรับรอง CA โปรดลบใบรับรอง CA ออกจากพื้นที่เก็บใบรับรองที่เชื่อถือได้ของระบบด้วยตนเอง",
+
+  "toast.error.trustCaSuccess": "เพิ่มความน่าเชื่อถือให้ใบรับรอง CA เรียบร้อยแล้ว",
+  "toast.error.trustCaMac": "ไม่สามารถเพิ่มความน่าเชื่อถือให้ CA ได้: {error}",
+  "toast.error.trustCaWindows": "ไม่สามารถเพิ่มความน่าเชื่อถือให้ CA ได้: {error}",
+  "toast.error.trustCaLinux": "ยังไม่รองรับการจัดการความน่าเชื่อถือบน Linux โปรดเพิ่มใบรับรอง CA เข้าสู่พื้นที่เก็บใบรับรองที่เชื่อถือได้ของระบบด้วยตนเอง",
+  "toast.error.trustCaOther": "แพลตฟอร์มนี้ไม่รองรับ",
 
   "confirm.removeMapping": "ลบ {domain}?",
 

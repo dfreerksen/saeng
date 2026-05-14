@@ -24,6 +24,12 @@
 
   "settings.title": "Paramètres",
   "settings.subtitle": "Configurer le comportement du proxy et les certificats SSL",
+  "settings.preferences": "Préférences",
+  "settings.colorMode": "Mode de Couleur",
+  "settings.colorModeDesc": "Mode de couleur utilisé dans l'interface.",
+  "settings.colorModeAuto": "Auto (suivre le système)",
+  "settings.colorModeLight": "Clair",
+  "settings.colorModeDark": "Sombre",
   "settings.language": "Langue",
   "settings.languageDesc": "Langue d'affichage de l'interface Saeng.",
   "settings.proxy": "Proxy",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "Certificat de l'AC approuvé avec succès.",
   "toast.caRegenerated": "Certificat de l'AC régénéré. Utilisez « Installer et approuver » pour l'enregistrer dans votre navigateur.",
   "toast.caDeleted": "Certificat de l'AC supprimé et retiré du magasin de confiance.",
+
+  "toast.error.untrustCaMac": "Échec de la suppression de la confiance envers l'AC sur macOS. Ceci n'est pas une erreur.",
+  "toast.error.untrustCaWindows": "Échec de la suppression de la confiance envers l'AC sur Windows. Ceci n'est pas une erreur.",
+  "toast.error.untrustCaLinux": "La suppression de la confiance sur Linux n'est pas encore prise en charge. Veuillez supprimer manuellement le certificat de l'AC du magasin de confiance de votre système.",
+  "toast.error.untrustCaOther": "Plateforme non prise en charge pour la suppression de la confiance envers le certificat de l'AC. Veuillez supprimer manuellement le certificat de l'AC du magasin de confiance de votre système.",
+
+  "toast.error.trustCaSuccess": "Le certificat de l'AC a été ajouté aux éléments de confiance avec succès.",
+  "toast.error.trustCaMac": "Échec de l'ajout de l'AC aux éléments de confiance : {error}",
+  "toast.error.trustCaWindows": "Échec de l'ajout de l'AC aux éléments de confiance : {error}",
+  "toast.error.trustCaLinux": "La gestion de la confiance sur Linux n'est pas prise en charge. Veuillez ajouter manuellement le certificat de l'AC au magasin de confiance de votre système.",
+  "toast.error.trustCaOther": "Plateforme non prise en charge.",
 
   "confirm.removeMapping": "Supprimer {domain} ?",
 

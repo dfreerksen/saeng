@@ -4,14 +4,11 @@ import { showToast } from './toast';
 // import { getOS, isLinux, isMac, isWindows } from './os';
 // import * as bootstrap from 'bootstrap';
 // import * as Popper from "@popperjs/core";
+import { initTooltips } from "./bootstrap/tooltip";
 
-// ── Bootstrap ──────────────────────────────────────────────────────
+// ── Initialize ─────────────────────────────────────────────────────
 
-// const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
-// const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
-
-// const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-// const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+initTooltips();
 
 // ── Navigation ─────────────────────────────────────────────────────
 
@@ -113,10 +110,10 @@ function renderMappings() {
       </td>
       <td>
         <div class="actions-cell">
-          <button class="icon-btn edit" data-id="${m.id}" title="${escapeHtml(t('table.editTitle'))}">
+          <button class="btn btn-outline-primary btn-edit edit" data-id="${m.id}" data-bs-toggle="tooltip" data-bs-title="${escapeHtml(t('table.editTitle'))}">
             <i class="bi bi-pencil"></i>
           </button>
-          <button class="icon-btn delete" data-id="${m.id}" title="${escapeHtml(t('table.deleteTitle'))}">
+          <button class="btn btn-outline-danger btn-delete delete" data-id="${m.id}" data-bs-toggle="tooltip" data-bs-title="${escapeHtml(t('table.deleteTitle'))}">
             <i class="bi bi-trash"></i>
           </button>
         </div>
@@ -128,14 +125,14 @@ function renderMappings() {
       // Don't re-render: just update the visual state based on returned data
     });
 
-    tr.querySelector('.icon-btn.edit').addEventListener('click', (e) => {
+    tr.querySelector('.btn-edit.edit').addEventListener('click', (e) => {
       const id = e.currentTarget.dataset.id;
       const mapping = mappings.find((x) => x.id === id);
       if (!mapping) return;
       openEditModal(mapping);
     });
 
-    tr.querySelector('.icon-btn.delete').addEventListener('click', async (e) => {
+    tr.querySelector('.btn-delete.delete').addEventListener('click', async (e) => {
       const id = e.currentTarget.dataset.id;
       const mapping = mappings.find((x) => x.id === id);
       if (!mapping) return;
@@ -146,6 +143,8 @@ function renderMappings() {
 
     tbody.appendChild(tr);
   });
+
+  initTooltips(tbody);
 }
 
 function escapeHtml(str) {
@@ -291,6 +290,14 @@ addForm.addEventListener('submit', async (e) => {
 
 // ── Settings ───────────────────────────────────────────────────────
 
+function applyColorMode(mode) {
+  const resolved = mode === 'auto'
+    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    : mode;
+  document.documentElement.setAttribute('data-bs-theme', resolved);
+  localStorage.setItem('theme', mode);
+}
+
 async function loadSettings() {
   const [settings, locales] = await Promise.all([
     electronAPI.settings.get(),
@@ -299,6 +306,10 @@ async function loadSettings() {
 
   document.getElementById('httpsEnabledToggle').checked = !!settings.httpsEnabled;
   document.getElementById('startOnLaunchToggle').checked = !!settings.startOnLaunch;
+
+  const colorMode = settings.colorMode || 'auto';
+  document.getElementById('colorModeSelect').value = colorMode;
+  applyColorMode(colorMode);
 
   const currentLocale = settings.locale || 'en';
   const currentDir = locales.find((l) => l.code === currentLocale)?.dir ?? 'ltr';
@@ -327,6 +338,12 @@ document.getElementById('httpsEnabledToggle').addEventListener('change', async (
 
 document.getElementById('startOnLaunchToggle').addEventListener('change', async (e) => {
   await electronAPI.settings.set({ startOnLaunch: e.target.checked });
+});
+
+document.getElementById('colorModeSelect').addEventListener('change', async (e) => {
+  const mode = e.target.value;
+  await electronAPI.settings.set({ colorMode: mode });
+  applyColorMode(mode);
 });
 
 document.getElementById('localeSelect').addEventListener('change', async (e) => {

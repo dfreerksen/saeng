@@ -24,6 +24,12 @@
 
   "settings.title": "設定",
   "settings.subtitle": "プロキシの動作やSSL証明書を設定します",
+  "settings.preferences": "設定",
+  "settings.colorMode": "カラーモード",
+  "settings.colorModeDesc": "インターフェースで使用されるカラーモードです。",
+  "settings.colorModeAuto": "自動 (システム設定に従う)",
+  "settings.colorModeLight": "ライト",
+  "settings.colorModeDark": "ダーク",
   "settings.language": "言語",
   "settings.languageDesc": "Saengのインターフェース表示言語。",
   "settings.proxy": "プロキシ",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "CA証明書の信頼設定が完了しました。",
   "toast.caRegenerated": "CA証明書を再生成しました。「インストールして信頼」を使用してブラウザに登録してください。",
   "toast.caDeleted": "CA証明書を削除し、信頼ストアから除去しました。",
+
+  "toast.error.untrustCaMac": "macOSでのCAの信頼解除に失敗しました。これはエラーではありません。",
+  "toast.error.untrustCaWindows": "WindowsでのCAの信頼解除に失敗しました。これはエラーではありません。",
+  "toast.error.untrustCaLinux": "Linuxでの信頼解除は現在サポートされていません。システムの信頼ストアから、手動でCA証明書を削除してください。",
+  "toast.error.untrustCaOther": "CA証明書の信頼解除に対応していないプラットフォームです。システムの信頼ストアから、手動でCA証明書を削除してください。",
+
+  "toast.error.trustCaSuccess": "CA証明書の信頼設定が完了しました。",
+  "toast.error.trustCaMac": "CAの信頼設定に失敗しました: {error}",
+  "toast.error.trustCaWindows": "CAの信頼設定に失敗しました: {error}",
+  "toast.error.trustCaLinux": "Linuxでの信頼管理はサポートされていません。システムの信頼ストアに、手動でCA証明書を追加してください。",
+  "toast.error.trustCaOther": "サポートされていないプラットフォームです。",
 
   "confirm.removeMapping": "{domain} を削除しますか？",
 

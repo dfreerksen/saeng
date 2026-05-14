@@ -24,6 +24,12 @@
 
   "settings.title": "Настройки",
   "settings.subtitle": "Конфигуриране на поведението на прокси сървъра и SSL сертификатите",
+  "settings.preferences": "Предпочитания",
+  "settings.colorMode": "Цветен режим",
+  "settings.colorModeDesc": "Цветен режим, използван в интерфейса.",
+  "settings.colorModeAuto": "Автоматично (следване на системните настройки)",
+  "settings.colorModeLight": "Светъл",
+  "settings.colorModeDark": "Тъмен",
   "settings.language": "Език",
   "settings.languageDesc": "Език за показване на интерфейса на Saeng.",
   "settings.proxy": "Прокси",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "CA сертификатът е успешно доверен.",
   "toast.caRegenerated": "CA сертификатът е регенериран. Използвайте „Инсталиране и доверие“, за да го регистрирате в браузъра си.",
   "toast.caDeleted": "CA сертификатът е изтрит и премахнат от хранилището за доверени данни.",
+
+  "toast.error.untrustCaMac": "Неуспешно премахване на доверието към CA на macOS. Това не е грешка",
+  "toast.error.untrustCaWindows": "Неуспешно премахване на доверието към CA на Windows. Това не е грешка",
+  "toast.error.untrustCaLinux": "Премахването на доверие в Linux все още не се поддържа. Моля, премахнете сертификата на CA от хранилището за доверени сертификати на системата ръчно.",
+  "toast.error.untrustCaOther": "Неподдържана платформа за премахване на доверието към CA сертификат. Моля, премахнете сертификата на CA от хранилището за доверени сертификати на системата ръчно.",
+
+  "toast.error.trustCaSuccess": "CA сертификатът е успешно одобрен.",
+  "toast.error.trustCaMac": "Неуспешно добавяне на доверие към CA: {error}",
+  "toast.error.trustCaWindows": "Неуспешно добавяне на доверие към CA: {error}",
+  "toast.error.trustCaLinux": "Управлението на доверие в Linux не се поддържа. Моля, добавете сертификата на CA към хранилището за доверени сертификати на системата ръчно.",
+  "toast.error.trustCaOther": "Неподдържана платформа.",
 
   "confirm.removeMapping": "Да се ​​премахне ли {domain}?",
 

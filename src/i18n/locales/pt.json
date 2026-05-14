@@ -24,6 +24,12 @@
 
   "settings.title": "Configurações",
   "settings.subtitle": "Configure o comportamento do proxy e os certificados SSL",
+  "settings.preferences": "Preferências",
+  "settings.colorMode": "Modo de Cor",
+  "settings.colorModeDesc": "Modo de cor utilizado na interface.",
+  "settings.colorModeAuto": "Auto (seguir o sistema)",
+  "settings.colorModeLight": "Claro",
+  "settings.colorModeDark": "Escuro",
   "settings.language": "Idioma",
   "settings.languageDesc": "Idioma de exibição da interface do Saeng.",
   "settings.proxy": "Proxy",
@@ -78,6 +84,17 @@
   "toast.caTrusted": "Certificado da CA confiável com sucesso.",
   "toast.caRegenerated": "Certificado da CA regenerado. Use Instalar e Confiar para registrá-lo no seu navegador.",
   "toast.caDeleted": "Certificado da CA excluído e removido do repositório de confiança.",
+
+  "toast.error.untrustCaMac": "Falha ao remover a confiança na CA no macOS. Isso não é um erro.",
+  "toast.error.untrustCaWindows": "Falha ao remover a confiança na CA no Windows. Isso não é um erro.",
+  "toast.error.untrustCaLinux": "A remoção de confiança no Linux ainda não é suportada. Por favor, remova o certificado da CA do repositório de confiança do seu sistema manualmente.",
+  "toast.error.untrustCaOther": "Plataforma não suportada para a remoção de confiança do certificado da CA. Por favor, remova o certificado da CA do repositório de confiança do seu sistema manualmente.",
+
+  "toast.error.trustCaSuccess": "Certificado da CA adicionado à lista de confiança com sucesso.",
+  "toast.error.trustCaMac": "Falha ao adicionar a CA à lista de confiança: {error}",
+  "toast.error.trustCaWindows": "Falha ao adicionar a CA à lista de confiança: {error}",
+  "toast.error.trustCaLinux": "O gerenciamento de confiança no Linux não é suportado. Por favor, adicione o certificado da CA ao repositório de confiança do seu sistema manualmente.",
+  "toast.error.trustCaOther": "Plataforma não suportada.",
 
   "confirm.removeMapping": "Remover {domain}?",
 
