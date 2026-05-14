@@ -5,6 +5,6 @@ Thumbs.db
 *.log
 dist/*
 !dist/.keep
-src/renderer/*.js
-src/renderer/*.css
+src/renderer/scripts.js
+src/renderer/styles.css
 .claude/settings.local.json
