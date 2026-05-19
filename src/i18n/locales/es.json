@@ -6,6 +6,7 @@
 
   "nav.mappings": "Mapeos",
   "nav.settings": "Configuración",
+  "nav.about": "Acerca de",
 
   "mappings.title": "Mapeos de Dominio",
   "mappings.subtitle": "Ruta de dominios locales a puertos locales",
@@ -19,6 +20,7 @@
   "table.label": "Etiqueta",
   "table.enabled": "Habilitado",
   "table.actions": "Acciones",
+  "table.copyTitle": "Copiar dominio",
   "table.editTitle": "Editar",
   "table.deleteTitle": "Eliminar",
 
@@ -54,6 +56,9 @@
   "modal.addSubmit": "Agregar mapeo",
   "modal.editSubmit": "Guardar cambios",
   "modal.cancel": "Cancelar",
+  "modal.close": "Cerrar",
+
+  "about.desc": "Un proxy inverso local para enrutar dominios .local a puertos localhost.",
 
   "form.domain": "Dominio",
   "form.port": "Puerto de Destino",
@@ -81,6 +86,7 @@
   "toast.mappingUpdated": "Actualizado {domain} → :{port}",
   "toast.httpsEnabled": "HTTPS habilitado. Reinicie el proxy para que los cambios surtan efecto.",
   "toast.httpsDisabled": "HTTPS deshabilitado.",
+  "toast.copied": "{url} copiado al portapapeles.",
   "toast.caTrusted": "Certificado de CA confiable correctamente.",
   "toast.caRegenerated": "Certificado de CA regenerado. Utilice Install & Trust para registrarlo en su navegador.",
   "toast.caDeleted": "Certificado de CA eliminado y eliminado del almacén de confianza.",

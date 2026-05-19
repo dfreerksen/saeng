@@ -43,13 +43,12 @@
   background: var(--text-muted);
   border-radius: 50%;
   height: 7px;
-  transition: background 0.3s;
   width: 7px;
 }
 
 .status-dot.running {
-  background: var(--success);
-  box-shadow: 0 0 6px var(--success);
+  background: var(--bs-green);
+  box-shadow: 0 0 6px var(--bs-green);
 }
 
 .status-dot.stopped {

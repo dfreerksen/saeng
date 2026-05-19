@@ -6,6 +6,7 @@
 
   "nav.mappings": "Mappages",
   "nav.settings": "Paramètres",
+  "nav.about": "À propos",
 
   "mappings.title": "Mappages de domaines",
   "mappings.subtitle": "Rediriger les domaines locaux vers des ports locaux",
@@ -19,6 +20,7 @@
   "table.label": "Libellé",
   "table.enabled": "Activé",
   "table.actions": "Actions",
+  "table.copyTitle": "Copier le domaine",
   "table.editTitle": "Modifier",
   "table.deleteTitle": "Supprimer",
 
@@ -54,6 +56,9 @@
   "modal.addSubmit": "Ajouter le mappage",
   "modal.editSubmit": "Enregistrer les modifications",
   "modal.cancel": "Annuler",
+  "modal.close": "Fermer",
+
+  "about.desc": "Un proxy inverse local pour acheminer les domaines .local vers les ports localhost.",
 
   "form.domain": "Domaine",
   "form.port": "Port cible",
@@ -81,6 +86,7 @@
   "toast.mappingUpdated": "Mise à jour de {domain} → :{port}",
   "toast.httpsEnabled": "HTTPS activé. Redémarrez le proxy pour que les modifications prennent effet.",
   "toast.httpsDisabled": "HTTPS désactivé.",
+  "toast.copied": "{url} copié dans le presse-papiers.",
   "toast.caTrusted": "Certificat de l'AC approuvé avec succès.",
   "toast.caRegenerated": "Certificat de l'AC régénéré. Utilisez « Installer et approuver » pour l'enregistrer dans votre navigateur.",
   "toast.caDeleted": "Certificat de l'AC supprimé et retiré du magasin de confiance.",

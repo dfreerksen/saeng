@@ -29,6 +29,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     revealCA: () => ipcRenderer.invoke('ssl:reveal-ca'),
     trustCA: () => ipcRenderer.invoke('ssl:trust-ca'),
   },
+  app: {
+    getInfo: () => ipcRenderer.invoke('app:get-info'),
+    openExternal: (url) => ipcRenderer.invoke('app:open-external', url),
+  },
   i18n: {
     getStrings: () => ipcRenderer.invoke('i18n:get-strings'),
     getLocales: () => ipcRenderer.invoke('i18n:get-locales'),

@@ -1,54 +1,51 @@
-.table-wrap {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
+// .table-wrap {
+//   background: var(--bg-surface);
+//   border: 1px solid var(--border);
+//   border-radius: var(--radius-md);
+//   overflow: hidden;
+// }
 
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
+// table {
+//   border-collapse: collapse;
+//   width: 100%;
+// }
 
-thead th {
-  background: var(--bg-elevated);
-  border-bottom: 1px solid var(--border);
-  color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  padding: 11px 16px;
-  text-align: left;
-  text-transform: uppercase;
-}
+// thead th {
+//   background: var(--bg-elevated);
+//   border-bottom: 1px solid var(--border);
+//   color: var(--text-muted);
+//   font-size: 11px;
+//   font-weight: 600;
+//   letter-spacing: 0.06em;
+//   padding: 11px 16px;
+//   text-align: left;
+//   text-transform: uppercase;
+// }
 
-tbody tr {
-  border-bottom: 1px solid var(--border);
-  transition: background 0.1s;
-}
+// tbody tr {
+//   border-bottom: 1px solid var(--border);
+// }
 
-tbody tr:last-child {
-  border-bottom: none;
-}
+// tbody tr:last-child {
+//   border-bottom: none;
+// }
 
-tbody tr:hover {
-  background: var(--bg-hover);
-}
+// tbody tr:hover {
+//   background: var(--bg-hover);
+// }
 
-td {
-  padding: 12px 16px;
-  vertical-align: middle;
-}
+// td {
+//   padding: 12px 16px;
+//   vertical-align: middle;
+// }
 
 .domain-cell {
   color: var(--accent);
-  font-family: var(--mono);
   font-size: 13px;
 }
 
 .port-cell {
   color: var(--text-secondary);
-  font-family: var(--mono);
   font-size: 13px;
 }
 
@@ -67,13 +64,13 @@ td {
 }
 
 .badge-https {
-  background: rgb(67 199 139 / 15%);
-  color: var(--success);
+  background: rgba(var(--bs-success), 0.15);
+  color: var(--bs-success);
 }
 
 .badge-http {
-  background: rgb(79 110 247 / 12%);
-  color: var(--accent);
+  background: rgba(var(--bs-primary), 0.12);
+  color: var(--bs-primary);
 }
 
 /* Toggle switch */
@@ -82,12 +79,12 @@ td {
   height: 20px;
   position: relative;
   width: 36px;
-}
 
-.toggle input {
-  height: 0;
-  opacity: 0;
-  width: 0;
+  input {
+    height: 0;
+    opacity: 0;
+    width: 0;
+  }
 }
 
 .toggle-track {
@@ -97,19 +94,17 @@ td {
   cursor: pointer;
   inset: 0;
   position: absolute;
-  transition: background 0.2s, border-color 0.2s;
-}
 
-.toggle-track::before {
-  background: var(--text-muted);
-  border-radius: 50%;
-  content: '';
-  height: 14px;
-  left: 2px;
-  position: absolute;
-  top: 2px;
-  transition: transform 0.2s, background 0.2s;
-  width: 14px;
+  &::before {
+    background: var(--text-muted);
+    border-radius: 50%;
+    content: '';
+    height: 14px;
+    left: 2px;
+    position: absolute;
+    top: 2px;
+    width: 14px;
+  }
 }
 
 .toggle input:checked + .toggle-track {
@@ -126,33 +121,6 @@ td {
   display: flex;
   gap: 6px;
   justify-content: flex-end;
-}
-
-.icon-btn {
-  background: none;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 14px;
-  padding: 4px 8px;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
-}
-
-.icon-btn:hover {
-  background: var(--bg-hover);
-  border-color: var(--border);
-  color: var(--text-primary);
-}
-
-.icon-btn.edit:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.icon-btn.delete:hover {
-  border-color: var(--danger);
-  color: var(--danger);
 }
 
 .empty-state {

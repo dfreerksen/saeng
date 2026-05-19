@@ -6,6 +6,7 @@
 
   "nav.mappings": "Ánh xạ",
   "nav.settings": "Cài đặt",
+  "nav.about": "Về",
 
   "mappings.title": "Ánh xạ Tên miền",
   "mappings.subtitle": "Điều hướng các tên miền cục bộ đến các cổng cục bộ",
@@ -19,6 +20,7 @@
   "table.label": "Nhãn",
   "table.enabled": "Đã bật",
   "table.actions": "Thao tác",
+  "table.copyTitle": "Sao chép tên miền",
   "table.editTitle": "Chỉnh sửa",
   "table.deleteTitle": "Xóa",
 
@@ -54,6 +56,9 @@
   "modal.addSubmit": "Thêm Ánh xạ",
   "modal.editSubmit": "Lưu Thay đổi",
   "modal.cancel": "Hủy",
+  "modal.close": "Đóng",
+
+  "about.desc": "Proxy ngược cục bộ để định tuyến các miền .local tới các cổng localhost.",
 
   "form.domain": "Tên miền",
   "form.port": "Cổng đích",
@@ -81,6 +86,7 @@
   "toast.mappingUpdated": "Đã cập nhật {domain} → :{port}",
   "toast.httpsEnabled": "Đã bật HTTPS. Hãy khởi động lại proxy để các thay đổi có hiệu lực.",
   "toast.httpsDisabled": "Đã tắt HTTPS.",
+  "toast.copied": "Đã sao chép {url} vào clipboard.",
   "toast.caTrusted": "Đã tin cậy chứng chỉ CA thành công.",
   "toast.caRegenerated": "Đã tạo lại chứng chỉ CA. Hãy sử dụng mục Cài đặt & Tin cậy để đăng ký chứng chỉ này với trình duyệt của bạn.",
   "toast.caDeleted": "Đã xóa chứng chỉ CA và gỡ bỏ khỏi kho lưu trữ tin cậy.",

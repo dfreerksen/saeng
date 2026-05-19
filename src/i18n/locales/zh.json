@@ -6,6 +6,7 @@
 
   "nav.mappings": "映射",
   "nav.settings": "设置",
+  "nav.about": "关于",
 
   "mappings.title": "域名映射",
   "mappings.subtitle": "将本地域名路由至本地端口",
@@ -19,6 +20,7 @@
   "table.label": "标签",
   "table.enabled": "已启用",
   "table.actions": "操作",
+  "table.copyTitle": "复制域名",
   "table.editTitle": "编辑",
   "table.deleteTitle": "移除",
 
@@ -54,6 +56,9 @@
   "modal.addSubmit": "添加映射",
   "modal.editSubmit": "保存更改",
   "modal.cancel": "取消",
+  "modal.close": "关闭",
+
+  "about.desc": "用于将 .local 域路由到 localhost 端口的本地反向代理。",
 
   "form.domain": "域名",
   "form.port": "目标端口",
@@ -81,6 +86,7 @@
   "toast.mappingUpdated": "已更新 {domain} → :{port}",
   "toast.httpsEnabled": "HTTPS 已启用。请重启代理以使更改生效。",
   "toast.httpsDisabled": "HTTPS 已禁用。",
+  "toast.copied": "已将 {url} 复制到剪贴板。",
   "toast.caTrusted": "CA 证书已成功受信任。",
   "toast.caRegenerated": "CA 证书已重新生成。请使用“安装并信任”将其注册到您的浏览器中。",
   "toast.caDeleted": "CA 证书已删除，并已从信任存储中移除。",

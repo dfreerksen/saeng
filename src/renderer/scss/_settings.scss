@@ -52,11 +52,9 @@
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   cursor: pointer;
-  font-family: var(--font);
   font-size: 13px;
   outline: none;
   padding: 7px 28px 7px 10px;
-  transition: border-color 0.15s;
 
   &:focus {
     border-color: var(--border-focus);
@@ -68,7 +66,6 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  font-family: var(--mono);
   font-size: 12px;
   margin: 12px 0;
   padding: 12px 14px;
@@ -81,10 +78,10 @@
   margin-top: -6px;
 
   &--warning {
-    color: var(--warning);
+    color: var(--bs-warning);
   }
 
   &--danger {
-    color: var(--danger);
+    color: var(--bs-danger);
   }
 }

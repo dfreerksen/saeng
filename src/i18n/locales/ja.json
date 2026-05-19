@@ -6,6 +6,7 @@
 
   "nav.mappings": "マッピング",
   "nav.settings": "設定",
+  "nav.about": "について",
 
   "mappings.title": "ドメインマッピング",
   "mappings.subtitle": "ローカルドメインをローカルポートへルーティング",
@@ -19,6 +20,7 @@
   "table.label": "ラベル",
   "table.enabled": "有効",
   "table.actions": "アクション",
+  "table.copyTitle": "ドメインをコピー",
   "table.editTitle": "編集",
   "table.deleteTitle": "削除",
 
@@ -54,6 +56,9 @@
   "modal.addSubmit": "マッピングを追加",
   "modal.editSubmit": "変更を保存",
   "modal.cancel": "キャンセル",
+  "modal.close": "閉じる",
+
+  "about.desc": ".local ドメインを localhost ポートにルーティングするためのローカル リバース プロキシ。",
 
   "form.domain": "ドメイン",
   "form.port": "ターゲットポート",
@@ -81,6 +86,7 @@
   "toast.mappingUpdated": "{domain} → :{port} のマッピングを更新しました",
   "toast.httpsEnabled": "HTTPSを有効にしました。変更を適用するにはプロキシを再起動してください。",
   "toast.httpsDisabled": "HTTPSを無効にしました。",
+  "toast.copied": "{url} をクリップボードにコピーしました。",
   "toast.caTrusted": "CA証明書の信頼設定が完了しました。",
   "toast.caRegenerated": "CA証明書を再生成しました。「インストールして信頼」を使用してブラウザに登録してください。",
   "toast.caDeleted": "CA証明書を削除し、信頼ストアから除去しました。",

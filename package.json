@@ -20,7 +20,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/dfreerksen"
+    "url": "https://github.com/dfreerksen/saeng.git"
   },
   "type": "module",
   "main": "main.js",
@@ -32,18 +32,19 @@
     "start": "npm run sass:build && npm run js:build && electron .",
     "build": "npm run sass:build && npm run js:build && electron-builder",
     "pack": "npm run sass:build && npm run js:build && electron-builder --dir",
+    "fonts:copy": "node -e \"const fs=require('fs');fs.mkdirSync('src/renderer/fonts',{recursive:true});['woff','woff2'].forEach(e=>fs.copyFileSync('node_modules/bootstrap-icons/font/fonts/bootstrap-icons.'+e,'src/renderer/fonts/bootstrap-icons.'+e))\"",
     "sass:build": "sass src/renderer/scss:src/renderer --no-source-map --load-path=node_modules",
     "js:build": "esbuild src/renderer/js/scripts.js --bundle --outfile=src/renderer/scripts.js"
   },
   "dependencies": {
-    "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.8",
-    "bootstrap-icons": "^1.13.1",
     "electron-store": "^11.0.2",
     "node-forge": "^1.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
     "electron": "^42.0.1",
     "electron-builder": "^26.8.1",
     "esbuild": "^0.28.0",
@@ -58,19 +59,27 @@
   "build": {
     "appId": "com.saeng.app",
     "productName": "Saeng",
+    "electronLanguages": ["en-US"],
     "files": [
       "main.js",
       "preload.cjs",
-      "src/**",
       "assets/**",
-      "node_modules/bootstrap-icons/font/fonts/**"
+      "src/**",
+      "!src/renderer/scss/**/*.scss",
+      "!src/renderer/js/**/*.js"
     ],
     "mac": {
       "category": "public.app-category.developer-tools",
       "icon": "assets/icons/mac/icon.icon",
       "target": [
-        "dmg",
-        "zip"
+        {
+          "target": "dmg",
+          "arch": ["arm64", "x64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["arm64", "x64"]
+        }
       ]
     },
     "win": {

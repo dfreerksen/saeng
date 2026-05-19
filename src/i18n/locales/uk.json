@@ -6,6 +6,7 @@
 
   "nav.mappings": "Зіставлення",
   "nav.settings": "Налаштування",
+  "nav.about": "про",
 
   "mappings.title": "Зіставлення доменів",
   "mappings.subtitle": "Маршрутизувати локальні домени на локальні порти",
@@ -19,6 +20,7 @@
   "table.label": "Мітка",
   "table.enabled": "Увімкнено",
   "table.actions": "Дії",
+  "table.copyTitle": "Копіювати домен",
   "table.editTitle": "Редагувати",
   "table.deleteTitle": "Видалити",
 
@@ -54,6 +56,9 @@
   "modal.addSubmit": "Додати зіставлення",
   "modal.editSubmit": "Зберегти зміни",
   "modal.cancel": "Скасувати",
+  "modal.close": "Закрити",
+
+  "about.desc": "Локальний зворотний проксі для маршрутизації доменів .local на порти localhost.",
 
   "form.domain": "Домен",
   "form.port": "Цільовий порт",
@@ -81,6 +86,7 @@
   "toast.mappingUpdated": "Оновлено {domain} → :{port}",
   "toast.httpsEnabled": "HTTPS увімкнено. Перезапустіть проксі-сервер, щоб зміни набули чинності.",
   "toast.httpsDisabled": "HTTPS вимкнено.",
+  "toast.copied": "{url} скопійовано до буфера обміну.",
   "toast.caTrusted": "Сертифікат CA успішно довірено.",
   "toast.caRegenerated": "Сертифікат CA відновлено. Використайте функцію «Встановити та довіряти», щоб зареєструвати його у вашому браузері.",
   "toast.caDeleted": "Сертифікат CA видалено та видалено зі сховища довірених сертифікатів.",

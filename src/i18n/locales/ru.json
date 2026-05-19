@@ -6,6 +6,7 @@
 
   "nav.mappings": "Сопоставления",
   "nav.settings": "Настройки",
+  "nav.about": "О",
 
   "mappings.title": "Сопоставления доменов",
   "mappings.subtitle": "Перенаправление локальных доменов на локальные порты",
@@ -19,6 +20,7 @@
   "table.label": "Метка",
   "table.enabled": "Включено",
   "table.actions": "Действия",
+  "table.copyTitle": "Скопировать домен",
   "table.editTitle": "Редактировать",
   "table.deleteTitle": "Удалить",
 
@@ -54,6 +56,9 @@
   "modal.addSubmit": "Добавить сопоставление",
   "modal.editSubmit": "Сохранить изменения",
   "modal.cancel": "Отмена",
+  "modal.close": "Закрыть",
+
+  "about.desc": "Локальный обратный прокси-сервер для маршрутизации доменов .local на порты localhost.",
 
   "form.domain": "Домен",
   "form.port": "Целевой порт",
@@ -81,6 +86,7 @@
   "toast.mappingUpdated": "Обновлено {domain} → :{port}",
   "toast.httpsEnabled": "HTTPS включен. Перезапустите прокси, чтобы изменения вступили в силу.",
   "toast.httpsDisabled": "HTTPS отключен.",
+  "toast.copied": "{url} скопировано в буфер обмена.",
   "toast.caTrusted": "Сертификат CA успешно доверен.",
   "toast.caRegenerated": "Сертификат CA восстановлен. Используйте \"Установить и доверять\", чтобы зарегистрировать его в вашем браузере.",
   "toast.caDeleted": "Сертификат CA удален и удален из хранилища доверенных сертификатов.",

@@ -211,6 +211,13 @@ function setupIPC() {
     trustCA(CertManager.getInstance(store.getCertDir()).getCAPath())
   );
 
+  ipcMain.handle('app:open-external', (_, url) => shell.openExternal(url));
+
+  ipcMain.handle('app:get-info', () => ({
+    name: app.getName(),
+    version: pkg.version,
+  }));
+
   ipcMain.handle('i18n:get-strings', () => i18n.getStrings());
 
   ipcMain.handle('i18n:get-locales', () => i18n.getSupportedLocales());

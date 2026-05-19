@@ -6,6 +6,7 @@
 
   "nav.mappings": "التعيينات",
   "nav.settings": "الإعدادات",
+  "nav.about": "عن",
 
   "mappings.title": "تعيينات النطاقات",
   "mappings.subtitle": "توجيه النطاقات المحلية إلى منافذ محلية",
@@ -19,6 +20,7 @@
   "table.label": "التسمية",
   "table.enabled": "مفعّل",
   "table.actions": "الإجراءات",
+  "table.copyTitle": "نسخ النطاق",
   "table.editTitle": "تعديل",
   "table.deleteTitle": "إزالة",
 
@@ -54,6 +56,9 @@
   "modal.addSubmit": "إضافة تعيين",
   "modal.editSubmit": "حفظ التغييرات",
   "modal.cancel": "إلغاء",
+  "modal.close": "يغلق",
+
+  "about.desc": "وكيل عكسي محلي لتوجيه النطاقات .local إلى منافذ localhost.",
 
   "form.domain": "النطاق",
   "form.port": "المنفذ المستهدف",
@@ -81,6 +86,7 @@
   "toast.mappingUpdated": "تم تحديث {domain} ← :{port}",
   "toast.httpsEnabled": "تم تفعيل HTTPS. أعد تشغيل الوكيل (Proxy) لتطبيق التغييرات.",
   "toast.httpsDisabled": "تم تعطيل HTTPS.",
+  "toast.copied": "تم نسخ {url} إلى الحافظة.",
   "toast.caTrusted": "تم الوثوق بشهادة المرجع المصدق (CA) بنجاح.",
   "toast.caRegenerated": "تم إعادة إنشاء شهادة المرجع المصدق (CA). استخدم خيار «تثبيت والوثوق» لتسجيلها في متصفحك.",
   "toast.caDeleted": "تم حذف شهادة المرجع المصدق (CA) وإزالتها من مخزن الثقة.",

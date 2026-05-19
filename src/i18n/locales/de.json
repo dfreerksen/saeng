@@ -6,6 +6,7 @@
 
   "nav.mappings": "Zuordnungen",
   "nav.settings": "Einstellungen",
+  "nav.about": "Um",
 
   "mappings.title": "Domain-Zuordnungen",
   "mappings.subtitle": "Lokale Domains auf lokale Ports weiterleiten",
@@ -19,6 +20,7 @@
   "table.label": "Etikett",
   "table.enabled": "Ermöglicht",
   "table.actions": "Aktionen",
+  "table.copyTitle": "Domain kopieren",
   "table.editTitle": "Bearbeiten",
   "table.deleteTitle": "Entfernen",
 
@@ -54,6 +56,9 @@
   "modal.addSubmit": "Mapping hinzufügen",
   "modal.editSubmit": "Änderungen speichern",
   "modal.cancel": "Abbrechen",
+  "modal.close": "Schließen",
+
+  "about.desc": "Ein lokaler Reverse-Proxy zum Weiterleiten von .local-Domänen an localhost-Ports.",
 
   "form.domain": "Domain",
   "form.port": "Zielport",
@@ -81,6 +86,7 @@
   "toast.mappingUpdated": "{domain} → :{port} aktualisiert",
   "toast.httpsEnabled": "HTTPS aktiviert. Starten Sie den Proxy neu, damit die Änderungen wirksam werden.",
   "toast.httpsDisabled": "HTTPS deaktiviert.",
+  "toast.copied": "{url} in die Zwischenablage kopiert.",
   "toast.caTrusted": "CA-Zertifikat erfolgreich vertrauenswürdig eingestellt.",
   "toast.caRegenerated": "CA-Zertifikat neu generiert. Verwenden Sie \"Installieren & Vertrauen\", um es mit Ihrem Browser zu registrieren.",
   "toast.caDeleted": "CA-Zertifikat gelöscht und aus dem Vertrauensspeicher entfernt.",

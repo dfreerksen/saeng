@@ -1,21 +1,15 @@
-// import { t, applyTranslations, initI18n } from './i18n';
 import { t, initI18n, loadStrings } from './i18n';
 import { showToast } from './toast';
 import { getOS } from './os';
-// import * as bootstrap from 'bootstrap';
-// import * as Popper from "@popperjs/core";
-import { initTooltips } from "./bootstrap/tooltip";
-
-// ── Initialize ─────────────────────────────────────────────────────
-
-initTooltips();
-document.body.classList.add(getOS());
+import { initTooltips, destroyTooltip } from "./bootstrap/tooltip";
+import * as Popper from "@popperjs/core";
+import * as bootstrap from 'bootstrap';
 
 // ── Navigation ─────────────────────────────────────────────────────
 
 let currentView = 'mappings';
 
-document.querySelectorAll('.nav-item').forEach((btn) => {
+document.querySelectorAll('.nav-item[data-view]').forEach((btn) => {
   btn.addEventListener('click', () => {
     const view = btn.dataset.view;
     document.querySelectorAll('.nav-item').forEach((b) => b.classList.remove('active'));
@@ -94,15 +88,13 @@ function renderMappings() {
   mappings.forEach((m) => {
     const tr = document.createElement('tr');
 
-    const protoBadge = m.https
-      ? '<span class="badge badge-https">HTTPS</span>'
-      : '<span class="badge badge-http">HTTP</span>';
+    const protoSecure = m.https ? 'https' : 'http';
+    const protoBadge = `<span class="badge badge-${protoSecure}">${protoSecure.toUpperCase()}</span>`;
 
     tr.innerHTML = `
       <td class="domain-cell">${escapeHtml(m.domain)}</td>
-      <td class="port-cell">:${m.port}</td>
-      <td>${protoBadge}</td>
       <td class="label-cell">${escapeHtml(m.label || '')}</td>
+      <td>${protoBadge}</td>
       <td>
         <label class="toggle">
           <input type="checkbox" class="toggle-enabled" data-id="${m.id}" ${m.enabled ? 'checked' : ''}>
@@ -111,9 +103,14 @@ function renderMappings() {
       </td>
       <td>
         <div class="actions-cell">
-          <button class="btn btn-outline-primary btn-edit edit" data-id="${m.id}" data-bs-toggle="tooltip" data-bs-title="${escapeHtml(t('table.editTitle'))}">
-            <i class="bi bi-pencil"></i>
+          <button class="btn btn-outline-secondary btn-copy copy" data-id="${m.id}" data-bs-toggle="tooltip" data-bs-title="${escapeHtml(t('table.copyTitle'))}">
+            <i class="bi bi-clipboard-check"></i>
           </button>
+          <span data-bs-toggle="tooltip" data-bs-title="${escapeHtml(t('table.editTitle'))}">
+            <button class="btn btn-outline-primary btn-edit edit" data-id="${m.id}" data-bs-toggle="modal" data-bs-target="#addModal">
+              <i class="bi bi-pencil"></i>
+            </button>
+          </span>
           <button class="btn btn-outline-danger btn-delete delete" data-id="${m.id}" data-bs-toggle="tooltip" data-bs-title="${escapeHtml(t('table.deleteTitle'))}">
             <i class="bi bi-trash"></i>
           </button>
@@ -124,6 +121,16 @@ function renderMappings() {
     tr.querySelector('.toggle-enabled').addEventListener('change', async (e) => {
       mappings = await electronAPI.mappings.toggle(e.target.dataset.id);
       // Don't re-render: just update the visual state based on returned data
+    });
+
+    tr.querySelector('.btn-copy.copy').addEventListener('click', (e) => {
+      const id = e.currentTarget.dataset.id;
+      const mapping = mappings.find((x) => x.id === id);
+      if (!mapping) return;
+      const protocol = document.getElementById('httpsEnabledToggle').checked ? 'https' : 'http';
+      const url = `${protocol}://${mapping.domain}`;
+      showToast(t('toast.copied', { url }), 'success');
+      navigator.clipboard.writeText(url);
     });
 
     tr.querySelector('.btn-edit.edit').addEventListener('click', (e) => {
@@ -138,6 +145,7 @@ function renderMappings() {
       const mapping = mappings.find((x) => x.id === id);
       if (!mapping) return;
       if (!confirm(t('confirm.removeMapping', { domain: mapping.domain }))) return;
+      destroyTooltip(e.currentTarget);
       mappings = await electronAPI.mappings.remove(id);
       renderMappings();
     });
@@ -416,6 +424,9 @@ document.getElementById('trustCaBtn').addEventListener('click', async () => {
 // ── Init ───────────────────────────────────────────────────────────
 
 async function init() {
+  // Add OS-specific class to body for platform-specific styling
+  document.body.classList.add(getOS());
+
   await initI18n();
 
   const status = await electronAPI.proxy.status();
@@ -426,14 +437,29 @@ async function init() {
 
   await loadSettings();
 
+  const appInfo = await electronAPI.app.getInfo();
+  document.getElementById('aboutVersion').textContent = `v${appInfo.version}`;
+
   const caPath = await electronAPI.ssl.getCAPath();
   document.getElementById('caPathBox').textContent = caPath;
 
   const caExpiry = await electronAPI.ssl.getCAExpiry();
   setExpiryDisplay(caExpiry);
+
+  // Bootstrap tooltips
+  initTooltips();
 }
 
 init();
 
 (() => {
+  document.addEventListener('click', (e) => {
+    const anchor = e.target.closest('a[href]');
+    if (!anchor) return;
+    const url = anchor.href;
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      e.preventDefault();
+      electronAPI.app.openExternal(url);
+    }
+  });
 })();

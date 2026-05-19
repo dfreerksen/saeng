@@ -6,6 +6,7 @@
 
   "nav.mappings": "การแมป",
   "nav.settings": "การตั้งค่า",
+  "nav.about": "เกี่ยวกับ",
 
   "mappings.title": "การแมปโดเมน",
   "mappings.subtitle": "กำหนดเส้นทางโดเมนท้องถิ่นไปยังพอร์ตท้องถิ่น",
@@ -19,6 +20,7 @@
   "table.label": "ฉลาก",
   "table.enabled": "เปิดใช้งานแล้ว",
   "table.actions": "การดำเนินการ",
+  "table.copyTitle": "คัดลอกโดเมน",
   "table.editTitle": "แก้ไข",
   "table.deleteTitle": "ลบ",
 
@@ -54,6 +56,9 @@
   "modal.addSubmit": "เพิ่มการทำแผนที่",
   "modal.editSubmit": "บันทึกการเปลี่ยนแปลง",
   "modal.cancel": "ยกเลิก",
+  "modal.close": "ปิด",
+
+  "about.desc": "พร็อกซีย้อนกลับในเครื่องสำหรับกำหนดเส้นทางโดเมน .local ไปยังพอร์ต localhost",
 
   "form.domain": "โดเมน",
   "form.port": "พอร์ตเป้าหมาย",
@@ -81,6 +86,7 @@
   "toast.mappingUpdated": "อัปเดต {domain} → :{port}",
   "toast.httpsEnabled": "เปิดใช้งาน HTTPS แล้ว รีสตาร์ทพร็อกซีเพื่อให้การเปลี่ยนแปลงมีผล",
   "toast.httpsDisabled": "HTTPS ถูกปิดใช้งาน",
+  "toast.copied": "คัดลอก {url} ไปยังคลิปบอร์ดแล้ว",
   "toast.caTrusted": "เชื่อถือใบรับรอง CA สำเร็จแล้ว",
   "toast.caRegenerated": "สร้างใบรับรอง CA ใหม่แล้ว ใช้ Install & Trust เพื่อลงทะเบียนกับเบราว์เซอร์ของคุณ",
   "toast.caDeleted": "ใบรับรอง CA ถูกลบและลบออกจาก trust store",

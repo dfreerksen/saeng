@@ -6,6 +6,7 @@
 
   "nav.mappings": "Mappings",
   "nav.settings": "Settings",
+  "nav.about": "About",
 
   "mappings.title": "Domain Mappings",
   "mappings.subtitle": "Route local domains to local ports",
@@ -19,6 +20,7 @@
   "table.label": "Label",
   "table.enabled": "Enabled",
   "table.actions": "Actions",
+  "table.copyTitle": "Copy Domain",
   "table.editTitle": "Edit",
   "table.deleteTitle": "Remove",
 
@@ -54,6 +56,9 @@
   "modal.addSubmit": "Add Mapping",
   "modal.editSubmit": "Save Changes",
   "modal.cancel": "Cancel",
+  "modal.close": "Close",
+
+  "about.desc": "A local reverse proxy for routing .local domains to localhost ports.",
 
   "form.domain": "Domain",
   "form.port": "Target Port",
@@ -81,6 +86,7 @@
   "toast.mappingUpdated": "Updated {domain} → :{port}",
   "toast.httpsEnabled": "HTTPS enabled. Restart the proxy for changes to take effect.",
   "toast.httpsDisabled": "HTTPS disabled.",
+  "toast.copied": "Copied {url} to clipboard.",
   "toast.caTrusted": "CA certificate trusted successfully.",
   "toast.caRegenerated": "CA certificate regenerated. Use Install & Trust to register it with your browser.",
   "toast.caDeleted": "CA certificate deleted and removed from trust store.",

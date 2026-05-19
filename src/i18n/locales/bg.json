@@ -6,6 +6,7 @@
 
   "nav.mappings": "Съответствия",
   "nav.settings": "Настройки",
+  "nav.about": "За",
 
   "mappings.title": "Съответствия на домейни",
   "mappings.subtitle": "Маршрутирай локални домейни към локални портове",
@@ -19,6 +20,7 @@
   "table.label": "Етикет",
   "table.enabled": "Активирано",
   "table.actions": "Действия",
+  "table.copyTitle": "Копиране на домейн",
   "table.editTitle": "Редактиране",
   "table.deleteTitle": "Премахване",
 
@@ -54,6 +56,9 @@
   "modal.addSubmit": "Добавяне на съпоставяне",
   "modal.editSubmit": "Запазване на промените",
   "modal.cancel": "Отказ",
+  "modal.close": "Затваряне",
+
+  "about.desc": "Локален обратен прокси за маршрутизиране на .local домейни към localhost портове.",
 
   "form.domain": "Домейн",
   "form.port": "Целеви порт",
@@ -81,6 +86,7 @@
   "toast.mappingUpdated": "Актуализиран {domain} → :{port}",
   "toast.httpsEnabled": "HTTPS е активиран. Рестартирайте проксито, за да влязат промените в сила.",
   "toast.httpsDisabled": "HTTPS е деактивиран.",
+  "toast.copied": "{url} е копиран в клипборда.",
   "toast.caTrusted": "CA сертификатът е успешно доверен.",
   "toast.caRegenerated": "CA сертификатът е регенериран. Използвайте „Инсталиране и доверие“, за да го регистрирате в браузъра си.",
   "toast.caDeleted": "CA сертификатът е изтрит и премахнат от хранилището за доверени данни.",

@@ -1,0 +1,102 @@
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  color: var(--text-secondary);
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.form-input {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  padding: 9px 12px;
+  width: 100%;
+}
+
+.form-input:focus {
+  border-color: var(--border-focus);
+}
+
+.form-input::placeholder {
+  color: var(--text-muted);
+}
+
+.domain-row {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.domain-sep {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.domain-suffix {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  font-size: 13px;
+  padding: 9px 10px;
+}
+
+.domain-suffix-select {
+  appearance: none;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 13px;
+  outline: none;
+  padding: 9px 10px;
+
+  &:focus {
+    border-color: var(--border-focus);
+  }
+}
+
+.form-hint {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: 5px;
+}
+
+.form-error {
+  color: var(--danger);
+  display: none;
+  font-size: 11px;
+  margin-top: 5px;
+}
+
+.form-error.visible {
+  display: block;
+}
+
+.checkbox-row {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+}
+
+.checkbox-row input[type="checkbox"] {
+  accent-color: var(--accent);
+  cursor: pointer;
+  height: 16px;
+  width: 16px;
+}
