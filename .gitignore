@@ -1,10 +1,38 @@
-node_modules/
-out/
-.DS_Store
-Thumbs.db
-*.log
-dist/*
-!dist/.keep
+# Compiled source files
 src/renderer/scripts.js
 src/renderer/styles.css
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+dist/*
+!dist/.keep
+
+# Dependency directories
+node_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+.env.production
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude
 .claude/settings.local.json
