@@ -49,7 +49,8 @@
   "settings.regenerateCaConfirm": "Thao tác này sẽ xóa chứng chỉ CA hiện tại và tất cả các chứng chỉ theo từng tên miền. Bạn sẽ cần thiết lập lại sự tin cậy đối với chứng chỉ mới trong trình duyệt của mình. Tiếp tục?",
   "settings.deleteCa": "Xóa Chứng chỉ CA",
   "settings.deleteCaConfirm": "Thao tác này sẽ gỡ bỏ chứng chỉ CA khỏi kho lưu trữ tin cậy của bạn và xóa tất cả các tệp chứng chỉ. HTTPS sẽ không hoạt động cho đến khi bạn tạo lại và thiết lập lại độ tin cậy cho một chứng chỉ mới. Tiếp tục?",
-  "settings.caPlatformNote": "Trên macOS: cài đặt vào System Keychain (yêu cầu mật khẩu của bạn).<br>Trên Windows: chạy certutil với quyền nâng cao (UAC).",
+  "settings.caPlatformNoteMac": "Trên macOS: cài đặt vào System Keychain (yêu cầu mật khẩu của bạn).",
+  "settings.caPlatformNoteWindows": "Trên Windows: chạy certutil với quyền nâng cao (UAC).",
 
   "modal.addTitle": "Thêm Ánh xạ Tên miền",
   "modal.editTitle": "Chỉnh sửa Ánh xạ",

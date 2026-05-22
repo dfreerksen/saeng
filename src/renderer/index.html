@@ -50,7 +50,7 @@
         <!-- Main content -->
         <main class="content">
 
-          <!-- ── Mappings view ── -->
+          <!-- Mappings view -->
           <div class="view active" id="view-mappings">
             <div class="view-header">
               <div>
@@ -84,7 +84,7 @@
             </div>
           </div>
 
-          <!-- ── Settings view ── -->
+          <!-- Settings view -->
           <div class="view" id="view-settings">
             <div class="view-header">
               <div>
@@ -146,7 +146,7 @@
             <div class="settings-section">
               <div class="settings-section-title" data-i18n="settings.caTitle">SSL Certificate Authority</div>
 
-              <p style="font-size:13px; color:var(--text-secondary); margin-bottom:12px; line-height:1.6"
+              <p style="font-size:13px; color:var(--saeng-primary-complement-color); margin-bottom:12px; line-height:1.6"
                 data-i18n-html="settings.caDesc">
                 To serve HTTPS on local domains, Saeng generates a local CA certificate.
                 You must install and trust it in your system keychain once.
@@ -172,9 +172,12 @@
                 <span class="d-none d-md-inline" data-i18n="settings.deleteCa">Delete CA Certificate</span>
               </button>
 
-              <p style="font-size:11px; color:var(--text-muted); margin-top:10px"
-                data-i18n-html="settings.caPlatformNote">
-                On macOS: installs into System Keychain (requires your password).<br>
+              <p class="mac" style="font-size:var(--saeng-font-size-small); color:var(--saeng-text-muted); margin-top:10px"
+                data-i18n-html="settings.caPlatformNoteMac">
+                On macOS: installs into System Keychain (requires your password).
+              </p>
+              <p class="windows" style="font-size:var(--saeng-font-size-small); color:var(--saeng-text-muted); margin-top:10px"
+                data-i18n-html="settings.caPlatformNoteWindows">
                 On Windows: runs certutil with UAC elevation.
               </p>
             </div>
@@ -185,7 +188,7 @@
       </div>
     </div>
 
-    <!-- ── Add mapping modal ── -->
+    <!-- Add/edit mapping modal -->
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
@@ -199,7 +202,7 @@
               <div class="form-group">
                 <label class="form-label">
                   <span data-i18n="form.domain">Domain</span>
-                  <span style="color:var(--text-muted)" data-i18n="form.required">(required)</span>
+                  <span style="color:var(--saeng-text-muted)" data-i18n="form.required">(required)</span>
                 </label>
                 <div class="domain-row">
                   <input class="form-input" id="subdomainInput"
@@ -223,7 +226,7 @@
               <div class="form-group">
                 <label class="form-label">
                   <span data-i18n="form.port">Target Port</span>
-                  <span style="color:var(--text-muted)" data-i18n="form.required">(required)</span>
+                  <span style="color:var(--saeng-text-muted)" data-i18n="form.required">(required)</span>
                 </label>
                 <input class="form-input" id="portInput"
                   type="number" min="1" max="65535" value="3000"
@@ -236,7 +239,7 @@
               <div class="form-group">
                 <label class="form-label">
                   <span data-i18n="form.label">Label</span>
-                  <span style="color:var(--text-muted)" data-i18n="form.optional">(optional)</span>
+                  <span style="color:var(--saeng-text-muted)" data-i18n="form.optional">(optional)</span>
                 </label>
                 <input class="form-input" id="labelInput"
                   placeholder="My API server" data-i18n-placeholder="form.labelPlaceholder"
@@ -264,17 +267,17 @@
       </div>
     </div>
 
-    <!-- ── About modal ── -->
+    <!-- About modal -->
     <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-body">
-            <div class="about-header">
-              <i class="bi bi-arrow-left-right about-icon"></i>
+            <div class="about-header text-center">
+              <img src="images/logo.svg" class="about-icon" alt="Saeng">
               <div class="about-name">Saeng</div>
               <div class="about-version" id="aboutVersion"></div>
             </div>
-            <p class="about-desc" data-i18n="about.desc">A local reverse proxy for routing .local domains to localhost ports.</p>
+            <p class="about-desc text-center" data-i18n="about.desc">A local reverse proxy for routing .local domains to localhost ports.</p>
             <p>
               Technologies:<br>
               Electron (v42.0.1)<br>
@@ -293,6 +296,7 @@
       </div>
     </div>
 
+    <!-- Toast container -->
     <div id="toast"></div>
 
     <script src="scripts.js" nonce="__NONCE__"></script>

@@ -49,7 +49,8 @@
   "settings.regenerateCaConfirm": "Гэта выдаліць бягучы сертыфікат ЦС і ўсе даменныя сертыфікаты. Вам трэба будзе паўторна давяраць новаму сертыфікату ў вашым браўзеры. Працягнуць?",
   "settings.deleteCa": "Выдаліць сертыфікат ЦС",
   "settings.deleteCaConfirm": "Гэта выдаліць сертыфікат ЦС з вашага даверанага сховішча і выдаліць усе файлы сертыфікатаў. HTTPS не будзе працаваць, пакуль вы не створыце новаму сертыфікату і зноў не даверыце яго. Працягнуць?",
-  "settings.caPlatformNote": "У macOS: усталёўваецца ў System Keychain (патрабуецца ваш пароль).<br>У Windows: запускае certutil з павышэннем UAC.",
+  "settings.caPlatformNoteMac": "У macOS: усталёўваецца ў System Keychain (патрабуецца ваш пароль).",
+  "settings.caPlatformNoteWindows": "У Windows: запускае certutil з павышэннем UAC.",
 
   "modal.addTitle": "Дадаць адлюстраванне дамена",
   "modal.editTitle": "Рэдагаваць адлюстраванне",

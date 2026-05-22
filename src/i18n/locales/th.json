@@ -49,7 +49,8 @@
   "settings.regenerateCaConfirm": "การดำเนินการนี้จะลบใบรับรอง CA ปัจจุบันและใบรับรองต่อโดเมนทั้งหมด คุณจะต้องเชื่อถือใบรับรองใหม่ในเบราว์เซอร์ของคุณอีกครั้ง ดำเนินการต่อ?",
   "settings.deleteCa": "ลบใบรับรอง CA",
   "settings.deleteCaConfirm": "การดำเนินการนี้จะลบใบรับรอง CA ออกจากร้านค้าที่เชื่อถือได้ของคุณและลบไฟล์ใบรับรองทั้งหมด HTTPS จะไม่ทำงานจนกว่าคุณจะสร้างใหม่และเชื่อถือใบรับรองใหม่อีกครั้ง ดำเนินการต่อ?",
-  "settings.caPlatformNote": "บน macOS: ติดตั้งลงใน System Keychain (ต้องใช้รหัสผ่านของคุณ)<br>บน Windows: รัน certutil ด้วยการยกระดับ UAC",
+  "settings.caPlatformNoteMac": "บน macOS: ติดตั้งลงใน System Keychain (ต้องใช้รหัสผ่านของคุณ)",
+  "settings.caPlatformNoteWindows": "บน Windows: รัน certutil ด้วยการยกระดับ UAC",
 
   "modal.addTitle": "เพิ่มการแมปโดเมน",
   "modal.editTitle": "แก้ไขการแมป",

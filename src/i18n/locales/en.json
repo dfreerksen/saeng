@@ -49,7 +49,8 @@
   "settings.regenerateCaConfirm": "This will delete the current CA certificate and all per-domain certificates. You will need to re-trust the new certificate in your browser. Continue?",
   "settings.deleteCa": "Delete CA Certificate",
   "settings.deleteCaConfirm": "This will remove the CA certificate from your trust store and delete all certificate files. HTTPS will not work until you regenerate and re-trust a new certificate. Continue?",
-  "settings.caPlatformNote": "On macOS: installs into System Keychain (requires your password).<br>On Windows: runs certutil with UAC elevation.",
+  "settings.caPlatformNoteMac": "On macOS: installs into System Keychain (requires your password).",
+  "settings.caPlatformNoteWindows": "On Windows: runs certutil with UAC elevation.",
 
   "modal.addTitle": "Add Domain Mapping",
   "modal.editTitle": "Edit Mapping",

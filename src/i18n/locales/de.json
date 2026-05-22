@@ -49,7 +49,8 @@
   "settings.regenerateCaConfirm": "Dies löscht das aktuelle CA-Zertifikat sowie alle domainspezifischen Zertifikate. Sie müssen dem neuen Zertifikat in Ihrem Browser erneut vertrauen. Fortfahren?",
   "settings.deleteCa": "CA-Zertifikat löschen",
   "settings.deleteCaConfirm": "Dies entfernt das CA-Zertifikat aus Ihrem Trust Store und löscht alle Zertifikatsdateien. HTTPS wird nicht funktionieren, bis Sie ein neues Zertifikat neu generiert und erneut als vertrauenswürdig eingestuft haben. Fortfahren?",
-  "settings.caPlatformNote": "Unter macOS: Installation im System-Schlüsselbund (erfordert Ihr Passwort).<br>Unter Windows: Ausführung von certutil mit UAC-Erhöhung.",
+  "settings.caPlatformNoteMac": "Unter macOS: Installation im System-Schlüsselbund (erfordert Ihr Passwort).",
+  "settings.caPlatformNoteWindows": "Unter Windows: Ausführung von certutil mit UAC-Erhöhung.",
 
   "modal.addTitle": "Domain-Mapping hinzufügen",
   "modal.editTitle": "Mapping bearbeiten",

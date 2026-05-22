@@ -49,7 +49,8 @@
   "settings.regenerateCaConfirm": "Cela supprimera le certificat d'autorité de certification (CA) actuel ainsi que tous les certificats par domaine. Vous devrez de nouveau faire confiance au nouveau certificat dans votre navigateur. Continuer ?",
   "settings.deleteCa": "Supprimer le certificat CA",
   "settings.deleteCaConfirm": "Cela supprimera le certificat CA de votre magasin de confiance et effacera tous les fichiers de certificat. HTTPS ne fonctionnera plus tant que vous n'aurez pas régénéré un nouveau certificat et que vous ne lui aurez pas fait confiance à nouveau. Continuer ?",
-  "settings.caPlatformNote": "Sur macOS : installation dans le Trousseau système (requiert votre mot de passe).<br>Sur Windows : exécution de certutil avec élévation UAC.",
+  "settings.caPlatformNoteMac": "Sur macOS : installation dans le Trousseau système (requiert votre mot de passe).",
+  "settings.caPlatformNoteWindows": "Sur Windows : exécution de certutil avec élévation UAC.",
 
   "modal.addTitle": "Ajouter un mappage de domaine",
   "modal.editTitle": "Modifier le mappage",

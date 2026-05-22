@@ -18,8 +18,7 @@
 }
 
 .titlebar-title {
-  color: var(--text-secondary);
-  font-size: 13px;
+  color: var(--saeng-primary-complement-color);
   font-weight: 600;
   letter-spacing: 0.04em;
 }
@@ -31,18 +30,17 @@
 .status-pill {
   align-items: center;
   -webkit-app-region: no-drag;
-  background: var(--bg-elevated);
+  background: var(--saeng-secondary-color);
   border: 1px solid var(--saeng-border);
   border-radius: 20px;
-  color: var(--text-secondary);
+  color: var(--saeng-primary-complement-color);
   display: flex;
-  font-size: 12px;
   gap: 6px;
   padding: 3px 10px 3px 8px;
 }
 
 .status-dot {
-  background: var(--text-muted);
+  background: var(--saeng-text-muted);
   border-radius: 50%;
   height: 7px;
   width: 7px;
@@ -53,7 +51,7 @@
   }
 
   &.stopped {
-    background: var(--text-muted);
+    background: var(--saeng-text-muted);
   }
 }
 

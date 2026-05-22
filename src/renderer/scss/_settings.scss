@@ -1,15 +1,13 @@
 .settings-section {
   background: var(--saeng-primary-color);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--saeng-radius-md);
   margin-bottom: 16px;
   padding: 20px;
 }
 
 .settings-section-title {
   border-bottom: 1px solid var(--saeng-border);
-  // color: var(--text-primary);
-  font-size: 13px;
   font-weight: 600;
   margin-bottom: 16px;
   padding-bottom: 12px;
@@ -33,26 +31,21 @@
 }
 
 .setting-name {
-  // color: var(--text-primary);
-  font-size: 13px;
   font-weight: 500;
 }
 
 .setting-desc {
-  color: var(--text-muted);
-  font-size: 12px;
+  color: var(--saeng-text-muted);
   margin-top: 2px;
 }
 
 .color-mode-select,
 .locale-select {
   appearance: none;
-  background: var(--bg-elevated);
+  background: var(--saeng-secondary-color);
   border: 1px solid var(--saeng-border);
-  border-radius: var(--radius-sm);
-  // color: var(--text-primary);
+  border-radius: var(--saeng-radius-sm);
   cursor: pointer;
-  font-size: 13px;
   outline: none;
   padding: 7px 28px 7px 10px;
 
@@ -62,19 +55,18 @@
 }
 
 .ca-info-box {
-  background: var(--bg-elevated);
+  background: var(--saeng-secondary-color);
   border: 1px solid var(--saeng-border);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  font-size: 12px;
+  border-radius: var(--saeng-radius-sm);
+  color: var(--saeng-primary-complement-color);
   margin: 12px 0;
   padding: 12px 14px;
   word-break: break-all;
 }
 
 .ca-expiry {
-  color: var(--text-muted);
-  font-size: 11px;
+  color: var(--saeng-text-muted);
+  font-size: var(--saeng-font-size-small);
   margin-top: -6px;
 
   &--warning {

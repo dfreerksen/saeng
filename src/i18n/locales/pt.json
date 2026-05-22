@@ -49,7 +49,8 @@
   "settings.regenerateCaConfirm": "Isso excluirá o certificado de CA atual e todos os certificados por domínio. Você precisará reestabelecer a confiança no novo certificado em seu navegador. Continuar?",
   "settings.deleteCa": "Excluir Certificado CA",
   "settings.deleteCaConfirm": "Isso removerá o certificado CA do seu repositório de confiança e excluirá todos os arquivos de certificado. O HTTPS não funcionará até que você regenere e confie novamente em um novo certificado. Continuar?",
-  "settings.caPlatformNote": "No macOS: instala no Chaveiro do Sistema (requer sua senha).<br>No Windows: executa o certutil com elevação de UAC.",
+  "settings.caPlatformNoteMac": "No macOS: instala no Chaveiro do Sistema (requer sua senha).",
+  "settings.caPlatformNoteWindows": "No Windows: executa o certutil com elevação de UAC.",
 
   "modal.addTitle": "Adicionar Mapeamento de Domínio",
   "modal.editTitle": "Editar Mapeamento",

@@ -12,11 +12,10 @@
   align-items: center;
   background: none;
   border: none;
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  border-radius: var(--saeng-radius-sm);
+  color: var(--saeng-primary-complement-color);
   cursor: pointer;
   display: flex;
-  font-size: 13px;
   font-weight: 500;
   gap: 10px;
   padding: 9px 12px;
@@ -25,13 +24,13 @@
 }
 
 .nav-item:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
+  background: var(--saeng-bg-hover);
+  color: var(--saeng-secondary-complement-color);
 }
 
 .nav-item.active {
-  background: var(--bg-elevated);
-  color: var(--accent);
+  background: var(--saeng-secondary-color);
+  color: var(--saeng-accent);
 }
 
 .nav-icon {
@@ -47,18 +46,17 @@
 
 .proxy-toggle-btn {
   background: transparent;
-  border: 1px solid var(--accent);
-  border-radius: var(--radius-sm);
-  color: var(--accent);
+  border: 1px solid var(--saeng-accent);
+  border-radius: var(--saeng-radius-sm);
+  color: var(--saeng-accent);
   cursor: pointer;
-  font-size: 13px;
   font-weight: 600;
   padding: 9px;
   width: 100%;
 }
 
 .proxy-toggle-btn:hover {
-  background: var(--accent);
+  background: var(--saeng-accent);
   color: #fff;
 }
 
@@ -81,11 +79,10 @@
   align-items: center;
   background: none;
   border: none;
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
+  border-radius: var(--saeng-radius-sm);
+  color: var(--saeng-text-muted);
   cursor: pointer;
   display: flex;
-  font-size: 12px;
   gap: 7px;
   margin-top: 4px;
   padding: 6px 8px;
@@ -93,6 +90,6 @@
 }
 
 .about-btn:hover {
-  background: var(--bg-hover);
-  color: var(--text-secondary);
+  background: var(--saeng-bg-hover);
+  color: var(--saeng-primary-complement-color);
 }

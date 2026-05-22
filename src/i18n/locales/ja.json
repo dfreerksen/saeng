@@ -49,7 +49,8 @@
   "settings.regenerateCaConfirm": "これにより、現在のCA証明書およびドメインごとのすべての証明書が削除されます。ブラウザにて、新しい証明書を再度信頼設定する必要があります。続行しますか？",
   "settings.deleteCa": "CA証明書の削除",
   "settings.deleteCaConfirm": "これにより、信頼ストアからCA証明書が削除され、すべての証明書ファイルが消去されます。新しい証明書を再生成して信頼設定を行うまで、HTTPS接続は機能しなくなります。続行しますか？",
-  "settings.caPlatformNote": "macOSの場合：システムキーチェーンにインストールされます（パスワードの入力が必要です）。<br>Windowsの場合：UAC昇格権限を使用してcertutilを実行します。",
+  "settings.caPlatformNoteMac": "macOSの場合：システムキーチェーンにインストールされます（パスワードの入力が必要です）。",
+  "settings.caPlatformNoteWindows": "Windowsの場合：UAC昇格権限を使用してcertutilを実行します。",
 
   "modal.addTitle": "ドメインマッピングの追加",
   "modal.editTitle": "マッピングの編集",

@@ -49,7 +49,8 @@
   "settings.regenerateCaConfirm": "현재 CA 인증서와 모든 도메인별 인증서가 삭제됩니다. 브라우저에서 새로운 인증서를 다시 신뢰하도록 설정해야 합니다. 계속하시겠습니까?",
   "settings.deleteCa": "CA 인증서 삭제",
   "settings.deleteCaConfirm": "이 작업은 신뢰 저장소에서 CA 인증서를 제거하고 모든 인증서 파일을 삭제합니다. 새 인증서를 다시 생성하여 신뢰하도록 설정하기 전까지는 HTTPS가 작동하지 않습니다. 계속하시겠습니까?",
-  "settings.caPlatformNote": "macOS: 시스템 키체인에 설치됩니다(비밀번호 필요).<br>Windows: UAC 권한 상승을 통해 certutil을 실행합니다.",
+  "settings.caPlatformNoteMac": "macOS: 시스템 키체인에 설치됩니다(비밀번호 필요).",
+  "settings.caPlatformNoteWindows": "Windows: UAC 권한 상승을 통해 certutil을 실행합니다.",
 
   "modal.addTitle": "도메인 매핑 추가",
   "modal.editTitle": "매핑 편집",

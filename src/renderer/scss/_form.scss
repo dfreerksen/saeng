@@ -3,9 +3,8 @@
 }
 
 .form-label {
-  color: var(--text-secondary);
+  color: var(--saeng-primary-complement-color);
   display: block;
-  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.05em;
   margin-bottom: 6px;
@@ -13,11 +12,10 @@
 }
 
 .form-input {
-  background: var(--bg-elevated);
+  background: var(--saeng-secondary-color);
   border: 1px solid var(--saeng-border);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  font-size: 14px;
+  border-radius: var(--saeng-radius-sm);
+  color: var(--saeng-secondary-complement-color);
   outline: none;
   padding: 9px 12px;
   width: 100%;
@@ -28,7 +26,7 @@
 }
 
 .form-input::placeholder {
-  color: var(--text-muted);
+  color: var(--saeng-text-muted);
 }
 
 .domain-row {
@@ -38,30 +36,27 @@
 }
 
 .domain-sep {
-  color: var(--text-muted);
+  color: var(--saeng-text-muted);
   flex-shrink: 0;
-  font-size: 14px;
 }
 
 .domain-suffix {
-  background: var(--bg-elevated);
+  background: var(--saeng-secondary-color);
   border: 1px solid var(--saeng-border);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  border-radius: var(--saeng-radius-sm);
+  color: var(--saeng-primary-complement-color);
   flex-shrink: 0;
-  font-size: 13px;
   padding: 9px 10px;
 }
 
 .domain-suffix-select {
   appearance: none;
-  background: var(--bg-elevated);
+  background: var(--saeng-secondary-color);
   border: 1px solid var(--saeng-border);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  border-radius: var(--saeng-radius-sm);
+  color: var(--saeng-primary-complement-color);
   cursor: pointer;
   flex-shrink: 0;
-  font-size: 13px;
   outline: none;
   padding: 9px 10px;
 
@@ -71,15 +66,15 @@
 }
 
 .form-hint {
-  color: var(--text-muted);
-  font-size: 11px;
+  color: var(--saeng-text-muted);
+  font-size: var(--saeng-font-size-small);
   margin-top: 5px;
 }
 
 .form-error {
   color: var(--bs-danger);
   display: none;
-  font-size: 11px;
+  font-size: var(--saeng-font-size-small);
   margin-top: 5px;
 
   &.visible {
@@ -95,7 +90,7 @@
 }
 
 .checkbox-row input[type="checkbox"] {
-  accent-color: var(--accent);
+  accent-color: var(--saeng-accent);
   cursor: pointer;
   height: 16px;
   width: 16px;
