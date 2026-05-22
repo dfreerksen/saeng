@@ -1,6 +1,6 @@
 .sidebar {
   background: var(--saeng-primary-color);
-  border-right: 1px solid var(--border);
+  border-right: 1px solid var(--saeng-border);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -40,7 +40,7 @@
 }
 
 .sidebar-footer {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--saeng-border);
   margin-top: auto;
   padding: 8px 4px 0;
 }
@@ -63,12 +63,12 @@
 }
 
 .proxy-toggle-btn.running {
-  border-color: var(--danger);
-  color: var(--danger);
+  border-color: var(--bs-danger);
+  color: var(--bs-danger);
 }
 
 .proxy-toggle-btn.running:hover {
-  background: var(--danger);
+  background: var(--bs-danger);
   color: #fff;
 }
 

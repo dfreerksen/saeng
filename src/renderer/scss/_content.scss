@@ -6,10 +6,10 @@
 
 .view {
   display: none;
-}
 
-.view.active {
-  display: block;
+  &.active {
+    display: block;
+  }
 }
 
 .view-header {
@@ -20,7 +20,7 @@
 }
 
 .view-title {
-  color: var(--text-primary);
+  // color: var(--text-primary);
   font-size: 18px;
   font-weight: 600;
 }

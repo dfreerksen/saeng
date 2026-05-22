@@ -8,8 +8,8 @@
 .titlebar {
   align-items: center;
   -webkit-app-region: drag;
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border);
+  background: var(--saeng-primary-color);
+  border-bottom: 1px solid var(--saeng-border);
   display: flex;
   flex-shrink: 0;
   gap: 12px;
@@ -24,13 +24,15 @@
   letter-spacing: 0.04em;
 }
 
-.titlebar-spacer { flex: 1; }
+.titlebar-spacer {
+  flex: 1;
+}
 
 .status-pill {
   align-items: center;
   -webkit-app-region: no-drag;
   background: var(--bg-elevated);
-  border: 1px solid var(--border);
+  border: 1px solid var(--saeng-border);
   border-radius: 20px;
   color: var(--text-secondary);
   display: flex;
@@ -44,15 +46,15 @@
   border-radius: 50%;
   height: 7px;
   width: 7px;
-}
 
-.status-dot.running {
-  background: var(--bs-green);
-  box-shadow: 0 0 6px var(--bs-green);
-}
+  &.running {
+    background: var(--bs-green);
+    box-shadow: 0 0 6px var(--bs-green);
+  }
 
-.status-dot.stopped {
-  background: var(--text-muted);
+  &.stopped {
+    background: var(--text-muted);
+  }
 }
 
 .main-layout {

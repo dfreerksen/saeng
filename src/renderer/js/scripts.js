@@ -107,7 +107,7 @@ function renderMappings() {
             <i class="bi bi-clipboard-check"></i>
           </button>
           <span data-bs-toggle="tooltip" data-bs-title="${escapeHtml(t('table.editTitle'))}">
-            <button class="btn btn-outline-primary btn-edit edit" data-id="${m.id}" data-bs-toggle="modal" data-bs-target="#addModal">
+            <button class="btn btn-outline-primary btn-edit edit" data-id="${m.id}">
               <i class="bi bi-pencil"></i>
             </button>
           </span>
@@ -204,7 +204,7 @@ function openAddModal() {
   clearFormErrors();
   document.getElementById('modalTitle').textContent = t('modal.addTitle');
   document.getElementById('formSubmitBtn').textContent = t('modal.addSubmit');
-  addModal.classList.add('open');
+  bootstrap.Modal.getOrCreateInstance(addModal).show();
   document.getElementById('domainInput').focus();
 }
 
@@ -221,19 +221,12 @@ function openEditModal(mapping) {
   document.getElementById('labelInput').value = mapping.label || '';
   document.getElementById('modalTitle').textContent = t('modal.editTitle');
   document.getElementById('formSubmitBtn').textContent = t('modal.editSubmit');
-  addModal.classList.add('open');
+  bootstrap.Modal.getOrCreateInstance(addModal).show();
   document.getElementById('domainInput').focus();
 }
 
 document.getElementById('addMappingBtn').addEventListener('click', openAddModal);
 
-document.getElementById('cancelAddBtn').addEventListener('click', () => {
-  addModal.classList.remove('open');
-});
-
-addModal.addEventListener('click', (e) => {
-  if (e.target === addModal) addModal.classList.remove('open');
-});
 
 function clearFormErrors() {
   document.querySelectorAll('.form-error').forEach((el) => el.classList.remove('visible'));
@@ -287,12 +280,12 @@ addForm.addEventListener('submit', async (e) => {
   if (editingId) {
     mappings = await electronAPI.mappings.update(editingId, { domain: fullDomain, port, https, label });
     renderMappings();
-    addModal.classList.remove('open');
+    bootstrap.Modal.getInstance(addModal)?.hide();
     showToast(t('toast.mappingUpdated', { domain: fullDomain, port }), 'success');
   } else {
     mappings = await electronAPI.mappings.add({ domain: fullDomain, port, https, label });
     renderMappings();
-    addModal.classList.remove('open');
+    bootstrap.Modal.getInstance(addModal)?.hide();
     showToast(t('toast.mappingAdded', { domain: fullDomain, port }), 'success');
   }
 });

@@ -3,8 +3,8 @@ export function showToast(message, type = 'info', duration = 3500) {
   const container = document.getElementById('toast');
   const el = document.createElement('div');
 
-  el.className = `toast ${type}`;
-  el.innerHTML = `<span class="toast-icon">${icons[type]}</span><span>${message}</span>`;
+  el.className = `alert alert-${type} d-flex align-items-center`;
+  el.innerHTML = `<i class="bi bi-${icons[type]}"></i><div>${message}</div>`;
   container.appendChild(el);
 
   setTimeout(() => el.remove(), duration);

@@ -65,8 +65,7 @@
       "preload.cjs",
       "assets/**",
       "src/**",
-      "!src/renderer/scss/**/*.scss",
-      "!src/renderer/js/**/*.js"
+      "!src/renderer/scss/**/*.scss"
     ],
     "mac": {
       "category": "public.app-category.developer-tools",

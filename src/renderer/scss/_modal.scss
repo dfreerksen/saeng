@@ -2,11 +2,12 @@
 .modal {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  background-color: rgba(0, 0, 0, 0.2);
+  // background-color: rgba(0, 0, 0, 0.2);
 }
 
 /* Optional: Reduce opacity of the default black backdrop to allow blur to show */
 .modal-backdrop {
+  background-color: rgba(var(--bs-modal-bg), 1);
   opacity: 0.2;
 }
 

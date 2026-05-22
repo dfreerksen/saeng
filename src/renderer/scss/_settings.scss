@@ -1,5 +1,5 @@
 .settings-section {
-  background: var(--bg-surface);
+  background: var(--saeng-primary-color);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   margin-bottom: 16px;
@@ -7,8 +7,8 @@
 }
 
 .settings-section-title {
-  border-bottom: 1px solid var(--border);
-  color: var(--text-primary);
+  border-bottom: 1px solid var(--saeng-border);
+  // color: var(--text-primary);
   font-size: 13px;
   font-weight: 600;
   margin-bottom: 16px;
@@ -17,7 +17,7 @@
 
 .setting-row {
   align-items: center;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--saeng-border);
   display: flex;
   justify-content: space-between;
   padding: 10px 0;
@@ -33,7 +33,7 @@
 }
 
 .setting-name {
-  color: var(--text-primary);
+  // color: var(--text-primary);
   font-size: 13px;
   font-weight: 500;
 }
@@ -48,22 +48,22 @@
 .locale-select {
   appearance: none;
   background: var(--bg-elevated);
-  border: 1px solid var(--border);
+  border: 1px solid var(--saeng-border);
   border-radius: var(--radius-sm);
-  color: var(--text-primary);
+  // color: var(--text-primary);
   cursor: pointer;
   font-size: 13px;
   outline: none;
   padding: 7px 28px 7px 10px;
 
   &:focus {
-    border-color: var(--border-focus);
+    border-color: var(--saeng-border-focus);
   }
 }
 
 .ca-info-box {
   background: var(--bg-elevated);
-  border: 1px solid var(--border);
+  border: 1px solid var(--saeng-border);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   font-size: 12px;
