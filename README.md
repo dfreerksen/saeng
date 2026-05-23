@@ -65,6 +65,20 @@ Build for distribution:
 npm run build
 ```
 
+### Tests
+
+Run Vitest in watch mode. Good for development
+
+```bash
+$ npm test
+```
+
+Run tests with a single pass. Good for CI
+
+```bash
+$ npm run test:run
+```
+
 ### ESLint
 
 [ESLint](https://github.com/eslint/eslint) is for Javascript linting

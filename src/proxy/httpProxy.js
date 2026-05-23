@@ -134,7 +134,7 @@ class HttpProxy {
     proxyReq.on('error', (err) => {
       if (!res.headersSent) {
         res.writeHead(502, { 'Content-Type': 'text/plain' });
-        res.end(`Saeng: backend error — ${err.message}`);
+        res.end(`Saeng: backend error - ${err.message}`);
       }
     });
 
@@ -170,7 +170,7 @@ class HttpProxy {
     proxyReq.on('error', (err) => {
       if (!res.headersSent) {
         res.writeHead(502, { 'Content-Type': 'text/plain' });
-        res.end(`Saeng: backend error — ${err.message}`);
+        res.end(`Saeng: backend error - ${err.message}`);
       }
     });
 

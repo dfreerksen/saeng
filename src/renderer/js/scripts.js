@@ -2,6 +2,7 @@ import { t, initI18n, loadStrings } from './i18n';
 import { showToast } from './toast';
 import { getOS } from './os';
 import { initTooltips, destroyTooltip } from "./bootstrap/tooltip";
+import { escapeHtml, validateDomainPart, splitDomain, setExpiryDisplay, DOMAIN_SUFFIXES, DEFAULT_SUFFIX } from './utils';
 import * as Popper from "@popperjs/core";
 import * as bootstrap from 'bootstrap';
 
@@ -156,23 +157,12 @@ function renderMappings() {
   initTooltips(tbody);
 }
 
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
 // ── Add / Edit mapping modal ───────────────────────────────────────
 
 const addModal = document.getElementById('addModal');
 const addForm = document.getElementById('addForm');
 
 let editingId = null;
-
-const DOMAIN_SUFFIXES = ['.local', '.test', '.localhost', '.co.local', '.co.test'];
-const DEFAULT_SUFFIX = '.local';
 
 const suffixSelect = document.getElementById('suffixSelect');
 DOMAIN_SUFFIXES.forEach((s) => {
@@ -183,20 +173,6 @@ DOMAIN_SUFFIXES.forEach((s) => {
   suffixSelect.appendChild(opt);
 });
 
-function splitDomain(fullDomain) {
-  let base = fullDomain;
-  let suffix = DEFAULT_SUFFIX;
-  for (const s of DOMAIN_SUFFIXES) {
-    if (fullDomain.endsWith(s)) {
-      base = fullDomain.slice(0, -s.length);
-      suffix = s;
-      break;
-    }
-  }
-  const dot = base.indexOf('.');
-  if (dot === -1) return { subdomain: '', domain: base, suffix };
-  return { subdomain: base.slice(0, dot), domain: base.slice(dot + 1), suffix };
-}
 
 function openAddModal() {
   editingId = null;
@@ -230,10 +206,6 @@ document.getElementById('addMappingBtn').addEventListener('click', openAddModal)
 
 function clearFormErrors() {
   document.querySelectorAll('.form-error').forEach((el) => el.classList.remove('visible'));
-}
-
-function validateDomainPart(value) {
-  return /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/.test(value) || /^[a-zA-Z0-9]$/.test(value);
 }
 
 addForm.addEventListener('submit', async (e) => {
@@ -357,24 +329,6 @@ document.getElementById('localeSelect').addEventListener('change', async (e) => 
   loadStrings(strings);
   setProxyStatus(proxyRunning);
 });
-
-function setExpiryDisplay(isoString) {
-  const el = document.getElementById('caExpiryBox');
-  const expiry = new Date(isoString);
-  const now = Date.now();
-  const msLeft = expiry - now;
-  const oneWeek = 7 * 24 * 60 * 60 * 1000;
-  const threeMonths = 90 * 24 * 60 * 60 * 1000;
-
-  const label = msLeft <= 0 ? 'Expired' : 'Expires';
-  el.textContent = `${label} ${expiry.toLocaleString()}`;
-  el.classList.remove('ca-expiry--warning', 'ca-expiry--danger');
-  if (msLeft <= oneWeek) {
-    el.classList.add('ca-expiry--danger');
-  } else if (msLeft <= threeMonths) {
-    el.classList.add('ca-expiry--warning');
-  }
-}
 
 document.getElementById('revealCaBtn').addEventListener('click', async () => {
   await electronAPI.ssl.revealCA();

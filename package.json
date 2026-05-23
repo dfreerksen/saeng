@@ -34,7 +34,9 @@
     "pack": "npm run sass:build && npm run js:build && electron-builder --dir",
     "fonts:copy": "node -e \"const fs=require('fs');fs.mkdirSync('src/renderer/fonts',{recursive:true});['woff','woff2'].forEach(e=>fs.copyFileSync('node_modules/bootstrap-icons/font/fonts/bootstrap-icons.'+e,'src/renderer/fonts/bootstrap-icons.'+e))\"",
     "sass:build": "sass src/renderer/scss:src/renderer --no-source-map --load-path=node_modules",
-    "js:build": "esbuild src/renderer/js/scripts.js --bundle --outfile=src/renderer/scripts.js"
+    "js:build": "esbuild src/renderer/js/scripts.js --bundle --outfile=src/renderer/scripts.js",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "electron-store": "^11.0.2",
@@ -50,16 +52,20 @@
     "esbuild": "^0.28.0",
     "eslint": "^10.4.0",
     "globals": "^17.6.0",
+    "jsdom": "^29.1.1",
     "sass": "^1.100.0",
     "stylelint": "^17.12.0",
     "stylelint-config-standard": "^40.0.0",
     "stylelint-config-standard-scss": "^17.0.0",
-    "stylelint-order": "^8.1.1"
+    "stylelint-order": "^8.1.1",
+    "vitest": "^4.1.7"
   },
   "build": {
     "appId": "com.saeng.app",
     "productName": "Saeng",
-    "electronLanguages": ["en-US"],
+    "electronLanguages": [
+      "en-US"
+    ],
     "files": [
       "main.js",
       "preload.cjs",
@@ -73,11 +79,17 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["arm64", "x64"]
+          "arch": [
+            "arm64",
+            "x64"
+          ]
         },
         {
           "target": "zip",
-          "arch": ["arm64", "x64"]
+          "arch": [
+            "arm64",
+            "x64"
+          ]
         }
       ]
     },
