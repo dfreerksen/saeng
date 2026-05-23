@@ -1,34 +1,34 @@
 import { execFile } from 'child_process';
 import { promisify } from 'util';
-import { isLinux, isMac, isWindows } from '../renderer/js/os.js';
-import { showToast } from '../renderer/js/toast.js';
-import { t } from '../renderer/js/i18n.js';
+import { t } from '../i18n/i18n.js';
 
 const execAsync = promisify(execFile);
 
 async function untrustCA(certPath) {
-  if (isMac()) {
+  if (process.platform === 'darwin') {
     try {
       await execAsync('/usr/bin/security', ['remove-trusted-cert', certPath]);
+      return { success: true };
     } catch {
-      showToast(t('toast.error.untrustCaMac'), 'info');
+      return { success: false, message: t('toast.error.untrustCaMac') };
     }
-  } else if (isWindows()) {
+  } else if (process.platform === 'win32') {
     try {
       const script = `Start-Process certutil -ArgumentList '-delstore "ROOT" "${certPath}"' -Verb RunAs -Wait`;
       await execAsync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script]);
+      return { success: true };
     } catch {
-      showToast(t('toast.error.untrustCaWindows'), 'info');
+      return { success: false, message: t('toast.error.untrustCaWindows') };
     }
-  } else if (isLinux()) {
-    showToast(t('toast.error.untrustCaLinux'), 'info');
-  } else {
-    showToast(t('toast.error.untrustCaOther'), 'info');
+  } else if (process.platform === 'linux') {
+    return { success: false, message: t('toast.error.untrustCaLinux') };
   }
+
+  return { success: false, message: t('toast.error.untrustCaOther') };
 }
 
 async function trustCA(certPath) {
-  if (isMac()) {
+  if (process.platform === 'darwin') {
     try {
       // Targets the per-user trust settings domain (no -d, no -k).
       // Running as the current user avoids the "no user interaction possible"
@@ -46,7 +46,7 @@ async function trustCA(certPath) {
       const msg = err.stderr || err.message || 'Unknown error';
       return { success: false, message: t('toast.error.trustCaMac', { error: msg }) };
     }
-  } else if (isWindows()) {
+  } else if (process.platform === 'win32') {
     try {
       // certutil requires admin — PowerShell elevation prompt appears automatically
       const script = `Start-Process certutil -ArgumentList '-addstore -f "ROOT" "${certPath}"' -Verb RunAs -Wait`;
@@ -57,7 +57,7 @@ async function trustCA(certPath) {
       const msg = err.stderr || err.message || 'Unknown error';
       return { success: false, message: t('toast.error.trustCaWindows', { error: msg }) };
     }
-  } else if (isLinux()) {
+  } else if (process.platform === 'linux') {
     // Linux trust management is highly distro-specific and often requires manual steps,
     // so we won't attempt to automate it. Instead, we'll show an informational message.
     return { success: false, message: t('toast.error.untrustCaLinux') };

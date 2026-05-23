@@ -53,7 +53,7 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => mainWindow.show());
 
   mainWindow.on('close', (event) => {
-    if (process.platform === 'darwin' && !isQuitting) {
+    if ((process.platform === 'darwin' || process.platform === 'win32') && !isQuitting) {
       event.preventDefault();
       mainWindow.hide();
     }
@@ -65,8 +65,17 @@ function createWindow() {
 }
 
 function createTray() {
-  // Fallback: empty 16×16 image when no icon file exists yet
-  const img = nativeImage.createEmpty();
+  const iconPaths = {
+    darwin: path.join(__dirname, 'assets/icons/mac/icon.icon/Assets/icon.png'),
+    win32: path.join(__dirname, 'assets/icons/win/icon.png'),
+    linux: path.join(__dirname, 'assets/icons/linux/icon.png'),
+  };
+  let img = nativeImage.createEmpty();
+  const iconPath = iconPaths[process.platform];
+  if (iconPath && fs.existsSync(iconPath)) {
+    const loaded = nativeImage.createFromPath(iconPath);
+    if (!loaded.isEmpty()) img = loaded;
+  }
   tray = new Tray(img);
 
   updateTrayMenu(false);
@@ -194,9 +203,9 @@ function setupIPC() {
 
   ipcMain.handle('ssl:delete-ca', async () => {
     const certManager = CertManager.getInstance(store.getCertDir());
-    await untrustCA(certManager.getCAPath());
+    const untrustResult = await untrustCA(certManager.getCAPath());
     certManager.deleteCA();
-    return { success: true };
+    return { success: true, warning: untrustResult?.success === false ? untrustResult.message : null };
   });
 
   ipcMain.handle('ssl:get-ca-path', () =>
@@ -277,7 +286,7 @@ app.on('activate', () => {
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+  if (process.platform === 'linux') {
     app.quit();
   }
 });

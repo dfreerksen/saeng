@@ -337,10 +337,11 @@ document.getElementById('revealCaBtn').addEventListener('click', async () => {
 document.getElementById('deleteCaBtn').addEventListener('click', async () => {
   if (!confirm(t('settings.deleteCaConfirm'))) return;
   document.getElementById('deleteCaBtn').disabled = true;
-  await electronAPI.ssl.deleteCA();
+  const result = await electronAPI.ssl.deleteCA();
   document.getElementById('caExpiryBox').textContent = '';
   document.getElementById('deleteCaBtn').disabled = false;
   showToast(t('toast.caDeleted'), 'info', 5000);
+  if (result?.warning) showToast(result.warning, 'info', 6000);
 });
 
 document.getElementById('regenerateCaBtn').addEventListener('click', async () => {

@@ -77,6 +77,11 @@ async function clearSystemProxy({ onlyIfUrl } = {}) {
       )
     );
   } else if (process.platform === 'win32') {
+    if (onlyIfUrl) {
+      const readScript = `$p = 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings'; (Get-ItemProperty -Path $p -Name AutoConfigURL -ErrorAction SilentlyContinue).AutoConfigURL`;
+      const { stdout } = await execAsync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', readScript]);
+      if (stdout.trim() !== onlyIfUrl) return;
+    }
     const script = [
       `$p = 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings'`,
       `Remove-ItemProperty -Path $p -Name AutoConfigURL -ErrorAction SilentlyContinue`,
