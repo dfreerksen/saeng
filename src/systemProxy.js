@@ -61,6 +61,9 @@ async function setSystemProxy(pacUrl) {
     ].join('; ');
 
     await execAsync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script]);
+  } else if (process.platform === 'linux') {
+    await execAsync('gsettings', ['set', 'org.gnome.system.proxy', 'mode', 'auto']);
+    await execAsync('gsettings', ['set', 'org.gnome.system.proxy', 'autoconfig-url', pacUrl]);
   }
 }
 
@@ -92,6 +95,14 @@ async function clearSystemProxy({ onlyIfUrl } = {}) {
     ].join('; ');
 
     await execAsync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script]);
+  } else if (process.platform === 'linux') {
+    if (onlyIfUrl) {
+      const { stdout } = await execAsync('gsettings', ['get', 'org.gnome.system.proxy', 'autoconfig-url']);
+      // gsettings returns string values wrapped in single quotes
+      const current = stdout.trim().replace(/^'|'$/g, '');
+      if (current !== onlyIfUrl) return;
+    }
+    await execAsync('gsettings', ['set', 'org.gnome.system.proxy', 'mode', 'none']);
   }
 }
 
