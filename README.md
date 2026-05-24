@@ -99,6 +99,19 @@ Manually run Stylelint for the repo
 $ yarn run stylelint "**/*.scss"
 ```
 
+### Release
+
+Run GitHub Actions locally. Install [`act`](https://github.com/nektos/act)
+
+```bash
+$ brew install act
+```
+
+```bash
+$ act -n release # dry run
+$ act release
+```
+
 ## License
 
 MIT © [David Freerksen](https://github.com/dfreerksen)
