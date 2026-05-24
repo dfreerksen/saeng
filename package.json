@@ -18,9 +18,13 @@
     "development",
     "domains"
   ],
+  "homepage": "https://github.com/dfreerksen/saeng",
   "repository": {
     "type": "git",
     "url": "https://github.com/dfreerksen/saeng.git"
+  },
+    "bugs": {
+    "url": "https://github.com/dfreerksen/saeng/issues"
   },
   "type": "module",
   "main": "main.js",
