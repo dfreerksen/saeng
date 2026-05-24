@@ -70,7 +70,7 @@ jobs:
           files: |
             dist/Saeng-*.exe
             dist/Saeng-*.exe.blockmap
-            dist/latest.yml
+            dist/latest-win.yml
 
   release-linux:
     name: Build (Linux)
