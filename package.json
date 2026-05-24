@@ -99,6 +99,7 @@
     },
     "win": {
       "icon": "assets/icons/win/icon.png",
+      "artifactName": "${productName}-${version}.${ext}",
       "target": [
         "nsis"
       ]
