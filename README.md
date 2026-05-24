@@ -36,7 +36,7 @@ HTTPS works by intercepting `CONNECT` tunnel requests and terminating TLS using 
 ## Requirements
 
 * Node.js >= 24.11.1
-* npm >= 11.6.4
+* npm >= 11.6.2
 * Xcode >= 26.0 (to create build)
 
 ## Development

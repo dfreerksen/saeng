@@ -30,7 +30,7 @@
   "main": "main.js",
   "engines": {
     "node": ">=24.11.1",
-    "npm": ">=11.6.4"
+    "npm": ">=11.6.2"
   },
   "scripts": {
     "start": "npm run sass:build && npm run js:build && electron .",

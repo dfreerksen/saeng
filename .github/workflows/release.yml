@@ -29,6 +29,7 @@ jobs:
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
+          token: ${{ secrets.GH_TOKEN }}
           files: |
             dist/Saeng-*.dmg
             dist/Saeng-*.dmg.blockmap
@@ -57,6 +58,7 @@ jobs:
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
+          token: ${{ secrets.GH_TOKEN }}
           files: |
             dist/Saeng-*.exe
             dist/Saeng-*.exe.blockmap
@@ -83,6 +85,7 @@ jobs:
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
+          token: ${{ secrets.GH_TOKEN }}
           files: |
             dist/Saeng-*.AppImage
             dist/Saeng-*.deb

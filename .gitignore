@@ -36,3 +36,6 @@ Thumbs.db
 
 # Claude
 .claude/settings.local.json
+
+# act local secrets
+.secrets
