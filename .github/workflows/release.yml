@@ -29,6 +29,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
@@ -58,6 +60,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
@@ -85,6 +89,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
