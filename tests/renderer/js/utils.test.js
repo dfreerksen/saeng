@@ -1,34 +1,12 @@
 // @vitest-environment jsdom
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
-  escapeHtml,
   validateDomainPart,
   splitDomain,
-  setExpiryDisplay,
+  getExpiryInfo,
   DOMAIN_SUFFIXES,
   DEFAULT_SUFFIX,
 } from '../../../src/renderer/js/utils.js';
-
-// ── escapeHtml ─────────────────────────────────────────────────────
-
-describe('escapeHtml()', () => {
-  it('escapes &', () => expect(escapeHtml('a & b')).toBe('a &amp; b'));
-  it('escapes <', () => expect(escapeHtml('<tag>')).toBe('&lt;tag&gt;'));
-  it('escapes >', () => expect(escapeHtml('a > b')).toBe('a &gt; b'));
-  it('escapes "', () => expect(escapeHtml('"quoted"')).toBe('&quot;quoted&quot;'));
-  it('escapes all four characters in one string', () => {
-    expect(escapeHtml('<a href="url">text & more</a>')).toBe(
-      '&lt;a href=&quot;url&quot;&gt;text &amp; more&lt;/a&gt;'
-    );
-  });
-  it('returns the input unchanged when nothing needs escaping', () => {
-    expect(escapeHtml('hello world')).toBe('hello world');
-  });
-  it('coerces non-string input to string', () => {
-    expect(escapeHtml(42)).toBe('42');
-    expect(escapeHtml(null)).toBe('null');
-  });
-});
 
 // ── validateDomainPart ─────────────────────────────────────────────
 
@@ -115,61 +93,45 @@ describe('splitDomain()', () => {
   });
 
   it('picks the longest matching suffix (co.local before .local)', () => {
-    // 'myapp.co.local' should match '.co.local', not '.local'
     expect(splitDomain('myapp.co.local').suffix).toBe('.co.local');
     expect(splitDomain('myapp.co.local').domain).toBe('myapp');
   });
 });
 
-// ── setExpiryDisplay ───────────────────────────────────────────────
+// ── getExpiryInfo ──────────────────────────────────────────────────
 
-describe('setExpiryDisplay()', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '<div id="caExpiryBox"></div>';
-  });
-
+describe('getExpiryInfo()', () => {
   const future = (ms) => new Date(Date.now() + ms).toISOString();
   const past = (ms) => new Date(Date.now() - ms).toISOString();
-
   const DAY = 24 * 60 * 60 * 1000;
 
-  it('shows "Expires" for a date well in the future', () => {
-    setExpiryDisplay(future(365 * DAY));
-    expect(document.getElementById('caExpiryBox').textContent).toMatch(/^Expires /);
+  it('returns null for a falsy input', () => {
+    expect(getExpiryInfo(null)).toBeNull();
+    expect(getExpiryInfo('')).toBeNull();
   });
 
-  it('shows "Expired" for a past date', () => {
-    setExpiryDisplay(past(DAY));
-    expect(document.getElementById('caExpiryBox').textContent).toMatch(/^Expired /);
+  it('returns text starting with "Expires" for a date well in the future', () => {
+    expect(getExpiryInfo(future(365 * DAY)).text).toMatch(/^Expires /);
   });
 
-  it('adds ca-expiry--danger for dates within one week', () => {
-    setExpiryDisplay(future(3 * DAY));
-    expect(document.getElementById('caExpiryBox').classList.contains('ca-expiry--danger')).toBe(true);
+  it('returns text starting with "Expired" for a past date', () => {
+    expect(getExpiryInfo(past(DAY)).text).toMatch(/^Expired /);
   });
 
-  it('adds ca-expiry--danger for expired dates', () => {
-    setExpiryDisplay(past(DAY));
-    expect(document.getElementById('caExpiryBox').classList.contains('ca-expiry--danger')).toBe(true);
+  it('returns urgency "danger" for dates within one week', () => {
+    expect(getExpiryInfo(future(3 * DAY)).urgency).toBe('danger');
   });
 
-  it('adds ca-expiry--warning for dates within three months but beyond one week', () => {
-    setExpiryDisplay(future(30 * DAY));
-    expect(document.getElementById('caExpiryBox').classList.contains('ca-expiry--warning')).toBe(true);
-    expect(document.getElementById('caExpiryBox').classList.contains('ca-expiry--danger')).toBe(false);
+  it('returns urgency "danger" for expired dates', () => {
+    expect(getExpiryInfo(past(DAY)).urgency).toBe('danger');
   });
 
-  it('adds no urgency class for dates more than three months away', () => {
-    setExpiryDisplay(future(120 * DAY));
-    const el = document.getElementById('caExpiryBox');
-    expect(el.classList.contains('ca-expiry--danger')).toBe(false);
-    expect(el.classList.contains('ca-expiry--warning')).toBe(false);
+  it('returns urgency "warning" for dates within three months but beyond one week', () => {
+    const info = getExpiryInfo(future(30 * DAY));
+    expect(info.urgency).toBe('warning');
   });
 
-  it('clears previous urgency classes before applying new ones', () => {
-    const el = document.getElementById('caExpiryBox');
-    el.classList.add('ca-expiry--danger');
-    setExpiryDisplay(future(120 * DAY)); // far future → no class
-    expect(el.classList.contains('ca-expiry--danger')).toBe(false);
+  it('returns urgency null for dates more than three months away', () => {
+    expect(getExpiryInfo(future(120 * DAY)).urgency).toBeNull();
   });
 });

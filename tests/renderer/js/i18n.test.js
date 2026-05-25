@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { t, loadStrings, applyTranslations, initI18n } from '../../../src/renderer/js/i18n.js';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { t, loadStrings } from '../../../src/renderer/js/i18n.js';
 
 const SAMPLE = {
   'proxy.start': 'Start Proxy',
@@ -58,64 +58,5 @@ describe('loadStrings()', () => {
     loadStrings({ 'new': 'New Value' });
     expect(t('old')).toBe('old'); // key not found → returns key
     expect(t('new')).toBe('New Value');
-  });
-
-  it('applies translations to [data-i18n] elements already in the document', () => {
-    loadStrings({ 'nav.home': 'Home' });
-    document.body.innerHTML = '<span data-i18n="nav.home"></span>';
-    loadStrings({ 'nav.home': 'Home' }); // triggers applyTranslations
-    expect(document.querySelector('[data-i18n]').textContent).toBe('Home');
-  });
-});
-
-describe('applyTranslations()', () => {
-  beforeEach(() => {
-    loadStrings({ 'key.text': 'Plain Text', 'key.html': '<b>Bold</b>', 'key.ph': 'Enter value' });
-  });
-
-  it('sets textContent for [data-i18n] elements', () => {
-    document.body.innerHTML = '<span data-i18n="key.text"></span>';
-    applyTranslations();
-    expect(document.querySelector('[data-i18n]').textContent).toBe('Plain Text');
-  });
-
-  it('sets innerHTML for [data-i18n-html] elements', () => {
-    document.body.innerHTML = '<div data-i18n-html="key.html"></div>';
-    applyTranslations();
-    expect(document.querySelector('[data-i18n-html]').innerHTML).toBe('<b>Bold</b>');
-  });
-
-  it('sets placeholder for [data-i18n-placeholder] elements', () => {
-    document.body.innerHTML = '<input data-i18n-placeholder="key.ph">';
-    applyTranslations();
-    expect(document.querySelector('[data-i18n-placeholder]').placeholder).toBe('Enter value');
-  });
-
-  it('handles multiple elements in one pass', () => {
-    document.body.innerHTML = `
-      <span data-i18n="key.text"></span>
-      <span data-i18n="key.text"></span>
-    `;
-    applyTranslations();
-    const els = document.querySelectorAll('[data-i18n]');
-    expect(els[0].textContent).toBe('Plain Text');
-    expect(els[1].textContent).toBe('Plain Text');
-  });
-
-  it('uses the key as fallback when not in the string set', () => {
-    document.body.innerHTML = '<span data-i18n="missing.key"></span>';
-    applyTranslations();
-    expect(document.querySelector('[data-i18n]').textContent).toBe('missing.key');
-  });
-});
-
-describe('initI18n()', () => {
-  it('fetches strings from electronAPI and applies them to the document', async () => {
-    document.body.innerHTML = '<span data-i18n="app.title"></span>';
-    globalThis.electronAPI = {
-      i18n: { getStrings: vi.fn().mockResolvedValue({ 'app.title': 'Saeng' }) },
-    };
-    await initI18n();
-    expect(document.querySelector('[data-i18n]').textContent).toBe('Saeng');
   });
 });

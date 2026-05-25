@@ -19,12 +19,12 @@
 }
 
 .badge-https {
-  background: rgba(var(--bs-success), 0.15);
+  background: color-mix(in srgb, var(--bs-success) 15%, transparent);
   color: var(--bs-success);
 }
 
 .badge-http {
-  background: rgba(var(--bs-primary), 0.12);
+  background: color-mix(in srgb, var(--bs-primary) 12%, transparent);
   color: var(--bs-primary);
 }
 

@@ -1,0 +1,265 @@
+// @vitest-environment jsdom
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+vi.mock('../../../src/renderer/components/Modal.jsx', () => ({
+  default: ({ children }) => <div data-testid="modal-wrapper">{children}</div>,
+}));
+
+import MappingModal from '../../../src/renderer/components/MappingModal.jsx';
+
+const t = (key) => key;
+
+const EXISTING_MAPPING = {
+  id: 'abc',
+  domain: 'api.myapp.local',
+  port: 4000,
+  https: true,
+  enabled: true,
+  label: 'API Server',
+};
+
+const OTHER_MAPPINGS = [
+  { id: 'xyz', domain: 'other.local', port: 5000, https: false, enabled: true, label: '' },
+];
+
+function renderAddModal(props = {}) {
+  const defaults = {
+    mappings: [],
+    onClose: vi.fn(),
+    onSubmit: vi.fn(),
+    t,
+  };
+  return render(<MappingModal {...defaults} {...props} />);
+}
+
+function renderEditModal(props = {}) {
+  return renderAddModal({ mapping: EXISTING_MAPPING, ...props });
+}
+
+describe('MappingModal — add mode', () => {
+  it('renders the add title', () => {
+    renderAddModal();
+    expect(screen.getByText('modal.addTitle')).toBeInTheDocument();
+  });
+
+  it('does not render the edit title', () => {
+    renderAddModal();
+    expect(screen.queryByText('modal.editTitle')).not.toBeInTheDocument();
+  });
+
+  it('renders the add submit button', () => {
+    renderAddModal();
+    expect(screen.getByText('modal.addSubmit')).toBeInTheDocument();
+  });
+
+  it('starts with an empty domain field', () => {
+    const { container } = renderAddModal();
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    expect(domainInput.value).toBe('');
+  });
+
+  it('starts with port defaulting to 3000', () => {
+    const { container } = renderAddModal();
+    const portInput = container.querySelector('input[type="number"]');
+    expect(portInput.value).toBe('3000');
+  });
+
+  it('starts with https unchecked', () => {
+    const { container } = renderAddModal();
+    const httpsCheckbox = container.querySelector('.checkbox-row input[type="checkbox"]');
+    expect(httpsCheckbox).not.toBeChecked();
+  });
+});
+
+describe('MappingModal — edit mode', () => {
+  it('renders the edit title', () => {
+    renderEditModal();
+    expect(screen.getByText('modal.editTitle')).toBeInTheDocument();
+  });
+
+  it('pre-fills the domain input', () => {
+    const { container } = renderEditModal();
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    expect(domainInput.value).toBe('myapp');
+  });
+
+  it('pre-fills the subdomain input', () => {
+    const { container } = renderEditModal();
+    const subdomainInput = container.querySelectorAll('.form-input')[0];
+    expect(subdomainInput.value).toBe('api');
+  });
+
+  it('pre-fills the port input', () => {
+    const { container } = renderEditModal();
+    const portInput = container.querySelector('input[type="number"]');
+    expect(portInput.value).toBe('4000');
+  });
+
+  it('pre-fills the https checkbox', () => {
+    const { container } = renderEditModal();
+    const httpsCheckbox = container.querySelector('.checkbox-row input[type="checkbox"]');
+    expect(httpsCheckbox).toBeChecked();
+  });
+
+  it('pre-fills the label input', () => {
+    const { container } = renderEditModal();
+    const labelInput = container.querySelectorAll('.form-input')[3];
+    expect(labelInput.value).toBe('API Server');
+  });
+
+  it('renders the edit submit button', () => {
+    renderEditModal();
+    expect(screen.getByText('modal.editSubmit')).toBeInTheDocument();
+  });
+});
+
+describe('MappingModal — cancel', () => {
+  it('calls onClose when the cancel button is clicked', () => {
+    const onClose = vi.fn();
+    renderAddModal({ onClose });
+    fireEvent.click(screen.getByText('modal.cancel'));
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it('calls onClose when the close (×) button is clicked', () => {
+    const onClose = vi.fn();
+    renderAddModal({ onClose });
+    fireEvent.click(screen.getByRole('button', { name: /close/i }));
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+});
+
+describe('MappingModal — validation', () => {
+  it('shows domain error when domain is empty on submit', async () => {
+    renderAddModal();
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(screen.getByText('form.domainErrorInvalid')).toBeInTheDocument();
+    });
+  });
+
+  it('shows domain error when domain is invalid', async () => {
+    const { container } = renderAddModal();
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(domainInput, { target: { value: '-invalid' } });
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(screen.getByText('form.domainErrorInvalid')).toBeInTheDocument();
+    });
+  });
+
+  it('shows subdomain error when subdomain is invalid', async () => {
+    const { container } = renderAddModal();
+    const subdomainInput = container.querySelectorAll('.form-input')[0];
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(subdomainInput, { target: { value: '-bad' } });
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(screen.getByText('form.subdomainError')).toBeInTheDocument();
+    });
+  });
+
+  it('shows port error when port is zero', async () => {
+    const { container } = renderAddModal();
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    const portInput = container.querySelector('input[type="number"]');
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    fireEvent.change(portInput, { target: { value: '0' } });
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(screen.getByText('form.portError')).toBeInTheDocument();
+    });
+  });
+
+  it('shows port error when port is out of range', async () => {
+    const { container } = renderAddModal();
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    const portInput = container.querySelector('input[type="number"]');
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    fireEvent.change(portInput, { target: { value: '99999' } });
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(screen.getByText('form.portError')).toBeInTheDocument();
+    });
+  });
+
+  it('shows duplicate domain error when the domain already exists', async () => {
+    const { container } = renderAddModal({
+      mappings: [{ id: 'other', domain: 'myapp.local', port: 3000, https: false, enabled: true, label: '' }],
+    });
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(screen.getByText('form.domainErrorDuplicate')).toBeInTheDocument();
+    });
+  });
+
+  it('does not call onSubmit when validation fails', async () => {
+    const onSubmit = vi.fn();
+    renderAddModal({ onSubmit });
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(screen.getByText('form.domainErrorInvalid')).toBeInTheDocument();
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+});
+
+describe('MappingModal — successful submit', () => {
+  it('calls onSubmit with the correct domain when no subdomain', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderAddModal({ onSubmit });
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ domain: 'myapp.local', port: 3000 })
+      );
+    });
+  });
+
+  it('calls onSubmit with subdomain prepended when subdomain is provided', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderAddModal({ onSubmit });
+    const subdomainInput = container.querySelectorAll('.form-input')[0];
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(subdomainInput, { target: { value: 'api' } });
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ domain: 'api.myapp.local' })
+      );
+    });
+  });
+
+  it('calls onSubmit with the correct port', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderAddModal({ onSubmit });
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    const portInput = container.querySelector('input[type="number"]');
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    fireEvent.change(portInput, { target: { value: '8080' } });
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ port: 8080 }));
+    });
+  });
+
+  it('disables the submit button while submitting', async () => {
+    let resolve;
+    const onSubmit = vi.fn().mockReturnValue(new Promise((r) => { resolve = r; }));
+    const { container } = renderAddModal({ onSubmit });
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(screen.getByText('modal.addSubmit')).toBeDisabled();
+    });
+    await act(async () => { resolve(); });
+  });
+});

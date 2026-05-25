@@ -1,12 +1,12 @@
 /* Apply blur to the modal itself */
 .modal {
-  -webkit-backdrop-filter: blur(8px);
+  // -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
 
 /* Optional: Reduce opacity of the default black backdrop to allow blur to show */
 .modal-backdrop {
-  background-color: rgba(var(--bs-modal-bg), 1);
+  background-color: color-mix(in srgb, var(--bs-modal-bg) 100%, transparent);
   opacity: 0.2;
 }
 
@@ -23,8 +23,8 @@
   color: var(--saeng-accent);
   display: block;
   font-size: 36px;
-  margin-bottom: 12px;
   margin-inline: auto;
+  margin-bottom: 12px;
 }
 
 .about-name {

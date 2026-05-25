@@ -148,9 +148,6 @@ class CertManager {
   }
 
   regenerateCA() {
-    const caPath = path.join(this.certDir, 'ca.crt');
-    const caKeyPath = path.join(this.certDir, 'ca.key');
-
     // Delete the CA and all per-domain certs (they were signed by the old CA)
     for (const file of fs.readdirSync(this.certDir)) {
       if (file.endsWith('.crt') || file.endsWith('.key')) {

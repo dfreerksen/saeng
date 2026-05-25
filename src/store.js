@@ -23,8 +23,8 @@ const schema = {
   settings: {
     type: 'object',
     default: {
-      httpsEnabled: false,
-      startOnLaunch: false,
+      httpsEnabled: true,
+      startOnLaunch: true,
       colorMode: 'auto',
       locale: 'en',
     },

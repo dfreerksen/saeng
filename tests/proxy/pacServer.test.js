@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import http from 'http';
 import { PacServer } from '../../src/proxy/pacServer.js';
 
 describe('PacServer._generatePAC()', () => {

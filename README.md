@@ -79,24 +79,32 @@ Run tests with a single pass. Good for CI
 $ npm run test:run
 ```
 
-### ESLint
+### Linting
+
+Run all linters
+
+```bash
+$ npm run lint
+```
+
+#### ESLint
 
 [ESLint](https://github.com/eslint/eslint) is for Javascript linting
 
 Manually run ESLint for the repo
 
 ```bash
-$ yarn run eslint .
+$ npm run lint:js
 ```
 
-### Stylelint
+#### Stylelint
 
 [Stylelint](https://github.com/stylelint/stylelint) is for SCSS linting.
 
 Manually run Stylelint for the repo
 
 ```bash
-$ yarn run stylelint "**/*.scss"
+$ npm run lint:css
 ```
 
 ### Release

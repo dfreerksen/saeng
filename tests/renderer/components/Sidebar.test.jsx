@@ -1,0 +1,97 @@
+// @vitest-environment jsdom
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import Sidebar from '../../../src/renderer/components/Sidebar.jsx';
+
+const t = (key) => key;
+
+function renderSidebar(props = {}) {
+  const defaults = {
+    currentView: 'mappings',
+    setCurrentView: vi.fn(),
+    proxyRunning: false,
+    onProxyToggle: vi.fn(),
+    onAbout: vi.fn(),
+    t,
+  };
+  return render(<Sidebar {...defaults} {...props} />);
+}
+
+describe('Sidebar', () => {
+  it('renders the mappings nav item', () => {
+    renderSidebar();
+    expect(screen.getByText('nav.mappings')).toBeInTheDocument();
+  });
+
+  it('renders the settings nav item', () => {
+    renderSidebar();
+    expect(screen.getByText('nav.settings')).toBeInTheDocument();
+  });
+
+  it('renders the about nav item', () => {
+    renderSidebar();
+    expect(screen.getByText('nav.about')).toBeInTheDocument();
+  });
+
+  it('applies active class to mappings button when currentView is mappings', () => {
+    const { container } = renderSidebar({ currentView: 'mappings' });
+    const navItems = container.querySelectorAll('.nav-item');
+    expect(navItems[0]).toHaveClass('active');
+    expect(navItems[1]).not.toHaveClass('active');
+  });
+
+  it('applies active class to settings button when currentView is settings', () => {
+    const { container } = renderSidebar({ currentView: 'settings' });
+    const navItems = container.querySelectorAll('.nav-item');
+    expect(navItems[0]).not.toHaveClass('active');
+    expect(navItems[1]).toHaveClass('active');
+  });
+
+  it('calls setCurrentView("mappings") when mappings button is clicked', () => {
+    const setCurrentView = vi.fn();
+    renderSidebar({ setCurrentView });
+    fireEvent.click(screen.getByText('nav.mappings').closest('button'));
+    expect(setCurrentView).toHaveBeenCalledWith('mappings');
+  });
+
+  it('calls setCurrentView("settings") when settings button is clicked', () => {
+    const setCurrentView = vi.fn();
+    renderSidebar({ setCurrentView });
+    fireEvent.click(screen.getByText('nav.settings').closest('button'));
+    expect(setCurrentView).toHaveBeenCalledWith('settings');
+  });
+
+  it('calls onAbout when the about button is clicked', () => {
+    const onAbout = vi.fn();
+    renderSidebar({ onAbout });
+    fireEvent.click(screen.getByText('nav.about').closest('button'));
+    expect(onAbout).toHaveBeenCalledOnce();
+  });
+
+  it('shows proxy.start text when proxy is not running', () => {
+    renderSidebar({ proxyRunning: false });
+    expect(screen.getByText('proxy.start')).toBeInTheDocument();
+  });
+
+  it('shows proxy.stop text when proxy is running', () => {
+    renderSidebar({ proxyRunning: true });
+    expect(screen.getByText('proxy.stop')).toBeInTheDocument();
+  });
+
+  it('applies running class to toggle button when proxy is running', () => {
+    const { container } = renderSidebar({ proxyRunning: true });
+    expect(container.querySelector('.proxy-toggle-btn')).toHaveClass('running');
+  });
+
+  it('does not apply running class to toggle button when proxy is stopped', () => {
+    const { container } = renderSidebar({ proxyRunning: false });
+    expect(container.querySelector('.proxy-toggle-btn')).not.toHaveClass('running');
+  });
+
+  it('calls onProxyToggle when proxy toggle button is clicked', () => {
+    const onProxyToggle = vi.fn();
+    const { container } = renderSidebar({ onProxyToggle });
+    fireEvent.click(container.querySelector('.proxy-toggle-btn'));
+    expect(onProxyToggle).toHaveBeenCalledOnce();
+  });
+});
