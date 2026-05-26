@@ -4,5 +4,6 @@
     "esbenp.prettier-vscode",
     "kamikillerto.vscode-colorize",
     "stylelint.vscode-stylelint"
-  ]
+  ],
+  "unwantedRecommendations": []
 }
