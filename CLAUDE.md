@@ -32,9 +32,9 @@ The project uses **ESM throughout** (`"type": "module"` in `package.json`). The 
 2. OS auto-proxy points to `http://127.0.0.1:8181/proxy.pac`
 3. PAC file returns `PROXY 127.0.0.1:<dynamicPort>` for configured domains, `DIRECT` for everything else
 4. The HTTP proxy (`src/proxy/httpProxy.js`) receives the request:
-   - Plain HTTP: reads `Host` header, looks up mapping, proxies to `localhost:<port>`
+   - Plain HTTP: reads `Host` header, looks up mapping, proxies to `<mapping.host>:<port>` (defaults to `127.0.0.1`)
    - HTTPS (`CONNECT` method): if HTTPS is disabled, raw TCP tunnel to backend; if enabled, pipes through an internal HTTPS server for MITM SSL termination
-   - WebSocket upgrades: replays the `Upgrade` request directly to the backend port
+   - WebSocket upgrades: replays the `Upgrade` request directly to the backend host/port
 5. On proxy start/stop, `src/systemProxy.js` calls `networksetup` (macOS) or PowerShell registry writes (Windows) to set/clear the system auto-proxy URL
 
 ### Ports
@@ -87,9 +87,9 @@ The user must install the CA cert into the OS trust store once — `src/ssl/trus
 
 Mapping shape:
 ```js
-{ id, domain, port, https, enabled, label, createdAt }
+{ id, domain, host, port, https, enabled, label, createdAt }
 ```
-`https` on a mapping means the **backend** expects HTTPS — it does not control whether the frontend domain is served over HTTPS (that is the global `settings.httpsEnabled` toggle).
+`host` is the backend hostname to proxy to (defaults to `127.0.0.1`). It is used for all connection types: plain HTTP, HTTPS CONNECT tunnels, and WebSocket upgrades. `https` on a mapping means the **backend** expects HTTPS — it does not control whether the frontend domain is served over HTTPS (that is the global `settings.httpsEnabled` toggle).
 
 Settings defaults: `{ httpsEnabled: true, startOnLaunch: true, colorMode: 'auto', locale: 'en' }`.
 

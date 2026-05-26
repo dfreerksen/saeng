@@ -2,6 +2,17 @@ import { describe, it, expect, afterEach } from 'vitest';
 import http from 'http';
 import { HttpProxy } from '../../src/proxy/httpProxy.js';
 
+function startBackend(response = 'ok') {
+  return new Promise((resolve) => {
+    const server = http.createServer((req, res) => res.end(response));
+    server.listen(0, '127.0.0.1', () => resolve(server));
+  });
+}
+
+function stopBackend(server) {
+  return new Promise((resolve) => server.close(resolve));
+}
+
 // Helper: make a plain HTTP request and return { statusCode, body }
 function makeRequest(port, { method = 'GET', path = '/', host } = {}) {
   return new Promise((resolve, reject) => {
@@ -32,11 +43,11 @@ describe('HttpProxy.updateMappings()', () => {
     expect(proxy.mappings.has('disabled.local')).toBe(false);
   });
 
-  it('stores the full mapping object (port, https, etc.)', () => {
+  it('stores the full mapping object (port, https, host, etc.)', () => {
     const proxy = new HttpProxy(null);
-    const mapping = { domain: 'myapp.local', port: 3000, https: true, enabled: true };
+    const mapping = { domain: 'myapp.local', port: 3000, https: true, host: '10.0.0.1', enabled: true };
     proxy.updateMappings([mapping]);
-    expect(proxy.mappings.get('myapp.local')).toMatchObject({ port: 3000, https: true });
+    expect(proxy.mappings.get('myapp.local')).toMatchObject({ port: 3000, https: true, host: '10.0.0.1' });
   });
 
   it('replaces the previous mapping set on each call', () => {
@@ -129,6 +140,20 @@ describe('HttpProxy request handling', () => {
     );
     const { statusCode } = await makeRequest(proxy.getPort(), { host: 'disabled.local' });
     expect(statusCode).toBe(502);
+  });
+
+  it('routes to mapping.host when an explicit host is provided', async () => {
+    const backend = await startBackend('from-backend');
+    const backendPort = backend.address().port;
+    proxy = new HttpProxy(null);
+    await proxy.start(
+      [{ domain: 'custom.local', host: '127.0.0.1', port: backendPort, enabled: true }],
+      { httpsEnabled: false }
+    );
+    const { statusCode, body } = await makeRequest(proxy.getPort(), { host: 'custom.local' });
+    expect(statusCode).toBe(200);
+    expect(body).toBe('from-backend');
+    await stopBackend(backend);
   });
 
   it('strips the port from the Host header when resolving the mapping', async () => {

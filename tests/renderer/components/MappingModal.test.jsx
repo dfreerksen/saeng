@@ -13,6 +13,7 @@ const t = (key) => key;
 const EXISTING_MAPPING = {
   id: 'abc',
   domain: 'api.myapp.local',
+  host: '192.168.1.10',
   port: 4000,
   https: true,
   enabled: true,
@@ -65,6 +66,12 @@ describe('MappingModal — add mode', () => {
     expect(portInput.value).toBe('3000');
   });
 
+  it('starts with host defaulting to 127.0.0.1', () => {
+    const { container } = renderAddModal();
+    const hostInput = container.querySelectorAll('.form-input')[2];
+    expect(hostInput.value).toBe('127.0.0.1');
+  });
+
   it('starts with https unchecked', () => {
     const { container } = renderAddModal();
     const httpsCheckbox = container.querySelector('.checkbox-row input[type="checkbox"]');
@@ -102,9 +109,15 @@ describe('MappingModal — edit mode', () => {
     expect(httpsCheckbox).toBeChecked();
   });
 
+  it('pre-fills the host input', () => {
+    const { container } = renderEditModal();
+    const hostInput = container.querySelectorAll('.form-input')[2];
+    expect(hostInput.value).toBe('192.168.1.10');
+  });
+
   it('pre-fills the label input', () => {
     const { container } = renderEditModal();
-    const labelInput = container.querySelectorAll('.form-input')[3];
+    const labelInput = container.querySelectorAll('.form-input')[4];
     expect(labelInput.value).toBe('API Server');
   });
 
@@ -219,6 +232,43 @@ describe('MappingModal — successful submit', () => {
       expect(onSubmit).toHaveBeenCalledWith(
         expect.objectContaining({ domain: 'myapp.local', port: 3000 })
       );
+    });
+  });
+
+  it('calls onSubmit with default host when host is not changed', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderAddModal({ onSubmit });
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ host: '127.0.0.1' }));
+    });
+  });
+
+  it('calls onSubmit with a custom host when host is changed', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderAddModal({ onSubmit });
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    const hostInput = container.querySelectorAll('.form-input')[2];
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    fireEvent.change(hostInput, { target: { value: '10.0.0.5' } });
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ host: '10.0.0.5' }));
+    });
+  });
+
+  it('falls back to 127.0.0.1 when host is cleared', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderAddModal({ onSubmit });
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    const hostInput = container.querySelectorAll('.form-input')[2];
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    fireEvent.change(hostInput, { target: { value: '   ' } });
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ host: '127.0.0.1' }));
     });
   });
 

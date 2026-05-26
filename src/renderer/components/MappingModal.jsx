@@ -9,6 +9,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
   const [subdomain, setSubdomain] = useState(parsed.subdomain);
   const [domain, setDomain] = useState(parsed.domain);
   const [suffix, setSuffix] = useState(parsed.suffix);
+  const [host, setHost] = useState(mapping?.host ?? '127.0.0.1');
   const [port, setPort] = useState(mapping?.port ?? 3000);
   const [https, setHttps] = useState(!!mapping?.https);
   const [label, setLabel] = useState(mapping?.label ?? '');
@@ -58,7 +59,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
     }
 
     setSubmitting(true);
-    await onSubmit({ domain: fullDomain, port: parsedPort, https, label: label.trim() });
+    await onSubmit({ domain: fullDomain, host: host.trim() || '127.0.0.1', port: parsedPort, https, label: label.trim() });
     setSubmitting(false);
   }
 
@@ -114,6 +115,22 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                 </div>
                 <div className="form-hint">{t('form.domainHint')}</div>
                 {domainError && <div className="form-error visible">{domainError}</div>}
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">
+                  <span>{t('form.host')}</span>
+                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('form.optional')}</span>
+                </label>
+                <input
+                  className="form-input"
+                  placeholder="127.0.0.1"
+                  value={host}
+                  onChange={(e) => setHost(e.target.value)}
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+                <div className="form-hint">{t('form.hostHint')}</div>
               </div>
 
               <div className="form-group">

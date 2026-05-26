@@ -12,6 +12,7 @@ const schema = {
       properties: {
         id: { type: 'string' },
         domain: { type: 'string' },
+        host: { type: 'string' },
         port: { type: 'number' },
         https: { type: 'boolean' },
         enabled: { type: 'boolean' },
@@ -45,6 +46,7 @@ class AppStore {
     const mapping = {
       id: randomUUID(),
       domain: data.domain.toLowerCase().trim(),
+      host: data.host || '127.0.0.1',
       port: parseInt(data.port, 10),
       https: !!data.https,
       enabled: true,
@@ -67,6 +69,7 @@ class AppStore {
       return {
         ...m,
         domain: data.domain.toLowerCase().trim(),
+        host: data.host || '127.0.0.1',
         port: parseInt(data.port, 10),
         https: !!data.https,
         label: data.label || '',

@@ -183,7 +183,7 @@ export default function App() {
             const updated = await window.electronAPI.mappings.add(data);
             setMappings(updated);
             setModal(null);
-            showToast(t('toast.mappingAdded', { domain: data.domain, port: data.port }), 'success');
+            showToast(t('toast.mappingAdded', { domain: data.domain, host: data.host, port: data.port }), 'success');
           }}
           t={t}
         />
@@ -198,7 +198,7 @@ export default function App() {
             const updated = await window.electronAPI.mappings.update(modal.mapping.id, data);
             setMappings(updated);
             setModal(null);
-            showToast(t('toast.mappingUpdated', { domain: data.domain, port: data.port }), 'success');
+            showToast(t('toast.mappingUpdated', { domain: data.domain, host: data.host, port: data.port }), 'success');
           }}
           t={t}
         />

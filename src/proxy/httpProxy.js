@@ -118,7 +118,7 @@ class HttpProxy {
 
     const backendProto = mapping.https ? https : http;
     const options = {
-      hostname: '127.0.0.1',
+      hostname: mapping.host || '127.0.0.1',
       port: mapping.port,
       method: req.method,
       path: reqPath || '/',
@@ -155,7 +155,7 @@ class HttpProxy {
 
     const backendProto = mapping.https ? https : http;
     const options = {
-      hostname: '127.0.0.1',
+      hostname: mapping.host || '127.0.0.1',
       port: mapping.port,
       method: req.method,
       path: req.url || '/',
@@ -189,7 +189,7 @@ class HttpProxy {
 
     if (!this.httpsEnabled || !this.internalHttpsPort) {
       // HTTPS not enabled — tunnel raw TCP to the backend (no SSL termination)
-      this._tunnelRaw(clientSocket, head, mapping.port);
+      this._tunnelRaw(clientSocket, head, mapping.port, mapping.host || '127.0.0.1');
       return;
     }
 
@@ -206,10 +206,10 @@ class HttpProxy {
     clientSocket.on('error', () => tunnelSocket.destroy());
   }
 
-  _tunnelRaw(clientSocket, head, targetPort) {
+  _tunnelRaw(clientSocket, head, targetPort, targetHost = '127.0.0.1') {
     clientSocket.write('HTTP/1.1 200 Connection Established\r\nProxy-agent: Saeng\r\n\r\n');
 
-    const serverSocket = net.connect(targetPort, '127.0.0.1', () => {
+    const serverSocket = net.connect(targetPort, targetHost, () => {
       if (head && head.length > 0) serverSocket.write(head);
       serverSocket.pipe(clientSocket);
       clientSocket.pipe(serverSocket);
@@ -229,7 +229,7 @@ class HttpProxy {
       return;
     }
 
-    const serverSocket = net.connect(mapping.port, '127.0.0.1', () => {
+    const serverSocket = net.connect(mapping.port, mapping.host || '127.0.0.1', () => {
       // Replay the upgrade request to the backend
       let requestLine = `${req.method} ${req.url} HTTP/${req.httpVersion}\r\n`;
       serverSocket.write(requestLine);

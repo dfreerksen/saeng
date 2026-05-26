@@ -73,6 +73,16 @@ describe('AppStore.addMapping()', () => {
     expect(new Date(result.createdAt).getTime()).toBeGreaterThan(0);
   });
 
+  it('defaults host to 127.0.0.1 when not provided', () => {
+    const result = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    expect(result.host).toBe('127.0.0.1');
+  });
+
+  it('stores the provided host', () => {
+    const result = store.addMapping({ domain: 'myapp.local', port: 3000, host: '10.0.0.5' });
+    expect(result.host).toBe('10.0.0.5');
+  });
+
   it('uses an empty string for label when omitted', () => {
     const result = store.addMapping({ domain: 'myapp.local', port: 3000 });
     expect(result.label).toBe('');
@@ -108,14 +118,15 @@ describe('AppStore.removeMapping()', () => {
 });
 
 describe('AppStore.updateMapping()', () => {
-  it('updates domain, port, https, and label', () => {
-    const m = store.addMapping({ domain: 'old.local', port: 1, https: false, label: '' });
-    store.updateMapping(m.id, { domain: 'NEW.local ', port: '9000', https: true, label: 'updated' });
+  it('updates domain, port, https, label, and host', () => {
+    const m = store.addMapping({ domain: 'old.local', port: 1, https: false, label: '', host: '127.0.0.1' });
+    store.updateMapping(m.id, { domain: 'NEW.local ', port: '9000', https: true, label: 'updated', host: '10.0.0.5' });
     const updated = store.getMappings().find((x) => x.id === m.id);
     expect(updated.domain).toBe('new.local');
     expect(updated.port).toBe(9000);
     expect(updated.https).toBe(true);
     expect(updated.label).toBe('updated');
+    expect(updated.host).toBe('10.0.0.5');
   });
 
   it('does not change id or createdAt', () => {
