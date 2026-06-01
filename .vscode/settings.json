@@ -1,4 +1,25 @@
 {
+  "cSpell.words": [
+    "autoconfig",
+    "autoproxy",
+    "certutil",
+    "certs",
+    "cjs",
+    "colorize",
+    "dbaeumer",
+    "esbuild",
+    "esbenp",
+    "jsdom",
+    "kamikillerto",
+    "networksetup",
+    "pac",
+    "pem",
+    "saeng",
+    "sni",
+    "stylelint",
+    "vitest",
+    "wpad"
+  ],
   "colorize.languages": [
     "javascript",
     "javascriptreact",

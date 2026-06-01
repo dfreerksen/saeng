@@ -3,6 +3,7 @@
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "kamikillerto.vscode-colorize",
+    "streetsidesoftware.code-spell-checker",
     "stylelint.vscode-stylelint"
   ],
   "unwantedRecommendations": []
