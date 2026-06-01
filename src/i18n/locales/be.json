@@ -78,8 +78,8 @@
   "form.portHint": "Порт localhost, на які слухае ваш сервіс.",
   "form.portError": "Калі ласка, увядзіце порт паміж 1 і 65535.",
   "form.labelPlaceholder": "Мой сервер API",
-  "form.httpsLabel": "Уключыце HTTPS для гэтага дамена",
-  "form.httpsHint": "Патрабуецца, каб у наладах быў уключаны HTTPS, а сертыфікат ЦС надзейны.",
+  "form.httpsLabel": "Сервер бэкенда выкарыстоўвае HTTPS",
+  "form.httpsHint": "Уключыце толькі калі ваш бэкенд-сэрвіс сам працуе з HTTPS. Не выключайце для звычайных HTTP-бэкендаў (нават калі доступ да дамена ажыццяўляецца праз HTTPS).",
 
   "toast.proxyStopped": "Проксі спынены.",
   "toast.proxyStopFailed": "Не атрымалася спыніць: {error}",

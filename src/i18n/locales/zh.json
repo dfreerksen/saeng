@@ -78,8 +78,8 @@
   "form.portHint": "您的服务在本地主机上监听的端口。",
   "form.portError": "请输入 1 到 65535 之间的端口号。",
   "form.labelPlaceholder": "我的 API 服务器",
-  "form.httpsLabel": "为此域名启用 HTTPS",
-  "form.httpsHint": "需要在“设置”中启用 HTTPS 功能，并已信任 CA 证书。",
+  "form.httpsLabel": "后端服务器使用 HTTPS",
+  "form.httpsHint": "仅当您的后端服务本身运行在 HTTPS 上时才启用此选项。对于纯 HTTP 后端，请保持关闭（即使该域名是通过 HTTPS 访问的）。",
 
   "toast.proxyStopped": "代理已停止。",
   "toast.proxyStopFailed": "停止失败：{error}",

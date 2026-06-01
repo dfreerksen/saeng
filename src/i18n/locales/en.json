@@ -78,8 +78,8 @@
   "form.portHint": "The localhost port your service listens on.",
   "form.portError": "Please enter a port between 1 and 65535.",
   "form.labelPlaceholder": "My API server",
-  "form.httpsLabel": "Enable HTTPS for this domain",
-  "form.httpsHint": "Requires HTTPS enabled in Settings and CA certificate trusted.",
+  "form.httpsLabel": "Backend server uses HTTPS",
+  "form.httpsHint": "Enable only if your backend service itself runs HTTPS. Leave off for plain HTTP backends (even if the domain is accessed via HTTPS).",
 
   "toast.proxyStopped": "Proxy stopped.",
   "toast.proxyStopFailed": "Failed to stop: {error}",

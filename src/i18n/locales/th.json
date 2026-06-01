@@ -78,8 +78,8 @@
   "form.portHint": "พอร์ต localhost ที่บริการของคุณรับฟัง",
   "form.portError": "โปรดป้อนพอร์ตระหว่าง 1 ถึง 65535",
   "form.labelPlaceholder": "เซิร์ฟเวอร์ API ของฉัน",
-  "form.httpsLabel": "เปิดใช้งาน HTTPS สำหรับโดเมนนี้",
-  "form.httpsHint": "ต้องเปิดใช้งาน HTTPS ในการตั้งค่าและใบรับรอง CA ที่เชื่อถือได้",
+  "form.httpsLabel": "เซิร์ฟเวอร์ Backend ใช้ HTTPS",
+  "form.httpsHint": "เปิดใช้งานเฉพาะในกรณีที่บริการ Backend ของคุณมีการทำงานผ่าน HTTPS เท่านั้น หาก Backend ใช้ HTTP แบบปกติ ให้ปิดการใช้งานไว้ (แม้ว่าการเข้าถึงโดเมนจะทำผ่าน HTTPS ก็ตาม)",
 
   "toast.proxyStopped": "พร็อกซีหยุดทำงาน",
   "toast.proxyStopFailed": "ไม่สามารถหยุด: {error}",

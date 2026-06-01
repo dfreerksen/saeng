@@ -78,8 +78,8 @@
   "form.portHint": "منفذ localhost الذي تستمع عليه خدمتك.",
   "form.portError": "يرجى إدخال رقم منفذ بين 1 و 65535.",
   "form.labelPlaceholder": "خادم API الخاص بي",
-  "form.httpsLabel": "تفعيل HTTPS لهذا النطاق",
-  "form.httpsHint": "يتطلب تفعيل HTTPS في الإعدادات والوثوق بشهادة المرجع المصدق (CA).",
+  "form.httpsLabel": "يستخدم خادم الواجهة الخلفية بروتوكول HTTPS",
+  "form.httpsHint": "قم بتفعيل هذا الخيار فقط إذا كانت خدمة الواجهة الخلفية نفسها تعمل عبر بروتوكول HTTPS. اتركه معطلاً في حال استخدام واجهات خلفية تعمل ببروتوكول HTTP العادي (حتى وإن كان يتم الوصول إلى النطاق عبر HTTPS).",
 
   "toast.proxyStopped": "تم إيقاف الوكيل (Proxy).",
   "toast.proxyStopFailed": "فشل إيقاف الوكيل: {error}",

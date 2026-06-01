@@ -78,8 +78,8 @@
   "form.portHint": "Cổng localhost mà dịch vụ của bạn đang lắng nghe.",
   "form.portError": "Vui lòng nhập một cổng trong khoảng từ 1 đến 65535.",
   "form.labelPlaceholder": "Máy chủ API của tôi",
-  "form.httpsLabel": "Bật HTTPS cho tên miền này",
-  "form.httpsHint": "Yêu cầu HTTPS phải được bật trong phần Cài đặt và chứng chỉ CA phải được thiết lập tin cậy.",
+  "form.httpsLabel": "Máy chủ Backend sử dụng HTTPS",
+  "form.httpsHint": "Chỉ bật tùy chọn này nếu bản thân dịch vụ backend của bạn đang chạy trên HTTPS. Hãy tắt tùy chọn này đối với các backend sử dụng HTTP thuần (ngay cả khi tên miền được truy cập thông qua HTTPS).",
 
   "toast.proxyStopped": "Proxy đã dừng.",
   "toast.proxyStopFailed": "Dừng thất bại: {error}",

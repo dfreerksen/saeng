@@ -123,6 +123,7 @@ class HttpProxy {
       method: req.method,
       path: reqPath || '/',
       headers: { ...req.headers },
+      ...(mapping.https && { rejectUnauthorized: false }),
     };
     delete options.headers['proxy-connection'];
 
@@ -160,6 +161,7 @@ class HttpProxy {
       method: req.method,
       path: req.url || '/',
       headers: { ...req.headers },
+      ...(mapping.https && { rejectUnauthorized: false }),
     };
 
     const proxyReq = backendProto.request(options, (proxyRes) => {

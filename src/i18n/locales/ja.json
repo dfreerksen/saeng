@@ -78,8 +78,8 @@
   "form.portHint": "サービスがリッスンしているlocalhostのポート番号です。",
   "form.portError": "1〜65535の範囲でポート番号を入力してください。",
   "form.labelPlaceholder": "マイAPIサーバー",
-  "form.httpsLabel": "このドメインでHTTPSを有効にする",
-  "form.httpsHint": "設定画面でHTTPSが有効化されており、かつCA証明書が信頼済みである必要があります。",
+  "form.httpsLabel": "バックエンドサーバーでHTTPSを使用する",
+  "form.httpsHint": "バックエンドサービス自体がHTTPSで稼働している場合にのみ有効にしてください。通常のHTTPバックエンドの場合は（ドメインへのアクセスがHTTPS経由であっても）無効のままにしてください。",
 
   "toast.proxyStopped": "プロキシを停止しました。",
   "toast.proxyStopFailed": "停止に失敗しました: {error}",

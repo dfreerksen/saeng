@@ -78,8 +78,8 @@
   "form.portHint": "Портът localhost, на който вашата услуга слуша.",
   "form.portError": "Моля, въведете порт между 1 и 65535.",
   "form.labelPlaceholder": "Моят API сървър",
-  "form.httpsLabel": "Активиране на HTTPS за този домейн",
-  "form.httpsHint": "Изисква HTTPS активиран в Настройки и CA сертификатът е надежден.",
+  "form.httpsLabel": "Backend сървърът използва HTTPS",
+  "form.httpsHint": "Активирайте само ако вашата backend услуга използва HTTPS. Не я активирайте за обикновени HTTP backend сървъри (дори ако домейнът е достъпен чрез HTTPS).",
 
   "toast.proxyStopped": "Прокси сървърът е спрян.",
   "toast.proxyStopFailed": "Спирането не бе успешно: {error}",
