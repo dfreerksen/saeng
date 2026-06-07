@@ -179,6 +179,65 @@ describe('SettingsView — proxy toggles', () => {
   });
 });
 
+describe('SettingsView — log max entries', () => {
+  it('renders the input with the current value', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, logMaxEntries: 1500 } });
+    expect(container.querySelector('.log-max-entries-input').value).toBe('1500');
+  });
+
+  it('defaults to 300 when logMaxEntries is not set', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, logMaxEntries: undefined } });
+    expect(container.querySelector('.log-max-entries-input').value).toBe('300');
+  });
+
+  it('commits the value on blur', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, logMaxEntries: 300 } });
+    const input = container.querySelector('.log-max-entries-input');
+    fireEvent.change(input, { target: { value: '5000' } });
+    fireEvent.blur(input);
+    expect(onSettingsChange).toHaveBeenCalledWith({ logMaxEntries: 5000 });
+  });
+
+  it('clamps values below the minimum to 100 on blur', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, logMaxEntries: 300 } });
+    const input = container.querySelector('.log-max-entries-input');
+    fireEvent.change(input, { target: { value: '5' } });
+    fireEvent.blur(input);
+    expect(input.value).toBe('100');
+    expect(onSettingsChange).toHaveBeenCalledWith({ logMaxEntries: 100 });
+  });
+
+  it('clamps values above the maximum to 100000 on blur', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, logMaxEntries: 300 } });
+    const input = container.querySelector('.log-max-entries-input');
+    fireEvent.change(input, { target: { value: '999999' } });
+    fireEvent.blur(input);
+    expect(input.value).toBe('100000');
+    expect(onSettingsChange).toHaveBeenCalledWith({ logMaxEntries: 100000 });
+  });
+
+  it('falls back to the default value when the input is cleared on blur', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, logMaxEntries: 5000 } });
+    const input = container.querySelector('.log-max-entries-input');
+    fireEvent.change(input, { target: { value: '' } });
+    fireEvent.blur(input);
+    expect(input.value).toBe('300');
+    expect(onSettingsChange).toHaveBeenCalledWith({ logMaxEntries: 300 });
+  });
+
+  it('does not call onSettingsChange when the value is unchanged after clamping', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, logMaxEntries: 300 } });
+    const input = container.querySelector('.log-max-entries-input');
+    fireEvent.blur(input);
+    expect(onSettingsChange).not.toHaveBeenCalled();
+  });
+});
+
 describe('SettingsView — CA management', () => {
   it('calls electronAPI.ssl.revealCA when reveal button is clicked', () => {
     renderSettingsView();

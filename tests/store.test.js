@@ -204,6 +204,36 @@ describe('AppStore.getSettings() / setSettings()', () => {
     expect(settings.httpsEnabled).toBe(true);
     expect(settings.startOnLaunch).toBe(true);
   });
+
+  it('getSettings() defaults logMaxEntries to 300', () => {
+    expect(store.getSettings().logMaxEntries).toBe(300);
+  });
+
+  it('setSettings() stores a valid logMaxEntries value', () => {
+    const result = store.setSettings({ logMaxEntries: 5000 });
+    expect(result.logMaxEntries).toBe(5000);
+    expect(store.getSettings().logMaxEntries).toBe(5000);
+  });
+
+  it('setSettings() clamps logMaxEntries below the minimum to 100', () => {
+    expect(store.setSettings({ logMaxEntries: 1 }).logMaxEntries).toBe(100);
+    expect(store.setSettings({ logMaxEntries: 0 }).logMaxEntries).toBe(100);
+    expect(store.setSettings({ logMaxEntries: -50 }).logMaxEntries).toBe(100);
+  });
+
+  it('setSettings() clamps logMaxEntries above the maximum to 100000', () => {
+    expect(store.setSettings({ logMaxEntries: 250000 }).logMaxEntries).toBe(100000);
+  });
+
+  it('setSettings() falls back to the default when logMaxEntries is not a number', () => {
+    expect(store.setSettings({ logMaxEntries: 'banana' }).logMaxEntries).toBe(300);
+  });
+
+  it('setSettings() leaves logMaxEntries untouched when not present in the patch', () => {
+    store.setSettings({ logMaxEntries: 500 });
+    const result = store.setSettings({ httpsEnabled: true });
+    expect(result.logMaxEntries).toBe(500);
+  });
 });
 
 describe('AppStore.getCertDir()', () => {

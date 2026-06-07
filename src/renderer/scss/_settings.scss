@@ -39,6 +39,21 @@
   margin-top: 2px;
 }
 
+.log-max-entries-input {
+  background: var(--saeng-secondary-color);
+  border: 1px solid var(--saeng-border);
+  border-radius: var(--saeng-radius-sm);
+  color: var(--saeng-secondary-complement-color);
+  outline: none;
+  padding: 7px 10px;
+  text-align: right;
+  width: 110px;
+
+  &:focus {
+    border-color: var(--saeng-border-focus);
+  }
+}
+
 .color-mode-select,
 .locale-select {
   appearance: none;

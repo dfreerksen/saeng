@@ -33,6 +33,12 @@ function makeElectronAPI(overrides = {}) {
       update: vi.fn().mockResolvedValue([]),
       ...overrides.mappings,
     },
+    requestLog: {
+      list: vi.fn().mockResolvedValue([]),
+      clear: vi.fn().mockResolvedValue([]),
+      onEntry: vi.fn(),
+      ...overrides.requestLog,
+    },
     settings: {
       get: vi.fn().mockResolvedValue({ httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en' }),
       set: vi.fn().mockResolvedValue(undefined),
@@ -143,6 +149,86 @@ describe('App — navigation', () => {
     fireEvent.click(screen.getByText('nav.settings').closest('button'));
     fireEvent.click(screen.getByText('nav.mappings').closest('button'));
     expect(document.querySelector('#view-mappings')).toHaveClass('active');
+  });
+
+  it('switches to the log view when the log nav item is clicked', async () => {
+    await renderApp();
+    fireEvent.click(screen.getByText('nav.log').closest('button'));
+    expect(document.querySelector('#view-log')).toHaveClass('active');
+    expect(document.querySelector('#view-mappings')).not.toHaveClass('active');
+  });
+});
+
+describe('App — request log', () => {
+  it('loads request log entries on init', async () => {
+    const entries = [{ id: '1', timestamp: 1700000000000, method: 'GET', hostname: 'myapp.local', path: '/', status: 200, latencyMs: 10, https: false }];
+    await renderApp({ requestLog: { list: vi.fn().mockResolvedValue(entries) } });
+    fireEvent.click(screen.getByText('nav.log').closest('button'));
+    expect(window.electronAPI.requestLog.list).toHaveBeenCalled();
+    expect(screen.getByText('myapp.local')).toBeInTheDocument();
+  });
+
+  it('registers a request log entry listener', async () => {
+    await renderApp();
+    expect(window.electronAPI.requestLog.onEntry).toHaveBeenCalledOnce();
+  });
+
+  it('appends incoming entries pushed via onEntry to the log view', async () => {
+    let pushEntry;
+    await renderApp({
+      requestLog: {
+        onEntry: vi.fn((cb) => { pushEntry = cb; }),
+      },
+    });
+    fireEvent.click(screen.getByText('nav.log').closest('button'));
+    expect(screen.getByText('log.empty')).toBeInTheDocument();
+
+    act(() => {
+      pushEntry({ id: 'e1', timestamp: Date.now(), method: 'GET', hostname: 'myapp.local', path: '/home', status: 200, latencyMs: 5, https: false });
+    });
+
+    expect(await screen.findByText('myapp.local')).toBeInTheDocument();
+    expect(screen.getByText('/home')).toBeInTheDocument();
+  });
+
+  it('trims appended entries to the configured logMaxEntries', async () => {
+    let pushEntry;
+    await renderApp({
+      requestLog: {
+        onEntry: vi.fn((cb) => { pushEntry = cb; }),
+      },
+      settings: {
+        get: vi.fn().mockResolvedValue({ httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en', logMaxEntries: 1 }),
+      },
+    });
+    fireEvent.click(screen.getByText('nav.log').closest('button'));
+
+    act(() => {
+      pushEntry({ id: 'e1', timestamp: Date.now(), method: 'GET', hostname: 'first.local', path: '/one', status: 200, latencyMs: 5, https: false });
+    });
+    act(() => {
+      pushEntry({ id: 'e2', timestamp: Date.now(), method: 'GET', hostname: 'second.local', path: '/two', status: 200, latencyMs: 5, https: false });
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('second.local')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('first.local')).not.toBeInTheDocument();
+  });
+
+  it('clears the request log when the clear button is clicked', async () => {
+    const entries = [{ id: '1', timestamp: 1700000000000, method: 'GET', hostname: 'myapp.local', path: '/', status: 200, latencyMs: 10, https: false }];
+    const clear = vi.fn().mockResolvedValue([]);
+    await renderApp({ requestLog: { list: vi.fn().mockResolvedValue(entries), clear } });
+    fireEvent.click(screen.getByText('nav.log').closest('button'));
+    expect(screen.getByText('myapp.local')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('log.clear').closest('button'));
+
+    await waitFor(() => {
+      expect(clear).toHaveBeenCalledOnce();
+      expect(screen.queryByText('myapp.local')).not.toBeInTheDocument();
+    });
   });
 });
 

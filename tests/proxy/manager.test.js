@@ -20,6 +20,12 @@ vi.mock('../../src/proxy/certManager.js', () => ({
   CertManager: { getInstance: vi.fn().mockReturnValue({}) },
 }));
 
+vi.mock('../../src/proxy/requestLog.js', () => ({
+  RequestLog: vi.fn(function (maxEntries) {
+    this.maxEntries = maxEntries;
+  }),
+}));
+
 vi.mock('../../src/systemProxy.js', () => ({
   setSystemProxy: vi.fn().mockResolvedValue(undefined),
   clearSystemProxy: vi.fn().mockResolvedValue(undefined),
@@ -28,9 +34,11 @@ vi.mock('../../src/systemProxy.js', () => ({
 import { ProxyManager } from '../../src/proxy/manager.js';
 import { HttpProxy } from '../../src/proxy/httpProxy.js';
 import { PacServer } from '../../src/proxy/pacServer.js';
+import { CertManager } from '../../src/proxy/certManager.js';
+import { RequestLog } from '../../src/proxy/requestLog.js';
 import { setSystemProxy, clearSystemProxy } from '../../src/systemProxy.js';
 
-const mockStore = { getCertDir: () => '/tmp/test-certs' };
+const mockStore = { getCertDir: () => '/tmp/test-certs', getSettings: () => ({ logMaxEntries: 300 }) };
 const mappings = [{ domain: 'myapp.local', port: 3000, enabled: true }];
 const settings = { httpsEnabled: false };
 
@@ -91,6 +99,21 @@ describe('ProxyManager.start()', () => {
     await manager.start(mappings, settings);
     const pacInstance = vi.mocked(PacServer).mock.instances[0];
     expect(pacInstance.start).toHaveBeenCalledWith(54321);
+  });
+});
+
+describe('ProxyManager — request log wiring', () => {
+  it('creates a RequestLog sized from the store settings', () => {
+    const manager = new ProxyManager(mockStore);
+    expect(RequestLog).toHaveBeenCalledWith(300);
+    expect(manager.requestLog).toBeInstanceOf(RequestLog);
+  });
+
+  it('passes the request log to HttpProxy on start', async () => {
+    const manager = new ProxyManager(mockStore);
+    await manager.start(mappings, settings);
+    const certManager = vi.mocked(CertManager.getInstance).mock.results[0].value;
+    expect(HttpProxy).toHaveBeenCalledWith(certManager, manager.requestLog);
   });
 });
 

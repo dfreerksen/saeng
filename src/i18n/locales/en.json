@@ -5,6 +5,7 @@
   "proxy.stop": "Stop Proxy",
 
   "nav.mappings": "Mappings",
+  "nav.log": "Log",
   "nav.settings": "Settings",
   "nav.about": "About",
 
@@ -13,6 +14,18 @@
   "mappings.add": "Add Mapping",
   "mappings.empty": "No mappings yet",
   "mappings.emptyHint": "Click \"Add Mapping\" to route a domain to a local port.",
+
+  "log.title": "Request Log",
+  "log.subtitle": "Live view of requests proxied through Saeng",
+  "log.clear": "Clear",
+  "log.empty": "No requests yet",
+  "log.emptyHint": "Requests proxied through Saeng will appear here while the proxy is running.",
+  "log.time": "Time",
+  "log.method": "Method",
+  "log.host": "Host",
+  "log.path": "Path",
+  "log.status": "Status",
+  "log.latency": "Latency",
 
   "table.domain": "Domain",
   "table.port": "Target Port",
@@ -39,6 +52,8 @@
   "settings.httpsEnabledDesc": "Intercept HTTPS traffic with a local CA cert. Requires browser trust step below.",
   "settings.startOnLaunch": "Start proxy on launch",
   "settings.startOnLaunchDesc": "Automatically start the proxy when Saeng opens.",
+  "settings.logMaxEntries": "Log entries to keep",
+  "settings.logMaxEntriesDesc": "Number of recent requests to keep in the request log ({min}-{max}).",
   "settings.caTitle": "SSL Certificate Authority",
   "settings.caDesc": "To serve HTTPS on local domains, Saeng generates a local CA certificate. You must install and trust it in your system keychain once.",
   "settings.caGenerating": "Generating CA certificate...",

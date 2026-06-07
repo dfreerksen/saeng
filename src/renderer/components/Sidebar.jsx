@@ -9,6 +9,13 @@ export default function Sidebar({ currentView, setCurrentView, proxyRunning, onP
         <span>{t('nav.mappings')}</span>
       </button>
       <button
+        className={`nav-item${currentView === 'log' ? ' active' : ''}`}
+        onClick={() => setCurrentView('log')}
+      >
+        <i className="bi bi-list-columns-reverse" />
+        <span>{t('nav.log')}</span>
+      </button>
+      <button
         className={`nav-item${currentView === 'settings' ? ' active' : ''}`}
         onClick={() => setCurrentView('settings')}
       >

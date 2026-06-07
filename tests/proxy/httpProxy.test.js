@@ -1,6 +1,17 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import http from 'http';
+import { EventEmitter } from 'events';
 import { HttpProxy } from '../../src/proxy/httpProxy.js';
+
+// Helper: build a minimal mock req/res pair for exercising _recordRequest()
+// directly, without spinning up a real server. `res` is an EventEmitter so
+// `res.on('finish', ...)` can be triggered with `res.emit('finish')`.
+function makeMockReqRes({ method = 'GET', url = '/path', statusCode = 200 } = {}) {
+  const req = { method, url, headers: {} };
+  const res = new EventEmitter();
+  res.statusCode = statusCode;
+  return { req, res };
+}
 
 function startBackend(response = 'ok') {
   return new Promise((resolve) => {
@@ -165,5 +176,127 @@ describe('HttpProxy request handling', () => {
     // The important thing is that the proxy attempted to connect, not that it rejected the host
     const { statusCode } = await makeRequest(proxy.getPort(), { host: 'myapp.local:3000' });
     expect(statusCode).toBe(502);
+  });
+});
+
+describe('HttpProxy._recordRequest()', () => {
+  it('does nothing when no requestLog is configured', () => {
+    const proxy = new HttpProxy(null);
+    const { req, res } = makeMockReqRes();
+    expect(() => {
+      proxy._recordRequest(req, res, 'myapp.local', false);
+      res.emit('finish');
+    }).not.toThrow();
+  });
+
+  it('logs a completed request with method, hostname, path, status, https flag and timing', () => {
+    const add = vi.fn();
+    const proxy = new HttpProxy(null, { add });
+    const { req, res } = makeMockReqRes({ method: 'GET', url: '/dashboard', statusCode: 200 });
+
+    proxy._recordRequest(req, res, 'myapp.local', false);
+    res.emit('finish');
+
+    expect(add).toHaveBeenCalledTimes(1);
+    expect(add.mock.calls[0][0]).toMatchObject({
+      method: 'GET',
+      hostname: 'myapp.local',
+      path: '/dashboard',
+      https: false,
+      status: 200,
+    });
+    expect(add.mock.calls[0][0].timestamp).toEqual(expect.any(Number));
+    expect(add.mock.calls[0][0].latencyMs).toEqual(expect.any(Number));
+  });
+
+  it('marks https requests with https: true', () => {
+    const add = vi.fn();
+    const proxy = new HttpProxy(null, { add });
+    const { req, res } = makeMockReqRes();
+
+    proxy._recordRequest(req, res, 'secure.local', true);
+    res.emit('finish');
+
+    expect(add.mock.calls[0][0]).toMatchObject({ hostname: 'secure.local', https: true });
+  });
+
+  it('extracts the path and query string from an absolute proxy URL', () => {
+    const add = vi.fn();
+    const proxy = new HttpProxy(null, { add });
+    const { req, res } = makeMockReqRes({ url: 'http://myapp.local/search?q=test' });
+
+    proxy._recordRequest(req, res, 'myapp.local', false);
+    res.emit('finish');
+
+    expect(add.mock.calls[0][0]).toMatchObject({ path: '/search?q=test' });
+  });
+
+  it('falls back to the raw URL when an absolute-looking URL fails to parse', () => {
+    const add = vi.fn();
+    const proxy = new HttpProxy(null, { add });
+    const { req, res } = makeMockReqRes({ url: 'http://' });
+
+    proxy._recordRequest(req, res, 'myapp.local', false);
+    res.emit('finish');
+
+    expect(add.mock.calls[0][0]).toMatchObject({ path: 'http://' });
+  });
+
+  it('defaults to "/" when the request has no url', () => {
+    const add = vi.fn();
+    const proxy = new HttpProxy(null, { add });
+    const { req, res } = makeMockReqRes();
+    delete req.url;
+
+    proxy._recordRequest(req, res, 'myapp.local', false);
+    res.emit('finish');
+
+    expect(add.mock.calls[0][0]).toMatchObject({ path: '/' });
+  });
+});
+
+describe('HttpProxy request logging — end to end', () => {
+  let proxy;
+  let backend;
+
+  afterEach(async () => {
+    await proxy?.stop();
+    proxy = null;
+    if (backend) await stopBackend(backend);
+    backend = null;
+  });
+
+  it('records a completed proxied request once the response finishes', async () => {
+    backend = await startBackend('hello');
+    const add = vi.fn();
+    proxy = new HttpProxy(null, { add });
+    await proxy.start(
+      [{ domain: 'logged.local', host: '127.0.0.1', port: backend.address().port, enabled: true }],
+      { httpsEnabled: false }
+    );
+
+    await makeRequest(proxy.getPort(), { host: 'logged.local', path: '/ping' });
+
+    await vi.waitFor(() => expect(add).toHaveBeenCalled());
+    expect(add.mock.calls[0][0]).toMatchObject({
+      method: 'GET',
+      hostname: 'logged.local',
+      path: '/ping',
+      https: false,
+      status: 200,
+    });
+  });
+
+  it('does not attempt to log when no requestLog is configured', async () => {
+    backend = await startBackend('hello');
+    proxy = new HttpProxy(null);
+    await proxy.start(
+      [{ domain: 'unlogged.local', host: '127.0.0.1', port: backend.address().port, enabled: true }],
+      { httpsEnabled: false }
+    );
+
+    await expect(
+      makeRequest(proxy.getPort(), { host: 'unlogged.local' })
+    ).resolves.toMatchObject({ statusCode: 200 });
   });
 });

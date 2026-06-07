@@ -23,6 +23,11 @@ describe('Sidebar', () => {
     expect(screen.getByText('nav.mappings')).toBeInTheDocument();
   });
 
+  it('renders the log nav item', () => {
+    renderSidebar();
+    expect(screen.getByText('nav.log')).toBeInTheDocument();
+  });
+
   it('renders the settings nav item', () => {
     renderSidebar();
     expect(screen.getByText('nav.settings')).toBeInTheDocument();
@@ -40,11 +45,20 @@ describe('Sidebar', () => {
     expect(navItems[1]).not.toHaveClass('active');
   });
 
+  it('applies active class to log button when currentView is log', () => {
+    const { container } = renderSidebar({ currentView: 'log' });
+    const navItems = container.querySelectorAll('.nav-item');
+    expect(navItems[0]).not.toHaveClass('active');
+    expect(navItems[1]).toHaveClass('active');
+    expect(navItems[2]).not.toHaveClass('active');
+  });
+
   it('applies active class to settings button when currentView is settings', () => {
     const { container } = renderSidebar({ currentView: 'settings' });
     const navItems = container.querySelectorAll('.nav-item');
     expect(navItems[0]).not.toHaveClass('active');
-    expect(navItems[1]).toHaveClass('active');
+    expect(navItems[1]).not.toHaveClass('active');
+    expect(navItems[2]).toHaveClass('active');
   });
 
   it('calls setCurrentView("mappings") when mappings button is clicked', () => {
@@ -52,6 +66,13 @@ describe('Sidebar', () => {
     renderSidebar({ setCurrentView });
     fireEvent.click(screen.getByText('nav.mappings').closest('button'));
     expect(setCurrentView).toHaveBeenCalledWith('mappings');
+  });
+
+  it('calls setCurrentView("log") when log button is clicked', () => {
+    const setCurrentView = vi.fn();
+    renderSidebar({ setCurrentView });
+    fireEvent.click(screen.getByText('nav.log').closest('button'));
+    expect(setCurrentView).toHaveBeenCalledWith('log');
   });
 
   it('calls setCurrentView("settings") when settings button is clicked', () => {

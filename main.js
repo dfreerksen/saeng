@@ -187,10 +187,21 @@ function setupIPC() {
     ...proxyManager.getStatus(),
   }));
 
+  ipcMain.handle('requestLog:list', () => proxyManager.requestLog.list());
+
+  ipcMain.handle('requestLog:clear', () => {
+    proxyManager.requestLog.clear();
+    return [];
+  });
+
   ipcMain.handle('settings:get', () => store.getSettings());
 
   ipcMain.handle('settings:set', (_, patch) => {
-    return store.setSettings(patch);
+    const updated = store.setSettings(patch);
+    if ('logMaxEntries' in patch) {
+      proxyManager.requestLog.setMaxEntries(updated.logMaxEntries);
+    }
+    return updated;
   });
 
   ipcMain.handle('ssl:get-ca-expiry', () =>
@@ -245,6 +256,9 @@ app.whenReady().then(async () => {
   store = new AppStore();
   i18n.load(store.getSettings().locale || app.getLocale());
   proxyManager = new ProxyManager(store);
+  proxyManager.requestLog.setListener((entry) =>
+    mainWindow?.webContents.send('requestLog:entry', entry)
+  );
 
   // Clear any leftover proxy config from a previous run (crash / force-quit).
   // Only touch services already pointing at our PAC URL so VPN-managed proxy

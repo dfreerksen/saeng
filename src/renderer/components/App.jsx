@@ -1,12 +1,15 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Titlebar from './Titlebar.jsx';
 import Sidebar from './Sidebar.jsx';
 import MappingsView from './MappingsView.jsx';
+import LogView from './LogView.jsx';
 import SettingsView from './SettingsView.jsx';
 import MappingModal from './MappingModal.jsx';
 import AboutModal from './AboutModal.jsx';
 import Toast from './Toast.jsx';
 import { getOS } from '../js/os.js';
+
+const DEFAULT_LOG_MAX_ENTRIES = 300;
 
 function applyColorMode(mode) {
   const resolved = mode === 'auto'
@@ -19,6 +22,7 @@ function applyColorMode(mode) {
 export default function App() {
   const [proxyRunning, setProxyRunning] = useState(false);
   const [mappings, setMappings] = useState([]);
+  const [requestLog, setRequestLog] = useState([]);
   const [settings, setSettingsState] = useState({});
   const [locales, setLocales] = useState([]);
   const [currentView, setCurrentView] = useState('mappings');
@@ -30,6 +34,13 @@ export default function App() {
   const [caPath, setCaPath] = useState('');
   const [caExpiry, setCaExpiry] = useState(null);
   const [i18nStrings, setI18nStrings] = useState({});
+  const logMaxEntriesRef = useRef(DEFAULT_LOG_MAX_ENTRIES);
+
+  useEffect(() => {
+    const max = settings.logMaxEntries || DEFAULT_LOG_MAX_ENTRIES;
+    logMaxEntriesRef.current = max;
+    setRequestLog((prev) => (prev.length > max ? prev.slice(prev.length - max) : prev));
+  }, [settings.logMaxEntries]);
 
   const t = useCallback((key, vars) => {
     let str = i18nStrings[key] ?? key;
@@ -54,9 +65,10 @@ export default function App() {
       const strings = await window.electronAPI.i18n.getStrings();
       setI18nStrings(strings);
 
-      const [status, mList, appInfo, caPathVal, caExpiryVal, settingsData, localeList] = await Promise.all([
+      const [status, mList, logEntries, appInfo, caPathVal, caExpiryVal, settingsData, localeList] = await Promise.all([
         window.electronAPI.proxy.status(),
         window.electronAPI.mappings.list(),
+        window.electronAPI.requestLog.list(),
         window.electronAPI.app.getInfo(),
         window.electronAPI.ssl.getCAPath(),
         window.electronAPI.ssl.getCAExpiry(),
@@ -66,6 +78,7 @@ export default function App() {
 
       setProxyRunning(status.running);
       setMappings(mList);
+      setRequestLog(logEntries);
       setAppVersion(appInfo.version);
       setElectronVersion(appInfo.electron);
       setNodeVersion(appInfo.node);
@@ -86,6 +99,14 @@ export default function App() {
 
     window.electronAPI.proxy.onStatusChanged((data) => {
       setProxyRunning(data.running);
+    });
+
+    window.electronAPI.requestLog.onEntry((entry) => {
+      setRequestLog((prev) => {
+        const next = [...prev, entry];
+        const max = logMaxEntriesRef.current;
+        return next.length > max ? next.slice(next.length - max) : next;
+      });
     });
 
     function handleExternalLinks(e) {
@@ -119,6 +140,11 @@ export default function App() {
         showToast(t('toast.proxyStartFailed', { error: result.error }), 'error');
       }
     }
+  }
+
+  async function handleClearLog() {
+    const cleared = await window.electronAPI.requestLog.clear();
+    setRequestLog(cleared);
   }
 
   async function updateSettings(patch) {
@@ -161,6 +187,12 @@ export default function App() {
             onAdd={() => setModal({ type: 'add' })}
             onEdit={(mapping) => setModal({ type: 'edit', mapping })}
             showToast={showToast}
+            t={t}
+          />
+          <LogView
+            active={currentView === 'log'}
+            entries={requestLog}
+            onClear={handleClearLog}
             t={t}
           />
           <SettingsView

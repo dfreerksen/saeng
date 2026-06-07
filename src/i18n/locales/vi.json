@@ -5,6 +5,7 @@
   "proxy.stop": "Dừng Proxy",
 
   "nav.mappings": "Ánh xạ",
+  "nav.log": "Nhật ký",
   "nav.settings": "Cài đặt",
   "nav.about": "Về",
 
@@ -13,6 +14,18 @@
   "mappings.add": "Thêm Ánh xạ",
   "mappings.empty": "Chưa có ánh xạ nào",
   "mappings.emptyHint": "Nhấn vào \"Thêm Ánh xạ\" để điều hướng một tên miền đến một cổng cục bộ.",
+
+  "log.title": "Nhật ký yêu cầu",
+  "log.subtitle": "Xem trực tiếp các yêu cầu được chuyển tiếp qua Saeng",
+  "log.clear": "Xóa",
+  "log.empty": "Chưa có yêu cầu nào",
+  "log.emptyHint": "Các yêu cầu được chuyển tiếp qua Saeng sẽ hiển thị tại đây khi proxy đang hoạt động.",
+  "log.time": "Thời gian",
+  "log.method": "Phương thức",
+  "log.host": "Máy chủ",
+  "log.path": "Đường dẫn",
+  "log.status": "Trạng thái",
+  "log.latency": "Độ trễ",
 
   "table.domain": "Tên miền",
   "table.port": "Cổng đích",
@@ -39,6 +52,8 @@
   "settings.httpsEnabledDesc": "Chặn lưu lượng HTTPS bằng một chứng chỉ CA cục bộ. Yêu cầu thực hiện bước tin cậy trên trình duyệt ở phía dưới.",
   "settings.startOnLaunch": "Khởi động proxy khi mở ứng dụng",
   "settings.startOnLaunchDesc": "Tự động khởi động proxy khi Saeng được mở.",
+  "settings.logMaxEntries": "Số lượng mục nhật ký cần giữ lại",
+  "settings.logMaxEntriesDesc": "Số lượng yêu cầu gần đây cần giữ lại trong nhật ký yêu cầu ({min}-{max}).",
   "settings.caTitle": "Cơ quan cấp chứng chỉ SSL (CA)",
   "settings.caDesc": "Để phục vụ HTTPS trên các tên miền cục bộ, Saeng tạo ra một chứng chỉ CA cục bộ. Bạn cần cài đặt và thiết lập tin cậy cho chứng chỉ này trong hệ thống quản lý chứng chỉ (keychain) của mình một lần duy nhất.",
   "settings.caGenerating": "Đang tạo chứng chỉ CA...",

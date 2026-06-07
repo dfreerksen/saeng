@@ -5,6 +5,7 @@
   "proxy.stop": "停止代理",
 
   "nav.mappings": "映射",
+  "nav.log": "日志",
   "nav.settings": "设置",
   "nav.about": "关于",
 
@@ -13,6 +14,18 @@
   "mappings.add": "添加映射",
   "mappings.empty": "暂无映射",
   "mappings.emptyHint": "点击“添加映射”以将域名路由至本地端口。",
+
+  "log.title": "请求日志",
+  "log.subtitle": "经由 Saeng 代理的请求实时视图",
+  "log.clear": "清除",
+  "log.empty": "暂无请求",
+  "log.emptyHint": "代理运行时，经由 Saeng 代理的请求将显示在此处。",
+  "log.time": "时间",
+  "log.method": "方法",
+  "log.host": "主机",
+  "log.path": "路径",
+  "log.status": "状态",
+  "log.latency": "延迟",
 
   "table.domain": "域名",
   "table.port": "目标端口",
@@ -39,6 +52,8 @@
   "settings.httpsEnabledDesc": "使用本地 CA 证书拦截 HTTPS 流量。需要执行下方所示的浏览器信任步骤。",
   "settings.startOnLaunch": "启动时自动开启代理",
   "settings.startOnLaunchDesc": "Saeng 启动时自动开启代理。",
+  "settings.logMaxEntries": "日志条目保留数量",
+  "settings.logMaxEntriesDesc": "在请求日志中保留的最新请求数量 ({min}-{max})。",
   "settings.caTitle": "SSL 证书颁发机构 (CA)",
   "settings.caDesc": "为了在本地域名上提供 HTTPS 服务，Saeng 会生成一个本地 CA 证书。您必须在系统的密钥串（Keychain）中安装并信任该证书一次。",
   "settings.caGenerating": "正在生成 CA 证书...",

@@ -28,6 +28,44 @@
   color: var(--bs-primary);
 }
 
+.badge-status-ok {
+  background: color-mix(in srgb, var(--bs-success) 15%, transparent);
+  color: var(--bs-success);
+}
+
+.badge-status-redirect {
+  background: color-mix(in srgb, var(--bs-info) 15%, transparent);
+  color: var(--bs-info);
+}
+
+.badge-status-warn {
+  background: color-mix(in srgb, var(--bs-warning) 18%, transparent);
+  color: var(--bs-warning);
+}
+
+.badge-status-error {
+  background: color-mix(in srgb, var(--bs-danger) 15%, transparent);
+  color: var(--bs-danger);
+}
+
+.badge-status-pending {
+  background: color-mix(in srgb, var(--saeng-text-muted) 15%, transparent);
+  color: var(--saeng-text-muted);
+}
+
+.log-time-cell,
+.log-path-cell {
+  color: var(--saeng-primary-complement-color);
+}
+
+.log-path-cell {
+  font-family: var(--bs-font-monospace, monospace);
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Toggle switch */
 .toggle {
   display: inline-block;

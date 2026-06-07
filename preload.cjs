@@ -17,6 +17,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on('proxy:status', (_, data) => callback(data));
     },
   },
+  requestLog: {
+    list: () => ipcRenderer.invoke('requestLog:list'),
+    clear: () => ipcRenderer.invoke('requestLog:clear'),
+    onEntry: (callback) => {
+      ipcRenderer.on('requestLog:entry', (_, entry) => callback(entry));
+    },
+  },
   settings: {
     get: () => ipcRenderer.invoke('settings:get'),
     set: (patch) => ipcRenderer.invoke('settings:set', patch),

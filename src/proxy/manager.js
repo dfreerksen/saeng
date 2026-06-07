@@ -1,6 +1,7 @@
 import { HttpProxy } from './httpProxy.js';
 import { PacServer } from './pacServer.js';
 import { CertManager } from './certManager.js';
+import { RequestLog } from './requestLog.js';
 import { setSystemProxy, clearSystemProxy } from '../systemProxy.js';
 
 const PAC_PORT = 8181;
@@ -10,6 +11,7 @@ class ProxyManager {
     this.store = store;
     this.httpProxy = null;
     this.pacServer = null;
+    this.requestLog = new RequestLog(store.getSettings().logMaxEntries);
     this.running = false;
     this.startedAt = null;
   }
@@ -31,7 +33,7 @@ class ProxyManager {
     const certDir = this.store.getCertDir();
     const certManager = CertManager.getInstance(certDir);
 
-    this.httpProxy = new HttpProxy(certManager);
+    this.httpProxy = new HttpProxy(certManager, this.requestLog);
     this.pacServer = new PacServer(PAC_PORT);
 
     this.pacServer.updateMappings(mappings);

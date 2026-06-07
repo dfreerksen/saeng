@@ -5,6 +5,7 @@
   "proxy.stop": "หยุดพร็อกซี",
 
   "nav.mappings": "การแมป",
+  "nav.log": "บันทึก",
   "nav.settings": "การตั้งค่า",
   "nav.about": "เกี่ยวกับ",
 
@@ -13,6 +14,18 @@
   "mappings.add": "เพิ่มการทำแผนที่",
   "mappings.empty": "ยังไม่มีการแมป",
   "mappings.emptyHint": "คลิก \"เพิ่มการแมป\" เพื่อกำหนดเส้นทางโดเมนไปยังพอร์ตในเครื่อง",
+
+  "log.title": "บันทึกคำขอ",
+  "log.subtitle": "แสดงคำขอที่ผ่านพร็อกซี Saeng แบบเรียลไทม์",
+  "log.clear": "ล้างข้อมูล",
+  "log.empty": "ยังไม่มีคำขอ",
+  "log.emptyHint": "คำขอที่ผ่านพร็อกซี Saeng จะปรากฏที่นี่ในขณะที่พร็อกซีทำงานอยู่",
+  "log.time": "เวลา",
+  "log.method": "Method",
+  "log.host": "Host",
+  "log.path": "Path",
+  "log.status": "สถานะ",
+  "log.latency": "ความหน่วง",
 
   "table.domain": "โดเมน",
   "table.port": "พอร์ตเป้าหมาย",
@@ -39,6 +52,8 @@
   "settings.httpsEnabledDesc": "สกัดกั้นการรับส่งข้อมูล HTTPS ด้วยใบรับรอง CA ในพื้นที่ ต้องมีขั้นตอนความน่าเชื่อถือของเบราว์เซอร์ด้านล่าง",
   "settings.startOnLaunch": "เริ่มพรอกซีเมื่อเปิดตัว",
   "settings.startOnLaunchDesc": "เริ่มพร็อกซีโดยอัตโนมัติเมื่อ Saeng เปิดขึ้น",
+  "settings.logMaxEntries": "รายการบันทึกที่จะเก็บ",
+  "settings.logMaxEntriesDesc": "จำนวนคำขอล่าสุดที่จะเก็บในบันทึกคำขอ ({min}-{max}).",
   "settings.caTitle": "ผู้ออกใบรับรอง SSL",
   "settings.caDesc": "เพื่อให้บริการ HTTPS บนโดเมนท้องถิ่น Saeng จะสร้างใบรับรอง CA ในเครื่อง คุณต้องติดตั้งและเชื่อถือในพวงกุญแจระบบของคุณหนึ่งครั้ง",
   "settings.caGenerating": "กำลังสร้างใบรับรอง CA...",

@@ -5,6 +5,7 @@
   "proxy.stop": "プロキシを停止",
 
   "nav.mappings": "マッピング",
+  "nav.log": "ログ",
   "nav.settings": "設定",
   "nav.about": "について",
 
@@ -13,6 +14,18 @@
   "mappings.add": "マッピングを追加",
   "mappings.empty": "マッピングはまだありません",
   "mappings.emptyHint": "「マッピングを追加」をクリックして、ドメインをローカルポートへルーティングしてください。",
+
+  "log.title": "リクエストログ",
+  "log.subtitle": "Saeng経由でプロキシされたリクエストのリアルタイム表示",
+  "log.clear": "クリア",
+  "log.empty": "リクエストはまだありません",
+  "log.emptyHint": "プロキシの実行中、Saeng経由のリクエストがここに表示されます。",
+  "log.time": "時刻",
+  "log.method": "メソッド",
+  "log.host": "ホスト",
+  "log.path": "パス",
+  "log.status": "ステータス",
+  "log.latency": "レイテンシ",
 
   "table.domain": "ドメイン",
   "table.port": "対象ポート",
@@ -39,6 +52,8 @@
   "settings.httpsEnabledDesc": "ローカルCA証明書を使用してHTTPSトラフィックを傍受します。以下の「ブラウザでの信頼設定」が必要です。",
   "settings.startOnLaunch": "起動時にプロキシを開始",
   "settings.startOnLaunchDesc": "Saengの起動時にプロキシを自動的に開始します。",
+  "settings.logMaxEntries": "ログ項目を保持",
+  "settings.logMaxEntriesDesc": "リクエストログに保持する最近のリクエスト数 ({min}-{max}).",
   "settings.caTitle": "SSL認証局（CA）",
   "settings.caDesc": "ローカルドメインでHTTPSを提供するため、SaengはローカルCA証明書を生成します。一度だけ、システムのキーチェーンにインストールし、信頼する設定を行う必要があります。",
   "settings.caGenerating": "CA証明書を生成中...",

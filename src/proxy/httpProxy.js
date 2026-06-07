@@ -4,8 +4,9 @@ import net from 'net';
 import tls from 'tls';
 
 class HttpProxy {
-  constructor(certManager) {
+  constructor(certManager, requestLog = null) {
     this.certManager = certManager;
+    this.requestLog = requestLog;
     this.mappings = new Map();
     this.httpServer = null;
     this.internalHttpsServer = null;
@@ -93,10 +94,41 @@ class HttpProxy {
     return this.httpServer ? this.httpServer.address().port : null;
   }
 
+  // Records a completed request/response cycle to the request log (if enabled).
+  // Hooked on 'finish' so it captures the real status code and total latency
+  // without affecting how the response is streamed to the client.
+  _recordRequest(req, res, hostname, https) {
+    if (!this.requestLog) return;
+
+    const startedAt = Date.now();
+    res.on('finish', () => {
+      let reqPath = req.url || '/';
+      if (reqPath.startsWith('http://') || reqPath.startsWith('https://')) {
+        try {
+          const parsed = new URL(reqPath);
+          reqPath = parsed.pathname + parsed.search;
+        } catch {
+          // leave reqPath as the raw URL
+        }
+      }
+
+      this.requestLog.add({
+        timestamp: startedAt,
+        method: req.method,
+        hostname,
+        path: reqPath,
+        https,
+        status: res.statusCode,
+        latencyMs: Date.now() - startedAt,
+      });
+    });
+  }
+
   _handleRequest(req, res) {
     const rawHost = req.headers.host || '';
     const hostname = rawHost.split(':')[0].toLowerCase();
     const mapping = this.findMapping(hostname);
+    this._recordRequest(req, res, hostname, false);
 
     if (!mapping) {
       res.writeHead(502, { 'Content-Type': 'text/plain' });
@@ -147,6 +179,7 @@ class HttpProxy {
     const rawHost = req.headers.host || '';
     const hostname = rawHost.split(':')[0].toLowerCase();
     const mapping = this.findMapping(hostname);
+    this._recordRequest(req, res, hostname, true);
 
     if (!mapping) {
       res.writeHead(502, { 'Content-Type': 'text/plain' });

@@ -1,0 +1,132 @@
+// @vitest-environment jsdom
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import LogView from '../../../src/renderer/components/LogView.jsx';
+
+const t = (key) => key;
+
+const SAMPLE_ENTRIES = [
+  {
+    id: '1',
+    timestamp: 1700000000000,
+    method: 'GET',
+    hostname: 'myapp.local',
+    path: '/',
+    status: 200,
+    latencyMs: 12,
+    https: false,
+  },
+  {
+    id: '2',
+    timestamp: 1700000001000,
+    method: 'POST',
+    hostname: 'api.myapp.local',
+    path: '/users',
+    status: 500,
+    latencyMs: 340,
+    https: true,
+  },
+  {
+    id: '3',
+    timestamp: 1700000002000,
+    method: 'GET',
+    hostname: 'myapp.local',
+    path: '/pending',
+    status: null,
+    latencyMs: null,
+    https: false,
+  },
+];
+
+function renderLogView(props = {}) {
+  const defaults = {
+    active: true,
+    entries: [],
+    onClear: vi.fn(),
+    t,
+  };
+  return render(<LogView {...defaults} {...props} />);
+}
+
+describe('LogView — empty state', () => {
+  it('shows the empty state element when there are no entries', () => {
+    renderLogView({ entries: [] });
+    expect(screen.getByText('log.empty')).toBeInTheDocument();
+    expect(screen.getByText('log.emptyHint')).toBeInTheDocument();
+  });
+
+  it('does not render the log table when there are no entries', () => {
+    const { container } = renderLogView({ entries: [] });
+    expect(container.querySelector('#logTable')).not.toBeInTheDocument();
+  });
+
+  it('disables the clear button when there are no entries', () => {
+    renderLogView({ entries: [] });
+    expect(screen.getByText('log.clear').closest('button')).toBeDisabled();
+  });
+});
+
+describe('LogView — table with entries', () => {
+  it('renders a table row for each entry', () => {
+    const { container } = renderLogView({ entries: SAMPLE_ENTRIES });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(3);
+  });
+
+  it('renders the most recent entry first', () => {
+    const { container } = renderLogView({ entries: SAMPLE_ENTRIES });
+    const rows = container.querySelectorAll('tbody tr');
+    expect(rows[0]).toHaveTextContent('/pending');
+    expect(rows[2]).toHaveTextContent('/');
+  });
+
+  it('displays the hostname and path for an entry', () => {
+    renderLogView({ entries: SAMPLE_ENTRIES });
+    expect(screen.getAllByText('myapp.local')).toHaveLength(2);
+    expect(screen.getByText('/users')).toBeInTheDocument();
+  });
+
+  it('shows an https badge for https entries and an http badge otherwise', () => {
+    renderLogView({ entries: SAMPLE_ENTRIES });
+    const badges = screen.getAllByText(/^(GET|POST)$/);
+    expect(badges[1]).toHaveClass('badge-https');
+    expect(badges[2]).toHaveClass('badge-http');
+  });
+
+  it('applies status badge classes based on the status code', () => {
+    renderLogView({ entries: SAMPLE_ENTRIES });
+    expect(screen.getByText('200')).toHaveClass('badge-status-ok');
+    expect(screen.getByText('500')).toHaveClass('badge-status-error');
+  });
+
+  it('shows a placeholder for entries without a status or latency yet', () => {
+    const { container } = renderLogView({ entries: [SAMPLE_ENTRIES[2]] });
+    expect(screen.getAllByText('—')).toHaveLength(2);
+    expect(container.querySelector('.badge-status-pending')).toHaveTextContent('—');
+  });
+
+  it('formats latency in milliseconds when present', () => {
+    renderLogView({ entries: [SAMPLE_ENTRIES[0]] });
+    expect(screen.getByText('12 ms')).toBeInTheDocument();
+  });
+
+  it('enables the clear button and calls onClear when clicked', () => {
+    const onClear = vi.fn();
+    renderLogView({ entries: SAMPLE_ENTRIES, onClear });
+    const button = screen.getByText('log.clear').closest('button');
+    expect(button).not.toBeDisabled();
+    fireEvent.click(button);
+    expect(onClear).toHaveBeenCalledOnce();
+  });
+});
+
+describe('LogView — active state', () => {
+  it('applies the active class when active is true', () => {
+    const { container } = renderLogView({ active: true });
+    expect(container.querySelector('#view-log')).toHaveClass('active');
+  });
+
+  it('does not apply the active class when active is false', () => {
+    const { container } = renderLogView({ active: false });
+    expect(container.querySelector('#view-log')).not.toHaveClass('active');
+  });
+});

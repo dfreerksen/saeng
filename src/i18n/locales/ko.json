@@ -5,6 +5,7 @@
   "proxy.stop": "프록시 중지",
 
   "nav.mappings": "매핑",
+  "nav.log": "통나무",
   "nav.settings": "설정",
   "nav.about": "에 대한",
 
@@ -13,6 +14,18 @@
   "mappings.add": "매핑 추가",
   "mappings.empty": "아직 매핑이 없습니다.",
   "mappings.emptyHint": "도메인을 로컬 포트로 라우팅하려면 \"매핑 추가\"를 클릭하세요.",
+
+  "log.title": "요청 로그",
+  "log.subtitle": "Saeng을 통해 프록시된 요청 실시간 보기",
+  "log.clear": "지우기",
+  "log.empty": "요청 없음",
+  "log.emptyHint": "프록시가 실행되는 동안 Saeng을 통해 프록시된 요청이 여기에 표시됩니다.",
+  "log.time": "시간",
+  "log.method": "메서드",
+  "log.host": "호스트",
+  "log.path": "경로",
+  "log.status": "상태",
+  "log.latency": "지연 시간",
 
   "table.domain": "도메인",
   "table.port": "대상 포트",
@@ -39,6 +52,8 @@
   "settings.httpsEnabledDesc": "로컬 CA 인증서를 사용하여 HTTPS 트래픽을 가로챕니다. 아래의 브라우저 신뢰 설정 단계가 필요합니다.",
   "settings.startOnLaunch": "시작 시 프록시 실행",
   "settings.startOnLaunchDesc": "Saeng이 실행될 때 프록시를 자동으로 시작합니다.",
+  "settings.logMaxEntries": "로그 항목 유지",
+  "settings.logMaxEntriesDesc": "요청 로그에 유지할 최신 요청 수 ({min}-{max}).",
   "settings.caTitle": "SSL 인증 기관 (CA)",
   "settings.caDesc": "로컬 도메인에서 HTTPS를 제공하기 위해, Saeng은 로컬 CA 인증서를 생성합니다. 이 인증서를 시스템 키체인에 한 번 설치하고 신뢰하도록 설정해야 합니다.",
   "settings.caGenerating": "CA 인증서 생성 중...",

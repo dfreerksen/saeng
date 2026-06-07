@@ -5,6 +5,7 @@
   "proxy.stop": "Detener proxy",
 
   "nav.mappings": "Mapeos",
+  "nav.log": "Registro",
   "nav.settings": "Configuración",
   "nav.about": "Acerca de",
 
@@ -13,6 +14,18 @@
   "mappings.add": "Agregar Mapeo",
   "mappings.empty": "Aún no hay asignaciones",
   "mappings.emptyHint": "Haga clic en \"Agregar asignación\" para enrutar un dominio a un puerto local.",
+
+  "log.title": "Registro de solicitudes",
+  "log.subtitle": "Vista en tiempo real de las solicitudes reenviadas a través de Saeng",
+  "log.clear": "Borrar",
+  "log.empty": "Aún no hay solicitudes",
+  "log.emptyHint": "Las solicitudes reenviadas a través de Saeng aparecerán aquí mientras el proxy esté en ejecución.",
+  "log.time": "Hora",
+  "log.method": "Método",
+  "log.host": "Host",
+  "log.path": "Ruta",
+  "log.status": "Estado",
+  "log.latency": "Latencia",
 
   "table.domain": "Dominio",
   "table.port": "Puerto de Destino",
@@ -39,6 +52,8 @@
   "settings.httpsEnabledDesc": "Intercepte el tráfico HTTPS con un certificado de CA local. Requiere el paso siguiente de confianza en el navegador.",
   "settings.startOnLaunch": "Iniciar proxy al iniciar",
   "settings.startOnLaunchDesc": "Inicia automáticamente el proxy cuando se abre Saeng.",
+  "settings.logMaxEntries": "Log-Einträge zum Behalten",
+  "settings.logMaxEntriesDesc": "Anzahl der letzten Anfragen, die im Anfragelog behalten werden ({min}-{max}).",
   "settings.caTitle": "Autoridad de certificación SSL",
   "settings.caDesc": "Para ofrecer HTTPS en dominios locales, Saeng genera un certificado de CA local. Debe instalarlo y confiarlo en el llavero de su sistema una vez.",
   "settings.caGenerating": "Generating CA certificate...",

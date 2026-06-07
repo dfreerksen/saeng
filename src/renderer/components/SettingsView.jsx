@@ -1,7 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getExpiryInfo } from '../js/utils.js';
 import { getOS } from '../js/os.js';
 import Tooltip from './Tooltip.jsx';
+
+const LOG_MAX_ENTRIES_MIN = 100;
+const LOG_MAX_ENTRIES_MAX = 100000;
+const LOG_MAX_ENTRIES_STEP = 100;
+const LOG_MAX_ENTRIES_DEFAULT = 300;
+
+function clampLogMaxEntries(value) {
+  const parsed = parseInt(value, 10);
+  if (Number.isNaN(parsed)) return LOG_MAX_ENTRIES_DEFAULT;
+  return Math.min(LOG_MAX_ENTRIES_MAX, Math.max(LOG_MAX_ENTRIES_MIN, parsed));
+}
 
 export default function SettingsView({
   active,
@@ -19,6 +30,21 @@ export default function SettingsView({
   const [trustingCA, setTrustingCA] = useState(false);
   const [regeneratingCA, setRegeneratingCA] = useState(false);
   const [deletingCA, setDeletingCA] = useState(false);
+  const [logMaxEntriesDraft, setLogMaxEntriesDraft] = useState(
+    String(settings.logMaxEntries ?? LOG_MAX_ENTRIES_DEFAULT)
+  );
+
+  useEffect(() => {
+    setLogMaxEntriesDraft(String(settings.logMaxEntries ?? LOG_MAX_ENTRIES_DEFAULT));
+  }, [settings.logMaxEntries]);
+
+  function commitLogMaxEntries() {
+    const clamped = clampLogMaxEntries(logMaxEntriesDraft);
+    setLogMaxEntriesDraft(String(clamped));
+    if (clamped !== settings.logMaxEntries) {
+      onSettingsChange({ logMaxEntries: clamped });
+    }
+  }
 
   const expiryInfo = getExpiryInfo(caExpiry);
   const os = getOS();
@@ -105,6 +131,28 @@ export default function SettingsView({
             />
             <span className="toggle-track" />
           </label>
+        </div>
+
+        <div className="setting-row">
+          <div className="setting-info">
+            <div className="setting-name">{t('settings.logMaxEntries')}</div>
+            <div className="setting-desc">
+              {t('settings.logMaxEntriesDesc', {
+                min: LOG_MAX_ENTRIES_MIN.toLocaleString(),
+                max: LOG_MAX_ENTRIES_MAX.toLocaleString(),
+              })}
+            </div>
+          </div>
+          <input
+            className="log-max-entries-input"
+            type="number"
+            min={LOG_MAX_ENTRIES_MIN}
+            max={LOG_MAX_ENTRIES_MAX}
+            step={LOG_MAX_ENTRIES_STEP}
+            value={logMaxEntriesDraft}
+            onChange={(e) => setLogMaxEntriesDraft(e.target.value)}
+            onBlur={commitLogMaxEntries}
+          />
         </div>
       </div>
 

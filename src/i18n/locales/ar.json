@@ -5,6 +5,7 @@
   "proxy.stop": "إيقاف الوكيل",
 
   "nav.mappings": "التعيينات",
+  "nav.log": "سجل",
   "nav.settings": "الإعدادات",
   "nav.about": "عن",
 
@@ -13,6 +14,18 @@
   "mappings.add": "إضافة تعيين",
   "mappings.empty": "لا توجد تعيينات بعد",
   "mappings.emptyHint": "انقر على \"إضافة تعيين\" لتوجيه نطاق معين إلى منفذ محلي.",
+
+  "log.title": "سجل الطلبات",
+  "log.subtitle": "عرض مباشر للطلبات الموجهة عبر Saeng",
+  "log.clear": "مسح",
+  "log.empty": "لا توجد طلبات بعد",
+  "log.emptyHint": "ستظهر هنا الطلبات الموجهة عبر Saeng أثناء تشغيل الوكيل (Proxy).",
+  "log.time": "الوقت",
+  "log.method": "الطريقة",
+  "log.host": "المضيف",
+  "log.path": "المسار",
+  "log.status": "الحالة",
+  "log.latency": "زمن الاستجابة",
 
   "table.domain": "النطاق",
   "table.port": "المنفذ المستهدف",
@@ -39,6 +52,8 @@
   "settings.httpsEnabledDesc": "اعتراض حركة مرور HTTPS باستخدام شهادة مرجع مصدق (CA) محلي. يتطلب خطوة الثقة في المتصفح الموضحة أدناه.",
   "settings.startOnLaunch": "تشغيل الوكيل عند الإطلاق",
   "settings.startOnLaunchDesc": "تشغيل الوكيل تلقائياً عند فتح Saeng.",
+  "settings.logMaxEntries": "عدد مدخلات السجل للحفاظ عليها",
+  "settings.logMaxEntriesDesc": "عدد الطلبات الأخيرة للحفاظ عليها في سجل الطلبات ({min}-{max}).",
   "settings.caTitle": "مرجع شهادات SSL (CA)",
   "settings.caDesc": "لتوفير خدمة HTTPS على النطاقات المحلية، يقوم Saeng بإنشاء شهادة مرجع مصدق (CA) محلية. يجب عليك تثبيتها ومنحها الثقة في سلسلة مفاتيح النظام (Keychain) لمرة واحدة.",
   "settings.caGenerating": "جاري إنشاء شهادة المرجع المصدق...",
