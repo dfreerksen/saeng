@@ -1,6 +1,7 @@
+import { Tooltip as BsTooltip } from 'bootstrap';
 import Modal from './Modal.jsx';
 
-export default function AboutModal({ version, onClose, t }) {
+export default function AboutModal({ version, electronVersion, nodeVersion, onClose, t }) {
   return (
     <Modal onClose={onClose}>
       <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -14,9 +15,9 @@ export default function AboutModal({ version, onClose, t }) {
             <p className="about-desc text-center">{t('about.desc')}</p>
             <p>
               Technologies:<br />
-              Electron (v42.0.1)<br />
-              Node.js (v24.11.1)<br />
-              Bootstrap (v5.3.8)
+              {electronVersion ? `Electron (v${electronVersion})` : 'Electron'}<br />
+              {nodeVersion ? `Node.js (v${nodeVersion})` : 'Node.js'}<br />
+              Bootstrap (v{BsTooltip.VERSION})
             </p>
             <p>
               Contributors:<br />

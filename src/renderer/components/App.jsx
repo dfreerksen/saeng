@@ -25,6 +25,8 @@ export default function App() {
   const [modal, setModal] = useState(null);
   const [toasts, setToasts] = useState([]);
   const [appVersion, setAppVersion] = useState('');
+  const [electronVersion, setElectronVersion] = useState('');
+  const [nodeVersion, setNodeVersion] = useState('');
   const [caPath, setCaPath] = useState('');
   const [caExpiry, setCaExpiry] = useState(null);
   const [i18nStrings, setI18nStrings] = useState({});
@@ -65,6 +67,8 @@ export default function App() {
       setProxyRunning(status.running);
       setMappings(mList);
       setAppVersion(appInfo.version);
+      setElectronVersion(appInfo.electron);
+      setNodeVersion(appInfo.node);
       setCaPath(caPathVal);
       setCaExpiry(caExpiryVal);
       setSettingsState(settingsData);
@@ -205,7 +209,13 @@ export default function App() {
       )}
 
       {modal?.type === 'about' && (
-        <AboutModal version={appVersion} onClose={() => setModal(null)} t={t} />
+        <AboutModal
+          version={appVersion}
+          electronVersion={electronVersion}
+          nodeVersion={nodeVersion}
+          onClose={() => setModal(null)}
+          t={t}
+        />
       )}
 
       <Toast toasts={toasts} />

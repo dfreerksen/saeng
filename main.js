@@ -225,6 +225,8 @@ function setupIPC() {
   ipcMain.handle('app:get-info', () => ({
     name: app.getName(),
     version: pkg.version,
+    electron: process.versions.electron,
+    node: process.versions.node,
   }));
 
   ipcMain.handle('i18n:get-strings', () => i18n.getStrings());
