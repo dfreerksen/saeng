@@ -38,7 +38,7 @@ import { CertManager } from '../../src/proxy/certManager.js';
 import { RequestLog } from '../../src/proxy/requestLog.js';
 import { setSystemProxy, clearSystemProxy } from '../../src/systemProxy.js';
 
-const mockStore = { getCertDir: () => '/tmp/test-certs', getSettings: () => ({ logMaxEntries: 300 }) };
+const mockStore = { getCertDir: () => '/tmp/test-certs', getSettings: () => ({ logMaxEntries: 300, loggingEnabled: true }) };
 const mappings = [{ domain: 'myapp.local', port: 3000, enabled: true }];
 const settings = { httpsEnabled: false };
 
@@ -105,7 +105,7 @@ describe('ProxyManager.start()', () => {
 describe('ProxyManager — request log wiring', () => {
   it('creates a RequestLog sized from the store settings', () => {
     const manager = new ProxyManager(mockStore);
-    expect(RequestLog).toHaveBeenCalledWith(300);
+    expect(RequestLog).toHaveBeenCalledWith(300, true);
     expect(manager.requestLog).toBeInstanceOf(RequestLog);
   });
 

@@ -11,7 +11,7 @@ class ProxyManager {
     this.store = store;
     this.httpProxy = null;
     this.pacServer = null;
-    this.requestLog = new RequestLog(store.getSettings().logMaxEntries);
+    this.requestLog = new RequestLog(store.getSettings().logMaxEntries, store.getSettings().loggingEnabled);
     this.running = false;
     this.startedAt = null;
   }

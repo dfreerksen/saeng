@@ -135,25 +135,48 @@ export default function SettingsView({
 
         <div className="setting-row">
           <div className="setting-info">
-            <div className="setting-name">{t('settings.logMaxEntries')}</div>
-            <div className="setting-desc">
-              {t('settings.logMaxEntriesDesc', {
-                min: LOG_MAX_ENTRIES_MIN.toLocaleString(),
-                max: LOG_MAX_ENTRIES_MAX.toLocaleString(),
-              })}
-            </div>
+            <div className="setting-name">{t('settings.loggingEnabled')}</div>
+            <div className="setting-desc">{t('settings.loggingEnabledDesc')}</div>
           </div>
-          <input
-            className="log-max-entries-input"
-            type="number"
-            min={LOG_MAX_ENTRIES_MIN}
-            max={LOG_MAX_ENTRIES_MAX}
-            step={LOG_MAX_ENTRIES_STEP}
-            value={logMaxEntriesDraft}
-            onChange={(e) => setLogMaxEntriesDraft(e.target.value)}
-            onBlur={commitLogMaxEntries}
-          />
+          <label className="toggle">
+            <input
+              type="checkbox"
+              checked={!!settings.loggingEnabled}
+              onChange={async (e) => {
+                await onSettingsChange({ loggingEnabled: e.target.checked });
+                showToast(
+                  e.target.checked ? t('toast.loggingEnabled') : t('toast.loggingDisabled'),
+                  'info'
+                );
+              }}
+            />
+            <span className="toggle-track" />
+          </label>
         </div>
+
+        {settings.loggingEnabled && (
+          <div className="setting-row">
+            <div className="setting-info">
+              <div className="setting-name">{t('settings.logMaxEntries')}</div>
+              <div className="setting-desc">
+                {t('settings.logMaxEntriesDesc', {
+                  min: LOG_MAX_ENTRIES_MIN.toLocaleString(),
+                  max: LOG_MAX_ENTRIES_MAX.toLocaleString(),
+                })}
+              </div>
+            </div>
+            <input
+              className="log-max-entries-input"
+              type="number"
+              min={LOG_MAX_ENTRIES_MIN}
+              max={LOG_MAX_ENTRIES_MAX}
+              step={LOG_MAX_ENTRIES_STEP}
+              value={logMaxEntriesDraft}
+              onChange={(e) => setLogMaxEntriesDraft(e.target.value)}
+              onBlur={commitLogMaxEntries}
+            />
+          </div>
+        )}
       </div>
 
       <div className="settings-section">

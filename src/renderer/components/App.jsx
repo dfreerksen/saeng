@@ -42,6 +42,12 @@ export default function App() {
     setRequestLog((prev) => (prev.length > max ? prev.slice(prev.length - max) : prev));
   }, [settings.logMaxEntries]);
 
+  useEffect(() => {
+    if (currentView === 'log' && settings.loggingEnabled === false) {
+      setCurrentView('mappings');
+    }
+  }, [currentView, settings.loggingEnabled]);
+
   const t = useCallback((key, vars) => {
     let str = i18nStrings[key] ?? key;
     if (vars) {
@@ -173,6 +179,7 @@ export default function App() {
         <Sidebar
           currentView={currentView}
           setCurrentView={setCurrentView}
+          loggingEnabled={settings.loggingEnabled !== false}
           proxyRunning={proxyRunning}
           onProxyToggle={handleProxyToggle}
           onAbout={() => setModal({ type: 'about' })}

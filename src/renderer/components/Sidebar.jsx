@@ -1,4 +1,4 @@
-export default function Sidebar({ currentView, setCurrentView, proxyRunning, onProxyToggle, onAbout, t }) {
+export default function Sidebar({ currentView, setCurrentView, loggingEnabled, proxyRunning, onProxyToggle, onAbout, t }) {
   return (
     <nav className="sidebar">
       <button
@@ -8,13 +8,15 @@ export default function Sidebar({ currentView, setCurrentView, proxyRunning, onP
         <i className="bi bi-arrow-left-right" />
         <span>{t('nav.mappings')}</span>
       </button>
-      <button
-        className={`nav-item${currentView === 'log' ? ' active' : ''}`}
-        onClick={() => setCurrentView('log')}
-      >
-        <i className="bi bi-list-columns-reverse" />
-        <span>{t('nav.log')}</span>
-      </button>
+      {loggingEnabled && (
+        <button
+          className={`nav-item${currentView === 'log' ? ' active' : ''}`}
+          onClick={() => setCurrentView('log')}
+        >
+          <i className="bi bi-list-columns-reverse" />
+          <span>{t('nav.log')}</span>
+        </button>
+      )}
       <button
         className={`nav-item${currentView === 'settings' ? ' active' : ''}`}
         onClick={() => setCurrentView('settings')}

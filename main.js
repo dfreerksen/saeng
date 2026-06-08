@@ -201,6 +201,9 @@ function setupIPC() {
     if ('logMaxEntries' in patch) {
       proxyManager.requestLog.setMaxEntries(updated.logMaxEntries);
     }
+    if ('loggingEnabled' in patch) {
+      proxyManager.requestLog.setEnabled(updated.loggingEnabled);
+    }
     return updated;
   });
 

@@ -57,4 +57,24 @@ describe('RequestLog', () => {
     log.clear();
     expect(log.list()).toEqual([]);
   });
+
+  it('add() is a no-op while disabled', () => {
+    const listener = vi.fn();
+    const log = new RequestLog(300, false);
+    log.setListener(listener);
+    expect(log.add({ method: 'GET', path: '/a' })).toBeNull();
+    expect(log.list()).toEqual([]);
+    expect(listener).not.toHaveBeenCalled();
+  });
+
+  it('setEnabled() toggles whether requests are recorded', () => {
+    const log = new RequestLog();
+    log.setEnabled(false);
+    log.add({ method: 'GET', path: '/a' });
+    expect(log.list()).toEqual([]);
+
+    log.setEnabled(true);
+    log.add({ method: 'GET', path: '/b' });
+    expect(log.list().map((e) => e.path)).toEqual(['/b']);
+  });
 });

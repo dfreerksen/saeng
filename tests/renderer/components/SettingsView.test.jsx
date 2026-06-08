@@ -25,6 +25,7 @@ const SAMPLE_SETTINGS = {
   locale: 'en',
   httpsEnabled: true,
   startOnLaunch: false,
+  loggingEnabled: true,
 };
 
 function renderSettingsView(props = {}) {
@@ -176,6 +177,38 @@ describe('SettingsView — proxy toggles', () => {
     const startToggle = container.querySelectorAll('.toggle input[type="checkbox"]')[1];
     fireEvent.click(startToggle);
     expect(onSettingsChange).toHaveBeenCalledWith({ startOnLaunch: true });
+  });
+});
+
+describe('SettingsView — logging enabled', () => {
+  it('checks the toggle when loggingEnabled is true', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, loggingEnabled: true } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    expect(toggles[2]).toBeChecked();
+  });
+
+  it('unchecks the toggle when loggingEnabled is false', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, loggingEnabled: false } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    expect(toggles[2]).not.toBeChecked();
+  });
+
+  it('calls onSettingsChange when the toggle is changed', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, loggingEnabled: true } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    fireEvent.click(toggles[2]);
+    expect(onSettingsChange).toHaveBeenCalledWith({ loggingEnabled: false });
+  });
+
+  it('hides the log max entries setting when logging is disabled', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, loggingEnabled: false } });
+    expect(container.querySelector('.log-max-entries-input')).not.toBeInTheDocument();
+  });
+
+  it('shows the log max entries setting when logging is enabled', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, loggingEnabled: true } });
+    expect(container.querySelector('.log-max-entries-input')).toBeInTheDocument();
   });
 });
 

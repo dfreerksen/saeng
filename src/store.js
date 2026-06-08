@@ -33,6 +33,7 @@ const schema = {
       colorMode: 'auto',
       locale: 'en',
       logMaxEntries: DEFAULT_LOG_MAX_ENTRIES,
+      loggingEnabled: true,
     },
   },
 };
@@ -93,7 +94,7 @@ class AppStore {
   }
 
   getSettings() {
-    return this.store.get('settings', { httpsEnabled: false, startOnLaunch: false, colorMode: 'auto', locale: 'en', logMaxEntries: DEFAULT_LOG_MAX_ENTRIES });
+    return this.store.get('settings', { httpsEnabled: false, startOnLaunch: false, colorMode: 'auto', locale: 'en', logMaxEntries: DEFAULT_LOG_MAX_ENTRIES, loggingEnabled: true });
   }
 
   setSettings(patch) {

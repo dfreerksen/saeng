@@ -9,6 +9,7 @@ function renderSidebar(props = {}) {
   const defaults = {
     currentView: 'mappings',
     setCurrentView: vi.fn(),
+    loggingEnabled: true,
     proxyRunning: false,
     onProxyToggle: vi.fn(),
     onAbout: vi.fn(),
@@ -26,6 +27,11 @@ describe('Sidebar', () => {
   it('renders the log nav item', () => {
     renderSidebar();
     expect(screen.getByText('nav.log')).toBeInTheDocument();
+  });
+
+  it('hides the log nav item when logging is disabled', () => {
+    renderSidebar({ loggingEnabled: false });
+    expect(screen.queryByText('nav.log')).not.toBeInTheDocument();
   });
 
   it('renders the settings nav item', () => {
