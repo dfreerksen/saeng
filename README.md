@@ -107,7 +107,7 @@ Manually run Stylelint for the repo
 $ npm run lint:css
 ```
 
-### Release
+### Release Pre Check
 
 Run GitHub Actions locally. Install [`act`](https://github.com/nektos/act)
 
@@ -118,6 +118,20 @@ $ brew install act
 ```bash
 $ act -n release # dry run
 $ act release
+```
+
+### Release
+
+Make sure GitHub command-line tool is installed first
+
+```bash
+brew install gh
+```
+
+Update the version it `package.json` and run `npm install`. Then run the release process using a Claude command
+
+```bash
+/release
 ```
 
 ## License
