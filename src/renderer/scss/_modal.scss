@@ -10,6 +10,15 @@
   opacity: 0.2;
 }
 
+.export-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
 .modal-about {
   text-align: center;
   width: 320px;

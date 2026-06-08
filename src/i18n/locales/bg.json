@@ -12,6 +12,8 @@
   "mappings.title": "Съответствия на домейни",
   "mappings.subtitle": "Маршрутирай локални домейни към локални портове",
   "mappings.add": "Добавяне на съответствия",
+  "mappings.export": "Експорт",
+  "mappings.import": "Импорт",
   "mappings.empty": "Все още няма съответствия",
   "mappings.emptyHint": "Кликнете върху \"Добавяне на съответствия\", за да маршрутирате домейн към локален порт.",
 
@@ -76,6 +78,16 @@
   "modal.cancel": "Отказ",
   "modal.close": "Затваряне",
 
+  "export.title": "Експортиране на съответствия",
+  "export.subtitle": "Изберете кои съответствия да бъдат включени в експортирания файл.",
+  "export.selectAll": "Избери всички",
+  "export.selectedCount": "Избрани {count} от {total}",
+  "export.submit": "Експорт",
+  "export.dialogTitle": "Експортиране на съответствия",
+  "import.dialogTitle": "Импортиране на съответствия",
+  "import.error.invalidFormat": "Избраният файл не е валиден файл за експорт на съответствия.",
+  "import.error.readFailed": "Избраният файл не можа да бъде прочетен: {error}",
+
   "about.desc": "Локален обратен прокси за маршрутизиране на .local домейни към localhost портове.",
 
   "form.domain": "Домейн",
@@ -109,6 +121,10 @@
   "toast.loggingEnabled": "Записването на заявки е активирано.",
   "toast.loggingDisabled": "Записването на заявки е деактивирано.",
   "toast.copied": "{url} е копиран в клипборда.",
+  "toast.exportSuccess": "Експортирани са {count} съответствия в {path}",
+  "toast.exportFailed": "Неуспешен експорт: {error}",
+  "toast.importResult": "Импортирани са {added} съответствия, пропуснати са {skipped} дубликата",
+  "toast.importFailed": "Неуспешен импорт: {error}",
   "toast.caTrusted": "CA сертификатът е успешно доверен.",
   "toast.caRegenerated": "CA сертификатът е регенериран. Използвайте „Инсталиране и доверие“, за да го регистрирате в браузъра си.",
   "toast.caDeleted": "CA сертификатът е изтрит и премахнат от хранилището за доверени данни.",

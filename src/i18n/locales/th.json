@@ -12,6 +12,8 @@
   "mappings.title": "การแมปโดเมน",
   "mappings.subtitle": "กำหนดเส้นทางโดเมนท้องถิ่นไปยังพอร์ตท้องถิ่น",
   "mappings.add": "เพิ่มการทำแผนที่",
+  "mappings.export": "ส่งออก",
+  "mappings.import": "นำเข้า",
   "mappings.empty": "ยังไม่มีการแมป",
   "mappings.emptyHint": "คลิก \"เพิ่มการแมป\" เพื่อกำหนดเส้นทางโดเมนไปยังพอร์ตในเครื่อง",
 
@@ -76,6 +78,16 @@
   "modal.cancel": "ยกเลิก",
   "modal.close": "ปิด",
 
+  "export.title": "ส่งออกการแมป",
+  "export.subtitle": "เลือกการแมปที่ต้องการรวมไว้ในไฟล์ที่ส่งออก",
+  "export.selectAll": "เลือกทั้งหมด",
+  "export.selectedCount": "เลือกแล้ว {count} จาก {total}",
+  "export.submit": "ส่งออก",
+  "export.dialogTitle": "ส่งออกการแมป",
+  "import.dialogTitle": "นำเข้าการแมป",
+  "import.error.invalidFormat": "ไฟล์ที่เลือกไม่ใช่ไฟล์ส่งออกการแมปที่ถูกต้อง",
+  "import.error.readFailed": "ไม่สามารถอ่านไฟล์ที่เลือกได้: {error}",
+
   "about.desc": "พร็อกซีย้อนกลับในเครื่องสำหรับกำหนดเส้นทางโดเมน .local ไปยังพอร์ต localhost",
 
   "form.domain": "โดเมน",
@@ -109,6 +121,10 @@
   "toast.loggingEnabled": "เปิดใช้งานการบันทึกคำขอแล้ว",
   "toast.loggingDisabled": "ปิดใช้งานการบันทึกคำขอแล้ว",
   "toast.copied": "คัดลอก {url} ไปยังคลิปบอร์ดแล้ว",
+  "toast.exportSuccess": "ส่งออกการแมป {count} รายการไปยัง {path} แล้ว",
+  "toast.exportFailed": "ส่งออกล้มเหลว: {error}",
+  "toast.importResult": "นำเข้าการแมป {added} รายการแล้ว ข้ามรายการที่ซ้ำกัน {skipped} รายการ",
+  "toast.importFailed": "นำเข้าล้มเหลว: {error}",
   "toast.caTrusted": "เชื่อถือใบรับรอง CA สำเร็จแล้ว",
   "toast.caRegenerated": "สร้างใบรับรอง CA ใหม่แล้ว ใช้ Install & Trust เพื่อลงทะเบียนกับเบราว์เซอร์ของคุณ",
   "toast.caDeleted": "ใบรับรอง CA ถูกลบและลบออกจาก trust store",

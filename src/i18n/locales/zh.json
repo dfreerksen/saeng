@@ -12,6 +12,8 @@
   "mappings.title": "域名映射",
   "mappings.subtitle": "将本地域名路由至本地端口",
   "mappings.add": "添加映射",
+  "mappings.export": "导出",
+  "mappings.import": "导入",
   "mappings.empty": "暂无映射",
   "mappings.emptyHint": "点击“添加映射”以将域名路由至本地端口。",
 
@@ -76,6 +78,16 @@
   "modal.cancel": "取消",
   "modal.close": "关闭",
 
+  "export.title": "导出映射",
+  "export.subtitle": "选择要包含在导出文件中的映射。",
+  "export.selectAll": "全选",
+  "export.selectedCount": "已选择 {count}/{total}",
+  "export.submit": "导出",
+  "export.dialogTitle": "导出映射",
+  "import.dialogTitle": "导入映射",
+  "import.error.invalidFormat": "所选文件不是有效的映射导出文件。",
+  "import.error.readFailed": "无法读取所选文件：{error}",
+
   "about.desc": "用于将 .local 域路由到 localhost 端口的本地反向代理。",
 
   "form.domain": "域名",
@@ -109,6 +121,10 @@
   "toast.loggingEnabled": "已启用请求日志记录。",
   "toast.loggingDisabled": "已禁用请求日志记录。",
   "toast.copied": "已将 {url} 复制到剪贴板。",
+  "toast.exportSuccess": "已将 {count} 个映射导出到 {path}",
+  "toast.exportFailed": "导出失败：{error}",
+  "toast.importResult": "已导入 {added} 个映射，跳过 {skipped} 个重复项",
+  "toast.importFailed": "导入失败：{error}",
   "toast.caTrusted": "CA 证书已成功受信任。",
   "toast.caRegenerated": "CA 证书已重新生成。请使用“安装并信任”将其注册到您的浏览器中。",
   "toast.caDeleted": "CA 证书已删除，并已从信任存储中移除。",

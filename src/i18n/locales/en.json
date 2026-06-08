@@ -12,6 +12,8 @@
   "mappings.title": "Domain Mappings",
   "mappings.subtitle": "Route local domains to local ports",
   "mappings.add": "Add Mapping",
+  "mappings.export": "Export",
+  "mappings.import": "Import",
   "mappings.empty": "No mappings yet",
   "mappings.emptyHint": "Click \"Add Mapping\" to route a domain to a local port.",
 
@@ -76,6 +78,17 @@
   "modal.cancel": "Cancel",
   "modal.close": "Close",
 
+  "export.title": "Export Mappings",
+  "export.subtitle": "Choose which mappings to include in the exported file.",
+  "export.selectAll": "Select All",
+  "export.selectedCount": "{count} of {total} selected",
+  "export.submit": "Export",
+  "export.dialogTitle": "Export Mappings",
+
+  "import.dialogTitle": "Import Mappings",
+  "import.error.invalidFormat": "The selected file is not a valid mappings export.",
+  "import.error.readFailed": "Could not read the selected file: {error}",
+
   "about.desc": "A local reverse proxy for routing .local domains to localhost ports.",
 
   "form.domain": "Domain",
@@ -109,6 +122,10 @@
   "toast.loggingEnabled": "Request logging enabled.",
   "toast.loggingDisabled": "Request logging disabled.",
   "toast.copied": "Copied {url} to clipboard.",
+  "toast.exportSuccess": "Exported {count} mappings to {path}",
+  "toast.exportFailed": "Failed to export: {error}",
+  "toast.importResult": "Imported {added} mappings, skipped {skipped} duplicates",
+  "toast.importFailed": "Failed to import: {error}",
   "toast.caTrusted": "CA certificate trusted successfully.",
   "toast.caRegenerated": "CA certificate regenerated. Use Install & Trust to register it with your browser.",
   "toast.caDeleted": "CA certificate deleted and removed from trust store.",

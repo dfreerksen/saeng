@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell, Tray, Menu, nativeImage, protocol, net } from 'electron';
+import { app, BrowserWindow, ipcMain, shell, Tray, Menu, nativeImage, protocol, net, dialog } from 'electron';
 import path from 'path';
 import { randomBytes } from 'crypto';
 import { pathToFileURL, fileURLToPath } from 'url';
@@ -160,6 +160,53 @@ function setupIPC() {
       proxyManager.updateMappings(store.getMappings());
     }
     return store.getMappings();
+  });
+
+  ipcMain.handle('mappings:export', async (_, ids) => {
+    const data = store.exportMappings(ids);
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: i18n.t('export.dialogTitle'),
+      defaultPath: 'saeng-mappings.json',
+      filters: [{ name: 'JSON', extensions: ['json'] }],
+    });
+    if (result.canceled || !result.filePath) {
+      return { canceled: true };
+    }
+    try {
+      fs.writeFileSync(result.filePath, JSON.stringify({ mappings: data }, null, 2), 'utf8');
+      return { success: true, path: result.filePath, count: data.length };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  ipcMain.handle('mappings:import', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: i18n.t('import.dialogTitle'),
+      properties: ['openFile'],
+      filters: [{ name: 'JSON', extensions: ['json'] }],
+    });
+    if (result.canceled || !result.filePaths?.length) {
+      return { canceled: true };
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(fs.readFileSync(result.filePaths[0], 'utf8'));
+    } catch (err) {
+      return { success: false, error: i18n.t('import.error.readFailed', { error: err.message }) };
+    }
+
+    const list = Array.isArray(parsed) ? parsed : parsed?.mappings;
+    if (!Array.isArray(list)) {
+      return { success: false, error: i18n.t('import.error.invalidFormat') };
+    }
+
+    const { added, skipped } = store.importMappings(list);
+    if (added.length > 0 && proxyManager.isRunning()) {
+      proxyManager.updateMappings(store.getMappings());
+    }
+    return { success: true, added: added.length, skipped: skipped.length, mappings: store.getMappings() };
   });
 
   ipcMain.handle('proxy:start', async () => {

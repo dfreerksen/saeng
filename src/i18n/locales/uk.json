@@ -12,6 +12,8 @@
   "mappings.title": "Зіставлення доменів",
   "mappings.subtitle": "Маршрутизувати локальні домени на локальні порти",
   "mappings.add": "Додати зіставлення",
+  "mappings.export": "Експорт",
+  "mappings.import": "Імпорт",
   "mappings.empty": "Поки що немає зіставлень",
   "mappings.emptyHint": "Натисніть \"Додати зіставлення\", щоб маршрутизувати домен на локальний порт.",
 
@@ -76,6 +78,16 @@
   "modal.cancel": "Скасувати",
   "modal.close": "Закрити",
 
+  "export.title": "Експортувати зіставлення",
+  "export.subtitle": "Виберіть, які зіставлення включити до експортованого файлу.",
+  "export.selectAll": "Вибрати все",
+  "export.selectedCount": "Вибрано {count} з {total}",
+  "export.submit": "Експорт",
+  "export.dialogTitle": "Експортувати зіставлення",
+  "import.dialogTitle": "Імпортувати зіставлення",
+  "import.error.invalidFormat": "Вибраний файл не є дійсним файлом експорту зіставлень.",
+  "import.error.readFailed": "Не вдалося прочитати вибраний файл: {error}",
+
   "about.desc": "Локальний зворотний проксі для маршрутизації доменів .local на порти localhost.",
 
   "form.domain": "Домен",
@@ -109,6 +121,10 @@
   "toast.loggingEnabled": "Журналювання запитів увімкнено.",
   "toast.loggingDisabled": "Журналювання запитів вимкнено.",
   "toast.copied": "{url} скопійовано до буфера обміну.",
+  "toast.exportSuccess": "Експортовано {count} зіставлень до {path}",
+  "toast.exportFailed": "Не вдалося експортувати: {error}",
+  "toast.importResult": "Імпортовано {added} зіставлень, пропущено {skipped} дублікатів",
+  "toast.importFailed": "Не вдалося імпортувати: {error}",
   "toast.caTrusted": "Сертифікат CA успішно довірено.",
   "toast.caRegenerated": "Сертифікат CA відновлено. Використайте функцію «Встановити та довіряти», щоб зареєструвати його у вашому браузері.",
   "toast.caDeleted": "Сертифікат CA видалено та видалено зі сховища довірених сертифікатів.",

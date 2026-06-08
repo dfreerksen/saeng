@@ -23,6 +23,8 @@ function renderMappingsView(props = {}) {
     settings: { httpsEnabled: false },
     onAdd: vi.fn(),
     onEdit: vi.fn(),
+    onExport: vi.fn(),
+    onImport: vi.fn(),
     showToast: vi.fn(),
     t,
   };
@@ -119,6 +121,49 @@ describe('MappingsView — add button', () => {
     renderMappingsView({ onAdd });
     fireEvent.click(screen.getByText('mappings.add').closest('button'));
     expect(onAdd).toHaveBeenCalledOnce();
+  });
+});
+
+describe('MappingsView — import button', () => {
+  it('renders the import button', () => {
+    renderMappingsView();
+    expect(screen.getByText('mappings.import')).toBeInTheDocument();
+  });
+
+  it('calls onImport when the import button is clicked', () => {
+    const onImport = vi.fn();
+    renderMappingsView({ onImport });
+    fireEvent.click(screen.getByText('mappings.import').closest('button'));
+    expect(onImport).toHaveBeenCalledOnce();
+  });
+
+  it('is enabled even when there are no mappings', () => {
+    renderMappingsView({ mappings: [] });
+    expect(screen.getByText('mappings.import').closest('button')).not.toBeDisabled();
+  });
+});
+
+describe('MappingsView — export button', () => {
+  it('renders the export button', () => {
+    renderMappingsView({ mappings: SAMPLE_MAPPINGS });
+    expect(screen.getByText('mappings.export')).toBeInTheDocument();
+  });
+
+  it('calls onExport when the export button is clicked', () => {
+    const onExport = vi.fn();
+    renderMappingsView({ mappings: SAMPLE_MAPPINGS, onExport });
+    fireEvent.click(screen.getByText('mappings.export').closest('button'));
+    expect(onExport).toHaveBeenCalledOnce();
+  });
+
+  it('is disabled when there are no mappings', () => {
+    renderMappingsView({ mappings: [] });
+    expect(screen.getByText('mappings.export').closest('button')).toBeDisabled();
+  });
+
+  it('is enabled when there are mappings', () => {
+    renderMappingsView({ mappings: SAMPLE_MAPPINGS });
+    expect(screen.getByText('mappings.export').closest('button')).not.toBeDisabled();
   });
 });
 

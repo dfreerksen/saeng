@@ -12,6 +12,8 @@
   "mappings.title": "ドメインマッピング",
   "mappings.subtitle": "ローカルドメインをローカルポートへルーティング",
   "mappings.add": "マッピングを追加",
+  "mappings.export": "エクスポート",
+  "mappings.import": "インポート",
   "mappings.empty": "マッピングはまだありません",
   "mappings.emptyHint": "「マッピングを追加」をクリックして、ドメインをローカルポートへルーティングしてください。",
 
@@ -76,6 +78,16 @@
   "modal.cancel": "キャンセル",
   "modal.close": "閉じる",
 
+  "export.title": "マッピングをエクスポート",
+  "export.subtitle": "エクスポートするファイルに含めるマッピングを選択してください。",
+  "export.selectAll": "すべて選択",
+  "export.selectedCount": "{total}件中{count}件選択",
+  "export.submit": "エクスポート",
+  "export.dialogTitle": "マッピングをエクスポート",
+  "import.dialogTitle": "マッピングをインポート",
+  "import.error.invalidFormat": "選択されたファイルは有効なマッピングのエクスポートファイルではありません。",
+  "import.error.readFailed": "選択したファイルを読み込めませんでした: {error}",
+
   "about.desc": ".local ドメインを localhost ポートにルーティングするためのローカル リバース プロキシ。",
 
   "form.domain": "ドメイン",
@@ -109,6 +121,10 @@
   "toast.loggingEnabled": "リクエストのログ記録を有効にしました。",
   "toast.loggingDisabled": "リクエストのログ記録を無効にしました。",
   "toast.copied": "{url} をクリップボードにコピーしました。",
+  "toast.exportSuccess": "{count}件のマッピングを{path}にエクスポートしました",
+  "toast.exportFailed": "エクスポートに失敗しました: {error}",
+  "toast.importResult": "{added}件のマッピングをインポートし、{skipped}件の重複をスキップしました",
+  "toast.importFailed": "インポートに失敗しました: {error}",
   "toast.caTrusted": "CA証明書の信頼設定が完了しました。",
   "toast.caRegenerated": "CA証明書を再生成しました。「インストールして信頼」を使用してブラウザに登録してください。",
   "toast.caDeleted": "CA証明書を削除し、信頼ストアから除去しました。",

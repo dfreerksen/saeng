@@ -31,6 +31,8 @@ function makeElectronAPI(overrides = {}) {
       remove: vi.fn().mockResolvedValue([]),
       toggle: vi.fn().mockResolvedValue([]),
       update: vi.fn().mockResolvedValue([]),
+      export: vi.fn().mockResolvedValue({ canceled: true }),
+      import: vi.fn().mockResolvedValue({ canceled: true }),
       ...overrides.mappings,
     },
     requestLog: {
@@ -289,6 +291,81 @@ describe('App — add mapping modal', () => {
     await waitFor(() => {
       expect(screen.queryByText('modal.addTitle')).not.toBeInTheDocument();
     });
+  });
+});
+
+describe('App — import mappings', () => {
+  it('does nothing when the import dialog is canceled', async () => {
+    const importFn = vi.fn().mockResolvedValue({ canceled: true });
+    await renderApp({ mappings: { import: importFn } });
+    fireEvent.click(screen.getByText('mappings.import').closest('button'));
+    await waitFor(() => expect(importFn).toHaveBeenCalledOnce());
+    expect(screen.queryByText('toast.importResult')).not.toBeInTheDocument();
+    expect(screen.queryByText('toast.importFailed')).not.toBeInTheDocument();
+  });
+
+  it('refreshes mappings and shows a result toast on successful import', async () => {
+    const newMappings = [{ id: 'm1', domain: 'imported.local', host: '127.0.0.1', port: 1, https: false, enabled: true, label: '' }];
+    const importFn = vi.fn().mockResolvedValue({ canceled: false, success: true, added: 1, skipped: 0, mappings: newMappings });
+    await renderApp({ mappings: { import: importFn } });
+    fireEvent.click(screen.getByText('mappings.import').closest('button'));
+    await waitFor(() => {
+      expect(screen.getByText('toast.importResult')).toBeInTheDocument();
+    });
+    expect(screen.getByText('imported.local')).toBeInTheDocument();
+  });
+
+  it('shows an error toast when import fails', async () => {
+    const importFn = vi.fn().mockResolvedValue({ canceled: false, success: false, error: 'boom' });
+    await renderApp({ mappings: { import: importFn } });
+    fireEvent.click(screen.getByText('mappings.import').closest('button'));
+    await waitFor(() => {
+      expect(screen.getByText('toast.importFailed')).toBeInTheDocument();
+    });
+  });
+});
+
+describe('App — export mappings', () => {
+  const sampleMappings = [
+    { id: 'm1', domain: 'a.local', host: '127.0.0.1', port: 1, https: false, enabled: true, label: '' },
+  ];
+
+  it('opens the export modal when the export button is clicked', async () => {
+    await renderApp({ mappings: { list: vi.fn().mockResolvedValue(sampleMappings) } });
+    fireEvent.click(screen.getByText('mappings.export').closest('button'));
+    expect(screen.getByText('export.title')).toBeInTheDocument();
+  });
+
+  it('keeps the modal open without toasting when export is canceled', async () => {
+    const exportFn = vi.fn().mockResolvedValue({ canceled: true });
+    await renderApp({ mappings: { list: vi.fn().mockResolvedValue(sampleMappings), export: exportFn } });
+    fireEvent.click(screen.getByText('mappings.export').closest('button'));
+    fireEvent.click(screen.getByText('export.submit'));
+    await waitFor(() => expect(exportFn).toHaveBeenCalledWith(['m1']));
+    expect(screen.getByText('export.title')).toBeInTheDocument();
+    expect(screen.queryByText('toast.exportSuccess')).not.toBeInTheDocument();
+  });
+
+  it('closes the modal and shows a success toast on successful export', async () => {
+    const exportFn = vi.fn().mockResolvedValue({ canceled: false, success: true, count: 1, path: '/tmp/export.json' });
+    await renderApp({ mappings: { list: vi.fn().mockResolvedValue(sampleMappings), export: exportFn } });
+    fireEvent.click(screen.getByText('mappings.export').closest('button'));
+    fireEvent.click(screen.getByText('export.submit'));
+    await waitFor(() => {
+      expect(screen.queryByText('export.title')).not.toBeInTheDocument();
+      expect(screen.getByText('toast.exportSuccess')).toBeInTheDocument();
+    });
+  });
+
+  it('keeps the modal open and shows an error toast when export fails', async () => {
+    const exportFn = vi.fn().mockResolvedValue({ canceled: false, success: false, error: 'boom' });
+    await renderApp({ mappings: { list: vi.fn().mockResolvedValue(sampleMappings), export: exportFn } });
+    fireEvent.click(screen.getByText('mappings.export').closest('button'));
+    fireEvent.click(screen.getByText('export.submit'));
+    await waitFor(() => {
+      expect(screen.getByText('toast.exportFailed')).toBeInTheDocument();
+    });
+    expect(screen.getByText('export.title')).toBeInTheDocument();
   });
 });
 

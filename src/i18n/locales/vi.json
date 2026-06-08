@@ -12,6 +12,8 @@
   "mappings.title": "Ánh xạ Tên miền",
   "mappings.subtitle": "Điều hướng các tên miền cục bộ đến các cổng cục bộ",
   "mappings.add": "Thêm Ánh xạ",
+  "mappings.export": "Xuất",
+  "mappings.import": "Nhập",
   "mappings.empty": "Chưa có ánh xạ nào",
   "mappings.emptyHint": "Nhấn vào \"Thêm Ánh xạ\" để điều hướng một tên miền đến một cổng cục bộ.",
 
@@ -76,6 +78,16 @@
   "modal.cancel": "Hủy",
   "modal.close": "Đóng",
 
+  "export.title": "Xuất Ánh xạ",
+  "export.subtitle": "Chọn những ánh xạ cần đưa vào tệp xuất.",
+  "export.selectAll": "Chọn tất cả",
+  "export.selectedCount": "Đã chọn {count} trên {total}",
+  "export.submit": "Xuất",
+  "export.dialogTitle": "Xuất Ánh xạ",
+  "import.dialogTitle": "Nhập Ánh xạ",
+  "import.error.invalidFormat": "Tệp đã chọn không phải là tệp xuất ánh xạ hợp lệ.",
+  "import.error.readFailed": "Không thể đọc tệp đã chọn: {error}",
+
   "about.desc": "Proxy ngược cục bộ để định tuyến các miền .local tới các cổng localhost.",
 
   "form.domain": "Tên miền",
@@ -109,6 +121,10 @@
   "toast.loggingEnabled": "Đã bật ghi nhật ký yêu cầu.",
   "toast.loggingDisabled": "Đã tắt ghi nhật ký yêu cầu.",
   "toast.copied": "Đã sao chép {url} vào clipboard.",
+  "toast.exportSuccess": "Đã xuất {count} ánh xạ sang {path}",
+  "toast.exportFailed": "Xuất thất bại: {error}",
+  "toast.importResult": "Đã nhập {added} ánh xạ, bỏ qua {skipped} bản trùng lặp",
+  "toast.importFailed": "Nhập thất bại: {error}",
   "toast.caTrusted": "Đã tin cậy chứng chỉ CA thành công.",
   "toast.caRegenerated": "Đã tạo lại chứng chỉ CA. Hãy sử dụng mục Cài đặt & Tin cậy để đăng ký chứng chỉ này với trình duyệt của bạn.",
   "toast.caDeleted": "Đã xóa chứng chỉ CA và gỡ bỏ khỏi kho lưu trữ tin cậy.",

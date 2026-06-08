@@ -12,6 +12,8 @@
   "mappings.title": "Domain-Zuordnungen",
   "mappings.subtitle": "Lokale Domains auf lokale Ports weiterleiten",
   "mappings.add": "Zuordnung hinzufügen",
+  "mappings.export": "Exportieren",
+  "mappings.import": "Importieren",
   "mappings.empty": "Noch keine Zuordnungen",
   "mappings.emptyHint": "Klicken Sie auf „Mapping hinzufügen“, um eine Domain auf einen lokalen Port weiterzuleiten.",
 
@@ -76,6 +78,16 @@
   "modal.cancel": "Abbrechen",
   "modal.close": "Schließen",
 
+  "export.title": "Zuordnungen exportieren",
+  "export.subtitle": "Wählen Sie aus, welche Zuordnungen in die exportierte Datei aufgenommen werden sollen.",
+  "export.selectAll": "Alle auswählen",
+  "export.selectedCount": "{count} von {total} ausgewählt",
+  "export.submit": "Exportieren",
+  "export.dialogTitle": "Zuordnungen exportieren",
+  "import.dialogTitle": "Zuordnungen importieren",
+  "import.error.invalidFormat": "Die ausgewählte Datei ist kein gültiger Zuordnungsexport.",
+  "import.error.readFailed": "Die ausgewählte Datei konnte nicht gelesen werden: {error}",
+
   "about.desc": "Ein lokaler Reverse-Proxy zum Weiterleiten von .local-Domänen an localhost-Ports.",
 
   "form.domain": "Domain",
@@ -109,6 +121,10 @@
   "toast.loggingEnabled": "Anfrageprotokollierung aktiviert.",
   "toast.loggingDisabled": "Anfrageprotokollierung deaktiviert.",
   "toast.copied": "{url} in die Zwischenablage kopiert.",
+  "toast.exportSuccess": "{count} Zuordnungen nach {path} exportiert",
+  "toast.exportFailed": "Export fehlgeschlagen: {error}",
+  "toast.importResult": "{added} Zuordnungen importiert, {skipped} Duplikate übersprungen",
+  "toast.importFailed": "Import fehlgeschlagen: {error}",
   "toast.caTrusted": "CA-Zertifikat erfolgreich vertrauenswürdig eingestellt.",
   "toast.caRegenerated": "CA-Zertifikat neu generiert. Verwenden Sie \"Installieren & Vertrauen\", um es mit Ihrem Browser zu registrieren.",
   "toast.caDeleted": "CA-Zertifikat gelöscht und aus dem Vertrauensspeicher entfernt.",

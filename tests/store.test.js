@@ -173,6 +173,83 @@ describe('AppStore.toggleMapping()', () => {
   });
 });
 
+describe('AppStore.exportMappings()', () => {
+  it('returns all mappings stripped of id and createdAt when no ids given', () => {
+    store.addMapping({ domain: 'a.local', port: 1, host: '127.0.0.1', https: false, label: 'A' });
+    const [result] = store.exportMappings();
+    expect(result).toEqual({ domain: 'a.local', host: '127.0.0.1', port: 1, https: false, label: 'A', enabled: true });
+    expect(result).not.toHaveProperty('id');
+    expect(result).not.toHaveProperty('createdAt');
+  });
+
+  it('returns all mappings when ids is an empty array', () => {
+    store.addMapping({ domain: 'a.local', port: 1 });
+    store.addMapping({ domain: 'b.local', port: 2 });
+    expect(store.exportMappings([])).toHaveLength(2);
+  });
+
+  it('returns only the mappings matching the given ids', () => {
+    const a = store.addMapping({ domain: 'a.local', port: 1 });
+    store.addMapping({ domain: 'b.local', port: 2 });
+    const result = store.exportMappings([a.id]);
+    expect(result).toHaveLength(1);
+    expect(result[0].domain).toBe('a.local');
+  });
+});
+
+describe('AppStore.importMappings()', () => {
+  it('adds valid entries and returns them in added', () => {
+    const { added, skipped } = store.importMappings([
+      { domain: 'New.Local ', host: '10.0.0.1', port: '3000', https: true, label: 'imported' },
+    ]);
+    expect(added).toHaveLength(1);
+    expect(skipped).toHaveLength(0);
+    expect(added[0].domain).toBe('new.local');
+    expect(added[0].host).toBe('10.0.0.1');
+    expect(added[0].port).toBe(3000);
+    expect(added[0].https).toBe(true);
+    expect(added[0].label).toBe('imported');
+    expect(store.getMappings()).toHaveLength(1);
+  });
+
+  it('persists enabled as false when entry.enabled is false', () => {
+    store.importMappings([{ domain: 'a.local', port: 1, enabled: false }]);
+    expect(store.getMappings()[0].enabled).toBe(false);
+  });
+
+  it('skips entries with a missing or non-string domain', () => {
+    const { added, skipped } = store.importMappings([{ port: 1 }, { domain: 42, port: 1 }]);
+    expect(added).toHaveLength(0);
+    expect(skipped).toEqual(['', 42]);
+  });
+
+  it('skips entries with an invalid port', () => {
+    const { added, skipped } = store.importMappings([
+      { domain: 'a.local', port: 'not-a-number' },
+      { domain: 'b.local', port: 0 },
+      { domain: 'c.local', port: 70000 },
+    ]);
+    expect(added).toHaveLength(0);
+    expect(skipped).toEqual(['a.local', 'b.local', 'c.local']);
+  });
+
+  it('skips entries whose domain already exists', () => {
+    store.addMapping({ domain: 'existing.local', port: 1 });
+    const { added, skipped } = store.importMappings([{ domain: 'Existing.Local', port: 2 }]);
+    expect(added).toHaveLength(0);
+    expect(skipped).toEqual(['Existing.Local']);
+  });
+
+  it('skips duplicate domains within the same import list', () => {
+    const { added, skipped } = store.importMappings([
+      { domain: 'dup.local', port: 1 },
+      { domain: 'DUP.local', port: 2 },
+    ]);
+    expect(added).toHaveLength(1);
+    expect(skipped).toEqual(['DUP.local']);
+  });
+});
+
 describe('AppStore.getSettings() / setSettings()', () => {
   it('getSettings() returns the default settings when nothing has been set', () => {
     const settings = store.getSettings();

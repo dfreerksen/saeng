@@ -12,6 +12,8 @@
   "mappings.title": "Адлюстраванне даменаў",
   "mappings.subtitle": "Накіроўвайце лакальныя дамены на лакальныя парты",
   "mappings.add": "Дадаць адлюстраванне",
+  "mappings.export": "Экспарт",
+  "mappings.import": "Імпарт",
   "mappings.empty": "Адлюстраванняў пакуль няма",
   "mappings.emptyHint": "Націсніце \"Дадаць супастаўленне\", каб накіраваць дамен на лакальны порт.",
 
@@ -76,6 +78,16 @@
   "modal.cancel": "Скасаваць",
   "modal.close": "Закрыць",
 
+  "export.title": "Экспартаваць адлюстраванні",
+  "export.subtitle": "Выберыце, якія адлюстраванні ўключыць у файл экспарту.",
+  "export.selectAll": "Выбраць усё",
+  "export.selectedCount": "Выбрана {count} з {total}",
+  "export.submit": "Экспарт",
+  "export.dialogTitle": "Экспартаваць адлюстраванні",
+  "import.dialogTitle": "Імпартаваць адлюстраванні",
+  "import.error.invalidFormat": "Выбраны файл не з'яўляецца сапраўдным файлам экспарту адлюстраванняў.",
+  "import.error.readFailed": "Не ўдалося прачытаць выбраны файл: {error}",
+
   "about.desc": "Лакальны зваротны проксі для маршрутызацыі даменаў .local на парты localhost.",
 
   "form.domain": "Дамен",
@@ -109,6 +121,10 @@
   "toast.loggingEnabled": "Журналаванне запытаў уключана.",
   "toast.loggingDisabled": "Журналаванне запытаў выключана.",
   "toast.copied": "{url} скапіявана ў буфер абмену.",
+  "toast.exportSuccess": "Экспартавана {count} адлюстраванняў у {path}",
+  "toast.exportFailed": "Не ўдалося экспартаваць: {error}",
+  "toast.importResult": "Імпартавана {added} адлюстраванняў, прапушчана {skipped} дублікатаў",
+  "toast.importFailed": "Не ўдалося імпартаваць: {error}",
   "toast.caTrusted": "Сертыфікат ЦС паспяхова давераны.",
   "toast.caRegenerated": "Сертыфікат ЦС адноўлены. Выкарыстоўвайце Install & Trust, каб зарэгістраваць яго ў вашым браўзеры.",
   "toast.caDeleted": "Сертыфікат ЦС выдалены і выдалены з сховішча давераных сертыфікатаў.",

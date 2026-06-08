@@ -12,6 +12,8 @@
   "mappings.title": "Mappages de domaines",
   "mappings.subtitle": "Rediriger les domaines locaux vers des ports locaux",
   "mappings.add": "Ajouter un mappage",
+  "mappings.export": "Exporter",
+  "mappings.import": "Importer",
   "mappings.empty": "Aucun mappage pour l'instant",
   "mappings.emptyHint": "Cliquez sur « Ajouter un mappage » pour rediriger un domaine vers un port local.",
 
@@ -76,6 +78,16 @@
   "modal.cancel": "Annuler",
   "modal.close": "Fermer",
 
+  "export.title": "Exporter les mappages",
+  "export.subtitle": "Choisissez les mappages à inclure dans le fichier exporté.",
+  "export.selectAll": "Tout sélectionner",
+  "export.selectedCount": "{count} sur {total} sélectionné(s)",
+  "export.submit": "Exporter",
+  "export.dialogTitle": "Exporter les mappages",
+  "import.dialogTitle": "Importer des mappages",
+  "import.error.invalidFormat": "Le fichier sélectionné n'est pas une exportation de mappages valide.",
+  "import.error.readFailed": "Impossible de lire le fichier sélectionné : {error}",
+
   "about.desc": "Un proxy inverse local pour acheminer les domaines .local vers les ports localhost.",
 
   "form.domain": "Domaine",
@@ -109,6 +121,10 @@
   "toast.loggingEnabled": "Journalisation des requêtes activée.",
   "toast.loggingDisabled": "Journalisation des requêtes désactivée.",
   "toast.copied": "{url} copié dans le presse-papiers.",
+  "toast.exportSuccess": "{count} mappages exportés vers {path}",
+  "toast.exportFailed": "Échec de l'exportation : {error}",
+  "toast.importResult": "{added} mappages importés, {skipped} doublons ignorés",
+  "toast.importFailed": "Échec de l'importation : {error}",
   "toast.caTrusted": "Certificat de l'AC approuvé avec succès.",
   "toast.caRegenerated": "Certificat de l'AC régénéré. Utilisez « Installer et approuver » pour l'enregistrer dans votre navigateur.",
   "toast.caDeleted": "Certificat de l'AC supprimé et retiré du magasin de confiance.",

@@ -12,6 +12,8 @@
   "mappings.title": "Mapeamentos de Domínio",
   "mappings.subtitle": "Direcione domínios locais para portas locais",
   "mappings.add": "Adicionar Mapeamento",
+  "mappings.export": "Exportar",
+  "mappings.import": "Importar",
   "mappings.empty": "Nenhum mapeamento ainda",
   "mappings.emptyHint": "Clique em \"Adicionar Mapeamento\" para direcionar um domínio para uma porta local.",
 
@@ -76,6 +78,16 @@
   "modal.cancel": "Cancelar",
   "modal.close": "Fechar",
 
+  "export.title": "Exportar Mapeamentos",
+  "export.subtitle": "Escolha quais mapeamentos incluir no arquivo exportado.",
+  "export.selectAll": "Selecionar Tudo",
+  "export.selectedCount": "{count} de {total} selecionados",
+  "export.submit": "Exportar",
+  "export.dialogTitle": "Exportar Mapeamentos",
+  "import.dialogTitle": "Importar Mapeamentos",
+  "import.error.invalidFormat": "O arquivo selecionado não é uma exportação de mapeamentos válida.",
+  "import.error.readFailed": "Não foi possível ler o arquivo selecionado: {error}",
+
   "about.desc": "Um proxy reverso local para rotear domínios .local para portas localhost.",
 
   "form.domain": "Domínio",
@@ -109,6 +121,10 @@
   "toast.loggingEnabled": "Registro de solicitações ativado.",
   "toast.loggingDisabled": "Registro de solicitações desativado.",
   "toast.copied": "{url} copiado para a área de transferência.",
+  "toast.exportSuccess": "{count} mapeamentos exportados para {path}",
+  "toast.exportFailed": "Falha ao exportar: {error}",
+  "toast.importResult": "{added} mapeamentos importados, {skipped} duplicados ignorados",
+  "toast.importFailed": "Falha ao importar: {error}",
   "toast.caTrusted": "Certificado da CA confiável com sucesso.",
   "toast.caRegenerated": "Certificado da CA regenerado. Use Instalar e Confiar para registrá-lo no seu navegador.",
   "toast.caDeleted": "Certificado da CA excluído e removido do repositório de confiança.",

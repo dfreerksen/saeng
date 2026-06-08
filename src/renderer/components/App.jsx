@@ -5,6 +5,7 @@ import MappingsView from './MappingsView.jsx';
 import LogView from './LogView.jsx';
 import SettingsView from './SettingsView.jsx';
 import MappingModal from './MappingModal.jsx';
+import ExportModal from './ExportModal.jsx';
 import AboutModal from './AboutModal.jsx';
 import Toast from './Toast.jsx';
 import { getOS } from '../js/os.js';
@@ -148,6 +149,17 @@ export default function App() {
     }
   }
 
+  async function handleImportMappings() {
+    const result = await window.electronAPI.mappings.import();
+    if (result.canceled) return;
+    if (result.success) {
+      setMappings(result.mappings);
+      showToast(t('toast.importResult', { added: result.added, skipped: result.skipped }), result.added > 0 ? 'success' : 'info');
+    } else {
+      showToast(t('toast.importFailed', { error: result.error }), 'error');
+    }
+  }
+
   async function handleClearLog() {
     const cleared = await window.electronAPI.requestLog.clear();
     setRequestLog(cleared);
@@ -193,6 +205,8 @@ export default function App() {
             settings={settings}
             onAdd={() => setModal({ type: 'add' })}
             onEdit={(mapping) => setModal({ type: 'edit', mapping })}
+            onExport={() => setModal({ type: 'export' })}
+            onImport={handleImportMappings}
             showToast={showToast}
             t={t}
           />
@@ -242,6 +256,24 @@ export default function App() {
             setMappings(updated);
             setModal(null);
             showToast(t('toast.mappingUpdated', { domain: data.domain, host: data.host, port: data.port }), 'success');
+          }}
+          t={t}
+        />
+      )}
+
+      {modal?.type === 'export' && (
+        <ExportModal
+          mappings={mappings}
+          onClose={() => setModal(null)}
+          onSubmit={async (ids) => {
+            const result = await window.electronAPI.mappings.export(ids);
+            if (result.canceled) return;
+            if (result.success) {
+              setModal(null);
+              showToast(t('toast.exportSuccess', { count: result.count, path: result.path }), 'success');
+            } else {
+              showToast(t('toast.exportFailed', { error: result.error }), 'error');
+            }
           }}
           t={t}
         />

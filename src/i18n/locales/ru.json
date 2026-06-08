@@ -12,6 +12,8 @@
   "mappings.title": "Сопоставления доменов",
   "mappings.subtitle": "Перенаправление локальных доменов на локальные порты",
   "mappings.add": "Добавить сопоставление",
+  "mappings.export": "Экспорт",
+  "mappings.import": "Импорт",
   "mappings.empty": "Сопоставления отсутствуют",
   "mappings.emptyHint": "Нажмите \"Добавить сопоставление\", чтобы перенаправить домен на локальный порт.",
 
@@ -76,6 +78,16 @@
   "modal.cancel": "Отмена",
   "modal.close": "Закрыть",
 
+  "export.title": "Экспорт сопоставлений",
+  "export.subtitle": "Выберите, какие сопоставления включить в экспортируемый файл.",
+  "export.selectAll": "Выбрать всё",
+  "export.selectedCount": "Выбрано {count} из {total}",
+  "export.submit": "Экспорт",
+  "export.dialogTitle": "Экспорт сопоставлений",
+  "import.dialogTitle": "Импорт сопоставлений",
+  "import.error.invalidFormat": "Выбранный файл не является корректным файлом экспорта сопоставлений.",
+  "import.error.readFailed": "Не удалось прочитать выбранный файл: {error}",
+
   "about.desc": "Локальный обратный прокси-сервер для маршрутизации доменов .local на порты localhost.",
 
   "form.domain": "Домен",
@@ -109,6 +121,10 @@
   "toast.loggingEnabled": "Журналирование запросов включено.",
   "toast.loggingDisabled": "Журналирование запросов отключено.",
   "toast.copied": "{url} скопировано в буфер обмена.",
+  "toast.exportSuccess": "Экспортировано {count} сопоставлений в {path}",
+  "toast.exportFailed": "Не удалось экспортировать: {error}",
+  "toast.importResult": "Импортировано {added} сопоставлений, пропущено {skipped} дубликатов",
+  "toast.importFailed": "Не удалось импортировать: {error}",
   "toast.caTrusted": "Сертификат CA успешно доверен.",
   "toast.caRegenerated": "Сертификат CA восстановлен. Используйте \"Установить и доверять\", чтобы зарегистрировать его в вашем браузере.",
   "toast.caDeleted": "Сертификат CA удален и удален из хранилища доверенных сертификатов.",

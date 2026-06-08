@@ -12,6 +12,8 @@
   "mappings.title": "Mapeos de Dominio",
   "mappings.subtitle": "Ruta de dominios locales a puertos locales",
   "mappings.add": "Agregar Mapeo",
+  "mappings.export": "Exportar",
+  "mappings.import": "Importar",
   "mappings.empty": "Aún no hay asignaciones",
   "mappings.emptyHint": "Haga clic en \"Agregar asignación\" para enrutar un dominio a un puerto local.",
 
@@ -76,6 +78,16 @@
   "modal.cancel": "Cancelar",
   "modal.close": "Cerrar",
 
+  "export.title": "Exportar mapeos",
+  "export.subtitle": "Elija qué mapeos incluir en el archivo exportado.",
+  "export.selectAll": "Seleccionar todo",
+  "export.selectedCount": "{count} de {total} seleccionados",
+  "export.submit": "Exportar",
+  "export.dialogTitle": "Exportar mapeos",
+  "import.dialogTitle": "Importar mapeos",
+  "import.error.invalidFormat": "El archivo seleccionado no es una exportación de mapeos válida.",
+  "import.error.readFailed": "No se pudo leer el archivo seleccionado: {error}",
+
   "about.desc": "Un proxy inverso local para enrutar dominios .local a puertos localhost.",
 
   "form.domain": "Dominio",
@@ -109,6 +121,10 @@
   "toast.loggingEnabled": "Registro de solicitudes habilitado.",
   "toast.loggingDisabled": "Registro de solicitudes deshabilitado.",
   "toast.copied": "{url} copiado al portapapeles.",
+  "toast.exportSuccess": "Se exportaron {count} mapeos a {path}",
+  "toast.exportFailed": "Error al exportar: {error}",
+  "toast.importResult": "Se importaron {added} mapeos, se omitieron {skipped} duplicados",
+  "toast.importFailed": "Error al importar: {error}",
   "toast.caTrusted": "Certificado de CA confiable correctamente.",
   "toast.caRegenerated": "Certificado de CA regenerado. Utilice Install & Trust para registrarlo en su navegador.",
   "toast.caDeleted": "Certificado de CA eliminado y eliminado del almacén de confianza.",

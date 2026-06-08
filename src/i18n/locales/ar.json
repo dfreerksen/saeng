@@ -12,6 +12,8 @@
   "mappings.title": "تعيينات النطاقات",
   "mappings.subtitle": "توجيه النطاقات المحلية إلى منافذ محلية",
   "mappings.add": "إضافة تعيين",
+  "mappings.export": "تصدير",
+  "mappings.import": "استيراد",
   "mappings.empty": "لا توجد تعيينات بعد",
   "mappings.emptyHint": "انقر على \"إضافة تعيين\" لتوجيه نطاق معين إلى منفذ محلي.",
 
@@ -76,6 +78,16 @@
   "modal.cancel": "إلغاء",
   "modal.close": "يغلق",
 
+  "export.title": "تصدير التعيينات",
+  "export.subtitle": "اختر التعيينات المراد تضمينها في الملف المُصدَّر.",
+  "export.selectAll": "تحديد الكل",
+  "export.selectedCount": "تم تحديد {count} من {total}",
+  "export.submit": "تصدير",
+  "export.dialogTitle": "تصدير التعيينات",
+  "import.dialogTitle": "استيراد التعيينات",
+  "import.error.invalidFormat": "الملف المحدد ليس ملف تصدير تعيينات صالحًا.",
+  "import.error.readFailed": "تعذرت قراءة الملف المحدد: {error}",
+
   "about.desc": "وكيل عكسي محلي لتوجيه النطاقات .local إلى منافذ localhost.",
 
   "form.domain": "النطاق",
@@ -109,6 +121,10 @@
   "toast.loggingEnabled": "تم تفعيل تسجيل الطلبات.",
   "toast.loggingDisabled": "تم تعطيل تسجيل الطلبات.",
   "toast.copied": "تم نسخ {url} إلى الحافظة.",
+  "toast.exportSuccess": "تم تصدير {count} من التعيينات إلى {path}",
+  "toast.exportFailed": "فشل التصدير: {error}",
+  "toast.importResult": "تم استيراد {added} من التعيينات، وتم تخطي {skipped} من التكرارات",
+  "toast.importFailed": "فشل الاستيراد: {error}",
   "toast.caTrusted": "تم الوثوق بشهادة المرجع المصدق (CA) بنجاح.",
   "toast.caRegenerated": "تم إعادة إنشاء شهادة المرجع المصدق (CA). استخدم خيار «تثبيت والوثوق» لتسجيلها في متصفحك.",
   "toast.caDeleted": "تم حذف شهادة المرجع المصدق (CA) وإزالتها من مخزن الثقة.",

@@ -93,6 +93,35 @@ class AppStore {
     return mappings.find((m) => m.id === id);
   }
 
+  exportMappings(ids) {
+    const mappings = this.getMappings();
+    const selected = Array.isArray(ids) && ids.length > 0
+      ? mappings.filter((m) => ids.includes(m.id))
+      : mappings;
+    return selected.map(({ domain, host, port, https, label, enabled }) => ({
+      domain, host, port, https, label, enabled,
+    }));
+  }
+
+  importMappings(list) {
+    const existingDomains = new Set(this.getMappings().map((m) => m.domain));
+    const added = [];
+    const skipped = [];
+    for (const entry of list) {
+      const domain = typeof entry?.domain === 'string' ? entry.domain.toLowerCase().trim() : '';
+      const port = parseInt(entry?.port, 10);
+      if (!domain || !Number.isInteger(port) || port < 1 || port > 65535 || existingDomains.has(domain)) {
+        skipped.push(entry?.domain ?? '');
+        continue;
+      }
+      const mapping = this.addMapping({ domain, host: entry.host, port, https: entry.https, label: entry.label });
+      if (entry.enabled === false) this.toggleMapping(mapping.id);
+      existingDomains.add(domain);
+      added.push(mapping);
+    }
+    return { added, skipped };
+  }
+
   getSettings() {
     return this.store.get('settings', { httpsEnabled: false, startOnLaunch: false, colorMode: 'auto', locale: 'en', logMaxEntries: DEFAULT_LOG_MAX_ENTRIES, loggingEnabled: true });
   }

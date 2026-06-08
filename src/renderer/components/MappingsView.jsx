@@ -1,6 +1,6 @@
 import Tooltip from './Tooltip.jsx';
 
-export default function MappingsView({ active, mappings, setMappings, settings, onAdd, onEdit, showToast, t }) {
+export default function MappingsView({ active, mappings, setMappings, settings, onAdd, onEdit, onExport, onImport, showToast, t }) {
   async function handleToggle(id) {
     const updated = await window.electronAPI.mappings.toggle(id);
     setMappings(updated);
@@ -30,10 +30,20 @@ export default function MappingsView({ active, mappings, setMappings, settings, 
           <div className="view-title">{t('mappings.title')}</div>
           <div className="view-subtitle">{t('mappings.subtitle')}</div>
         </div>
-        <button className="btn btn-primary" onClick={onAdd}>
-          <i className="bi bi-plus" />
-          <span>{t('mappings.add')}</span>
-        </button>
+        <div className="view-header-actions">
+          <button className="btn btn-outline-secondary" onClick={onImport}>
+            <i className="bi bi-upload" />
+            <span>{t('mappings.import')}</span>
+          </button>
+          <button className="btn btn-outline-secondary" onClick={onExport} disabled={mappings.length === 0}>
+            <i className="bi bi-download" />
+            <span>{t('mappings.export')}</span>
+          </button>
+          <button className="btn btn-primary" onClick={onAdd}>
+            <i className="bi bi-plus" />
+            <span>{t('mappings.add')}</span>
+          </button>
+        </div>
       </div>
 
       <div className="table-responsive">
