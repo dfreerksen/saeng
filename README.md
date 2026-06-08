@@ -4,7 +4,7 @@ Local domain proxy manager for local development domains. Saeng means "light," "
 
 Saeng routes local defined domains to localhost ports using a PAC (Proxy Auto-Config) file — no `/etc/hosts` edits, no elevated port binding, no `sudo`. Add a mapping, start the proxy, and `http://myapp.local` goes straight to your local server.
 
-Saeng primarily works for Mac, with plans to make it work for Windows and Linux
+Saeng works on macOS, Windows, and Linux
 
 ## Features
 
@@ -13,7 +13,7 @@ Saeng primarily works for Mac, with plans to make it work for Windows and Linux
 * HTTPS support via a local CA certificate (with MITM SSL termination)
 * WebSocket pass-through
 * Start proxy automatically on launch
-* System tray integration on macOS and Windows
+* System tray integration on macOS, Windows, and Linux
 
 ## How it works
 
@@ -37,7 +37,9 @@ HTTPS works by intercepting `CONNECT` tunnel requests and terminating TLS using 
 
 * Node.js >= 24.11.1
 * npm >= 11.6.2
-* Xcode >= 26.0 (to create build)
+* Xcode >= 26.0 (to create local build)
+* GitHub CLI (for release)
+  * Install with `brew install gh`
 
 ## Development
 
@@ -122,13 +124,7 @@ $ act release
 
 ### Release
 
-Make sure GitHub command-line tool is installed first
-
-```bash
-brew install gh
-```
-
-Update the version it `package.json` and run `npm install`. Then run the release process using a Claude command
+Update the version it `package.json` and run `npm install`. Then run the release process using a Claude command and follow the instructions
 
 ```bash
 /release
