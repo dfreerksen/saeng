@@ -67,7 +67,9 @@ The renderer is a **React 19** app bundled by **esbuild**. SCSS is compiled by *
 | Channel | Description |
 |---|---|
 | `mappings:list/add/remove/update/toggle` | CRUD for domain mappings |
+| `mappings:export/import` | Export/import mappings to/from a JSON file via native save/open dialogs |
 | `proxy:start/stop/status` | Control and query proxy state |
+| `requestLog:list/clear` | Read/clear the in-memory request log |
 | `settings:get/set` | Read/write persistent settings |
 | `ssl:get-ca-expiry/regenerate-ca/delete-ca/get-ca-path/reveal-ca/trust-ca` | CA cert management |
 | `app:get-info/open-external` | App metadata, open URL in browser |
@@ -91,7 +93,13 @@ Mapping shape:
 ```
 `host` is the backend hostname to proxy to (defaults to `127.0.0.1`). It is used for all connection types: plain HTTP, HTTPS CONNECT tunnels, and WebSocket upgrades. `https` on a mapping means the **backend** expects HTTPS — it does not control whether the frontend domain is served over HTTPS (that is the global `settings.httpsEnabled` toggle).
 
-Settings defaults: `{ httpsEnabled: true, startOnLaunch: true, colorMode: 'auto', locale: 'en' }`.
+Settings defaults: `{ httpsEnabled: true, startOnLaunch: true, colorMode: 'auto', locale: 'en', logMaxEntries: DEFAULT_LOG_MAX_ENTRIES, loggingEnabled: true }`.
+
+`store.exportMappings(ids)` / `store.importMappings(list)` back the `mappings:export`/`mappings:import` IPC handlers — export writes `{ mappings: [...] }` JSON via a save dialog, import reads a file (accepting either a bare array or `{ mappings: [...] }`), skipping mappings that already exist.
+
+### Request log
+
+`RequestLog` (`src/proxy/requestLog.js`) is an in-memory ring buffer (default cap `DEFAULT_MAX_ENTRIES = 300`, configurable via `settings.logMaxEntries`) that records metadata (no bodies) for each proxied request, including the error reason on failures. It lives on `ProxyManager` and is wired into `HttpProxy` so entries are recorded on the hot path. Toggling `settings.loggingEnabled` calls `requestLog.setEnabled()`, which short-circuits `add()` without clearing existing entries. The renderer's `LogView.jsx` reads/clears it via the `requestLog:list/clear` IPC channels.
 
 ### Live mapping updates
 
