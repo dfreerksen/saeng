@@ -120,6 +120,7 @@ class HttpProxy {
         https,
         status: res.statusCode,
         latencyMs: Date.now() - startedAt,
+        error: res.proxyError ?? null,
       });
     });
   }
@@ -165,6 +166,7 @@ class HttpProxy {
     });
 
     proxyReq.on('error', (err) => {
+      res.proxyError = err.message;
       if (!res.headersSent) {
         res.writeHead(502, { 'Content-Type': 'text/plain' });
         res.end(`Saeng: backend error - ${err.message}`);
@@ -203,6 +205,7 @@ class HttpProxy {
     });
 
     proxyReq.on('error', (err) => {
+      res.proxyError = err.message;
       if (!res.headersSent) {
         res.writeHead(502, { 'Content-Type': 'text/plain' });
         res.end(`Saeng: backend error - ${err.message}`);

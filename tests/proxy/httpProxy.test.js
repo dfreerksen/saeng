@@ -6,10 +6,11 @@ import { HttpProxy } from '../../src/proxy/httpProxy.js';
 // Helper: build a minimal mock req/res pair for exercising _recordRequest()
 // directly, without spinning up a real server. `res` is an EventEmitter so
 // `res.on('finish', ...)` can be triggered with `res.emit('finish')`.
-function makeMockReqRes({ method = 'GET', url = '/path', statusCode = 200 } = {}) {
+function makeMockReqRes({ method = 'GET', url = '/path', statusCode = 200, proxyError } = {}) {
   const req = { method, url, headers: {} };
   const res = new EventEmitter();
   res.statusCode = statusCode;
+  if (proxyError !== undefined) res.proxyError = proxyError;
   return { req, res };
 }
 
@@ -204,9 +205,24 @@ describe('HttpProxy._recordRequest()', () => {
       path: '/dashboard',
       https: false,
       status: 200,
+      error: null,
     });
     expect(add.mock.calls[0][0].timestamp).toEqual(expect.any(Number));
     expect(add.mock.calls[0][0].latencyMs).toEqual(expect.any(Number));
+  });
+
+  it('includes the backend error message when the response was marked with proxyError', () => {
+    const add = vi.fn();
+    const proxy = new HttpProxy(null, { add });
+    const { req, res } = makeMockReqRes({ statusCode: 502, proxyError: 'connect ECONNREFUSED 127.0.0.1:9999' });
+
+    proxy._recordRequest(req, res, 'myapp.local', false);
+    res.emit('finish');
+
+    expect(add.mock.calls[0][0]).toMatchObject({
+      status: 502,
+      error: 'connect ECONNREFUSED 127.0.0.1:9999',
+    });
   });
 
   it('marks https requests with https: true', () => {
@@ -284,6 +300,24 @@ describe('HttpProxy request logging — end to end', () => {
       path: '/ping',
       https: false,
       status: 200,
+    });
+  });
+
+  it('records the backend error message when the backend is unreachable', async () => {
+    const add = vi.fn();
+    proxy = new HttpProxy(null, { add });
+    await proxy.start(
+      [{ domain: 'unreachable.local', host: '127.0.0.1', port: 1, enabled: true }],
+      { httpsEnabled: false }
+    );
+
+    await makeRequest(proxy.getPort(), { host: 'unreachable.local', path: '/ping' });
+
+    await vi.waitFor(() => expect(add).toHaveBeenCalled());
+    expect(add.mock.calls[0][0]).toMatchObject({
+      hostname: 'unreachable.local',
+      status: 502,
+      error: expect.stringContaining('ECONNREFUSED'),
     });
   });
 

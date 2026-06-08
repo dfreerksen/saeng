@@ -53,7 +53,7 @@ export default function LogView({ active, entries, onClear, t }) {
                   <td className="domain-cell">{entry.hostname}</td>
                   <td className="log-path-cell">{entry.path}</td>
                   <td>
-                    <span className={`badge ${statusBadgeClass(entry.status)}`}>
+                    <span className={`badge ${statusBadgeClass(entry.status)}`} title={entry.error || undefined}>
                       {entry.status ?? '—'}
                     </span>
                   </td>

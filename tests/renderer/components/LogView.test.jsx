@@ -25,6 +25,7 @@ const SAMPLE_ENTRIES = [
     status: 500,
     latencyMs: 340,
     https: true,
+    error: 'connect ECONNREFUSED 127.0.0.1:9999',
   },
   {
     id: '3',
@@ -96,6 +97,16 @@ describe('LogView — table with entries', () => {
     renderLogView({ entries: SAMPLE_ENTRIES });
     expect(screen.getByText('200')).toHaveClass('badge-status-ok');
     expect(screen.getByText('500')).toHaveClass('badge-status-error');
+  });
+
+  it('shows the backend error message as a tooltip on the status badge when present', () => {
+    renderLogView({ entries: SAMPLE_ENTRIES });
+    expect(screen.getByText('500')).toHaveAttribute('title', 'connect ECONNREFUSED 127.0.0.1:9999');
+  });
+
+  it('does not set a tooltip on the status badge when there is no error', () => {
+    renderLogView({ entries: SAMPLE_ENTRIES });
+    expect(screen.getByText('200')).not.toHaveAttribute('title');
   });
 
   it('shows a placeholder for entries without a status or latency yet', () => {
