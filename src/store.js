@@ -20,7 +20,6 @@ const schema = {
         port: { type: 'number' },
         https: { type: 'boolean' },
         enabled: { type: 'boolean' },
-        label: { type: 'string' },
         createdAt: { type: 'string' },
       },
     },
@@ -56,7 +55,6 @@ class AppStore {
       port: parseInt(data.port, 10),
       https: !!data.https,
       enabled: true,
-      label: data.label || '',
       createdAt: new Date().toISOString(),
     };
     mappings.push(mapping);
@@ -78,7 +76,6 @@ class AppStore {
         host: data.host || '127.0.0.1',
         port: parseInt(data.port, 10),
         https: !!data.https,
-        label: data.label || '',
       };
     });
     this.store.set('mappings', mappings);
@@ -93,13 +90,21 @@ class AppStore {
     return mappings.find((m) => m.id === id);
   }
 
+  setMappingsEnabled(ids, enabled) {
+    const idSet = new Set(ids);
+    const mappings = this.getMappings().map((m) =>
+      idSet.has(m.id) ? { ...m, enabled: !!enabled } : m
+    );
+    this.store.set('mappings', mappings);
+  }
+
   exportMappings(ids) {
     const mappings = this.getMappings();
     const selected = Array.isArray(ids) && ids.length > 0
       ? mappings.filter((m) => ids.includes(m.id))
       : mappings;
-    return selected.map(({ domain, host, port, https, label, enabled }) => ({
-      domain, host, port, https, label, enabled,
+    return selected.map(({ domain, host, port, https, enabled }) => ({
+      domain, host, port, https, enabled,
     }));
   }
 
@@ -114,7 +119,7 @@ class AppStore {
         skipped.push(entry?.domain ?? '');
         continue;
       }
-      const mapping = this.addMapping({ domain, host: entry.host, port, https: entry.https, label: entry.label });
+      const mapping = this.addMapping({ domain, host: entry.host, port, https: entry.https });
       if (entry.enabled === false) this.toggleMapping(mapping.id);
       existingDomains.add(domain);
       added.push(mapping);

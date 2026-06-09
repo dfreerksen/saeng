@@ -11,8 +11,8 @@ import MappingsView from '../../../src/renderer/components/MappingsView.jsx';
 const t = (key) => key;
 
 const SAMPLE_MAPPINGS = [
-  { id: '1', domain: 'myapp.local', port: 3000, https: false, enabled: true, label: 'My App' },
-  { id: '2', domain: 'api.myapp.local', port: 4000, https: true, enabled: false, label: '' },
+  { id: '1', domain: 'myapp.local', port: 3000, https: false, enabled: true },
+  { id: '2', domain: 'api.myapp.local', port: 4000, https: true, enabled: false },
 ];
 
 function renderMappingsView(props = {}) {
@@ -36,6 +36,7 @@ beforeEach(() => {
     mappings: {
       toggle: vi.fn().mockResolvedValue([]),
       remove: vi.fn().mockResolvedValue([]),
+      setGroupEnabled: vi.fn().mockResolvedValue([]),
     },
   };
   Object.defineProperty(navigator, 'clipboard', {
@@ -62,18 +63,15 @@ describe('MappingsView — empty state', () => {
 describe('MappingsView — table with mappings', () => {
   it('renders a table row for each mapping', () => {
     const { container } = renderMappingsView({ mappings: SAMPLE_MAPPINGS });
-    expect(container.querySelectorAll('tbody tr')).toHaveLength(2);
+    expect(container.querySelectorAll('tbody tr:not(.group-header-row)')).toHaveLength(2);
   });
 
   it('displays the domain in the table', () => {
-    renderMappingsView({ mappings: SAMPLE_MAPPINGS });
-    expect(screen.getByText('myapp.local')).toBeInTheDocument();
-    expect(screen.getByText('api.myapp.local')).toBeInTheDocument();
-  });
-
-  it('displays the label in the table', () => {
-    renderMappingsView({ mappings: SAMPLE_MAPPINGS });
-    expect(screen.getByText('My App')).toBeInTheDocument();
+    const { container } = renderMappingsView({ mappings: SAMPLE_MAPPINGS });
+    expect(container.querySelector('.domain-cell[data-domain="myapp.local"], td.domain-cell')).toBeInTheDocument();
+    expect(container.querySelectorAll('td.domain-cell')).toHaveLength(2);
+    expect(container.querySelectorAll('td.domain-cell')[0].textContent).toBe('myapp.local');
+    expect(container.querySelectorAll('td.domain-cell')[1].textContent).toBe('api.myapp.local');
   });
 
   it('shows HTTP badge for a non-https mapping', () => {
@@ -92,9 +90,146 @@ describe('MappingsView — table with mappings', () => {
 
   it('reflects enabled state in the toggle checkbox', () => {
     const { container } = renderMappingsView({ mappings: SAMPLE_MAPPINGS });
-    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-    expect(checkboxes[0]).toBeChecked();
-    expect(checkboxes[1]).not.toBeChecked();
+    const mappingCheckboxes = container.querySelectorAll('tr:not(.group-header-row) input[type="checkbox"]');
+    expect(mappingCheckboxes[0]).toBeChecked();
+    expect(mappingCheckboxes[1]).not.toBeChecked();
+  });
+});
+
+describe('MappingsView — group headers', () => {
+  it('renders one group header for mappings sharing a base domain', () => {
+    const { container } = renderMappingsView({ mappings: SAMPLE_MAPPINGS });
+    expect(container.querySelectorAll('.group-header-row')).toHaveLength(1);
+  });
+
+  it('displays the base domain as the group name', () => {
+    const { container } = renderMappingsView({ mappings: SAMPLE_MAPPINGS });
+    expect(container.querySelector('.group-name').textContent).toBe('myapp.local');
+  });
+
+  it('renders a separate group header for each distinct base domain', () => {
+    const mappings = [
+      { id: '1', domain: 'myapp.local', port: 3000, https: false, enabled: true },
+      { id: '2', domain: 'other.local', port: 4000, https: false, enabled: true },
+    ];
+    const { container } = renderMappingsView({ mappings });
+    expect(container.querySelectorAll('.group-header-row')).toHaveLength(2);
+  });
+
+  it('places subdomains under the same group as their base domain', () => {
+    const { container } = renderMappingsView({ mappings: SAMPLE_MAPPINGS });
+    const tbody = container.querySelectorAll('tbody');
+    expect(tbody).toHaveLength(1);
+    expect(tbody[0].querySelectorAll('tr:not(.group-header-row)')).toHaveLength(2);
+  });
+});
+
+describe('MappingsView — group member ordering', () => {
+  it('places the bare domain before subdomains', () => {
+    const mappings = [
+      { id: '1', domain: 'api.myapp.local', port: 4000, https: false, enabled: true },
+      { id: '2', domain: 'myapp.local', port: 3000, https: false, enabled: true },
+    ];
+    const { container } = renderMappingsView({ mappings });
+    const cells = container.querySelectorAll('td.domain-cell');
+    expect(cells[0].textContent).toBe('myapp.local');
+    expect(cells[1].textContent).toBe('api.myapp.local');
+  });
+
+  it('places a wildcard subdomain after the bare domain but before named subdomains', () => {
+    const mappings = [
+      { id: '1', domain: 'api.myapp.local', port: 4000, https: false, enabled: true },
+      { id: '2', domain: '*.myapp.local', port: 3000, https: false, enabled: true },
+      { id: '3', domain: 'myapp.local', port: 3000, https: false, enabled: true },
+    ];
+    const { container } = renderMappingsView({ mappings });
+    const cells = container.querySelectorAll('td.domain-cell');
+    expect(cells[0].textContent).toBe('myapp.local');
+    expect(cells[1].textContent).toBe('*.myapp.local');
+    expect(cells[2].textContent).toBe('api.myapp.local');
+  });
+
+  it('places numeric subdomains before alphabetic subdomains', () => {
+    const mappings = [
+      { id: '1', domain: 'web.myapp.local', port: 4000, https: false, enabled: true },
+      { id: '2', domain: '1.myapp.local', port: 3000, https: false, enabled: true },
+    ];
+    const { container } = renderMappingsView({ mappings });
+    const cells = container.querySelectorAll('td.domain-cell');
+    expect(cells[0].textContent).toBe('1.myapp.local');
+    expect(cells[1].textContent).toBe('web.myapp.local');
+  });
+
+  it('sorts numeric subdomains numerically rather than lexically', () => {
+    const mappings = [
+      { id: '1', domain: '10.myapp.local', port: 4000, https: false, enabled: true },
+      { id: '2', domain: '2.myapp.local', port: 3000, https: false, enabled: true },
+    ];
+    const { container } = renderMappingsView({ mappings });
+    const cells = container.querySelectorAll('td.domain-cell');
+    expect(cells[0].textContent).toBe('2.myapp.local');
+    expect(cells[1].textContent).toBe('10.myapp.local');
+  });
+
+  it('sorts alphabetic subdomains alphabetically', () => {
+    const mappings = [
+      { id: '1', domain: 'web.myapp.local', port: 4000, https: false, enabled: true },
+      { id: '2', domain: 'api.myapp.local', port: 3000, https: false, enabled: true },
+    ];
+    const { container } = renderMappingsView({ mappings });
+    const cells = container.querySelectorAll('td.domain-cell');
+    expect(cells[0].textContent).toBe('api.myapp.local');
+    expect(cells[1].textContent).toBe('web.myapp.local');
+  });
+});
+
+describe('MappingsView — group toggle', () => {
+  it('is checked when all mappings in the group are enabled', () => {
+    const allEnabled = [
+      { id: '1', domain: 'myapp.local', port: 3000, https: false, enabled: true },
+      { id: '2', domain: 'api.myapp.local', port: 4000, https: false, enabled: true },
+    ];
+    const { container } = renderMappingsView({ mappings: allEnabled });
+    expect(container.querySelector('.group-header-row input[type="checkbox"]')).toBeChecked();
+  });
+
+  it('is unchecked when any mapping in the group is disabled', () => {
+    const { container } = renderMappingsView({ mappings: SAMPLE_MAPPINGS });
+    expect(container.querySelector('.group-header-row input[type="checkbox"]')).not.toBeChecked();
+  });
+
+  it('calls setGroupEnabled with all group ids and false when all are enabled', async () => {
+    const allEnabled = [
+      { id: '1', domain: 'myapp.local', port: 3000, https: false, enabled: true },
+      { id: '2', domain: 'api.myapp.local', port: 4000, https: false, enabled: true },
+    ];
+    const { container } = renderMappingsView({ mappings: allEnabled });
+    fireEvent.click(container.querySelector('.group-header-row input[type="checkbox"]'));
+    await waitFor(() => {
+      expect(window.electronAPI.mappings.setGroupEnabled).toHaveBeenCalledWith(['1', '2'], false);
+    });
+  });
+
+  it('calls setGroupEnabled with all group ids and true when not all are enabled', async () => {
+    const { container } = renderMappingsView({ mappings: SAMPLE_MAPPINGS });
+    fireEvent.click(container.querySelector('.group-header-row input[type="checkbox"]'));
+    await waitFor(() => {
+      expect(window.electronAPI.mappings.setGroupEnabled).toHaveBeenCalledWith(['1', '2'], true);
+    });
+  });
+
+  it('updates mappings with the result from setGroupEnabled', async () => {
+    const updated = [
+      { id: '1', domain: 'myapp.local', port: 3000, https: false, enabled: false },
+      { id: '2', domain: 'api.myapp.local', port: 4000, https: false, enabled: false },
+    ];
+    window.electronAPI.mappings.setGroupEnabled.mockResolvedValue(updated);
+    const setMappings = vi.fn();
+    const { container } = renderMappingsView({ mappings: SAMPLE_MAPPINGS, setMappings });
+    fireEvent.click(container.querySelector('.group-header-row input[type="checkbox"]'));
+    await waitFor(() => {
+      expect(setMappings).toHaveBeenCalledWith(updated);
+    });
   });
 });
 
@@ -171,18 +306,20 @@ describe('MappingsView — toggle', () => {
   it('calls electronAPI.mappings.toggle with the mapping id', async () => {
     const setMappings = vi.fn();
     const { container } = renderMappingsView({ mappings: SAMPLE_MAPPINGS, setMappings });
-    fireEvent.click(container.querySelectorAll('input[type="checkbox"]')[0]);
+    const mappingCheckboxes = container.querySelectorAll('tr:not(.group-header-row) input[type="checkbox"]');
+    fireEvent.click(mappingCheckboxes[0]);
     await waitFor(() => {
       expect(window.electronAPI.mappings.toggle).toHaveBeenCalledWith('1');
     });
   });
 
   it('updates mappings with the result from toggle', async () => {
-    const updated = [{ id: '1', domain: 'myapp.local', port: 3000, https: false, enabled: false, label: '' }];
+    const updated = [{ id: '1', domain: 'myapp.local', port: 3000, https: false, enabled: false }];
     window.electronAPI.mappings.toggle.mockResolvedValue(updated);
     const setMappings = vi.fn();
     const { container } = renderMappingsView({ mappings: SAMPLE_MAPPINGS, setMappings });
-    fireEvent.click(container.querySelectorAll('input[type="checkbox"]')[0]);
+    const mappingCheckboxes = container.querySelectorAll('tr:not(.group-header-row) input[type="checkbox"]');
+    fireEvent.click(mappingCheckboxes[0]);
     await waitFor(() => {
       expect(setMappings).toHaveBeenCalledWith(updated);
     });

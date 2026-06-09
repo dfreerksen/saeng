@@ -34,7 +34,7 @@ describe('AppStore.getMappings()', () => {
 
 describe('AppStore.addMapping()', () => {
   it('returns the newly created mapping', () => {
-    const result = store.addMapping({ domain: 'MyApp.local ', port: '3000', https: false, label: 'dev' });
+    const result = store.addMapping({ domain: 'MyApp.local ', port: '3000', https: false });
     expect(result).toBeDefined();
     expect(result.id).toBeDefined();
   });
@@ -83,11 +83,6 @@ describe('AppStore.addMapping()', () => {
     expect(result.host).toBe('10.0.0.5');
   });
 
-  it('uses an empty string for label when omitted', () => {
-    const result = store.addMapping({ domain: 'myapp.local', port: 3000 });
-    expect(result.label).toBe('');
-  });
-
   it('persists the mapping so getMappings() includes it', () => {
     store.addMapping({ domain: 'myapp.local', port: 3000 });
     expect(store.getMappings()).toHaveLength(1);
@@ -118,14 +113,13 @@ describe('AppStore.removeMapping()', () => {
 });
 
 describe('AppStore.updateMapping()', () => {
-  it('updates domain, port, https, label, and host', () => {
-    const m = store.addMapping({ domain: 'old.local', port: 1, https: false, label: '', host: '127.0.0.1' });
-    store.updateMapping(m.id, { domain: 'NEW.local ', port: '9000', https: true, label: 'updated', host: '10.0.0.5' });
+  it('updates domain, port, https, and host', () => {
+    const m = store.addMapping({ domain: 'old.local', port: 1, https: false, host: '127.0.0.1' });
+    store.updateMapping(m.id, { domain: 'NEW.local ', port: '9000', https: true, host: '10.0.0.5' });
     const updated = store.getMappings().find((x) => x.id === m.id);
     expect(updated.domain).toBe('new.local');
     expect(updated.port).toBe(9000);
     expect(updated.https).toBe(true);
-    expect(updated.label).toBe('updated');
     expect(updated.host).toBe('10.0.0.5');
   });
 
@@ -173,11 +167,52 @@ describe('AppStore.toggleMapping()', () => {
   });
 });
 
+describe('AppStore.setMappingsEnabled()', () => {
+  it('enables all specified mappings', () => {
+    const a = store.addMapping({ domain: 'a.local', port: 1 });
+    const b = store.addMapping({ domain: 'b.local', port: 2 });
+    store.toggleMapping(a.id);
+    store.toggleMapping(b.id);
+    store.setMappingsEnabled([a.id, b.id], true);
+    const mappings = store.getMappings();
+    expect(mappings.find((m) => m.id === a.id).enabled).toBe(true);
+    expect(mappings.find((m) => m.id === b.id).enabled).toBe(true);
+  });
+
+  it('disables all specified mappings', () => {
+    const a = store.addMapping({ domain: 'a.local', port: 1 });
+    const b = store.addMapping({ domain: 'b.local', port: 2 });
+    store.setMappingsEnabled([a.id, b.id], false);
+    const mappings = store.getMappings();
+    expect(mappings.find((m) => m.id === a.id).enabled).toBe(false);
+    expect(mappings.find((m) => m.id === b.id).enabled).toBe(false);
+  });
+
+  it('does not affect mappings outside the given ids', () => {
+    const a = store.addMapping({ domain: 'a.local', port: 1 });
+    const b = store.addMapping({ domain: 'b.local', port: 2 });
+    store.setMappingsEnabled([a.id], false);
+    expect(store.getMappings().find((m) => m.id === b.id).enabled).toBe(true);
+  });
+
+  it('is a no-op for an empty ids array', () => {
+    const a = store.addMapping({ domain: 'a.local', port: 1 });
+    store.setMappingsEnabled([], false);
+    expect(store.getMappings().find((m) => m.id === a.id).enabled).toBe(true);
+  });
+
+  it('silently ignores unknown ids', () => {
+    const a = store.addMapping({ domain: 'a.local', port: 1 });
+    expect(() => store.setMappingsEnabled(['nonexistent'], false)).not.toThrow();
+    expect(store.getMappings().find((m) => m.id === a.id).enabled).toBe(true);
+  });
+});
+
 describe('AppStore.exportMappings()', () => {
   it('returns all mappings stripped of id and createdAt when no ids given', () => {
-    store.addMapping({ domain: 'a.local', port: 1, host: '127.0.0.1', https: false, label: 'A' });
+    store.addMapping({ domain: 'a.local', port: 1, host: '127.0.0.1', https: false });
     const [result] = store.exportMappings();
-    expect(result).toEqual({ domain: 'a.local', host: '127.0.0.1', port: 1, https: false, label: 'A', enabled: true });
+    expect(result).toEqual({ domain: 'a.local', host: '127.0.0.1', port: 1, https: false, enabled: true });
     expect(result).not.toHaveProperty('id');
     expect(result).not.toHaveProperty('createdAt');
   });
@@ -200,7 +235,7 @@ describe('AppStore.exportMappings()', () => {
 describe('AppStore.importMappings()', () => {
   it('adds valid entries and returns them in added', () => {
     const { added, skipped } = store.importMappings([
-      { domain: 'New.Local ', host: '10.0.0.1', port: '3000', https: true, label: 'imported' },
+      { domain: 'New.Local ', host: '10.0.0.1', port: '3000', https: true },
     ]);
     expect(added).toHaveLength(1);
     expect(skipped).toHaveLength(0);
@@ -208,7 +243,6 @@ describe('AppStore.importMappings()', () => {
     expect(added[0].host).toBe('10.0.0.1');
     expect(added[0].port).toBe(3000);
     expect(added[0].https).toBe(true);
-    expect(added[0].label).toBe('imported');
     expect(store.getMappings()).toHaveLength(1);
   });
 

@@ -1,8 +1,45 @@
+import { splitDomain } from '../js/utils.js';
 import Tooltip from './Tooltip.jsx';
+
+function subdomainRank(subdomain) {
+  if (subdomain === '') return 0;
+  if (subdomain === '*') return 1;
+  if (/^[0-9]/.test(subdomain)) return 2;
+  return 3;
+}
+
+function compareMappings(a, b) {
+  const subA = splitDomain(a.domain).subdomain;
+  const subB = splitDomain(b.domain).subdomain;
+  const rankDiff = subdomainRank(subA) - subdomainRank(subB);
+  if (rankDiff !== 0) return rankDiff;
+  return subA.localeCompare(subB, undefined, { numeric: true });
+}
+
+function buildGroups(mappings) {
+  const groups = new Map();
+  for (const m of mappings) {
+    const { domain, suffix } = splitDomain(m.domain);
+    const key = domain + suffix;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(m);
+  }
+  for (const groupMappings of groups.values()) {
+    groupMappings.sort(compareMappings);
+  }
+  return groups;
+}
 
 export default function MappingsView({ active, mappings, setMappings, settings, onAdd, onEdit, onExport, onImport, showToast, t }) {
   async function handleToggle(id) {
     const updated = await window.electronAPI.mappings.toggle(id);
+    setMappings(updated);
+  }
+
+  async function handleGroupToggle(groupMappings) {
+    const allEnabled = groupMappings.every((m) => m.enabled);
+    const ids = groupMappings.map((m) => m.id);
+    const updated = await window.electronAPI.mappings.setGroupEnabled(ids, !allEnabled);
     setMappings(updated);
   }
 
@@ -22,6 +59,8 @@ export default function MappingsView({ active, mappings, setMappings, settings, 
     showToast(t('toast.copied', { url }), 'success');
     navigator.clipboard.writeText(url);
   }
+
+  const groups = buildGroups(mappings);
 
   return (
     <div className={`view${active ? ' active' : ''}`} id="view-mappings">
@@ -58,64 +97,84 @@ export default function MappingsView({ active, mappings, setMappings, settings, 
             <thead>
               <tr>
                 <th scope="col">{t('table.domain')}</th>
-                <th scope="col">{t('table.label')}</th>
                 <th scope="col">{t('table.protocol')}</th>
                 <th scope="col">{t('table.enabled')}</th>
                 <th scope="col" style={{ textAlign: 'right' }}>{t('table.actions')}</th>
               </tr>
             </thead>
-            <tbody>
-              {mappings.map((m) => {
-                const proto = m.https ? 'https' : 'http';
-                return (
-                  <tr key={m.id}>
-                    <td className="domain-cell">{m.domain}</td>
-                    <td className="label-cell">{m.label || ''}</td>
-                    <td>
-                      <span className={`badge badge-${proto}`}>{proto.toUpperCase()}</span>
-                    </td>
-                    <td>
-                      <label className="toggle">
-                        <input
-                          type="checkbox"
-                          checked={m.enabled}
-                          onChange={() => handleToggle(m.id)}
-                        />
-                        <span className="toggle-track" />
-                      </label>
-                    </td>
-                    <td>
-                      <div className="actions-cell">
-                        <Tooltip title={t('table.copyTitle')}>
-                          <button
-                            className="btn btn-outline-secondary btn-copy"
-                            onClick={() => handleCopy(m.id)}
-                          >
-                            <i className="bi bi-clipboard-check" />
-                          </button>
-                        </Tooltip>
-                        <Tooltip title={t('table.editTitle')}>
-                          <button
-                            className="btn btn-outline-primary btn-edit"
-                            onClick={() => onEdit(m)}
-                          >
-                            <i className="bi bi-pencil" />
-                          </button>
-                        </Tooltip>
-                        <Tooltip title={t('table.deleteTitle')}>
-                          <button
-                            className="btn btn-outline-danger btn-delete"
-                            onClick={() => handleDelete(m.id)}
-                          >
-                            <i className="bi bi-trash" />
-                          </button>
+            {[...groups.entries()].map(([groupKey, groupMappings]) => {
+              const allEnabled = groupMappings.every((m) => m.enabled);
+              return (
+                <tbody key={groupKey}>
+                  <tr className="group-header-row">
+                    <td colSpan={4}>
+                      <div className="group-header">
+                        <span className="group-name">{groupKey}</span>
+                        <Tooltip title={t('table.groupToggleTitle')}>
+                          <label className="toggle">
+                            <input
+                              type="checkbox"
+                              checked={allEnabled}
+                              onChange={() => handleGroupToggle(groupMappings)}
+                            />
+                            <span className="toggle-track" />
+                          </label>
                         </Tooltip>
                       </div>
                     </td>
                   </tr>
-                );
-              })}
-            </tbody>
+                  {groupMappings.map((m) => {
+                    const proto = m.https ? 'https' : 'http';
+                    return (
+                      <tr key={m.id}>
+                        <td className="domain-cell">{m.domain}</td>
+                        <td>
+                          <span className={`badge badge-${proto}`}>{proto.toUpperCase()}</span>
+                        </td>
+                        <td>
+                          <label className="toggle">
+                            <input
+                              type="checkbox"
+                              checked={m.enabled}
+                              onChange={() => handleToggle(m.id)}
+                            />
+                            <span className="toggle-track" />
+                          </label>
+                        </td>
+                        <td>
+                          <div className="actions-cell">
+                            <Tooltip title={t('table.copyTitle')}>
+                              <button
+                                className="btn btn-outline-secondary btn-copy"
+                                onClick={() => handleCopy(m.id)}
+                              >
+                                <i className="bi bi-clipboard-check" />
+                              </button>
+                            </Tooltip>
+                            <Tooltip title={t('table.editTitle')}>
+                              <button
+                                className="btn btn-outline-primary btn-edit"
+                                onClick={() => onEdit(m)}
+                              >
+                                <i className="bi bi-pencil" />
+                              </button>
+                            </Tooltip>
+                            <Tooltip title={t('table.deleteTitle')}>
+                              <button
+                                className="btn btn-outline-danger btn-delete"
+                                onClick={() => handleDelete(m.id)}
+                              >
+                                <i className="bi bi-trash" />
+                              </button>
+                            </Tooltip>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              );
+            })}
           </table>
         )}
       </div>

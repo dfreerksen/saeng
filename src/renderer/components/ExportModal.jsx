@@ -53,7 +53,7 @@ export default function ExportModal({ mappings, onClose, onSubmit, t }) {
                       checked={selected.has(m.id)}
                       onChange={() => toggleOne(m.id)}
                     />
-                    <span>{m.domain}{m.label ? ` — ${m.label}` : ''}</span>
+                    <span>{m.domain}</span>
                   </label>
                 ))}
               </div>

@@ -1,12 +1,32 @@
+.table .group-header-row td {
+  background-color: var(--saeng-secondary-color);
+  border-top: 1px solid var(--saeng-border);
+  padding-block: 6px;
+}
+
+.table tbody + tbody .group-header-row td {
+  padding-top: 20px;
+}
+
+.group-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.group-name {
+  color: var(--saeng-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .domain-cell {
   color: var(--saeng-accent);
 }
 
 .port-cell {
-  color: var(--saeng-primary-complement-color);
-}
-
-.label-cell {
   color: var(--saeng-primary-complement-color);
 }
 

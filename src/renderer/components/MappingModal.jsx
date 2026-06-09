@@ -12,7 +12,6 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
   const [host, setHost] = useState(mapping?.host ?? '127.0.0.1');
   const [port, setPort] = useState(mapping?.port ?? 3000);
   const [https, setHttps] = useState(!!mapping?.https);
-  const [label, setLabel] = useState(mapping?.label ?? '');
   const [domainError, setDomainError] = useState('');
   const [portError, setPortError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -59,7 +58,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
     }
 
     setSubmitting(true);
-    await onSubmit({ domain: fullDomain, host: host.trim() || '127.0.0.1', port: parsedPort, https, label: label.trim() });
+    await onSubmit({ domain: fullDomain, host: host.trim() || '127.0.0.1', port: parsedPort, https });
     setSubmitting(false);
   }
 
@@ -85,7 +84,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                     className="form-input"
                     placeholder={t('form.subdomainPlaceholder')}
                     value={subdomain}
-                    onChange={(e) => setSubdomain(e.target.value)}
+                    onChange={(e) => setSubdomain(e.target.value.toLowerCase())}
                     autoComplete="off"
                     spellCheck={false}
                     style={{ flex: 1, minWidth: 0 }}
@@ -96,7 +95,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                     className="form-input"
                     placeholder={t('form.domainPlaceholder')}
                     value={domain}
-                    onChange={(e) => setDomain(e.target.value)}
+                    onChange={(e) => setDomain(e.target.value.toLowerCase())}
                     autoComplete="off"
                     spellCheck={false}
                     required
@@ -150,21 +149,6 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                 />
                 <div className="form-hint">{t('form.portHint')}</div>
                 {portError && <div className="form-error visible">{portError}</div>}
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">
-                  <span>{t('form.label')}</span>
-                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('form.optional')}</span>
-                </label>
-                <input
-                  className="form-input"
-                  placeholder={t('form.labelPlaceholder')}
-                  value={label}
-                  onChange={(e) => setLabel(e.target.value)}
-                  autoComplete="off"
-                  maxLength={60}
-                />
               </div>
 
               <div className="form-group">

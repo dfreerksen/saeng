@@ -305,14 +305,14 @@ describe('App — import mappings', () => {
   });
 
   it('refreshes mappings and shows a result toast on successful import', async () => {
-    const newMappings = [{ id: 'm1', domain: 'imported.local', host: '127.0.0.1', port: 1, https: false, enabled: true, label: '' }];
+    const newMappings = [{ id: 'm1', domain: 'imported.local', host: '127.0.0.1', port: 1, https: false, enabled: true }];
     const importFn = vi.fn().mockResolvedValue({ canceled: false, success: true, added: 1, skipped: 0, mappings: newMappings });
     await renderApp({ mappings: { import: importFn } });
     fireEvent.click(screen.getByText('mappings.import').closest('button'));
     await waitFor(() => {
       expect(screen.getByText('toast.importResult')).toBeInTheDocument();
     });
-    expect(screen.getByText('imported.local')).toBeInTheDocument();
+    expect(screen.getAllByText('imported.local')[0]).toBeInTheDocument();
   });
 
   it('shows an error toast when import fails', async () => {
@@ -327,7 +327,7 @@ describe('App — import mappings', () => {
 
 describe('App — export mappings', () => {
   const sampleMappings = [
-    { id: 'm1', domain: 'a.local', host: '127.0.0.1', port: 1, https: false, enabled: true, label: '' },
+    { id: 'm1', domain: 'a.local', host: '127.0.0.1', port: 1, https: false, enabled: true },
   ];
 
   it('opens the export modal when the export button is clicked', async () => {

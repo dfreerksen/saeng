@@ -154,6 +154,14 @@ function setupIPC() {
     return store.getMappings();
   });
 
+  ipcMain.handle('mappings:setGroupEnabled', (_, ids, enabled) => {
+    store.setMappingsEnabled(ids, enabled);
+    if (proxyManager.isRunning()) {
+      proxyManager.updateMappings(store.getMappings());
+    }
+    return store.getMappings();
+  });
+
   ipcMain.handle('mappings:update', (_, id, data) => {
     store.updateMapping(id, data);
     if (proxyManager.isRunning()) {

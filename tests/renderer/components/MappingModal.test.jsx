@@ -17,11 +17,10 @@ const EXISTING_MAPPING = {
   port: 4000,
   https: true,
   enabled: true,
-  label: 'API Server',
 };
 
 const OTHER_MAPPINGS = [
-  { id: 'xyz', domain: 'other.local', port: 5000, https: false, enabled: true, label: '' },
+  { id: 'xyz', domain: 'other.local', port: 5000, https: false, enabled: true },
 ];
 
 function renderAddModal(props = {}) {
@@ -115,15 +114,25 @@ describe('MappingModal — edit mode', () => {
     expect(hostInput.value).toBe('192.168.1.10');
   });
 
-  it('pre-fills the label input', () => {
-    const { container } = renderEditModal();
-    const labelInput = container.querySelectorAll('.form-input')[4];
-    expect(labelInput.value).toBe('API Server');
-  });
-
   it('renders the edit submit button', () => {
     renderEditModal();
     expect(screen.getByText('modal.editSubmit')).toBeInTheDocument();
+  });
+});
+
+describe('MappingModal — input lowercasing', () => {
+  it('lowercases the domain as the user types', () => {
+    const { container } = renderAddModal();
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(domainInput, { target: { value: 'MyApp' } });
+    expect(domainInput.value).toBe('myapp');
+  });
+
+  it('lowercases the subdomain as the user types', () => {
+    const { container } = renderAddModal();
+    const subdomainInput = container.querySelectorAll('.form-input')[0];
+    fireEvent.change(subdomainInput, { target: { value: 'API' } });
+    expect(subdomainInput.value).toBe('api');
   });
 });
 
@@ -200,7 +209,7 @@ describe('MappingModal — validation', () => {
 
   it('shows duplicate domain error when the domain already exists', async () => {
     const { container } = renderAddModal({
-      mappings: [{ id: 'other', domain: 'myapp.local', port: 3000, https: false, enabled: true, label: '' }],
+      mappings: [{ id: 'other', domain: 'myapp.local', port: 3000, https: false, enabled: true }],
     });
     const domainInput = container.querySelectorAll('.form-input')[1];
     fireEvent.change(domainInput, { target: { value: 'myapp' } });

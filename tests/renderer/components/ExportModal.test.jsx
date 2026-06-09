@@ -11,8 +11,8 @@ import ExportModal from '../../../src/renderer/components/ExportModal.jsx';
 const t = (key) => key;
 
 const SAMPLE_MAPPINGS = [
-  { id: '1', domain: 'myapp.local', label: 'My App' },
-  { id: '2', domain: 'api.local', label: '' },
+  { id: '1', domain: 'myapp.local' },
+  { id: '2', domain: 'api.local' },
 ];
 
 function renderExportModal(props = {}) {
@@ -36,15 +36,15 @@ describe('ExportModal — rendering', () => {
     expect(screen.getByText('export.subtitle')).toBeInTheDocument();
   });
 
-  it('renders a checkbox row for each mapping showing domain and label', () => {
+  it('renders a checkbox row for each mapping showing domain', () => {
     renderExportModal();
-    expect(screen.getByText('myapp.local — My App')).toBeInTheDocument();
+    expect(screen.getByText('myapp.local')).toBeInTheDocument();
     expect(screen.getByText('api.local')).toBeInTheDocument();
   });
 
   it('starts with every mapping selected', () => {
     renderExportModal();
-    expect(checkboxFor('myapp.local — My App')).toBeChecked();
+    expect(checkboxFor('myapp.local')).toBeChecked();
     expect(checkboxFor('api.local')).toBeChecked();
   });
 
@@ -60,7 +60,7 @@ describe('ExportModal — selection', () => {
     renderExportModal();
     const [selectAll] = screen.getAllByRole('checkbox');
     fireEvent.click(selectAll);
-    expect(checkboxFor('myapp.local — My App')).not.toBeChecked();
+    expect(checkboxFor('myapp.local')).not.toBeChecked();
     expect(checkboxFor('api.local')).not.toBeChecked();
     expect(selectAll).not.toBeChecked();
   });
@@ -70,20 +70,20 @@ describe('ExportModal — selection', () => {
     const [selectAll] = screen.getAllByRole('checkbox');
     fireEvent.click(selectAll);
     fireEvent.click(selectAll);
-    expect(checkboxFor('myapp.local — My App')).toBeChecked();
+    expect(checkboxFor('myapp.local')).toBeChecked();
     expect(checkboxFor('api.local')).toBeChecked();
   });
 
   it('toggles a single mapping without affecting the others', () => {
     renderExportModal();
-    fireEvent.click(checkboxFor('myapp.local — My App'));
-    expect(checkboxFor('myapp.local — My App')).not.toBeChecked();
+    fireEvent.click(checkboxFor('myapp.local'));
+    expect(checkboxFor('myapp.local')).not.toBeChecked();
     expect(checkboxFor('api.local')).toBeChecked();
   });
 
   it('unchecks select-all once any single mapping is deselected', () => {
     renderExportModal();
-    fireEvent.click(checkboxFor('myapp.local — My App'));
+    fireEvent.click(checkboxFor('myapp.local'));
     const [selectAll] = screen.getAllByRole('checkbox');
     expect(selectAll).not.toBeChecked();
   });

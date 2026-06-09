@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     remove: (id) => ipcRenderer.invoke('mappings:remove', id),
     toggle: (id) => ipcRenderer.invoke('mappings:toggle', id),
     update: (id, data) => ipcRenderer.invoke('mappings:update', id, data),
+    setGroupEnabled: (ids, enabled) => ipcRenderer.invoke('mappings:setGroupEnabled', ids, enabled),
     export: (ids) => ipcRenderer.invoke('mappings:export', ids),
     import: () => ipcRenderer.invoke('mappings:import'),
   },
