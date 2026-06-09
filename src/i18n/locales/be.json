@@ -99,7 +99,7 @@
   "form.optional": "(неабавязковы)",
   "form.subdomainPlaceholder": "api",
   "form.domainPlaceholder": "myapp",
-  "form.domainHint": "Субдамен неабавязковы.",
+  "form.domainHint": "Субдамен неабавязковы. Увядзіце * для супастаўлення ўсіх субдаменаў (напр., *.myapp.local адпавядае api.myapp.local).",
   "form.domainError": "Увядзіце сапраўднае даменнае імя.",
   "form.domainErrorInvalid": "Увядзіце сапраўднае даменнае імя (літары, лічбы, падкрэсліванні).",
   "form.subdomainError": "Субдамен павінен змяшчаць толькі літары, лічбы і падкрэсліванні.",

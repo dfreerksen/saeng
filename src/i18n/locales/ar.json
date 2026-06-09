@@ -99,7 +99,7 @@
   "form.optional": "(اختياري)",
   "form.subdomainPlaceholder": "api",
   "form.domainPlaceholder": "myapp",
-  "form.domainHint": "النطاق الفرعي اختياري.",
+  "form.domainHint": "النطاق الفرعي اختياري. أدخل * لمطابقة جميع النطاقات الفرعية (مثال: *.myapp.local تطابق api.myapp.local).",
   "form.domainError": "يرجى إدخال اسم نطاق صالح.",
   "form.domainErrorInvalid": "أدخل اسم نطاق صالحاً (أحرف، أرقام، واصلات).",
   "form.subdomainError": "يجب أن يحتوي النطاق الفرعي على أحرف وأرقام وواصلات فقط.",

@@ -99,7 +99,7 @@
   "form.optional": "(tùy chọn)",
   "form.subdomainPlaceholder": "api",
   "form.domainPlaceholder": "myapp",
-  "form.domainHint": "Tên miền phụ là tùy chọn.",
+  "form.domainHint": "Tên miền phụ là tùy chọn. Nhập * để khớp với tất cả tên miền phụ (ví dụ: *.myapp.local khớp với api.myapp.local).",
   "form.domainError": "Vui lòng nhập một tên miền hợp lệ.",
   "form.domainErrorInvalid": "Nhập tên miền hợp lệ (chữ cái, số, dấu gạch ngang).",
   "form.subdomainError": "Tên miền phụ chỉ được chứa chữ cái, số và dấu gạch ngang.",

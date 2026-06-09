@@ -99,7 +99,7 @@
   "form.optional": "(facultatif)",
   "form.subdomainPlaceholder": "api",
   "form.domainPlaceholder": "myapp",
-  "form.domainHint": "Le sous-domaine est facultatif.",
+  "form.domainHint": "Le sous-domaine est facultatif. Saisissez * pour correspondre à tous les sous-domaines (p. ex. *.myapp.local correspond à api.myapp.local).",
   "form.domainError": "Veuillez saisir un nom de domaine valide.",
   "form.domainErrorInvalid": "Saisissez un nom de domaine valide (lettres, chiffres, tirets).",
   "form.subdomainError": "Le sous-domaine ne doit contenir que des lettres, des chiffres et des tirets.",

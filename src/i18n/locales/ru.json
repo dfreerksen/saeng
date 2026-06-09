@@ -99,7 +99,7 @@
   "form.optional": "(необязательный)",
   "form.subdomainPlaceholder": "api",
   "form.domainPlaceholder": "myapp",
-  "form.domainHint": "Субдомен не является обязательным.",
+  "form.domainHint": "Субдомен не является обязательным. Введите * для соответствия всем поддоменам (напр., *.myapp.local соответствует api.myapp.local).",
   "form.domainError": "Пожалуйста, введите действительное доменное имя.",
   "form.domainErrorInvalid": "Введите действительное доменное имя (буквы, числа, дефисы).",
   "form.subdomainError": "Субдомен должен содержать только буквы, числа и дефисы.",

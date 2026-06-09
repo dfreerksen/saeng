@@ -22,7 +22,7 @@ class PacServer {
     }
 
     const conditions = enabledDomains
-      .map((d) => `host === "${d}"`)
+      .map((d) => (d.startsWith('*.') ? `shExpMatch(host, "${d}")` : `host === "${d}"`))
       .join(' ||\n    ');
 
     return `function FindProxyForURL(url, host) {

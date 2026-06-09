@@ -37,7 +37,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
     if (!trimDomain || !validateDomainPart(trimDomain)) {
       setDomainError(t('form.domainErrorInvalid'));
       valid = false;
-    } else if (trimSubdomain && !validateDomainPart(trimSubdomain)) {
+    } else if (trimSubdomain && trimSubdomain !== '*' && !validateDomainPart(trimSubdomain)) {
       setDomainError(t('form.subdomainError'));
       valid = false;
     }

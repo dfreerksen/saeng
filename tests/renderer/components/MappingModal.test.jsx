@@ -287,6 +287,21 @@ describe('MappingModal — successful submit', () => {
     });
   });
 
+  it('calls onSubmit with a wildcard domain when subdomain is *', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderAddModal({ onSubmit });
+    const subdomainInput = container.querySelectorAll('.form-input')[0];
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(subdomainInput, { target: { value: '*' } });
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    fireEvent.click(screen.getByText('modal.addSubmit'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ domain: '*.myapp.local' })
+      );
+    });
+  });
+
   it('calls onSubmit with the correct port', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined);
     const { container } = renderAddModal({ onSubmit });

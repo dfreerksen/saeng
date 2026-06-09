@@ -99,7 +99,7 @@
   "form.optional": "(ไม่จำเป็น)",
   "form.subdomainPlaceholder": "api",
   "form.domainPlaceholder": "myapp",
-  "form.domainHint": "โดเมนย่อยเป็นทางเลือก",
+  "form.domainHint": "โดเมนย่อยเป็นทางเลือก ป้อน * เพื่อจับคู่โดเมนย่อยทั้งหมด (เช่น *.myapp.local จะจับคู่กับ api.myapp.local)",
   "form.domainError": "กรุณากรอกชื่อโดเมนที่ถูกต้อง",
   "form.domainErrorInvalid": "ป้อนชื่อโดเมนที่ถูกต้อง (ตัวอักษร ตัวเลข ขีดกลาง)",
   "form.subdomainError": "โดเมนย่อยต้องมีเฉพาะตัวอักษร ตัวเลข และขีดกลางเท่านั้น",

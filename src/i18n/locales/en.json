@@ -100,7 +100,7 @@
   "form.optional": "(optional)",
   "form.subdomainPlaceholder": "api",
   "form.domainPlaceholder": "myapp",
-  "form.domainHint": "Subdomain is optional.",
+  "form.domainHint": "Subdomain is optional. Enter * to match all subdomains (e.g. *.myapp.local matches api.myapp.local).",
   "form.domainError": "Please enter a valid domain name.",
   "form.domainErrorInvalid": "Enter a valid domain name (letters, numbers, hyphens).",
   "form.subdomainError": "Subdomain must contain only letters, numbers, and hyphens.",

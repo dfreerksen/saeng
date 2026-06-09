@@ -89,6 +89,45 @@ describe('HttpProxy.findMapping()', () => {
     expect(proxy.findMapping('MYAPP.LOCAL')).toBeDefined();
     expect(proxy.findMapping('MyApp.Local')).toBeDefined();
   });
+
+  it('matches a subdomain against a wildcard mapping', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{ domain: '*.myapp.local', port: 3000, enabled: true }]);
+    expect(proxy.findMapping('api.myapp.local')).toMatchObject({ port: 3000 });
+    expect(proxy.findMapping('a.b.myapp.local')).toMatchObject({ port: 3000 });
+  });
+
+  it('does not match the bare base domain against a wildcard mapping', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{ domain: '*.myapp.local', port: 3000, enabled: true }]);
+    expect(proxy.findMapping('myapp.local')).toBeUndefined();
+  });
+
+  it('prefers an exact mapping over an overlapping wildcard mapping', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([
+      { domain: '*.myapp.local', port: 3000, enabled: true },
+      { domain: 'api.myapp.local', port: 4000, enabled: true },
+    ]);
+    expect(proxy.findMapping('api.myapp.local')).toMatchObject({ port: 4000 });
+    expect(proxy.findMapping('admin.myapp.local')).toMatchObject({ port: 3000 });
+  });
+
+  it('prefers the more specific wildcard when wildcards overlap', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([
+      { domain: '*.myapp.local', port: 3000, enabled: true },
+      { domain: '*.api.myapp.local', port: 5000, enabled: true },
+    ]);
+    expect(proxy.findMapping('v1.api.myapp.local')).toMatchObject({ port: 5000 });
+    expect(proxy.findMapping('admin.myapp.local')).toMatchObject({ port: 3000 });
+  });
+
+  it('is case-insensitive for wildcard mappings', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{ domain: '*.myapp.local', port: 3000, enabled: true }]);
+    expect(proxy.findMapping('API.MYAPP.LOCAL')).toBeDefined();
+  });
 });
 
 describe('HttpProxy.getPort()', () => {

@@ -99,7 +99,7 @@
   "form.optional": "（选填）",
   "form.subdomainPlaceholder": "api",
   "form.domainPlaceholder": "myapp",
-  "form.domainHint": "子域名为选填项。",
+  "form.domainHint": "子域名为选填项。输入 * 可匹配所有子域名（例如 *.myapp.local 匹配 api.myapp.local）。",
   "form.domainError": "请输入有效的域名。",
   "form.domainErrorInvalid": "请输入有效的域名（仅限字母、数字和连字符）。",
   "form.subdomainError": "子域名只能包含字母、数字和连字符。",

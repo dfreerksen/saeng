@@ -8,6 +8,7 @@ class HttpProxy {
     this.certManager = certManager;
     this.requestLog = requestLog;
     this.mappings = new Map();
+    this.wildcards = [];
     this.httpServer = null;
     this.internalHttpsServer = null;
     this.internalHttpsPort = null;
@@ -15,13 +16,26 @@ class HttpProxy {
   }
 
   updateMappings(mappings) {
+    const enabled = mappings.filter((m) => m.enabled);
     this.mappings = new Map(
-      mappings.filter((m) => m.enabled).map((m) => [m.domain, m])
+      enabled.filter((m) => !m.domain.startsWith('*.')).map((m) => [m.domain, m])
     );
+    this.wildcards = enabled
+      .filter((m) => m.domain.startsWith('*.'))
+      .map((m) => ({ base: m.domain.slice(2), mapping: m }))
+      .sort((a, b) => b.base.length - a.base.length);
   }
 
   findMapping(hostname) {
-    return this.mappings.get(hostname.toLowerCase());
+    const lower = hostname.toLowerCase();
+
+    const exact = this.mappings.get(lower);
+    if (exact) return exact;
+
+    const wildcard = this.wildcards.find(
+      ({ base }) => lower !== base && lower.endsWith(`.${base}`)
+    );
+    return wildcard?.mapping;
   }
 
   async start(mappings, settings) {

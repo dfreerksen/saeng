@@ -99,7 +99,7 @@
   "form.optional": "(任意)",
   "form.subdomainPlaceholder": "api",
   "form.domainPlaceholder": "myapp",
-  "form.domainHint": "サブドメインは任意です。",
+  "form.domainHint": "サブドメインは任意です。* を入力するとすべてのサブドメインに一致します（例: *.myapp.local は api.myapp.local に一致します）。",
   "form.domainError": "有効なドメイン名を入力してください。",
   "form.domainErrorInvalid": "有効なドメイン名（英数字、ハイフン）を入力してください。",
   "form.subdomainError": "サブドメインには英数字とハイフンのみ使用できます。",

@@ -99,7 +99,7 @@
   "form.optional": "(선택 사항)",
   "form.subdomainPlaceholder": "api",
   "form.domainPlaceholder": "myapp",
-  "form.domainHint": "서브도메인은 선택 사항입니다.",
+  "form.domainHint": "서브도메인은 선택 사항입니다. *를 입력하면 모든 서브도메인과 일치합니다 (예: *.myapp.local은 api.myapp.local과 일치).",
   "form.domainError": "유효한 도메인 이름을 입력해 주세요.",
   "form.domainErrorInvalid": "유효한 도메인 이름(문자, 숫자, 하이픈)을 입력하세요.",
   "form.subdomainError": "서브도메인에는 문자, 숫자, 하이픈만 포함될 수 있습니다.",

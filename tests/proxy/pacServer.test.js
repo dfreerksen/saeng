@@ -44,12 +44,29 @@ describe('PacServer._generatePAC()', () => {
     expect(pac).not.toContain('skipped.local');
   });
 
-  it('uses exact hostname equality (no wildcards)', () => {
+  it('uses exact hostname equality for non-wildcard domains', () => {
     server.mappings = [{ domain: 'myapp.local', enabled: true }];
     const pac = server._generatePAC();
     expect(pac).toMatch(/host === "myapp\.local"/);
     expect(pac).not.toContain('shExpMatch');
     expect(pac).not.toContain('*');
+  });
+
+  it('uses shExpMatch for wildcard subdomain domains', () => {
+    server.mappings = [{ domain: '*.myapp.local', enabled: true }];
+    const pac = server._generatePAC();
+    expect(pac).toContain('shExpMatch(host, "*.myapp.local")');
+    expect(pac).not.toContain('host === "*.myapp.local"');
+  });
+
+  it('mixes exact and wildcard conditions for a combination of mappings', () => {
+    server.mappings = [
+      { domain: 'myapp.local', enabled: true },
+      { domain: '*.api.local', enabled: true },
+    ];
+    const pac = server._generatePAC();
+    expect(pac).toContain('host === "myapp.local"');
+    expect(pac).toContain('shExpMatch(host, "*.api.local")');
   });
 
   it('reflects the current proxyPort in the PAC output', () => {

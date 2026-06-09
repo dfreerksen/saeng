@@ -99,7 +99,7 @@
   "form.optional": "(по избор)",
   "form.subdomainPlaceholder": "api",
   "form.domainPlaceholder": "myapp",
-  "form.domainHint": "Поддомейнът е по избор.",
+  "form.domainHint": "Поддомейнът е по избор. Въведете * за съвпадение с всички поддомейни (напр. *.myapp.local съответства на api.myapp.local).",
   "form.domainError": "Моля, въведете валидно име на домейн.",
   "form.domainErrorInvalid": "Въведете валидно име на домейн (букви, цифри, тирета).",
   "form.subdomainError": "Поддомейнът трябва да съдържа само букви, числа и тирета.",

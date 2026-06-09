@@ -99,7 +99,7 @@
   "form.optional": "(opcional)",
   "form.subdomainPlaceholder": "api",
   "form.domainPlaceholder": "myapp",
-  "form.domainHint": "El subdominio es opcional.",
+  "form.domainHint": "El subdominio es opcional. Introduce * para coincidir con todos los subdominios (p. ej., *.myapp.local coincide con api.myapp.local).",
   "form.domainError": "Por favor ingrese un nombre de dominio válido.",
   "form.domainErrorInvalid": "Ingrese un nombre de dominio válido (letras, números, guiones).",
   "form.subdomainError": "El subdominio debe contener únicamente letras, números y guiones.",
