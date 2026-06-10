@@ -1,10 +1,14 @@
 # Saeng
 
-Local domain proxy manager for local development domains. Saeng means "light," "radiance," or "glow" in Thai.
+Local domain proxy manager for local development domains.
 
 Saeng routes local defined domains to localhost ports using a PAC (Proxy Auto-Config) file — no `/etc/hosts` edits, no elevated port binding, no `sudo`. Add a mapping, start the proxy, and `http://myapp.local` goes straight to your local server.
 
 Saeng works on macOS, Windows, and Linux
+
+Saeng means "light," "radiance," or "glow" in Thai.
+
+![Saeng](./screenshot.png "Saeng")
 
 ## Features
 
@@ -14,6 +18,7 @@ Saeng works on macOS, Windows, and Linux
 * WebSocket pass-through
 * Start proxy automatically on launch
 * System tray integration on macOS, Windows, and Linux
+* Optional backend health checks with live status indicators per mapping
 
 ## How it works
 
@@ -32,6 +37,10 @@ HTTPS works by intercepting `CONNECT` tunnel requests and terminating TLS using 
 4. Enable the **HTTPS** toggle on any mapping whose backend speaks HTTPS.
 
 > The HTTPS toggle on a mapping controls whether Saeng connects to the *backend* using HTTPS — not whether the local domain is served over HTTPS. Global HTTPS must be enabled in Settings for the browser-to-proxy leg to use TLS.
+
+## Health checks
+
+Enable **Backend health checks** in Settings to have Saeng periodically ping each enabled mapping's `host:port` while the proxy is running. A status dot next to each domain in the mappings table shows whether the backend is reachable, with a tooltip showing the latency or error. The check interval and timeout are configurable in Settings.
 
 ## Requirements
 
