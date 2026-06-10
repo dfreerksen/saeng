@@ -70,12 +70,13 @@ The renderer is a **React 19** app bundled by **esbuild**. SCSS is compiled by *
 | `mappings:export/import` | Export/import mappings to/from a JSON file via native save/open dialogs |
 | `proxy:start/stop/status` | Control and query proxy state |
 | `requestLog:list/clear` | Read/clear the in-memory request log |
+| `health:list` | Read current backend health-check statuses, keyed by mapping id |
 | `settings:get/set` | Read/write persistent settings |
 | `ssl:get-ca-expiry/regenerate-ca/delete-ca/get-ca-path/reveal-ca/trust-ca` | CA cert management |
 | `app:get-info/open-external` | App metadata, open URL in browser |
 | `i18n:get-strings/get-locales/set-locale` | Internationalisation |
 
-The main process also pushes `proxy:status` events to the renderer when proxy state changes (from the tray menu).
+The main process also pushes `proxy:status` events to the renderer when proxy state changes (from the tray menu), and `health:update` events whenever a backend health check completes.
 
 ### HTTPS / SSL
 
@@ -93,7 +94,7 @@ Mapping shape:
 ```
 `host` is the backend hostname to proxy to (defaults to `127.0.0.1`). It is used for all connection types: plain HTTP, HTTPS CONNECT tunnels, and WebSocket upgrades. `https` on a mapping means the **backend** expects HTTPS — it does not control whether the frontend domain is served over HTTPS (that is the global `settings.httpsEnabled` toggle).
 
-Settings defaults: `{ httpsEnabled: true, startOnLaunch: true, colorMode: 'auto', locale: 'en', logMaxEntries: DEFAULT_LOG_MAX_ENTRIES, loggingEnabled: true }`.
+Settings defaults: `{ httpsEnabled: true, startOnLaunch: true, colorMode: 'auto', locale: 'en', logMaxEntries: DEFAULT_LOG_MAX_ENTRIES, loggingEnabled: true, healthCheckEnabled: false, healthCheckIntervalMs: DEFAULT_INTERVAL_MS, healthCheckTimeoutMs: DEFAULT_TIMEOUT_MS }`. `healthCheckIntervalMs` (1 min default, clamped 5s-300s) and `healthCheckTimeoutMs` (2s default, clamped 500ms-30s) come from `src/proxy/healthChecker.js`'s exported defaults and are clamped in `setSettings()`.
 
 `store.exportMappings(ids)` / `store.importMappings(list)` back the `mappings:export`/`mappings:import` IPC handlers — export writes `{ mappings: [...] }` JSON via a save dialog, import reads a file (accepting either a bare array or `{ mappings: [...] }`), skipping mappings that already exist.
 
@@ -103,13 +104,19 @@ Settings defaults: `{ httpsEnabled: true, startOnLaunch: true, colorMode: 'auto'
 
 ### Live mapping updates
 
-Adding, removing, toggling, or editing a mapping while the proxy is running calls `ProxyManager.updateMappings()`, which pushes the change live to both `httpProxy` and `pacServer` — no proxy restart required.
+Adding, removing, toggling, or editing a mapping always calls `ProxyManager.updateMappings()`. While the proxy is running this pushes the change live to both `httpProxy` and `pacServer` — no proxy restart required. It also always forwards the new mapping list to `healthChecker.updateMappings()`, even when the proxy is stopped, so health-check state stays in sync.
+
+### Health checks
+
+`HealthChecker` (`src/proxy/healthChecker.js`) lives on `ProxyManager` and, when `settings.healthCheckEnabled` is true and the proxy is running (`setProxyRunning()`), periodically opens a raw TCP connection (`net.connect`) to each enabled mapping's `host:port` on a `setInterval` of `settings.healthCheckIntervalMs`, timing out after `settings.healthCheckTimeoutMs`. Each check produces `{ id, status: 'up' | 'down', latencyMs, checkedAt, error }`, stored in an in-memory map and emitted to a listener (mirroring `RequestLog`'s pattern). Newly-enabled mappings are checked immediately rather than waiting for the next tick.
+
+`main.js` wires `healthChecker.setListener()` to push `health:update` events to the renderer, exposes the current map via `health:list`, and starts the checker (`healthChecker.start(mappings)`) on `app.whenReady` regardless of `startOnLaunch`. `settings:set` calls `setEnabled`/`setIntervalMs`/`setTimeoutMs` on the checker when those keys change. The renderer's `MappingsView.jsx` shows a colored status dot with a tooltip next to each domain when `settings.healthCheckEnabled` is true and the mapping is enabled and the proxy is running.
 
 ### Startup / shutdown
 
-On `app.whenReady`: clears any leftover system proxy pointing at our PAC URL (avoiding stomping VPN-managed settings on other interfaces), pre-warms the CA cert, then optionally auto-starts if `settings.startOnLaunch` is true.
+On `app.whenReady`: clears any leftover system proxy pointing at our PAC URL (avoiding stomping VPN-managed settings on other interfaces), pre-warms the CA cert, creates the window/tray, starts the health checker, then optionally auto-starts the proxy if `settings.startOnLaunch` is true.
 
-On `app.before-quit`: tears down the proxy (which calls `clearSystemProxy`) before exit. On macOS and Windows, closing the window hides it rather than quitting; the tray keeps the app alive. On Linux, closing the window quits.
+On `app.before-quit`: stops the health checker and tears down the proxy (which calls `clearSystemProxy`) before exit. On macOS and Windows, closing the window hides it rather than quitting; the tray keeps the app alive. On Linux, closing the window quits.
 
 ### Internationalisation
 
