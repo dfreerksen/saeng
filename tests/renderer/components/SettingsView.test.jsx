@@ -178,6 +178,17 @@ describe('SettingsView — proxy toggles', () => {
     fireEvent.click(startToggle);
     expect(onSettingsChange).toHaveBeenCalledWith({ startOnLaunch: true });
   });
+
+  it('shows a toast after toggling startOnLaunch', async () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const showToast = vi.fn();
+    const { container } = renderSettingsView({ onSettingsChange, showToast });
+    const startToggle = container.querySelectorAll('.toggle input[type="checkbox"]')[1];
+    fireEvent.click(startToggle);
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith('toast.settingsUpdated', 'info');
+    });
+  });
 });
 
 describe('SettingsView — logging enabled', () => {
@@ -232,6 +243,26 @@ describe('SettingsView — log max entries', () => {
     expect(onSettingsChange).toHaveBeenCalledWith({ logMaxEntries: 5000 });
   });
 
+  it('shows a toast after committing a changed value', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const showToast = vi.fn();
+    const { container } = renderSettingsView({ onSettingsChange, showToast, settings: { ...SAMPLE_SETTINGS, logMaxEntries: 300 } });
+    const input = container.querySelector('.log-max-entries-input');
+    fireEvent.change(input, { target: { value: '5000' } });
+    fireEvent.blur(input);
+    expect(showToast).toHaveBeenCalledWith('toast.settingsUpdated', 'info');
+  });
+
+  it('does not show a toast when the value is unchanged on blur', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const showToast = vi.fn();
+    const { container } = renderSettingsView({ onSettingsChange, showToast, settings: { ...SAMPLE_SETTINGS, logMaxEntries: 300 } });
+    const input = container.querySelector('.log-max-entries-input');
+    fireEvent.blur(input);
+    expect(onSettingsChange).not.toHaveBeenCalled();
+    expect(showToast).not.toHaveBeenCalled();
+  });
+
   it('clamps values below the minimum to 100 on blur', () => {
     const onSettingsChange = vi.fn().mockResolvedValue(undefined);
     const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, logMaxEntries: 300 } });
@@ -268,6 +299,187 @@ describe('SettingsView — log max entries', () => {
     const input = container.querySelector('.log-max-entries-input');
     fireEvent.blur(input);
     expect(onSettingsChange).not.toHaveBeenCalled();
+  });
+});
+
+describe('SettingsView — health check enabled', () => {
+  it('unchecks the toggle when healthCheckEnabled is not set', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    expect(toggles[3]).not.toBeChecked();
+  });
+
+  it('checks the toggle when healthCheckEnabled is true', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    expect(toggles[3]).toBeChecked();
+  });
+
+  it('calls onSettingsChange when the toggle is changed', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: false } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    fireEvent.click(toggles[3]);
+    expect(onSettingsChange).toHaveBeenCalledWith({ healthCheckEnabled: true });
+  });
+
+  it('hides the interval and timeout inputs when disabled', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: false } });
+    expect(container.querySelector('.health-check-interval-input')).not.toBeInTheDocument();
+    expect(container.querySelector('.health-check-timeout-input')).not.toBeInTheDocument();
+  });
+
+  it('shows the interval and timeout inputs when enabled', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true } });
+    expect(container.querySelector('.health-check-interval-input')).toBeInTheDocument();
+    expect(container.querySelector('.health-check-timeout-input')).toBeInTheDocument();
+  });
+});
+
+describe('SettingsView — health check interval', () => {
+  it('renders the interval in seconds, converted from milliseconds', () => {
+    const { container } = renderSettingsView({
+      settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true, healthCheckIntervalMs: 30000 },
+    });
+    expect(container.querySelector('.health-check-interval-input').value).toBe('30');
+  });
+
+  it('defaults to 15 seconds when healthCheckIntervalMs is not set', () => {
+    const { container } = renderSettingsView({
+      settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true, healthCheckIntervalMs: undefined },
+    });
+    expect(container.querySelector('.health-check-interval-input').value).toBe('15');
+  });
+
+  it('commits the value on blur, converting seconds to milliseconds', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({
+      onSettingsChange,
+      settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true, healthCheckIntervalMs: 15000 },
+    });
+    const input = container.querySelector('.health-check-interval-input');
+    fireEvent.change(input, { target: { value: '60' } });
+    fireEvent.blur(input);
+    expect(onSettingsChange).toHaveBeenCalledWith({ healthCheckIntervalMs: 60000 });
+  });
+
+  it('clamps values below the minimum to 5 seconds on blur', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({
+      onSettingsChange,
+      settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true, healthCheckIntervalMs: 15000 },
+    });
+    const input = container.querySelector('.health-check-interval-input');
+    fireEvent.change(input, { target: { value: '1' } });
+    fireEvent.blur(input);
+    expect(input.value).toBe('5');
+    expect(onSettingsChange).toHaveBeenCalledWith({ healthCheckIntervalMs: 5000 });
+  });
+
+  it('clamps values above the maximum to 300 seconds on blur', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({
+      onSettingsChange,
+      settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true, healthCheckIntervalMs: 15000 },
+    });
+    const input = container.querySelector('.health-check-interval-input');
+    fireEvent.change(input, { target: { value: '9999' } });
+    fireEvent.blur(input);
+    expect(input.value).toBe('300');
+    expect(onSettingsChange).toHaveBeenCalledWith({ healthCheckIntervalMs: 300000 });
+  });
+
+  it('does not call onSettingsChange when the value is unchanged after clamping', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({
+      onSettingsChange,
+      settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true, healthCheckIntervalMs: 15000 },
+    });
+    const input = container.querySelector('.health-check-interval-input');
+    fireEvent.blur(input);
+    expect(onSettingsChange).not.toHaveBeenCalled();
+  });
+
+  it('shows a toast after committing a changed value', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const showToast = vi.fn();
+    const { container } = renderSettingsView({
+      onSettingsChange,
+      showToast,
+      settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true, healthCheckIntervalMs: 15000 },
+    });
+    const input = container.querySelector('.health-check-interval-input');
+    fireEvent.change(input, { target: { value: '60' } });
+    fireEvent.blur(input);
+    expect(showToast).toHaveBeenCalledWith('toast.settingsUpdated', 'info');
+  });
+});
+
+describe('SettingsView — health check timeout', () => {
+  it('renders the timeout in milliseconds', () => {
+    const { container } = renderSettingsView({
+      settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true, healthCheckTimeoutMs: 3000 },
+    });
+    expect(container.querySelector('.health-check-timeout-input').value).toBe('3000');
+  });
+
+  it('defaults to 2000ms when healthCheckTimeoutMs is not set', () => {
+    const { container } = renderSettingsView({
+      settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true, healthCheckTimeoutMs: undefined },
+    });
+    expect(container.querySelector('.health-check-timeout-input').value).toBe('2000');
+  });
+
+  it('commits the value on blur', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({
+      onSettingsChange,
+      settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true, healthCheckTimeoutMs: 2000 },
+    });
+    const input = container.querySelector('.health-check-timeout-input');
+    fireEvent.change(input, { target: { value: '5000' } });
+    fireEvent.blur(input);
+    expect(onSettingsChange).toHaveBeenCalledWith({ healthCheckTimeoutMs: 5000 });
+  });
+
+  it('clamps values below the minimum to 500ms on blur', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({
+      onSettingsChange,
+      settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true, healthCheckTimeoutMs: 2000 },
+    });
+    const input = container.querySelector('.health-check-timeout-input');
+    fireEvent.change(input, { target: { value: '10' } });
+    fireEvent.blur(input);
+    expect(input.value).toBe('500');
+    expect(onSettingsChange).toHaveBeenCalledWith({ healthCheckTimeoutMs: 500 });
+  });
+
+  it('clamps values above the maximum to 30000ms on blur', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({
+      onSettingsChange,
+      settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true, healthCheckTimeoutMs: 2000 },
+    });
+    const input = container.querySelector('.health-check-timeout-input');
+    fireEvent.change(input, { target: { value: '999999' } });
+    fireEvent.blur(input);
+    expect(input.value).toBe('30000');
+    expect(onSettingsChange).toHaveBeenCalledWith({ healthCheckTimeoutMs: 30000 });
+  });
+
+  it('shows a toast after committing a changed value', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const showToast = vi.fn();
+    const { container } = renderSettingsView({
+      onSettingsChange,
+      showToast,
+      settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true, healthCheckTimeoutMs: 2000 },
+    });
+    const input = container.querySelector('.health-check-timeout-input');
+    fireEvent.change(input, { target: { value: '5000' } });
+    fireEvent.blur(input);
+    expect(showToast).toHaveBeenCalledWith('toast.settingsUpdated', 'info');
   });
 });
 

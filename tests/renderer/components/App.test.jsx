@@ -41,8 +41,13 @@ function makeElectronAPI(overrides = {}) {
       onEntry: vi.fn(),
       ...overrides.requestLog,
     },
+    health: {
+      list: vi.fn().mockResolvedValue({}),
+      onUpdate: vi.fn(),
+      ...overrides.health,
+    },
     settings: {
-      get: vi.fn().mockResolvedValue({ httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en' }),
+      get: vi.fn().mockResolvedValue({ httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en', healthCheckEnabled: true }),
       set: vi.fn().mockResolvedValue(undefined),
       ...overrides.settings,
     },
@@ -161,6 +166,37 @@ describe('App — navigation', () => {
   });
 });
 
+describe('App — settings toasts', () => {
+  it('shows a toast after changing the color mode', async () => {
+    await renderApp();
+    fireEvent.click(screen.getByText('nav.settings').closest('button'));
+    const select = document.querySelector('.color-mode-select');
+    fireEvent.change(select, { target: { value: 'dark' } });
+    await waitFor(() => {
+      expect(window.electronAPI.settings.set).toHaveBeenCalledWith({ colorMode: 'dark' });
+      expect(screen.getByText('toast.settingsUpdated')).toBeInTheDocument();
+    });
+  });
+
+  it('shows a toast after changing the language', async () => {
+    await renderApp({
+      i18n: {
+        getLocales: vi.fn().mockResolvedValue([
+          { code: 'en', name: 'English', dir: 'ltr' },
+          { code: 'fr', name: 'Français', dir: 'ltr' },
+        ]),
+      },
+    });
+    fireEvent.click(screen.getByText('nav.settings').closest('button'));
+    const select = document.querySelector('.locale-select');
+    fireEvent.change(select, { target: { value: 'fr' } });
+    await waitFor(() => {
+      expect(window.electronAPI.settings.set).toHaveBeenCalledWith({ locale: 'fr' });
+      expect(screen.getByText('Settings have been updated.')).toBeInTheDocument();
+    });
+  });
+});
+
 describe('App — request log', () => {
   it('loads request log entries on init', async () => {
     const entries = [{ id: '1', timestamp: 1700000000000, method: 'GET', hostname: 'myapp.local', path: '/', status: 200, latencyMs: 10, https: false }];
@@ -231,6 +267,57 @@ describe('App — request log', () => {
       expect(clear).toHaveBeenCalledOnce();
       expect(screen.queryByText('myapp.local')).not.toBeInTheDocument();
     });
+  });
+});
+
+describe('App — health checks', () => {
+  const sampleMappings = [{ id: '1', domain: 'myapp.local', port: 3000, https: false, enabled: true }];
+
+  it('loads health statuses on init and reflects them in the mappings table', async () => {
+    const healthList = { 1: { id: '1', status: 'up', latencyMs: 5, error: null } };
+    await renderApp({
+      mappings: { list: vi.fn().mockResolvedValue(sampleMappings) },
+      health: { list: vi.fn().mockResolvedValue(healthList) },
+      proxy: { status: vi.fn().mockResolvedValue({ running: true }) },
+    });
+    expect(window.electronAPI.health.list).toHaveBeenCalled();
+    expect(document.querySelector('.health-dot')).toHaveClass('up');
+  });
+
+  it('shows an unknown status dot before any health result arrives', async () => {
+    await renderApp({ mappings: { list: vi.fn().mockResolvedValue(sampleMappings) } });
+    expect(document.querySelector('.health-dot')).toHaveClass('unknown');
+  });
+
+  it('shows an unknown status dot when the proxy is stopped, even with a stale health status', async () => {
+    const healthList = { 1: { id: '1', status: 'up', latencyMs: 5, error: null } };
+    await renderApp({
+      mappings: { list: vi.fn().mockResolvedValue(sampleMappings) },
+      health: { list: vi.fn().mockResolvedValue(healthList) },
+      proxy: { status: vi.fn().mockResolvedValue({ running: false }) },
+    });
+    expect(document.querySelector('.health-dot')).toHaveClass('unknown');
+  });
+
+  it('registers a health update listener', async () => {
+    await renderApp();
+    expect(window.electronAPI.health.onUpdate).toHaveBeenCalledOnce();
+  });
+
+  it('applies incoming health updates pushed via onUpdate', async () => {
+    let pushUpdate;
+    await renderApp({
+      mappings: { list: vi.fn().mockResolvedValue(sampleMappings) },
+      health: { onUpdate: vi.fn((cb) => { pushUpdate = cb; }) },
+      proxy: { status: vi.fn().mockResolvedValue({ running: true }) },
+    });
+    expect(document.querySelector('.health-dot')).toHaveClass('unknown');
+
+    act(() => {
+      pushUpdate({ id: '1', status: 'down', latencyMs: 2000, error: 'timeout' });
+    });
+
+    expect(document.querySelector('.health-dot')).toHaveClass('down');
   });
 });
 

@@ -26,6 +26,27 @@
   color: var(--saeng-accent);
 }
 
+.health-dot {
+  border-radius: 50%;
+  display: inline-block;
+  height: 7px;
+  margin-right: 6px;
+  width: 7px;
+
+  &.up {
+    background: var(--bs-success);
+    box-shadow: 0 0 6px var(--bs-success);
+  }
+
+  &.down {
+    background: var(--bs-danger);
+  }
+
+  &.unknown {
+    background: var(--saeng-text-muted);
+  }
+}
+
 .port-cell {
   color: var(--saeng-primary-complement-color);
 }

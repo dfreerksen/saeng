@@ -24,6 +24,7 @@ export default function App() {
   const [proxyRunning, setProxyRunning] = useState(false);
   const [mappings, setMappings] = useState([]);
   const [requestLog, setRequestLog] = useState([]);
+  const [healthStatuses, setHealthStatuses] = useState({});
   const [settings, setSettingsState] = useState({});
   const [locales, setLocales] = useState([]);
   const [currentView, setCurrentView] = useState('mappings');
@@ -72,10 +73,11 @@ export default function App() {
       const strings = await window.electronAPI.i18n.getStrings();
       setI18nStrings(strings);
 
-      const [status, mList, logEntries, appInfo, caPathVal, caExpiryVal, settingsData, localeList] = await Promise.all([
+      const [status, mList, logEntries, healthList, appInfo, caPathVal, caExpiryVal, settingsData, localeList] = await Promise.all([
         window.electronAPI.proxy.status(),
         window.electronAPI.mappings.list(),
         window.electronAPI.requestLog.list(),
+        window.electronAPI.health.list(),
         window.electronAPI.app.getInfo(),
         window.electronAPI.ssl.getCAPath(),
         window.electronAPI.ssl.getCAExpiry(),
@@ -86,6 +88,7 @@ export default function App() {
       setProxyRunning(status.running);
       setMappings(mList);
       setRequestLog(logEntries);
+      setHealthStatuses(healthList);
       setAppVersion(appInfo.version);
       setElectronVersion(appInfo.electron);
       setNodeVersion(appInfo.node);
@@ -114,6 +117,10 @@ export default function App() {
         const max = logMaxEntriesRef.current;
         return next.length > max ? next.slice(next.length - max) : next;
       });
+    });
+
+    window.electronAPI.health.onUpdate((result) => {
+      setHealthStatuses((prev) => ({ ...prev, [result.id]: result }));
     });
 
     function handleExternalLinks(e) {
@@ -177,11 +184,13 @@ export default function App() {
     document.documentElement.lang = locale;
     document.documentElement.dir = localeInfo?.dir ?? 'ltr';
     await updateSettings({ locale });
+    showToast(strings['toast.settingsUpdated'] ?? 'Settings have been updated.', 'info');
   }
 
   async function handleColorModeChange(mode) {
     await updateSettings({ colorMode: mode });
     applyColorMode(mode);
+    showToast(t('toast.settingsUpdated'), 'info');
   }
 
   return (
@@ -202,6 +211,8 @@ export default function App() {
             active={currentView === 'mappings'}
             mappings={mappings}
             setMappings={setMappings}
+            healthStatuses={healthStatuses}
+            proxyRunning={proxyRunning}
             settings={settings}
             onAdd={() => setModal({ type: 'add' })}
             onEdit={(mapping) => setModal({ type: 'edit', mapping })}

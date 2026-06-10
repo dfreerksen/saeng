@@ -27,6 +27,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on('requestLog:entry', (_, entry) => callback(entry));
     },
   },
+  health: {
+    list: () => ipcRenderer.invoke('health:list'),
+    onUpdate: (callback) => {
+      ipcRenderer.on('health:update', (_, result) => callback(result));
+    },
+  },
   settings: {
     get: () => ipcRenderer.invoke('settings:get'),
     set: (patch) => ipcRenderer.invoke('settings:set', patch),

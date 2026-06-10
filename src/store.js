@@ -2,10 +2,17 @@ import ElectronStore from 'electron-store';
 import { randomUUID } from 'crypto';
 import path from 'path';
 import { app } from 'electron';
+import { DEFAULT_INTERVAL_MS as DEFAULT_HEALTH_CHECK_INTERVAL_MS, DEFAULT_TIMEOUT_MS as DEFAULT_HEALTH_CHECK_TIMEOUT_MS } from './proxy/healthChecker.js';
 
 const DEFAULT_LOG_MAX_ENTRIES = 300;
 const MIN_LOG_MAX_ENTRIES = 100;
 const MAX_LOG_MAX_ENTRIES = 100000;
+
+const MIN_HEALTH_CHECK_INTERVAL_MS = 5000;
+const MAX_HEALTH_CHECK_INTERVAL_MS = 300000;
+
+const MIN_HEALTH_CHECK_TIMEOUT_MS = 500;
+const MAX_HEALTH_CHECK_TIMEOUT_MS = 30000;
 
 const schema = {
   mappings: {
@@ -33,6 +40,9 @@ const schema = {
       locale: 'en',
       logMaxEntries: DEFAULT_LOG_MAX_ENTRIES,
       loggingEnabled: true,
+      healthCheckEnabled: false,
+      healthCheckIntervalMs: DEFAULT_HEALTH_CHECK_INTERVAL_MS,
+      healthCheckTimeoutMs: DEFAULT_HEALTH_CHECK_TIMEOUT_MS,
     },
   },
 };
@@ -128,7 +138,17 @@ class AppStore {
   }
 
   getSettings() {
-    return this.store.get('settings', { httpsEnabled: false, startOnLaunch: false, colorMode: 'auto', locale: 'en', logMaxEntries: DEFAULT_LOG_MAX_ENTRIES, loggingEnabled: true });
+    return this.store.get('settings', {
+      httpsEnabled: false,
+      startOnLaunch: false,
+      colorMode: 'auto',
+      locale: 'en',
+      logMaxEntries: DEFAULT_LOG_MAX_ENTRIES,
+      loggingEnabled: true,
+      healthCheckEnabled: false,
+      healthCheckIntervalMs: DEFAULT_HEALTH_CHECK_INTERVAL_MS,
+      healthCheckTimeoutMs: DEFAULT_HEALTH_CHECK_TIMEOUT_MS,
+    });
   }
 
   setSettings(patch) {
@@ -139,6 +159,18 @@ class AppStore {
       updated.logMaxEntries = Number.isNaN(parsed)
         ? DEFAULT_LOG_MAX_ENTRIES
         : Math.min(MAX_LOG_MAX_ENTRIES, Math.max(MIN_LOG_MAX_ENTRIES, parsed));
+    }
+    if ('healthCheckIntervalMs' in patch) {
+      const parsed = parseInt(patch.healthCheckIntervalMs, 10);
+      updated.healthCheckIntervalMs = Number.isNaN(parsed)
+        ? DEFAULT_HEALTH_CHECK_INTERVAL_MS
+        : Math.min(MAX_HEALTH_CHECK_INTERVAL_MS, Math.max(MIN_HEALTH_CHECK_INTERVAL_MS, parsed));
+    }
+    if ('healthCheckTimeoutMs' in patch) {
+      const parsed = parseInt(patch.healthCheckTimeoutMs, 10);
+      updated.healthCheckTimeoutMs = Number.isNaN(parsed)
+        ? DEFAULT_HEALTH_CHECK_TIMEOUT_MS
+        : Math.min(MAX_HEALTH_CHECK_TIMEOUT_MS, Math.max(MIN_HEALTH_CHECK_TIMEOUT_MS, parsed));
     }
     this.store.set('settings', updated);
     return updated;

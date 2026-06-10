@@ -345,6 +345,62 @@ describe('AppStore.getSettings() / setSettings()', () => {
     const result = store.setSettings({ httpsEnabled: true });
     expect(result.logMaxEntries).toBe(500);
   });
+
+  it('getSettings() defaults healthCheckEnabled to false', () => {
+    expect(store.getSettings().healthCheckEnabled).toBe(false);
+  });
+
+  it('getSettings() defaults healthCheckIntervalMs to 15000', () => {
+    expect(store.getSettings().healthCheckIntervalMs).toBe(60000);
+  });
+
+  it('getSettings() defaults healthCheckTimeoutMs to 2000', () => {
+    expect(store.getSettings().healthCheckTimeoutMs).toBe(2000);
+  });
+
+  it('setSettings() stores a healthCheckEnabled value', () => {
+    const result = store.setSettings({ healthCheckEnabled: true });
+    expect(result.healthCheckEnabled).toBe(true);
+    expect(store.getSettings().healthCheckEnabled).toBe(true);
+  });
+
+  it('setSettings() stores a valid healthCheckIntervalMs value', () => {
+    const result = store.setSettings({ healthCheckIntervalMs: 30000 });
+    expect(result.healthCheckIntervalMs).toBe(30000);
+    expect(store.getSettings().healthCheckIntervalMs).toBe(30000);
+  });
+
+  it('setSettings() clamps healthCheckIntervalMs below the minimum to 5000', () => {
+    expect(store.setSettings({ healthCheckIntervalMs: 1000 }).healthCheckIntervalMs).toBe(5000);
+    expect(store.setSettings({ healthCheckIntervalMs: 0 }).healthCheckIntervalMs).toBe(5000);
+  });
+
+  it('setSettings() clamps healthCheckIntervalMs above the maximum to 300000', () => {
+    expect(store.setSettings({ healthCheckIntervalMs: 999999 }).healthCheckIntervalMs).toBe(300000);
+  });
+
+  it('setSettings() falls back to the default when healthCheckIntervalMs is not a number', () => {
+    expect(store.setSettings({ healthCheckIntervalMs: 'banana' }).healthCheckIntervalMs).toBe(60000);
+  });
+
+  it('setSettings() stores a valid healthCheckTimeoutMs value', () => {
+    const result = store.setSettings({ healthCheckTimeoutMs: 5000 });
+    expect(result.healthCheckTimeoutMs).toBe(5000);
+    expect(store.getSettings().healthCheckTimeoutMs).toBe(5000);
+  });
+
+  it('setSettings() clamps healthCheckTimeoutMs below the minimum to 500', () => {
+    expect(store.setSettings({ healthCheckTimeoutMs: 100 }).healthCheckTimeoutMs).toBe(500);
+    expect(store.setSettings({ healthCheckTimeoutMs: 0 }).healthCheckTimeoutMs).toBe(500);
+  });
+
+  it('setSettings() clamps healthCheckTimeoutMs above the maximum to 30000', () => {
+    expect(store.setSettings({ healthCheckTimeoutMs: 999999 }).healthCheckTimeoutMs).toBe(30000);
+  });
+
+  it('setSettings() falls back to the default when healthCheckTimeoutMs is not a number', () => {
+    expect(store.setSettings({ healthCheckTimeoutMs: 'banana' }).healthCheckTimeoutMs).toBe(2000);
+  });
 });
 
 describe('AppStore.getCertDir()', () => {

@@ -8,10 +8,31 @@ const LOG_MAX_ENTRIES_MAX = 100000;
 const LOG_MAX_ENTRIES_STEP = 100;
 const LOG_MAX_ENTRIES_DEFAULT = 300;
 
+const HEALTH_CHECK_INTERVAL_MIN_S = 5;
+const HEALTH_CHECK_INTERVAL_MAX_S = 300;
+const HEALTH_CHECK_INTERVAL_DEFAULT_S = 15;
+
+const HEALTH_CHECK_TIMEOUT_MIN_MS = 500;
+const HEALTH_CHECK_TIMEOUT_MAX_MS = 30000;
+const HEALTH_CHECK_TIMEOUT_STEP_MS = 100;
+const HEALTH_CHECK_TIMEOUT_DEFAULT_MS = 2000;
+
 function clampLogMaxEntries(value) {
   const parsed = parseInt(value, 10);
   if (Number.isNaN(parsed)) return LOG_MAX_ENTRIES_DEFAULT;
   return Math.min(LOG_MAX_ENTRIES_MAX, Math.max(LOG_MAX_ENTRIES_MIN, parsed));
+}
+
+function clampHealthCheckIntervalSeconds(value) {
+  const parsed = parseInt(value, 10);
+  if (Number.isNaN(parsed)) return HEALTH_CHECK_INTERVAL_DEFAULT_S;
+  return Math.min(HEALTH_CHECK_INTERVAL_MAX_S, Math.max(HEALTH_CHECK_INTERVAL_MIN_S, parsed));
+}
+
+function clampHealthCheckTimeoutMs(value) {
+  const parsed = parseInt(value, 10);
+  if (Number.isNaN(parsed)) return HEALTH_CHECK_TIMEOUT_DEFAULT_MS;
+  return Math.min(HEALTH_CHECK_TIMEOUT_MAX_MS, Math.max(HEALTH_CHECK_TIMEOUT_MIN_MS, parsed));
 }
 
 export default function SettingsView({
@@ -33,16 +54,52 @@ export default function SettingsView({
   const [logMaxEntriesDraft, setLogMaxEntriesDraft] = useState(
     String(settings.logMaxEntries ?? LOG_MAX_ENTRIES_DEFAULT)
   );
+  const [healthCheckIntervalDraft, setHealthCheckIntervalDraft] = useState(
+    String(Math.round((settings.healthCheckIntervalMs ?? HEALTH_CHECK_INTERVAL_DEFAULT_S * 1000) / 1000))
+  );
+  const [healthCheckTimeoutDraft, setHealthCheckTimeoutDraft] = useState(
+    String(settings.healthCheckTimeoutMs ?? HEALTH_CHECK_TIMEOUT_DEFAULT_MS)
+  );
 
   useEffect(() => {
     setLogMaxEntriesDraft(String(settings.logMaxEntries ?? LOG_MAX_ENTRIES_DEFAULT));
   }, [settings.logMaxEntries]);
+
+  useEffect(() => {
+    setHealthCheckIntervalDraft(
+      String(Math.round((settings.healthCheckIntervalMs ?? HEALTH_CHECK_INTERVAL_DEFAULT_S * 1000) / 1000))
+    );
+  }, [settings.healthCheckIntervalMs]);
+
+  useEffect(() => {
+    setHealthCheckTimeoutDraft(String(settings.healthCheckTimeoutMs ?? HEALTH_CHECK_TIMEOUT_DEFAULT_MS));
+  }, [settings.healthCheckTimeoutMs]);
 
   function commitLogMaxEntries() {
     const clamped = clampLogMaxEntries(logMaxEntriesDraft);
     setLogMaxEntriesDraft(String(clamped));
     if (clamped !== settings.logMaxEntries) {
       onSettingsChange({ logMaxEntries: clamped });
+      showToast(t('toast.settingsUpdated'), 'info');
+    }
+  }
+
+  function commitHealthCheckInterval() {
+    const clampedSeconds = clampHealthCheckIntervalSeconds(healthCheckIntervalDraft);
+    setHealthCheckIntervalDraft(String(clampedSeconds));
+    const ms = clampedSeconds * 1000;
+    if (ms !== settings.healthCheckIntervalMs) {
+      onSettingsChange({ healthCheckIntervalMs: ms });
+      showToast(t('toast.settingsUpdated'), 'info');
+    }
+  }
+
+  function commitHealthCheckTimeout() {
+    const clamped = clampHealthCheckTimeoutMs(healthCheckTimeoutDraft);
+    setHealthCheckTimeoutDraft(String(clamped));
+    if (clamped !== settings.healthCheckTimeoutMs) {
+      onSettingsChange({ healthCheckTimeoutMs: clamped });
+      showToast(t('toast.settingsUpdated'), 'info');
     }
   }
 
@@ -107,11 +164,9 @@ export default function SettingsView({
               type="checkbox"
               checked={!!settings.httpsEnabled}
               onChange={async (e) => {
-                await onSettingsChange({ httpsEnabled: e.target.checked });
-                showToast(
-                  e.target.checked ? t('toast.httpsEnabled') : t('toast.httpsDisabled'),
-                  'info'
-                );
+                const checked = e.target.checked;
+                await onSettingsChange({ httpsEnabled: checked });
+                showToast(checked ? t('toast.httpsEnabled') : t('toast.httpsDisabled'), 'info');
               }}
             />
             <span className="toggle-track" />
@@ -127,11 +182,19 @@ export default function SettingsView({
             <input
               type="checkbox"
               checked={!!settings.startOnLaunch}
-              onChange={(e) => onSettingsChange({ startOnLaunch: e.target.checked })}
+              onChange={async (e) => {
+                await onSettingsChange({ startOnLaunch: e.target.checked });
+                showToast(t('toast.settingsUpdated'), 'info');
+              }}
             />
             <span className="toggle-track" />
           </label>
         </div>
+
+      </div>
+
+      <div className="settings-section">
+        <div className="settings-section-title">{t('settings.requestLogs')}</div>
 
         <div className="setting-row">
           <div className="setting-info">
@@ -143,11 +206,9 @@ export default function SettingsView({
               type="checkbox"
               checked={!!settings.loggingEnabled}
               onChange={async (e) => {
-                await onSettingsChange({ loggingEnabled: e.target.checked });
-                showToast(
-                  e.target.checked ? t('toast.loggingEnabled') : t('toast.loggingDisabled'),
-                  'info'
-                );
+                const checked = e.target.checked;
+                await onSettingsChange({ loggingEnabled: checked });
+                showToast(checked ? t('toast.loggingEnabled') : t('toast.loggingDisabled'), 'info');
               }}
             />
             <span className="toggle-track" />
@@ -176,6 +237,76 @@ export default function SettingsView({
               onBlur={commitLogMaxEntries}
             />
           </div>
+        )}
+      </div>
+
+      <div className="settings-section">
+        <div className="settings-section-title">{t('settings.healthChecks')}</div>
+
+        <div className="setting-row">
+          <div className="setting-info">
+            <div className="setting-name">{t('settings.healthCheckEnabled')}</div>
+            <div className="setting-desc">{t('settings.healthCheckEnabledDesc')}</div>
+          </div>
+          <label className="toggle">
+            <input
+              type="checkbox"
+              checked={!!settings.healthCheckEnabled}
+              onChange={async (e) => {
+                const checked = e.target.checked;
+                await onSettingsChange({ healthCheckEnabled: checked });
+                showToast(checked ? t('toast.healthCheckEnabled') : t('toast.healthCheckDisabled'), 'info');
+              }}
+            />
+            <span className="toggle-track" />
+          </label>
+        </div>
+
+        {settings.healthCheckEnabled && (
+          <>
+            <div className="setting-row">
+              <div className="setting-info">
+                <div className="setting-name">{t('settings.healthCheckInterval')}</div>
+                <div className="setting-desc">
+                  {t('settings.healthCheckIntervalDesc', {
+                    min: HEALTH_CHECK_INTERVAL_MIN_S,
+                    max: HEALTH_CHECK_INTERVAL_MAX_S,
+                  })}
+                </div>
+              </div>
+              <input
+                className="health-check-interval-input"
+                type="number"
+                min={HEALTH_CHECK_INTERVAL_MIN_S}
+                max={HEALTH_CHECK_INTERVAL_MAX_S}
+                value={healthCheckIntervalDraft}
+                onChange={(e) => setHealthCheckIntervalDraft(e.target.value)}
+                onBlur={commitHealthCheckInterval}
+              />
+            </div>
+
+            <div className="setting-row">
+              <div className="setting-info">
+                <div className="setting-name">{t('settings.healthCheckTimeout')}</div>
+                <div className="setting-desc">
+                  {t('settings.healthCheckTimeoutDesc', {
+                    min: HEALTH_CHECK_TIMEOUT_MIN_MS,
+                    max: HEALTH_CHECK_TIMEOUT_MAX_MS,
+                  })}
+                </div>
+              </div>
+              <input
+                className="health-check-timeout-input"
+                type="number"
+                min={HEALTH_CHECK_TIMEOUT_MIN_MS}
+                max={HEALTH_CHECK_TIMEOUT_MAX_MS}
+                step={HEALTH_CHECK_TIMEOUT_STEP_MS}
+                value={healthCheckTimeoutDraft}
+                onChange={(e) => setHealthCheckTimeoutDraft(e.target.value)}
+                onBlur={commitHealthCheckTimeout}
+              />
+            </div>
+          </>
         )}
       </div>
 

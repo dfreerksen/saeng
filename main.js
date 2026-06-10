@@ -132,41 +132,31 @@ function setupIPC() {
 
   ipcMain.handle('mappings:add', (_, data) => {
     store.addMapping(data);
-    if (proxyManager.isRunning()) {
-      proxyManager.updateMappings(store.getMappings());
-    }
+    proxyManager.updateMappings(store.getMappings());
     return store.getMappings();
   });
 
   ipcMain.handle('mappings:remove', (_, id) => {
     store.removeMapping(id);
-    if (proxyManager.isRunning()) {
-      proxyManager.updateMappings(store.getMappings());
-    }
+    proxyManager.updateMappings(store.getMappings());
     return store.getMappings();
   });
 
   ipcMain.handle('mappings:toggle', (_, id) => {
     store.toggleMapping(id);
-    if (proxyManager.isRunning()) {
-      proxyManager.updateMappings(store.getMappings());
-    }
+    proxyManager.updateMappings(store.getMappings());
     return store.getMappings();
   });
 
   ipcMain.handle('mappings:setGroupEnabled', (_, ids, enabled) => {
     store.setMappingsEnabled(ids, enabled);
-    if (proxyManager.isRunning()) {
-      proxyManager.updateMappings(store.getMappings());
-    }
+    proxyManager.updateMappings(store.getMappings());
     return store.getMappings();
   });
 
   ipcMain.handle('mappings:update', (_, id, data) => {
     store.updateMapping(id, data);
-    if (proxyManager.isRunning()) {
-      proxyManager.updateMappings(store.getMappings());
-    }
+    proxyManager.updateMappings(store.getMappings());
     return store.getMappings();
   });
 
@@ -211,7 +201,7 @@ function setupIPC() {
     }
 
     const { added, skipped } = store.importMappings(list);
-    if (added.length > 0 && proxyManager.isRunning()) {
+    if (added.length > 0) {
       proxyManager.updateMappings(store.getMappings());
     }
     return { success: true, added: added.length, skipped: skipped.length, mappings: store.getMappings() };
@@ -249,6 +239,8 @@ function setupIPC() {
     return [];
   });
 
+  ipcMain.handle('health:list', () => proxyManager.healthChecker.getStatuses());
+
   ipcMain.handle('settings:get', () => store.getSettings());
 
   ipcMain.handle('settings:set', (_, patch) => {
@@ -258,6 +250,15 @@ function setupIPC() {
     }
     if ('loggingEnabled' in patch) {
       proxyManager.requestLog.setEnabled(updated.loggingEnabled);
+    }
+    if ('healthCheckEnabled' in patch) {
+      proxyManager.healthChecker.setEnabled(updated.healthCheckEnabled);
+    }
+    if ('healthCheckIntervalMs' in patch) {
+      proxyManager.healthChecker.setIntervalMs(updated.healthCheckIntervalMs);
+    }
+    if ('healthCheckTimeoutMs' in patch) {
+      proxyManager.healthChecker.setTimeoutMs(updated.healthCheckTimeoutMs);
     }
     return updated;
   });
@@ -317,6 +318,9 @@ app.whenReady().then(async () => {
   proxyManager.requestLog.setListener((entry) =>
     mainWindow?.webContents.send('requestLog:entry', entry)
   );
+  proxyManager.healthChecker.setListener((result) =>
+    mainWindow?.webContents.send('health:update', result)
+  );
 
   // Clear any leftover proxy config from a previous run (crash / force-quit).
   // Only touch services already pointing at our PAC URL so VPN-managed proxy
@@ -345,6 +349,8 @@ app.whenReady().then(async () => {
   createWindow();
   createTray();
 
+  proxyManager.healthChecker.start(store.getMappings());
+
   // Auto-start if the setting is enabled
   if (store.getSettings().startOnLaunch) {
     proxyManager.start(store.getMappings(), store.getSettings()).then(() => {
@@ -370,6 +376,7 @@ app.on('before-quit', (event) => {
   isQuitting = true;
   event.preventDefault();
   tray?.destroy();
+  proxyManager?.healthChecker.stop();
   const cleanup = proxyManager?.isRunning() ? proxyManager.stop() : Promise.resolve();
   cleanup.catch(() => {}).finally(() => app.quit());
 });

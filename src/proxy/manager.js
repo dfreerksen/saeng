@@ -2,6 +2,7 @@ import { HttpProxy } from './httpProxy.js';
 import { PacServer } from './pacServer.js';
 import { CertManager } from './certManager.js';
 import { RequestLog } from './requestLog.js';
+import { HealthChecker } from './healthChecker.js';
 import { setSystemProxy, clearSystemProxy } from '../systemProxy.js';
 
 const PAC_PORT = 8181;
@@ -11,7 +12,10 @@ class ProxyManager {
     this.store = store;
     this.httpProxy = null;
     this.pacServer = null;
-    this.requestLog = new RequestLog(store.getSettings().logMaxEntries, store.getSettings().loggingEnabled);
+    const settings = store.getSettings();
+    this.requestLog = new RequestLog(settings.logMaxEntries, settings.loggingEnabled);
+    this.healthChecker = new HealthChecker(settings.healthCheckIntervalMs, settings.healthCheckTimeoutMs, settings.healthCheckEnabled);
+    this.healthChecker.setProxyRunning(false);
     this.running = false;
     this.startedAt = null;
   }
@@ -46,6 +50,8 @@ class ProxyManager {
 
     this.running = true;
     this.startedAt = Date.now();
+    this.healthChecker.updateMappings(mappings);
+    this.healthChecker.setProxyRunning(true);
   }
 
   async stop() {
@@ -65,9 +71,11 @@ class ProxyManager {
 
     this.running = false;
     this.startedAt = null;
+    this.healthChecker.setProxyRunning(false);
   }
 
   updateMappings(mappings) {
+    this.healthChecker.updateMappings(mappings);
     if (!this.running) return;
     this.httpProxy?.updateMappings(mappings);
     this.pacServer?.updateMappings(mappings);

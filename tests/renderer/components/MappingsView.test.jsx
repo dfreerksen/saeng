@@ -20,7 +20,8 @@ function renderMappingsView(props = {}) {
     active: true,
     mappings: [],
     setMappings: vi.fn(),
-    settings: { httpsEnabled: false },
+    proxyRunning: true,
+    settings: { httpsEnabled: false, healthCheckEnabled: true },
     onAdd: vi.fn(),
     onEdit: vi.fn(),
     onExport: vi.fn(),
@@ -356,6 +357,55 @@ describe('MappingsView — edit', () => {
     renderMappingsView({ mappings: SAMPLE_MAPPINGS, onEdit });
     fireEvent.click(screen.getAllByRole('button').find((b) => b.classList.contains('btn-edit')));
     expect(onEdit).toHaveBeenCalledWith(SAMPLE_MAPPINGS[0]);
+  });
+});
+
+describe('MappingsView — health status', () => {
+  it('shows an unknown dot when there is no health status for a mapping', () => {
+    const { container } = renderMappingsView({ mappings: [SAMPLE_MAPPINGS[0]], healthStatuses: {} });
+    expect(container.querySelector('.health-dot')).toHaveClass('unknown');
+  });
+
+  it('shows an up dot when the health status is up', () => {
+    const { container } = renderMappingsView({
+      mappings: [SAMPLE_MAPPINGS[0]],
+      healthStatuses: { 1: { id: '1', status: 'up', latencyMs: 12, error: null } },
+    });
+    expect(container.querySelector('.health-dot')).toHaveClass('up');
+  });
+
+  it('shows a down dot when the health status is down', () => {
+    const { container } = renderMappingsView({
+      mappings: [SAMPLE_MAPPINGS[0]],
+      healthStatuses: { 1: { id: '1', status: 'down', latencyMs: 2000, error: 'timeout' } },
+    });
+    expect(container.querySelector('.health-dot')).toHaveClass('down');
+  });
+
+  it('hides the health dot when health checks are disabled in settings', () => {
+    const { container } = renderMappingsView({
+      mappings: [SAMPLE_MAPPINGS[0]],
+      healthStatuses: { 1: { id: '1', status: 'up', latencyMs: 12, error: null } },
+      settings: { httpsEnabled: false, healthCheckEnabled: false },
+    });
+    expect(container.querySelector('.health-dot')).not.toBeInTheDocument();
+  });
+
+  it('shows an unknown dot for a disabled mapping even with a stale health status', () => {
+    const { container } = renderMappingsView({
+      mappings: [SAMPLE_MAPPINGS[1]],
+      healthStatuses: { 2: { id: '2', status: 'up', latencyMs: 12, error: null } },
+    });
+    expect(container.querySelector('.health-dot')).toHaveClass('unknown');
+  });
+
+  it('shows an unknown dot when the proxy is stopped, even with a stale health status', () => {
+    const { container } = renderMappingsView({
+      mappings: [SAMPLE_MAPPINGS[0]],
+      healthStatuses: { 1: { id: '1', status: 'up', latencyMs: 12, error: null } },
+      proxyRunning: false,
+    });
+    expect(container.querySelector('.health-dot')).toHaveClass('unknown');
   });
 });
 

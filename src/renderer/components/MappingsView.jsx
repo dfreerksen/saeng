@@ -30,7 +30,13 @@ function buildGroups(mappings) {
   return groups;
 }
 
-export default function MappingsView({ active, mappings, setMappings, settings, onAdd, onEdit, onExport, onImport, showToast, t }) {
+function healthTooltip(health, t) {
+  if (!health) return t('health.unknown');
+  if (health.status === 'up') return t('health.up', { latency: health.latencyMs });
+  return t('health.down', { error: health.error });
+}
+
+export default function MappingsView({ active, mappings, setMappings, healthStatuses, proxyRunning, settings, onAdd, onEdit, onExport, onImport, showToast, t }) {
   async function handleToggle(id) {
     const updated = await window.electronAPI.mappings.toggle(id);
     setMappings(updated);
@@ -125,9 +131,18 @@ export default function MappingsView({ active, mappings, setMappings, settings, 
                   </tr>
                   {groupMappings.map((m) => {
                     const proto = m.https ? 'https' : 'http';
+                    const health = m.enabled && proxyRunning ? healthStatuses?.[m.id] : null;
+                    const healthState = health?.status ?? 'unknown';
                     return (
                       <tr key={m.id}>
-                        <td className="domain-cell">{m.domain}</td>
+                        <td className="domain-cell">
+                          {settings.healthCheckEnabled && (
+                            <Tooltip title={healthTooltip(health, t)}>
+                              <span className={`health-dot ${healthState}`} />
+                            </Tooltip>
+                          )}
+                          {m.domain}
+                        </td>
                         <td>
                           <span className={`badge badge-${proto}`}>{proto.toUpperCase()}</span>
                         </td>

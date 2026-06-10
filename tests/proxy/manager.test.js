@@ -26,6 +26,15 @@ vi.mock('../../src/proxy/requestLog.js', () => ({
   }),
 }));
 
+vi.mock('../../src/proxy/healthChecker.js', () => ({
+  HealthChecker: vi.fn(function () {
+    this.updateMappings = vi.fn();
+    this.start = vi.fn();
+    this.stop = vi.fn();
+    this.setProxyRunning = vi.fn();
+  }),
+}));
+
 vi.mock('../../src/systemProxy.js', () => ({
   setSystemProxy: vi.fn().mockResolvedValue(undefined),
   clearSystemProxy: vi.fn().mockResolvedValue(undefined),
@@ -36,6 +45,7 @@ import { HttpProxy } from '../../src/proxy/httpProxy.js';
 import { PacServer } from '../../src/proxy/pacServer.js';
 import { CertManager } from '../../src/proxy/certManager.js';
 import { RequestLog } from '../../src/proxy/requestLog.js';
+import { HealthChecker } from '../../src/proxy/healthChecker.js';
 import { setSystemProxy, clearSystemProxy } from '../../src/systemProxy.js';
 
 const mockStore = { getCertDir: () => '/tmp/test-certs', getSettings: () => ({ logMaxEntries: 300, loggingEnabled: true }) };
@@ -153,7 +163,7 @@ describe('ProxyManager.stop()', () => {
 });
 
 describe('ProxyManager.updateMappings()', () => {
-  it('does nothing when the proxy is not running', () => {
+  it('does nothing to HttpProxy/PacServer when the proxy is not running', () => {
     const manager = new ProxyManager(mockStore);
     manager.updateMappings(mappings);
     expect(vi.mocked(HttpProxy)).not.toHaveBeenCalled();
@@ -168,5 +178,52 @@ describe('ProxyManager.updateMappings()', () => {
     manager.updateMappings(newMappings);
     expect(httpInstance.updateMappings).toHaveBeenCalledWith(newMappings);
     expect(pacInstance.updateMappings).toHaveBeenCalledWith(newMappings);
+  });
+
+  it('always pushes updates to the health checker, even when not running', () => {
+    const manager = new ProxyManager(mockStore);
+    manager.updateMappings(mappings);
+    expect(manager.healthChecker.updateMappings).toHaveBeenCalledWith(mappings);
+  });
+});
+
+describe('ProxyManager — health checker wiring', () => {
+  it('creates a HealthChecker', () => {
+    const manager = new ProxyManager(mockStore);
+    expect(manager.healthChecker).toBeInstanceOf(HealthChecker);
+  });
+
+  it('constructs the HealthChecker with the interval/timeout/enabled settings', () => {
+    const store = {
+      getCertDir: () => '/tmp/test-certs',
+      getSettings: () => ({
+        logMaxEntries: 300,
+        loggingEnabled: true,
+        healthCheckIntervalMs: 30000,
+        healthCheckTimeoutMs: 5000,
+        healthCheckEnabled: true,
+      }),
+    };
+    new ProxyManager(store);
+    expect(vi.mocked(HealthChecker)).toHaveBeenCalledWith(30000, 5000, true);
+  });
+
+  it('marks the health checker as not running on construction', () => {
+    const manager = new ProxyManager(mockStore);
+    expect(manager.healthChecker.setProxyRunning).toHaveBeenCalledWith(false);
+  });
+
+  it('tells the health checker the proxy is running on start()', async () => {
+    const manager = new ProxyManager(mockStore);
+    await manager.start(mappings, settings);
+    expect(manager.healthChecker.updateMappings).toHaveBeenCalledWith(mappings);
+    expect(manager.healthChecker.setProxyRunning).toHaveBeenLastCalledWith(true);
+  });
+
+  it('tells the health checker the proxy has stopped on stop()', async () => {
+    const manager = new ProxyManager(mockStore);
+    await manager.start(mappings, settings);
+    await manager.stop();
+    expect(manager.healthChecker.setProxyRunning).toHaveBeenLastCalledWith(false);
   });
 });

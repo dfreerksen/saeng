@@ -39,7 +39,9 @@
   margin-top: 2px;
 }
 
-.log-max-entries-input {
+.log-max-entries-input,
+.health-check-interval-input,
+.health-check-timeout-input {
   background: var(--saeng-secondary-color);
   border: 1px solid var(--saeng-border);
   border-radius: var(--saeng-radius-sm);
