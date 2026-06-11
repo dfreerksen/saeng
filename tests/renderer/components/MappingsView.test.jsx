@@ -249,13 +249,13 @@ describe('MappingsView — active state', () => {
 describe('MappingsView — add button', () => {
   it('renders the add button', () => {
     renderMappingsView();
-    expect(screen.getByText('mappings.add')).toBeInTheDocument();
+    expect(screen.getByText('mappings.actions.add')).toBeInTheDocument();
   });
 
   it('calls onAdd when the add button is clicked', () => {
     const onAdd = vi.fn();
     renderMappingsView({ onAdd });
-    fireEvent.click(screen.getByText('mappings.add').closest('button'));
+    fireEvent.click(screen.getByText('mappings.actions.add').closest('button'));
     expect(onAdd).toHaveBeenCalledOnce();
   });
 });
@@ -263,43 +263,43 @@ describe('MappingsView — add button', () => {
 describe('MappingsView — import button', () => {
   it('renders the import button', () => {
     renderMappingsView();
-    expect(screen.getByText('mappings.import')).toBeInTheDocument();
+    expect(screen.getByText('mappings.actions.import')).toBeInTheDocument();
   });
 
   it('calls onImport when the import button is clicked', () => {
     const onImport = vi.fn();
     renderMappingsView({ onImport });
-    fireEvent.click(screen.getByText('mappings.import').closest('button'));
+    fireEvent.click(screen.getByText('mappings.actions.import').closest('button'));
     expect(onImport).toHaveBeenCalledOnce();
   });
 
   it('is enabled even when there are no mappings', () => {
     renderMappingsView({ mappings: [] });
-    expect(screen.getByText('mappings.import').closest('button')).not.toBeDisabled();
+    expect(screen.getByText('mappings.actions.import').closest('button')).not.toBeDisabled();
   });
 });
 
 describe('MappingsView — export button', () => {
   it('renders the export button', () => {
     renderMappingsView({ mappings: SAMPLE_MAPPINGS });
-    expect(screen.getByText('mappings.export')).toBeInTheDocument();
+    expect(screen.getByText('mappings.actions.export')).toBeInTheDocument();
   });
 
   it('calls onExport when the export button is clicked', () => {
     const onExport = vi.fn();
     renderMappingsView({ mappings: SAMPLE_MAPPINGS, onExport });
-    fireEvent.click(screen.getByText('mappings.export').closest('button'));
+    fireEvent.click(screen.getByText('mappings.actions.export').closest('button'));
     expect(onExport).toHaveBeenCalledOnce();
   });
 
   it('is disabled when there are no mappings', () => {
     renderMappingsView({ mappings: [] });
-    expect(screen.getByText('mappings.export').closest('button')).toBeDisabled();
+    expect(screen.getByText('mappings.actions.export').closest('button')).toBeDisabled();
   });
 
   it('is enabled when there are mappings', () => {
     renderMappingsView({ mappings: SAMPLE_MAPPINGS });
-    expect(screen.getByText('mappings.export').closest('button')).not.toBeDisabled();
+    expect(screen.getByText('mappings.actions.export').closest('button')).not.toBeDisabled();
   });
 });
 

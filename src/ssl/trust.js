@@ -10,7 +10,7 @@ async function untrustCA(certPath) {
       await execAsync('/usr/bin/security', ['remove-trusted-cert', certPath]);
       return { success: true };
     } catch {
-      return { success: false, message: t('toast.error.untrustCaMac') };
+      return { success: false, message: t('flash.ca.untrust.mac') };
     }
   } else if (process.platform === 'win32') {
     try {
@@ -18,13 +18,13 @@ async function untrustCA(certPath) {
       await execAsync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script]);
       return { success: true };
     } catch {
-      return { success: false, message: t('toast.error.untrustCaWindows') };
+      return { success: false, message: t('flash.ca.untrust.windows') };
     }
   } else if (process.platform === 'linux') {
-    return { success: false, message: t('toast.error.untrustCaLinux') };
+    return { success: false, message: t('flash.ca.untrust.linux') };
   }
 
-  return { success: false, message: t('toast.error.untrustCaOther') };
+  return { success: false, message: t('flash.ca.untrust.other') };
 }
 
 async function trustCA(certPath) {
@@ -40,30 +40,30 @@ async function trustCA(certPath) {
         '-r', 'trustRoot',
         certPath,
       ]);
-      return { success: true, message: t('toast.error.trustCaSuccess') };
+      return { success: true, message: t('flash.ca.trust.success') };
     } catch (err) {
       console.error('Failed to trust CA on macOS:', err);
       const msg = err.stderr || err.message || 'Unknown error';
-      return { success: false, message: t('toast.error.trustCaMac', { error: msg }) };
+      return { success: false, message: t('flash.ca.trust.mac', { error: msg }) };
     }
   } else if (process.platform === 'win32') {
     try {
       // certutil requires admin — PowerShell elevation prompt appears automatically
       const script = `Start-Process certutil -ArgumentList '-addstore -f "ROOT" "${certPath}"' -Verb RunAs -Wait`;
       await execAsync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script]);
-      return { success: true, message: t('toast.error.trustCaSuccess') };
+      return { success: true, message: t('flash.ca.trust.success') };
     } catch (err) {
       console.error('Failed to trust CA on Windows:', err);
       const msg = err.stderr || err.message || 'Unknown error';
-      return { success: false, message: t('toast.error.trustCaWindows', { error: msg }) };
+      return { success: false, message: t('flash.ca.trust.windows', { error: msg }) };
     }
   } else if (process.platform === 'linux') {
     // Linux trust management is highly distro-specific and often requires manual steps,
     // so we won't attempt to automate it. Instead, we'll show an informational message.
-    return { success: false, message: t('toast.error.untrustCaLinux') };
+    return { success: false, message: t('flash.ca.untrust.linux') };
   }
 
-  return { success: false, message: t('toast.error.trustCaOther') };
+  return { success: false, message: t('flash.ca.trust.other') };
 }
 
 export { trustCA, untrustCA };

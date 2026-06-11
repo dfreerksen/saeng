@@ -45,8 +45,8 @@ describe('AboutModal', () => {
     expect(onClose).toHaveBeenCalledOnce();
   });
 
-  it('renders the close button text via t(modal.close)', () => {
+  it('renders the close button text via t(about.modals.buttons.close)', () => {
     render(<AboutModal version="1.0.0" onClose={() => {}} t={t} />);
-    expect(screen.getByText('modal.close')).toBeInTheDocument();
+    expect(screen.getByText('about.modals.buttons.close')).toBeInTheDocument();
   });
 });

@@ -20,7 +20,7 @@ export default function LogView({ active, entries, onClear, t }) {
         </div>
         <button className="btn btn-outline-secondary" onClick={onClear} disabled={entries.length === 0}>
           <i className="bi bi-trash" />
-          <span>{t('log.clear')}</span>
+          <span>{t('log.actions.clear')}</span>
         </button>
       </div>
 
@@ -35,12 +35,12 @@ export default function LogView({ active, entries, onClear, t }) {
           <table className="table table-borderless table-striped table-hover" id="logTable">
             <thead>
               <tr>
-                <th scope="col">{t('log.time')}</th>
-                <th scope="col">{t('log.method')}</th>
-                <th scope="col">{t('log.host')}</th>
-                <th scope="col">{t('log.path')}</th>
-                <th scope="col">{t('log.status')}</th>
-                <th scope="col" style={{ textAlign: 'right' }}>{t('log.latency')}</th>
+                <th scope="col">{t('log.table.time')}</th>
+                <th scope="col">{t('log.table.method')}</th>
+                <th scope="col">{t('log.table.host')}</th>
+                <th scope="col">{t('log.table.path')}</th>
+                <th scope="col">{t('log.table.status')}</th>
+                <th scope="col" style={{ textAlign: 'right' }}>{t('log.table.latency')}</th>
               </tr>
             </thead>
             <tbody>

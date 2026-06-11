@@ -141,17 +141,17 @@ export default function App() {
       const result = await window.electronAPI.proxy.stop();
       if (result.success) {
         setProxyRunning(false);
-        showToast(t('toast.proxyStopped'), 'info');
+        showToast(t('flash.proxy.stopped'), 'info');
       } else {
-        showToast(t('toast.proxyStopFailed', { error: result.error }), 'error');
+        showToast(t('flash.proxy.stopFailed', { error: result.error }), 'error');
       }
     } else {
       const result = await window.electronAPI.proxy.start();
       if (result.success) {
         setProxyRunning(true);
-        showToast(t('toast.proxyStarted'), 'success');
+        showToast(t('flash.proxy.started'), 'success');
       } else {
-        showToast(t('toast.proxyStartFailed', { error: result.error }), 'error');
+        showToast(t('flash.proxy.startFailed', { error: result.error }), 'error');
       }
     }
   }
@@ -161,9 +161,9 @@ export default function App() {
     if (result.canceled) return;
     if (result.success) {
       setMappings(result.mappings);
-      showToast(t('toast.importResult', { added: result.added, skipped: result.skipped }), result.added > 0 ? 'success' : 'info');
+      showToast(t('flash.import.success', { added: result.added, skipped: result.skipped }), result.added > 0 ? 'success' : 'info');
     } else {
-      showToast(t('toast.importFailed', { error: result.error }), 'error');
+      showToast(t('flash.import.error', { error: result.error }), 'error');
     }
   }
 
@@ -184,13 +184,13 @@ export default function App() {
     document.documentElement.lang = locale;
     document.documentElement.dir = localeInfo?.dir ?? 'ltr';
     await updateSettings({ locale });
-    showToast(strings['toast.settingsUpdated'] ?? 'Settings have been updated.', 'info');
+    showToast(strings['flash.settings.updated'] ?? 'Settings have been updated.', 'info');
   }
 
   async function handleColorModeChange(mode) {
     await updateSettings({ colorMode: mode });
     applyColorMode(mode);
-    showToast(t('toast.settingsUpdated'), 'info');
+    showToast(t('flash.settings.updated'), 'info');
   }
 
   return (
@@ -251,7 +251,7 @@ export default function App() {
             const updated = await window.electronAPI.mappings.add(data);
             setMappings(updated);
             setModal(null);
-            showToast(t('toast.mappingAdded', { domain: data.domain, host: data.host, port: data.port }), 'success');
+            showToast(t('flash.mapping.added', { domain: data.domain, host: data.host, port: data.port }), 'success');
           }}
           t={t}
         />
@@ -266,7 +266,7 @@ export default function App() {
             const updated = await window.electronAPI.mappings.update(modal.mapping.id, data);
             setMappings(updated);
             setModal(null);
-            showToast(t('toast.mappingUpdated', { domain: data.domain, host: data.host, port: data.port }), 'success');
+            showToast(t('flash.mapping.updated', { domain: data.domain, host: data.host, port: data.port }), 'success');
           }}
           t={t}
         />
@@ -281,9 +281,9 @@ export default function App() {
             if (result.canceled) return;
             if (result.success) {
               setModal(null);
-              showToast(t('toast.exportSuccess', { count: result.count, path: result.path }), 'success');
+              showToast(t('flash.export.success', { count: result.count, path: result.path }), 'success');
             } else {
-              showToast(t('toast.exportFailed', { error: result.error }), 'error');
+              showToast(t('flash.export.error', { error: result.error }), 'error');
             }
           }}
           t={t}

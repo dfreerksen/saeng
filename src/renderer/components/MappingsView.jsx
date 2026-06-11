@@ -31,9 +31,9 @@ function buildGroups(mappings) {
 }
 
 function healthTooltip(health, t) {
-  if (!health) return t('health.unknown');
-  if (health.status === 'up') return t('health.up', { latency: health.latencyMs });
-  return t('health.down', { error: health.error });
+  if (!health) return t('mappings.table.health.unknown');
+  if (health.status === 'up') return t('mappings.table.health.up', { latency: health.latencyMs });
+  return t('mappings.table.health.down', { error: health.error });
 }
 
 export default function MappingsView({ active, mappings, setMappings, healthStatuses, proxyRunning, settings, onAdd, onEdit, onExport, onImport, showToast, t }) {
@@ -52,7 +52,7 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
   async function handleDelete(id) {
     const mapping = mappings.find((m) => m.id === id);
     if (!mapping) return;
-    if (!confirm(t('confirm.removeMapping', { domain: mapping.domain }))) return;
+    if (!confirm(t('mappings.table.actions.confirm.remove', { domain: mapping.domain }))) return;
     const updated = await window.electronAPI.mappings.remove(id);
     setMappings(updated);
   }
@@ -62,7 +62,7 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
     if (!mapping) return;
     const protocol = settings.httpsEnabled ? 'https' : 'http';
     const url = `${protocol}://${mapping.domain}`;
-    showToast(t('toast.copied', { url }), 'success');
+    showToast(t('flash.copied', { url }), 'success');
     navigator.clipboard.writeText(url);
   }
 
@@ -78,15 +78,15 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
         <div className="view-header-actions">
           <button className="btn btn-outline-secondary" onClick={onImport}>
             <i className="bi bi-upload" />
-            <span>{t('mappings.import')}</span>
+            <span>{t('mappings.actions.import')}</span>
           </button>
           <button className="btn btn-outline-secondary" onClick={onExport} disabled={mappings.length === 0}>
             <i className="bi bi-download" />
-            <span>{t('mappings.export')}</span>
+            <span>{t('mappings.actions.export')}</span>
           </button>
           <button className="btn btn-primary" onClick={onAdd}>
             <i className="bi bi-plus" />
-            <span>{t('mappings.add')}</span>
+            <span>{t('mappings.actions.add')}</span>
           </button>
         </div>
       </div>
@@ -102,10 +102,10 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
           <table className="table table-borderless table-striped table-hover" id="mappingsTable">
             <thead>
               <tr>
-                <th scope="col">{t('table.domain')}</th>
-                <th scope="col">{t('table.protocol')}</th>
-                <th scope="col">{t('table.enabled')}</th>
-                <th scope="col" style={{ textAlign: 'right' }}>{t('table.actions')}</th>
+                <th scope="col">{t('mappings.table.domain')}</th>
+                <th scope="col">{t('mappings.table.protocol')}</th>
+                <th scope="col">{t('mappings.table.enabled')}</th>
+                <th scope="col" style={{ textAlign: 'right' }}>{t('mappings.table.actions')}</th>
               </tr>
             </thead>
             {[...groups.entries()].map(([groupKey, groupMappings]) => {
@@ -116,7 +116,7 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
                     <td colSpan={4}>
                       <div className="group-header">
                         <span className="group-name">{groupKey}</span>
-                        <Tooltip title={t('table.groupToggleTitle')}>
+                        <Tooltip title={t('mappings.table.groupToggleAll')}>
                           <label className="toggle">
                             <input
                               type="checkbox"
@@ -158,7 +158,7 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
                         </td>
                         <td>
                           <div className="actions-cell">
-                            <Tooltip title={t('table.copyTitle')}>
+                            <Tooltip title={t('mappings.table.actions.copy')}>
                               <button
                                 className="btn btn-outline-secondary btn-copy"
                                 onClick={() => handleCopy(m.id)}
@@ -166,7 +166,7 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
                                 <i className="bi bi-clipboard-check" />
                               </button>
                             </Tooltip>
-                            <Tooltip title={t('table.editTitle')}>
+                            <Tooltip title={t('mappings.table.actions.edit')}>
                               <button
                                 className="btn btn-outline-primary btn-edit"
                                 onClick={() => onEdit(m)}
@@ -174,7 +174,7 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
                                 <i className="bi bi-pencil" />
                               </button>
                             </Tooltip>
-                            <Tooltip title={t('table.deleteTitle')}>
+                            <Tooltip title={t('mappings.table.actions.delete')}>
                               <button
                                 className="btn btn-outline-danger btn-delete"
                                 onClick={() => handleDelete(m.id)}

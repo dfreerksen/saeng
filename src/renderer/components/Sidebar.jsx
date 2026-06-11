@@ -33,7 +33,7 @@ export default function Sidebar({ currentView, setCurrentView, loggingEnabled, p
           className={`proxy-toggle-btn${proxyRunning ? ' running' : ''}`}
           onClick={onProxyToggle}
         >
-          {proxyRunning ? t('proxy.stop') : t('proxy.start')}
+          {proxyRunning ? t('proxy.action.stop') : t('proxy.action.start')}
         </button>
       </div>
     </nav>

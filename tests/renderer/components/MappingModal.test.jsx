@@ -40,17 +40,17 @@ function renderEditModal(props = {}) {
 describe('MappingModal — add mode', () => {
   it('renders the add title', () => {
     renderAddModal();
-    expect(screen.getByText('modal.addTitle')).toBeInTheDocument();
+    expect(screen.getByText('mappings.modals.manage.addTitle')).toBeInTheDocument();
   });
 
   it('does not render the edit title', () => {
     renderAddModal();
-    expect(screen.queryByText('modal.editTitle')).not.toBeInTheDocument();
+    expect(screen.queryByText('mappings.modals.manage.editTitle')).not.toBeInTheDocument();
   });
 
   it('renders the add submit button', () => {
     renderAddModal();
-    expect(screen.getByText('modal.addSubmit')).toBeInTheDocument();
+    expect(screen.getByText('mappings.modals.manage.buttons.add')).toBeInTheDocument();
   });
 
   it('starts with an empty domain field', () => {
@@ -81,7 +81,7 @@ describe('MappingModal — add mode', () => {
 describe('MappingModal — edit mode', () => {
   it('renders the edit title', () => {
     renderEditModal();
-    expect(screen.getByText('modal.editTitle')).toBeInTheDocument();
+    expect(screen.getByText('mappings.modals.manage.editTitle')).toBeInTheDocument();
   });
 
   it('pre-fills the domain input', () => {
@@ -116,7 +116,7 @@ describe('MappingModal — edit mode', () => {
 
   it('renders the edit submit button', () => {
     renderEditModal();
-    expect(screen.getByText('modal.editSubmit')).toBeInTheDocument();
+    expect(screen.getByText('mappings.modals.manage.buttons.update')).toBeInTheDocument();
   });
 });
 
@@ -140,7 +140,7 @@ describe('MappingModal — cancel', () => {
   it('calls onClose when the cancel button is clicked', () => {
     const onClose = vi.fn();
     renderAddModal({ onClose });
-    fireEvent.click(screen.getByText('modal.cancel'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.cancel'));
     expect(onClose).toHaveBeenCalledOnce();
   });
 
@@ -155,9 +155,9 @@ describe('MappingModal — cancel', () => {
 describe('MappingModal — validation', () => {
   it('shows domain error when domain is empty on submit', async () => {
     renderAddModal();
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
-      expect(screen.getByText('form.domainErrorInvalid')).toBeInTheDocument();
+      expect(screen.getByText('mappings.modals.manage.form.domain.error.invalid')).toBeInTheDocument();
     });
   });
 
@@ -165,9 +165,9 @@ describe('MappingModal — validation', () => {
     const { container } = renderAddModal();
     const domainInput = container.querySelectorAll('.form-input')[1];
     fireEvent.change(domainInput, { target: { value: '-invalid' } });
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
-      expect(screen.getByText('form.domainErrorInvalid')).toBeInTheDocument();
+      expect(screen.getByText('mappings.modals.manage.form.domain.error.invalid')).toBeInTheDocument();
     });
   });
 
@@ -177,9 +177,9 @@ describe('MappingModal — validation', () => {
     const domainInput = container.querySelectorAll('.form-input')[1];
     fireEvent.change(subdomainInput, { target: { value: '-bad' } });
     fireEvent.change(domainInput, { target: { value: 'myapp' } });
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
-      expect(screen.getByText('form.subdomainError')).toBeInTheDocument();
+      expect(screen.getByText('mappings.modals.manage.form.subdomain.error')).toBeInTheDocument();
     });
   });
 
@@ -189,9 +189,9 @@ describe('MappingModal — validation', () => {
     const portInput = container.querySelector('input[type="number"]');
     fireEvent.change(domainInput, { target: { value: 'myapp' } });
     fireEvent.change(portInput, { target: { value: '0' } });
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
-      expect(screen.getByText('form.portError')).toBeInTheDocument();
+      expect(screen.getByText('mappings.modals.manage.form.port.error')).toBeInTheDocument();
     });
   });
 
@@ -201,9 +201,9 @@ describe('MappingModal — validation', () => {
     const portInput = container.querySelector('input[type="number"]');
     fireEvent.change(domainInput, { target: { value: 'myapp' } });
     fireEvent.change(portInput, { target: { value: '99999' } });
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
-      expect(screen.getByText('form.portError')).toBeInTheDocument();
+      expect(screen.getByText('mappings.modals.manage.form.port.error')).toBeInTheDocument();
     });
   });
 
@@ -213,18 +213,18 @@ describe('MappingModal — validation', () => {
     });
     const domainInput = container.querySelectorAll('.form-input')[1];
     fireEvent.change(domainInput, { target: { value: 'myapp' } });
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
-      expect(screen.getByText('form.domainErrorDuplicate')).toBeInTheDocument();
+      expect(screen.getByText('mappings.modals.manage.form.domain.error.duplicate')).toBeInTheDocument();
     });
   });
 
   it('does not call onSubmit when validation fails', async () => {
     const onSubmit = vi.fn();
     renderAddModal({ onSubmit });
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
-      expect(screen.getByText('form.domainErrorInvalid')).toBeInTheDocument();
+      expect(screen.getByText('mappings.modals.manage.form.domain.error.invalid')).toBeInTheDocument();
     });
     expect(onSubmit).not.toHaveBeenCalled();
   });
@@ -236,7 +236,7 @@ describe('MappingModal — successful submit', () => {
     const { container } = renderAddModal({ onSubmit });
     const domainInput = container.querySelectorAll('.form-input')[1];
     fireEvent.change(domainInput, { target: { value: 'myapp' } });
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(
         expect.objectContaining({ domain: 'myapp.local', port: 3000 })
@@ -249,7 +249,7 @@ describe('MappingModal — successful submit', () => {
     const { container } = renderAddModal({ onSubmit });
     const domainInput = container.querySelectorAll('.form-input')[1];
     fireEvent.change(domainInput, { target: { value: 'myapp' } });
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ host: '127.0.0.1' }));
     });
@@ -262,7 +262,7 @@ describe('MappingModal — successful submit', () => {
     const hostInput = container.querySelectorAll('.form-input')[2];
     fireEvent.change(domainInput, { target: { value: 'myapp' } });
     fireEvent.change(hostInput, { target: { value: '10.0.0.5' } });
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ host: '10.0.0.5' }));
     });
@@ -275,7 +275,7 @@ describe('MappingModal — successful submit', () => {
     const hostInput = container.querySelectorAll('.form-input')[2];
     fireEvent.change(domainInput, { target: { value: 'myapp' } });
     fireEvent.change(hostInput, { target: { value: '   ' } });
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ host: '127.0.0.1' }));
     });
@@ -288,7 +288,7 @@ describe('MappingModal — successful submit', () => {
     const domainInput = container.querySelectorAll('.form-input')[1];
     fireEvent.change(subdomainInput, { target: { value: 'api' } });
     fireEvent.change(domainInput, { target: { value: 'myapp' } });
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(
         expect.objectContaining({ domain: 'api.myapp.local' })
@@ -303,7 +303,7 @@ describe('MappingModal — successful submit', () => {
     const domainInput = container.querySelectorAll('.form-input')[1];
     fireEvent.change(subdomainInput, { target: { value: '*' } });
     fireEvent.change(domainInput, { target: { value: 'myapp' } });
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(
         expect.objectContaining({ domain: '*.myapp.local' })
@@ -318,7 +318,7 @@ describe('MappingModal — successful submit', () => {
     const portInput = container.querySelector('input[type="number"]');
     fireEvent.change(domainInput, { target: { value: 'myapp' } });
     fireEvent.change(portInput, { target: { value: '8080' } });
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ port: 8080 }));
     });
@@ -330,9 +330,9 @@ describe('MappingModal — successful submit', () => {
     const { container } = renderAddModal({ onSubmit });
     const domainInput = container.querySelectorAll('.form-input')[1];
     fireEvent.change(domainInput, { target: { value: 'myapp' } });
-    fireEvent.click(screen.getByText('modal.addSubmit'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
-      expect(screen.getByText('modal.addSubmit')).toBeDisabled();
+      expect(screen.getByText('mappings.modals.manage.buttons.add')).toBeDisabled();
     });
     await act(async () => { resolve(); });
   });

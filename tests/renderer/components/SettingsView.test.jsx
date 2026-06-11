@@ -81,7 +81,7 @@ describe('SettingsView — rendering', () => {
 
   it('shows generating placeholder when CA path is empty', () => {
     renderSettingsView({ caPath: '' });
-    expect(screen.getByText('settings.caGenerating')).toBeInTheDocument();
+    expect(screen.getByText('settings.cert.actions.generating')).toBeInTheDocument();
   });
 });
 
@@ -186,7 +186,7 @@ describe('SettingsView — proxy toggles', () => {
     const startToggle = container.querySelectorAll('.toggle input[type="checkbox"]')[1];
     fireEvent.click(startToggle);
     await waitFor(() => {
-      expect(showToast).toHaveBeenCalledWith('toast.settingsUpdated', 'info');
+      expect(showToast).toHaveBeenCalledWith('flash.settings.updated', 'info');
     });
   });
 });
@@ -250,7 +250,7 @@ describe('SettingsView — log max entries', () => {
     const input = container.querySelector('.log-max-entries-input');
     fireEvent.change(input, { target: { value: '5000' } });
     fireEvent.blur(input);
-    expect(showToast).toHaveBeenCalledWith('toast.settingsUpdated', 'info');
+    expect(showToast).toHaveBeenCalledWith('flash.settings.updated', 'info');
   });
 
   it('does not show a toast when the value is unchanged on blur', () => {
@@ -411,7 +411,7 @@ describe('SettingsView — health check interval', () => {
     const input = container.querySelector('.health-check-interval-input');
     fireEvent.change(input, { target: { value: '60' } });
     fireEvent.blur(input);
-    expect(showToast).toHaveBeenCalledWith('toast.settingsUpdated', 'info');
+    expect(showToast).toHaveBeenCalledWith('flash.settings.updated', 'info');
   });
 });
 
@@ -479,21 +479,21 @@ describe('SettingsView — health check timeout', () => {
     const input = container.querySelector('.health-check-timeout-input');
     fireEvent.change(input, { target: { value: '5000' } });
     fireEvent.blur(input);
-    expect(showToast).toHaveBeenCalledWith('toast.settingsUpdated', 'info');
+    expect(showToast).toHaveBeenCalledWith('flash.settings.updated', 'info');
   });
 });
 
 describe('SettingsView — CA management', () => {
   it('calls electronAPI.ssl.revealCA when reveal button is clicked', () => {
     renderSettingsView();
-    const revealBtn = screen.getByText('settings.revealCa').closest('button');
+    const revealBtn = screen.getByText('settings.cert.actions.show').closest('button');
     fireEvent.click(revealBtn);
     expect(window.electronAPI.ssl.revealCA).toHaveBeenCalledOnce();
   });
 
   it('calls electronAPI.ssl.trustCA when trust button is clicked', async () => {
     renderSettingsView();
-    const trustBtn = screen.getByText('settings.trustCa').closest('button');
+    const trustBtn = screen.getByText('settings.cert.actions.install').closest('button');
     fireEvent.click(trustBtn);
     await waitFor(() => {
       expect(window.electronAPI.ssl.trustCA).toHaveBeenCalledOnce();
@@ -503,9 +503,9 @@ describe('SettingsView — CA management', () => {
   it('shows success toast after trusting CA', async () => {
     const showToast = vi.fn();
     renderSettingsView({ showToast });
-    fireEvent.click(screen.getByText('settings.trustCa').closest('button'));
+    fireEvent.click(screen.getByText('settings.cert.actions.install').closest('button'));
     await waitFor(() => {
-      expect(showToast).toHaveBeenCalledWith('toast.caTrusted', 'success', 5000);
+      expect(showToast).toHaveBeenCalledWith('flash.ca.trusted', 'success', 5000);
     });
   });
 
@@ -513,7 +513,7 @@ describe('SettingsView — CA management', () => {
     window.electronAPI.ssl.trustCA.mockResolvedValue({ success: false, message: 'Denied' });
     const showToast = vi.fn();
     renderSettingsView({ showToast });
-    fireEvent.click(screen.getByText('settings.trustCa').closest('button'));
+    fireEvent.click(screen.getByText('settings.cert.actions.install').closest('button'));
     await waitFor(() => {
       expect(showToast).toHaveBeenCalledWith('Denied', 'error', 6000);
     });
@@ -522,7 +522,7 @@ describe('SettingsView — CA management', () => {
   it('calls electronAPI.ssl.regenerateCA when confirmed', async () => {
     window.confirm.mockReturnValue(true);
     renderSettingsView();
-    fireEvent.click(screen.getByText('settings.regenerateCa').closest('button'));
+    fireEvent.click(screen.getByText('settings.cert.actions.regenerate').closest('button'));
     await waitFor(() => {
       expect(window.electronAPI.ssl.regenerateCA).toHaveBeenCalledOnce();
     });
@@ -531,7 +531,7 @@ describe('SettingsView — CA management', () => {
   it('does not call regenerateCA when confirmation is denied', () => {
     window.confirm.mockReturnValue(false);
     renderSettingsView();
-    fireEvent.click(screen.getByText('settings.regenerateCa').closest('button'));
+    fireEvent.click(screen.getByText('settings.cert.actions.regenerate').closest('button'));
     expect(window.electronAPI.ssl.regenerateCA).not.toHaveBeenCalled();
   });
 
@@ -541,7 +541,7 @@ describe('SettingsView — CA management', () => {
     window.confirm.mockReturnValue(true);
     const setCaExpiry = vi.fn();
     renderSettingsView({ setCaExpiry });
-    fireEvent.click(screen.getByText('settings.regenerateCa').closest('button'));
+    fireEvent.click(screen.getByText('settings.cert.actions.regenerate').closest('button'));
     await waitFor(() => {
       expect(setCaExpiry).toHaveBeenCalledWith(newExpiry);
     });
@@ -550,7 +550,7 @@ describe('SettingsView — CA management', () => {
   it('calls electronAPI.ssl.deleteCA when confirmed', async () => {
     window.confirm.mockReturnValue(true);
     renderSettingsView();
-    fireEvent.click(screen.getByText('settings.deleteCa').closest('button'));
+    fireEvent.click(screen.getByText('settings.cert.actions.delete').closest('button'));
     await waitFor(() => {
       expect(window.electronAPI.ssl.deleteCA).toHaveBeenCalledOnce();
     });
@@ -559,7 +559,7 @@ describe('SettingsView — CA management', () => {
   it('does not call deleteCA when confirmation is denied', () => {
     window.confirm.mockReturnValue(false);
     renderSettingsView();
-    fireEvent.click(screen.getByText('settings.deleteCa').closest('button'));
+    fireEvent.click(screen.getByText('settings.cert.actions.delete').closest('button'));
     expect(window.electronAPI.ssl.deleteCA).not.toHaveBeenCalled();
   });
 
@@ -567,7 +567,7 @@ describe('SettingsView — CA management', () => {
     window.confirm.mockReturnValue(true);
     const setCaExpiry = vi.fn();
     renderSettingsView({ setCaExpiry });
-    fireEvent.click(screen.getByText('settings.deleteCa').closest('button'));
+    fireEvent.click(screen.getByText('settings.cert.actions.delete').closest('button'));
     await waitFor(() => {
       expect(setCaExpiry).toHaveBeenCalledWith(null);
     });
@@ -603,18 +603,18 @@ describe('SettingsView — platform notes', () => {
   it('shows the mac platform note on mac', () => {
     vi.mocked(getOS).mockReturnValue('mac');
     renderSettingsView();
-    expect(screen.getByText('settings.caPlatformNoteMac')).toBeInTheDocument();
+    expect(screen.getByText('settings.cert.platformNote.mac')).toBeInTheDocument();
   });
 
   it('shows the windows platform note on windows', () => {
     vi.mocked(getOS).mockReturnValue('windows');
     renderSettingsView();
-    expect(screen.getByText('settings.caPlatformNoteWindows')).toBeInTheDocument();
+    expect(screen.getByText('settings.cert.platformNote.windows')).toBeInTheDocument();
   });
 
   it('does not show the mac note on windows', () => {
     vi.mocked(getOS).mockReturnValue('windows');
     renderSettingsView();
-    expect(screen.queryByText('settings.caPlatformNoteMac')).not.toBeInTheDocument();
+    expect(screen.queryByText('settings.cert.platformNote.mac')).not.toBeInTheDocument();
   });
 });

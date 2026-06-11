@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { t, loadStrings } from '../../../src/renderer/js/i18n.js';
 
 const SAMPLE = {
-  'proxy.start': 'Start Proxy',
+  'proxy.action.start': 'Start Proxy',
   'greeting': 'Hello, {name}!',
 };
 
@@ -18,7 +18,7 @@ describe('t()', () => {
 
   it('returns the translated string for a known key', () => {
     loadStrings(SAMPLE);
-    expect(t('proxy.start')).toBe('Start Proxy');
+    expect(t('proxy.action.start')).toBe('Start Proxy');
   });
 
   it('returns the key when the key is not in the loaded strings', () => {

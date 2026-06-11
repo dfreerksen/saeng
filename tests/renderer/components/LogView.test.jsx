@@ -63,7 +63,7 @@ describe('LogView — empty state', () => {
 
   it('disables the clear button when there are no entries', () => {
     renderLogView({ entries: [] });
-    expect(screen.getByText('log.clear').closest('button')).toBeDisabled();
+    expect(screen.getByText('log.actions.clear').closest('button')).toBeDisabled();
   });
 });
 
@@ -123,7 +123,7 @@ describe('LogView — table with entries', () => {
   it('enables the clear button and calls onClear when clicked', () => {
     const onClear = vi.fn();
     renderLogView({ entries: SAMPLE_ENTRIES, onClear });
-    const button = screen.getByText('log.clear').closest('button');
+    const button = screen.getByText('log.actions.clear').closest('button');
     expect(button).not.toBeDisabled();
     fireEvent.click(button);
     expect(onClear).toHaveBeenCalledOnce();

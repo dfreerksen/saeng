@@ -80,7 +80,7 @@ export default function SettingsView({
     setLogMaxEntriesDraft(String(clamped));
     if (clamped !== settings.logMaxEntries) {
       onSettingsChange({ logMaxEntries: clamped });
-      showToast(t('toast.settingsUpdated'), 'info');
+      showToast(t('flash.settings.updated'), 'info');
     }
   }
 
@@ -90,7 +90,7 @@ export default function SettingsView({
     const ms = clampedSeconds * 1000;
     if (ms !== settings.healthCheckIntervalMs) {
       onSettingsChange({ healthCheckIntervalMs: ms });
-      showToast(t('toast.settingsUpdated'), 'info');
+      showToast(t('flash.settings.updated'), 'info');
     }
   }
 
@@ -99,7 +99,7 @@ export default function SettingsView({
     setHealthCheckTimeoutDraft(String(clamped));
     if (clamped !== settings.healthCheckTimeoutMs) {
       onSettingsChange({ healthCheckTimeoutMs: clamped });
-      showToast(t('toast.settingsUpdated'), 'info');
+      showToast(t('flash.settings.updated'), 'info');
     }
   }
 
@@ -116,28 +116,28 @@ export default function SettingsView({
       </div>
 
       <div className="settings-section">
-        <div className="settings-section-title">{t('settings.preferences')}</div>
+        <div className="settings-section-title">{t('settings.preferences.title')}</div>
 
         <div className="setting-row">
           <div className="setting-info">
-            <div className="setting-name">{t('settings.colorMode')}</div>
-            <div className="setting-desc">{t('settings.colorModeDesc')}</div>
+            <div className="setting-name">{t('settings.preferences.colorMode.label')}</div>
+            <div className="setting-desc">{t('settings.preferences.colorMode.description')}</div>
           </div>
           <select
             className="color-mode-select"
             value={settings.colorMode || 'auto'}
             onChange={(e) => onColorModeChange(e.target.value)}
           >
-            <option value="auto">{t('settings.colorModeAuto')}</option>
-            <option value="light">{t('settings.colorModeLight')}</option>
-            <option value="dark">{t('settings.colorModeDark')}</option>
+            <option value="auto">{t('settings.preferences.colorMode.options.auto')}</option>
+            <option value="light">{t('settings.preferences.colorMode.options.light')}</option>
+            <option value="dark">{t('settings.preferences.colorMode.options.dark')}</option>
           </select>
         </div>
 
         <div className="setting-row">
           <div className="setting-info">
-            <div className="setting-name">{t('settings.language')}</div>
-            <div className="setting-desc">{t('settings.languageDesc')}</div>
+            <div className="setting-name">{t('settings.preferences.language.label')}</div>
+            <div className="setting-desc">{t('settings.preferences.language.description')}</div>
           </div>
           <select
             className="locale-select"
@@ -152,12 +152,12 @@ export default function SettingsView({
       </div>
 
       <div className="settings-section">
-        <div className="settings-section-title">{t('settings.proxy')}</div>
+        <div className="settings-section-title">{t('settings.proxy.title')}</div>
 
         <div className="setting-row">
           <div className="setting-info">
-            <div className="setting-name">{t('settings.httpsEnabled')}</div>
-            <div className="setting-desc">{t('settings.httpsEnabledDesc')}</div>
+            <div className="setting-name">{t('settings.proxy.httpsEnabled.label')}</div>
+            <div className="setting-desc">{t('settings.proxy.httpsEnabled.description')}</div>
           </div>
           <label className="toggle">
             <input
@@ -166,7 +166,7 @@ export default function SettingsView({
               onChange={async (e) => {
                 const checked = e.target.checked;
                 await onSettingsChange({ httpsEnabled: checked });
-                showToast(checked ? t('toast.httpsEnabled') : t('toast.httpsDisabled'), 'info');
+                showToast(checked ? t('flash.https.enabled') : t('flash.https.disabled'), 'info');
               }}
             />
             <span className="toggle-track" />
@@ -175,8 +175,8 @@ export default function SettingsView({
 
         <div className="setting-row">
           <div className="setting-info">
-            <div className="setting-name">{t('settings.startOnLaunch')}</div>
-            <div className="setting-desc">{t('settings.startOnLaunchDesc')}</div>
+            <div className="setting-name">{t('settings.proxy.startOnLaunch.label')}</div>
+            <div className="setting-desc">{t('settings.proxy.startOnLaunch.description')}</div>
           </div>
           <label className="toggle">
             <input
@@ -184,7 +184,7 @@ export default function SettingsView({
               checked={!!settings.startOnLaunch}
               onChange={async (e) => {
                 await onSettingsChange({ startOnLaunch: e.target.checked });
-                showToast(t('toast.settingsUpdated'), 'info');
+                showToast(t('flash.settings.updated'), 'info');
               }}
             />
             <span className="toggle-track" />
@@ -194,12 +194,12 @@ export default function SettingsView({
       </div>
 
       <div className="settings-section">
-        <div className="settings-section-title">{t('settings.requestLogs')}</div>
+        <div className="settings-section-title">{t('settings.requestLogs.title')}</div>
 
         <div className="setting-row">
           <div className="setting-info">
-            <div className="setting-name">{t('settings.loggingEnabled')}</div>
-            <div className="setting-desc">{t('settings.loggingEnabledDesc')}</div>
+            <div className="setting-name">{t('settings.requestLogs.logRequests.label')}</div>
+            <div className="setting-desc">{t('settings.requestLogs.logRequests.description')}</div>
           </div>
           <label className="toggle">
             <input
@@ -208,7 +208,7 @@ export default function SettingsView({
               onChange={async (e) => {
                 const checked = e.target.checked;
                 await onSettingsChange({ loggingEnabled: checked });
-                showToast(checked ? t('toast.loggingEnabled') : t('toast.loggingDisabled'), 'info');
+                showToast(checked ? t('flash.logging.enabled') : t('flash.logging.disabled'), 'info');
               }}
             />
             <span className="toggle-track" />
@@ -218,9 +218,9 @@ export default function SettingsView({
         {settings.loggingEnabled && (
           <div className="setting-row">
             <div className="setting-info">
-              <div className="setting-name">{t('settings.logMaxEntries')}</div>
+              <div className="setting-name">{t('settings.requestLogs.logMaxEntries.label')}</div>
               <div className="setting-desc">
-                {t('settings.logMaxEntriesDesc', {
+                {t('settings.requestLogs.logMaxEntries.description', {
                   min: LOG_MAX_ENTRIES_MIN.toLocaleString(),
                   max: LOG_MAX_ENTRIES_MAX.toLocaleString(),
                 })}
@@ -241,12 +241,12 @@ export default function SettingsView({
       </div>
 
       <div className="settings-section">
-        <div className="settings-section-title">{t('settings.healthChecks')}</div>
+        <div className="settings-section-title">{t('settings.healthChecks.title')}</div>
 
         <div className="setting-row">
           <div className="setting-info">
-            <div className="setting-name">{t('settings.healthCheckEnabled')}</div>
-            <div className="setting-desc">{t('settings.healthCheckEnabledDesc')}</div>
+            <div className="setting-name">{t('settings.healthChecks.enableCheck.label')}</div>
+            <div className="setting-desc">{t('settings.healthChecks.enableCheck.description')}</div>
           </div>
           <label className="toggle">
             <input
@@ -255,7 +255,7 @@ export default function SettingsView({
               onChange={async (e) => {
                 const checked = e.target.checked;
                 await onSettingsChange({ healthCheckEnabled: checked });
-                showToast(checked ? t('toast.healthCheckEnabled') : t('toast.healthCheckDisabled'), 'info');
+                showToast(checked ? t('flash.healthCheck.enabled') : t('flash.healthCheck.disabled'), 'info');
               }}
             />
             <span className="toggle-track" />
@@ -266,9 +266,9 @@ export default function SettingsView({
           <>
             <div className="setting-row">
               <div className="setting-info">
-                <div className="setting-name">{t('settings.healthCheckInterval')}</div>
+                <div className="setting-name">{t('settings.healthChecks.interval.label')}</div>
                 <div className="setting-desc">
-                  {t('settings.healthCheckIntervalDesc', {
+                  {t('settings.healthChecks.interval.description', {
                     min: HEALTH_CHECK_INTERVAL_MIN_S,
                     max: HEALTH_CHECK_INTERVAL_MAX_S,
                   })}
@@ -287,9 +287,9 @@ export default function SettingsView({
 
             <div className="setting-row">
               <div className="setting-info">
-                <div className="setting-name">{t('settings.healthCheckTimeout')}</div>
+                <div className="setting-name">{t('settings.healthChecks.timeout.label')}</div>
                 <div className="setting-desc">
-                  {t('settings.healthCheckTimeoutDesc', {
+                  {t('settings.healthChecks.timeout.description', {
                     min: HEALTH_CHECK_TIMEOUT_MIN_MS,
                     max: HEALTH_CHECK_TIMEOUT_MAX_MS,
                   })}
@@ -311,31 +311,31 @@ export default function SettingsView({
       </div>
 
       <div className="settings-section">
-        <div className="settings-section-title">{t('settings.caTitle')}</div>
+        <div className="settings-section-title">{t('settings.cert.title')}</div>
 
         <p
           style={{ fontSize: 13, color: 'var(--saeng-primary-complement-color)', marginBottom: 12, lineHeight: 1.6 }}
-          dangerouslySetInnerHTML={{ __html: t('settings.caDesc') }}
+          dangerouslySetInnerHTML={{ __html: t('settings.cert.description') }}
         />
 
-        <div className="ca-info-box">{caPath || t('settings.caGenerating')}</div>
+        <div className="ca-info-box">{caPath || t('settings.cert.actions.generating')}</div>
         {expiryInfo && (
           <div className={`ca-expiry${expiryInfo.urgency ? ` ca-expiry--${expiryInfo.urgency}` : ''}`}>
             {expiryInfo.text}
           </div>
         )}
 
-        <Tooltip title={t('settings.revealCa')}>
+        <Tooltip title={t('settings.cert.actions.show')}>
           <button
             className="btn btn-outline-secondary"
             onClick={() => window.electronAPI.ssl.revealCA()}
           >
             <i className="bi bi-folder2-open" />
-            <span className="d-none d-md-inline">{t('settings.revealCa')}</span>
+            <span className="d-none d-md-inline">{t('settings.cert.actions.show')}</span>
           </button>
         </Tooltip>
 
-        <Tooltip title={t('settings.trustCa')}>
+        <Tooltip title={t('settings.cert.actions.install')}>
           <button
             className="btn btn-outline-primary"
             disabled={trustingCA}
@@ -344,7 +344,7 @@ export default function SettingsView({
               const result = await window.electronAPI.ssl.trustCA();
               setTrustingCA(false);
               if (result.success) {
-                showToast(t('toast.caTrusted'), 'success', 5000);
+                showToast(t('flash.ca.trusted'), 'success', 5000);
               } else {
                 showToast(result.message, 'error', 6000);
               }
@@ -352,58 +352,58 @@ export default function SettingsView({
           >
             <i className="bi bi-shield-check" />
             <span className="d-none d-md-inline">
-              {trustingCA ? t('settings.caInstalling') : t('settings.trustCa')}
+              {trustingCA ? t('settings.cert.actions.installing') : t('settings.cert.actions.install')}
             </span>
           </button>
         </Tooltip>
 
-        <Tooltip title={t('settings.regenerateCa')}>
+        <Tooltip title={t('settings.cert.actions.regenerate')}>
           <button
             className="btn btn-outline-warning"
             disabled={regeneratingCA}
             onClick={async () => {
-              if (!confirm(t('settings.regenerateCaConfirm'))) return;
+              if (!confirm(t('settings.cert.confirm.regenerate'))) return;
               setRegeneratingCA(true);
               const newExpiry = await window.electronAPI.ssl.regenerateCA();
               setCaExpiry(newExpiry);
               setRegeneratingCA(false);
-              showToast(t('toast.caRegenerated'), 'success', 5000);
+              showToast(t('flash.ca.regenerated'), 'success', 5000);
             }}
           >
             <i className="bi bi-arrow-repeat" />
-            <span className="d-none d-md-inline">{t('settings.regenerateCa')}</span>
+            <span className="d-none d-md-inline">{t('settings.cert.actions.regenerate')}</span>
           </button>
         </Tooltip>
 
-        <Tooltip title={t('settings.deleteCa')}>
+        <Tooltip title={t('settings.cert.actions.delete')}>
           <button
             className="btn btn-outline-danger"
             disabled={deletingCA}
             onClick={async () => {
-              if (!confirm(t('settings.deleteCaConfirm'))) return;
+              if (!confirm(t('settings.cert.confirm.delete'))) return;
               setDeletingCA(true);
               const result = await window.electronAPI.ssl.deleteCA();
               setCaExpiry(null);
               setDeletingCA(false);
-              showToast(t('toast.caDeleted'), 'info', 5000);
+              showToast(t('flash.ca.deleted'), 'info', 5000);
               if (result?.warning) showToast(result.warning, 'info', 6000);
             }}
           >
             <i className="bi bi-trash" />
-            <span className="d-none d-md-inline">{t('settings.deleteCa')}</span>
+            <span className="d-none d-md-inline">{t('settings.cert.actions.delete')}</span>
           </button>
         </Tooltip>
 
         {os === 'mac' && (
           <p
             style={{ fontSize: 'var(--saeng-font-size-small)', color: 'var(--saeng-text-muted)', marginTop: 10 }}
-            dangerouslySetInnerHTML={{ __html: t('settings.caPlatformNoteMac') }}
+            dangerouslySetInnerHTML={{ __html: t('settings.cert.platformNote.mac') }}
           />
         )}
         {os === 'windows' && (
           <p
             style={{ fontSize: 'var(--saeng-font-size-small)', color: 'var(--saeng-text-muted)', marginTop: 10 }}
-            dangerouslySetInnerHTML={{ __html: t('settings.caPlatformNoteWindows') }}
+            dangerouslySetInnerHTML={{ __html: t('settings.cert.platformNote.windows') }}
           />
         )}
       </div>

@@ -95,14 +95,14 @@ describe('Sidebar', () => {
     expect(onAbout).toHaveBeenCalledOnce();
   });
 
-  it('shows proxy.start text when proxy is not running', () => {
+  it('shows proxy.action.start text when proxy is not running', () => {
     renderSidebar({ proxyRunning: false });
-    expect(screen.getByText('proxy.start')).toBeInTheDocument();
+    expect(screen.getByText('proxy.action.start')).toBeInTheDocument();
   });
 
-  it('shows proxy.stop text when proxy is running', () => {
+  it('shows proxy.action.stop text when proxy is running', () => {
     renderSidebar({ proxyRunning: true });
-    expect(screen.getByText('proxy.stop')).toBeInTheDocument();
+    expect(screen.getByText('proxy.action.stop')).toBeInTheDocument();
   });
 
   it('applies running class to toggle button when proxy is running', () => {

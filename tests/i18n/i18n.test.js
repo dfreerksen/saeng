@@ -44,7 +44,7 @@ describe('load() and t()', () => {
   });
 
   it('returns the translated string for a known key', () => {
-    expect(t('proxy.start')).toBe('Start Proxy');
+    expect(t('proxy.action.start')).toBe('Start Proxy');
   });
 
   it('returns the key itself for an unknown key', () => {
@@ -66,16 +66,16 @@ describe('load() and t()', () => {
 
   it('falls back to English when locale is unknown', () => {
     load('xx');
-    expect(t('proxy.start')).toBe('Start Proxy');
+    expect(t('proxy.action.start')).toBe('Start Proxy');
   });
 
   it('handles a full locale tag by stripping the region suffix', () => {
     load('en-US');
-    expect(t('proxy.start')).toBe('Start Proxy');
+    expect(t('proxy.action.start')).toBe('Start Proxy');
   });
 
   it('handles null/undefined locale by defaulting to English', () => {
     load(null);
-    expect(t('proxy.start')).toBe('Start Proxy');
+    expect(t('proxy.action.start')).toBe('Start Proxy');
   });
 });

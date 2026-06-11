@@ -34,15 +34,15 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
     let valid = true;
 
     if (!trimDomain || !validateDomainPart(trimDomain)) {
-      setDomainError(t('form.domainErrorInvalid'));
+      setDomainError(t('mappings.modals.manage.form.domain.error.invalid'));
       valid = false;
     } else if (trimSubdomain && trimSubdomain !== '*' && !validateDomainPart(trimSubdomain)) {
-      setDomainError(t('form.subdomainError'));
+      setDomainError(t('mappings.modals.manage.form.subdomain.error'));
       valid = false;
     }
 
     if (!parsedPort || parsedPort < 1 || parsedPort > 65535 || isNaN(parsedPort)) {
-      setPortError(t('form.portError'));
+      setPortError(t('mappings.modals.manage.form.port.error'));
       valid = false;
     }
 
@@ -53,7 +53,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
       : `${trimDomain}${suffix}`;
 
     if (mappings.some((m) => m.domain === fullDomain && m.id !== mapping?.id)) {
-      setDomainError(t('form.domainErrorDuplicate', { domain: fullDomain }));
+      setDomainError(t('mappings.modals.manage.form.domain.error.duplicate', { domain: fullDomain }));
       return;
     }
 
@@ -68,7 +68,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
         <div className="modal-content">
           <div className="modal-header">
             <h1 className="modal-title fs-5">
-              {isEditing ? t('modal.editTitle') : t('modal.addTitle')}
+              {isEditing ? t('mappings.modals.manage.editTitle') : t('mappings.modals.manage.addTitle')}
             </h1>
             <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
           </div>
@@ -76,13 +76,13 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
             <form onSubmit={handleSubmit} noValidate>
               <div className="form-group">
                 <label className="form-label">
-                  <span>{t('form.domain')}</span>
-                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('form.required')}</span>
+                  <span>{t('mappings.modals.manage.form.domain.label')}</span>
+                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('mappings.modals.manage.form.required')}</span>
                 </label>
                 <div className="domain-row">
                   <input
                     className="form-input"
-                    placeholder={t('form.subdomainPlaceholder')}
+                    placeholder={t('mappings.modals.manage.form.subdomain.placeholder')}
                     value={subdomain}
                     onChange={(e) => setSubdomain(e.target.value.toLowerCase())}
                     autoComplete="off"
@@ -93,7 +93,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                   <input
                     ref={domainInputRef}
                     className="form-input"
-                    placeholder={t('form.domainPlaceholder')}
+                    placeholder={t('mappings.modals.manage.form.domain.placeholder')}
                     value={domain}
                     onChange={(e) => setDomain(e.target.value.toLowerCase())}
                     autoComplete="off"
@@ -112,14 +112,14 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                     ))}
                   </select>
                 </div>
-                <div className="form-hint">{t('form.domainHint')}</div>
+                <div className="form-hint">{t('mappings.modals.manage.form.domain.hint')}</div>
                 {domainError && <div className="form-error visible">{domainError}</div>}
               </div>
 
               <div className="form-group">
                 <label className="form-label">
-                  <span>{t('form.host')}</span>
-                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('form.optional')}</span>
+                  <span>{t('mappings.modals.manage.form.host.label')}</span>
+                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('mappings.modals.manage.form.optional')}</span>
                 </label>
                 <input
                   className="form-input"
@@ -129,13 +129,13 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                   autoComplete="off"
                   spellCheck={false}
                 />
-                <div className="form-hint">{t('form.hostHint')}</div>
+                <div className="form-hint">{t('mappings.modals.manage.form.host.hint')}</div>
               </div>
 
               <div className="form-group">
                 <label className="form-label">
-                  <span>{t('form.port')}</span>
-                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('form.required')}</span>
+                  <span>{t('mappings.modals.manage.form.port.label')}</span>
+                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('mappings.modals.manage.form.required')}</span>
                 </label>
                 <input
                   className="form-input"
@@ -147,7 +147,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                   autoComplete="off"
                   required
                 />
-                <div className="form-hint">{t('form.portHint')}</div>
+                <div className="form-hint">{t('mappings.modals.manage.form.port.hint')}</div>
                 {portError && <div className="form-error visible">{portError}</div>}
               </div>
 
@@ -158,17 +158,17 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                     checked={https}
                     onChange={(e) => setHttps(e.target.checked)}
                   />
-                  <span>{t('form.httpsLabel')}</span>
+                  <span>{t('mappings.modals.manage.form.https.label')}</span>
                 </label>
-                <div className="form-hint" style={{ marginTop: 6 }}>{t('form.httpsHint')}</div>
+                <div className="form-hint" style={{ marginTop: 6 }}>{t('mappings.modals.manage.form.https.hint')}</div>
               </div>
 
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={onClose}>
-                  {t('modal.cancel')}
+                  {t('mappings.modals.manage.buttons.cancel')}
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {isEditing ? t('modal.editSubmit') : t('modal.addSubmit')}
+                  {isEditing ? t('mappings.modals.manage.buttons.update') : t('mappings.modals.manage.buttons.add')}
                 </button>
               </div>
             </form>

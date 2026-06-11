@@ -25,7 +25,7 @@ export default function AboutModal({ version, electronVersion, nodeVersion, onCl
             </p>
             <div className="modal-footer">
               <button type="button" className="btn btn-primary" onClick={onClose} aria-label="Close">
-                {t('modal.close')}
+                {t('about.modals.buttons.close')}
               </button>
             </div>
           </div>

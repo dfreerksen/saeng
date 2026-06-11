@@ -33,16 +33,16 @@ export default function ExportModal({ mappings, onClose, onSubmit, t }) {
       <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content">
           <div className="modal-header">
-            <h1 className="modal-title fs-5">{t('export.title')}</h1>
+            <h1 className="modal-title fs-5">{t('mappings.modals.export.title')}</h1>
             <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
           </div>
           <div className="modal-body">
             <form onSubmit={handleSubmit} noValidate>
-              <p className="form-hint" style={{ marginTop: 0 }}>{t('export.subtitle')}</p>
+              <p className="form-hint" style={{ marginTop: 0 }}>{t('mappings.modals.export.description')}</p>
 
               <label className="checkbox-row">
                 <input type="checkbox" checked={allSelected} onChange={toggleAll} />
-                <span>{t('export.selectAll')}</span>
+                <span>{t('mappings.modals.export.selectAll')}</span>
               </label>
 
               <div className="export-list">
@@ -59,15 +59,15 @@ export default function ExportModal({ mappings, onClose, onSubmit, t }) {
               </div>
 
               <div className="form-hint">
-                {t('export.selectedCount', { count: selected.size, total: mappings.length })}
+                {t('mappings.modals.export.selectedCount', { count: selected.size, total: mappings.length })}
               </div>
 
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={onClose}>
-                  {t('modal.cancel')}
+                  {t('mappings.modals.manage.buttons.cancel')}
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={submitting || selected.size === 0}>
-                  {t('export.submit')}
+                  {t('mappings.modals.export.buttons.submit')}
                 </button>
               </div>
             </form>

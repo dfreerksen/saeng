@@ -32,8 +32,8 @@ function checkboxFor(domainText) {
 describe('ExportModal — rendering', () => {
   it('renders the title and subtitle', () => {
     renderExportModal();
-    expect(screen.getByText('export.title')).toBeInTheDocument();
-    expect(screen.getByText('export.subtitle')).toBeInTheDocument();
+    expect(screen.getByText('mappings.modals.export.title')).toBeInTheDocument();
+    expect(screen.getByText('mappings.modals.export.description')).toBeInTheDocument();
   });
 
   it('renders a checkbox row for each mapping showing domain', () => {
@@ -92,14 +92,14 @@ describe('ExportModal — selection', () => {
 describe('ExportModal — submit button state', () => {
   it('is enabled while at least one mapping is selected', () => {
     renderExportModal();
-    expect(screen.getByText('export.submit').closest('button')).not.toBeDisabled();
+    expect(screen.getByText('mappings.modals.export.buttons.submit').closest('button')).not.toBeDisabled();
   });
 
   it('is disabled once every mapping is deselected', () => {
     renderExportModal();
     const [selectAll] = screen.getAllByRole('checkbox');
     fireEvent.click(selectAll);
-    expect(screen.getByText('export.submit').closest('button')).toBeDisabled();
+    expect(screen.getByText('mappings.modals.export.buttons.submit').closest('button')).toBeDisabled();
   });
 });
 
@@ -107,7 +107,7 @@ describe('ExportModal — submit', () => {
   it('calls onSubmit with the ids of the selected mappings', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined);
     renderExportModal({ onSubmit });
-    fireEvent.click(screen.getByText('export.submit').closest('button'));
+    fireEvent.click(screen.getByText('mappings.modals.export.buttons.submit').closest('button'));
     await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
     expect(onSubmit).toHaveBeenCalledWith(['1', '2']);
   });
@@ -116,7 +116,7 @@ describe('ExportModal — submit', () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined);
     renderExportModal({ onSubmit });
     fireEvent.click(checkboxFor('api.local'));
-    fireEvent.click(screen.getByText('export.submit').closest('button'));
+    fireEvent.click(screen.getByText('mappings.modals.export.buttons.submit').closest('button'));
     await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
     expect(onSubmit).toHaveBeenCalledWith(['1']);
   });
@@ -125,10 +125,10 @@ describe('ExportModal — submit', () => {
     let resolveSubmit;
     const onSubmit = vi.fn(() => new Promise((resolve) => { resolveSubmit = resolve; }));
     renderExportModal({ onSubmit });
-    fireEvent.click(screen.getByText('export.submit').closest('button'));
-    await waitFor(() => expect(screen.getByText('export.submit').closest('button')).toBeDisabled());
+    fireEvent.click(screen.getByText('mappings.modals.export.buttons.submit').closest('button'));
+    await waitFor(() => expect(screen.getByText('mappings.modals.export.buttons.submit').closest('button')).toBeDisabled());
     resolveSubmit();
-    await waitFor(() => expect(screen.getByText('export.submit').closest('button')).not.toBeDisabled());
+    await waitFor(() => expect(screen.getByText('mappings.modals.export.buttons.submit').closest('button')).not.toBeDisabled());
   });
 });
 
@@ -143,7 +143,7 @@ describe('ExportModal — close', () => {
   it('calls onClose when the cancel button is clicked', () => {
     const onClose = vi.fn();
     renderExportModal({ onClose });
-    fireEvent.click(screen.getByText('modal.cancel'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.cancel'));
     expect(onClose).toHaveBeenCalledOnce();
   });
 });

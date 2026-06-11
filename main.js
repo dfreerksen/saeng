@@ -163,7 +163,7 @@ function setupIPC() {
   ipcMain.handle('mappings:export', async (_, ids) => {
     const data = store.exportMappings(ids);
     const result = await dialog.showSaveDialog(mainWindow, {
-      title: i18n.t('export.dialogTitle'),
+      title: i18n.t('mappings.modals.export.dialog.title'),
       defaultPath: 'saeng-mappings.json',
       filters: [{ name: 'JSON', extensions: ['json'] }],
     });
@@ -180,7 +180,7 @@ function setupIPC() {
 
   ipcMain.handle('mappings:import', async () => {
     const result = await dialog.showOpenDialog(mainWindow, {
-      title: i18n.t('import.dialogTitle'),
+      title: i18n.t('mappings.modals.import.dialog.title'),
       properties: ['openFile'],
       filters: [{ name: 'JSON', extensions: ['json'] }],
     });
@@ -192,12 +192,12 @@ function setupIPC() {
     try {
       parsed = JSON.parse(fs.readFileSync(result.filePaths[0], 'utf8'));
     } catch (err) {
-      return { success: false, error: i18n.t('import.error.readFailed', { error: err.message }) };
+      return { success: false, error: i18n.t('mappings.modals.import.error.readFailed', { error: err.message }) };
     }
 
     const list = Array.isArray(parsed) ? parsed : parsed?.mappings;
     if (!Array.isArray(list)) {
-      return { success: false, error: i18n.t('import.error.invalidFormat') };
+      return { success: false, error: i18n.t('mappings.modals.import.error.invalidFormat') };
     }
 
     const { added, skipped } = store.importMappings(list);
