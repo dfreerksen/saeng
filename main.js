@@ -9,6 +9,7 @@ import { ProxyManager } from './src/proxy/manager.js';
 import { CertManager } from './src/proxy/certManager.js';
 import { clearSystemProxy } from './src/systemProxy.js';
 import { trustCA, untrustCA } from './src/ssl/trust.js';
+import { UpdateChecker } from './src/updateChecker.js';
 import pkg from './package.json' with { type: 'json' };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -21,6 +22,7 @@ let mainWindow = null;
 let tray = null;
 let store = null;
 let proxyManager = null;
+let updateChecker = null;
 let isQuitting = false;
 
 app.setAboutPanelOptions({
@@ -299,6 +301,8 @@ function setupIPC() {
     node: process.versions.node,
   }));
 
+  ipcMain.handle('update:get-status', () => updateChecker.getStatus());
+
   ipcMain.handle('i18n:get-strings', () => i18n.getStrings());
 
   ipcMain.handle('i18n:get-locales', () => i18n.getSupportedLocales());
@@ -320,6 +324,11 @@ app.whenReady().then(async () => {
   );
   proxyManager.healthChecker.setListener((result) =>
     mainWindow?.webContents.send('health:update', result)
+  );
+
+  updateChecker = new UpdateChecker(pkg.version);
+  updateChecker.setListener((status) =>
+    mainWindow?.webContents.send('update:status', status)
   );
 
   // Clear any leftover proxy config from a previous run (crash / force-quit).
@@ -350,6 +359,7 @@ app.whenReady().then(async () => {
   createTray();
 
   proxyManager.healthChecker.start(store.getMappings());
+  updateChecker.start();
 
   // Auto-start if the setting is enabled
   if (store.getSettings().startOnLaunch) {
@@ -377,6 +387,7 @@ app.on('before-quit', (event) => {
   event.preventDefault();
   tray?.destroy();
   proxyManager?.healthChecker.stop();
+  updateChecker?.stop();
   const cleanup = proxyManager?.isRunning() ? proxyManager.stop() : Promise.resolve();
   cleanup.catch(() => {}).finally(() => app.quit());
 });

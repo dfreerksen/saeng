@@ -71,6 +71,11 @@ function makeElectronAPI(overrides = {}) {
       setLocale: vi.fn().mockResolvedValue({}),
       ...overrides.i18n,
     },
+    update: {
+      getStatus: vi.fn().mockResolvedValue({ updateAvailable: false, currentVersion: '1.2.3', latestVersion: null, url: null }),
+      onStatus: vi.fn(),
+      ...overrides.update,
+    },
   };
 }
 

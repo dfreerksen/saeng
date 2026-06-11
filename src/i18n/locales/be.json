@@ -124,6 +124,9 @@
   "about.desc": "Лакальны зваротны проксі для маршрутызацыі даменаў .local на парты localhost.",
   "about.modals.buttons.close": "Закрыць",
 
+  "update.available": "Даступна абнаўленне",
+  "update.tooltip": "Версія {version} даступная. Націсніце, каб праглядзець на GitHub.",
+
   "flash.proxy.stopped": "Проксі спынены.",
   "flash.proxy.stopFailed": "Не атрымалася спыніць: {error}",
   "flash.proxy.started": "Проксі запушчаны. Сістэмны проксі наладжаны.",

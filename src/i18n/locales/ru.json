@@ -124,6 +124,9 @@
   "about.desc": "Локальный обратный прокси-сервер для маршрутизации доменов .local на порты localhost.",
   "about.modals.buttons.close": "Закрыть",
 
+  "update.available": "Доступно обновление",
+  "update.tooltip": "Доступна версия {version}. Нажмите, чтобы посмотреть на GitHub.",
+
   "flash.proxy.stopped": "Прокси остановлен.",
   "flash.proxy.stopFailed": "Не удалось остановить: {error}",
   "flash.proxy.started": "Прокси запущен. Системный прокси настроен.",

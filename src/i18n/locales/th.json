@@ -124,6 +124,9 @@
   "about.desc": "พร็อกซีย้อนกลับในเครื่องสำหรับกำหนดเส้นทางโดเมน .local ไปยังพอร์ต localhost",
   "about.modals.buttons.close": "ปิด",
 
+  "update.available": "มีการอัปเดต",
+  "update.tooltip": "มีเวอร์ชัน {version} พร้อมใช้งาน คลิกเพื่อดูบน GitHub",
+
   "flash.proxy.stopped": "พร็อกซีหยุดทำงาน",
   "flash.proxy.stopFailed": "ไม่สามารถหยุด: {error}",
   "flash.proxy.started": "พร็อกซีเริ่มต้นแล้ว กำหนดค่าพร็อกซีของระบบแล้ว",

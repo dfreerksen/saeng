@@ -1,9 +1,13 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Titlebar from '../../../src/renderer/components/Titlebar.jsx';
 
 const t = (key) => key;
+
+beforeEach(() => {
+  window.electronAPI = { app: { openExternal: vi.fn() } };
+});
 
 describe('Titlebar', () => {
   it('renders the app name', () => {
@@ -38,5 +42,24 @@ describe('Titlebar', () => {
     render(<Titlebar proxyRunning={false} t={customT} />);
     expect(customT).toHaveBeenCalledWith('proxy.status.stopped');
     expect(screen.getByText('[proxy.status.stopped]')).toBeInTheDocument();
+  });
+
+  it('does not show an update badge when no update is available', () => {
+    render(<Titlebar proxyRunning={false} updateInfo={{ updateAvailable: false }} t={t} />);
+    expect(screen.queryByText('update.available')).not.toBeInTheDocument();
+  });
+
+  it('shows an update badge when an update is available', () => {
+    const updateInfo = { updateAvailable: true, latestVersion: '1.7.0', url: 'https://github.com/dfreerksen/saeng/releases/tag/v1.7.0' };
+    render(<Titlebar proxyRunning={false} updateInfo={updateInfo} t={t} />);
+    expect(screen.getByText('update.available')).toBeInTheDocument();
+  });
+
+  it('opens the release URL when the update badge is clicked', () => {
+    const updateInfo = { updateAvailable: true, latestVersion: '1.7.0', url: 'https://github.com/dfreerksen/saeng/releases/tag/v1.7.0' };
+    render(<Titlebar proxyRunning={false} updateInfo={updateInfo} t={t} />);
+
+    fireEvent.click(screen.getByText('update.available'));
+    expect(window.electronAPI.app.openExternal).toHaveBeenCalledWith(updateInfo.url);
   });
 });

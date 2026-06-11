@@ -124,6 +124,9 @@
   "about.desc": ".local 도메인을 localhost 포트로 라우팅하기 위한 로컬 역방향 프록시.",
   "about.modals.buttons.close": "닫기",
 
+  "update.available": "업데이트 사용 가능",
+  "update.tooltip": "버전 {version}을(를) 사용할 수 있습니다. 클릭하여 GitHub에서 확인하세요.",
+
   "flash.proxy.stopped": "프록시가 중지되었습니다.",
   "flash.proxy.stopFailed": "중지 실패: {error}",
   "flash.proxy.started": "프록시가 시작되었습니다. 시스템 프록시가 구성되었습니다.",

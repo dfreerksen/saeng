@@ -124,6 +124,9 @@
   "about.desc": "用于将 .local 域路由到 localhost 端口的本地反向代理。",
   "about.modals.buttons.close": "关闭",
 
+  "update.available": "有可用更新",
+  "update.tooltip": "版本 {version} 现已可用。点击在 GitHub 上查看。",
+
   "flash.proxy.stopped": "代理已停止。",
   "flash.proxy.stopFailed": "停止失败：{error}",
   "flash.proxy.started": "代理已启动。系统代理已配置。",

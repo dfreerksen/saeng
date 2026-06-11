@@ -124,6 +124,9 @@
   "about.desc": "Proxy ngược cục bộ để định tuyến các miền .local tới các cổng localhost.",
   "about.modals.buttons.close": "Đóng",
 
+  "update.available": "Có bản cập nhật",
+  "update.tooltip": "Phiên bản {version} đã có sẵn. Nhấp để xem trên GitHub.",
+
   "flash.proxy.stopped": "Proxy đã dừng.",
   "flash.proxy.stopFailed": "Dừng thất bại: {error}",
   "flash.proxy.started": "Proxy đã khởi chạy. Đã cấu hình proxy hệ thống.",

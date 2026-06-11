@@ -27,6 +27,25 @@
   flex: 1;
 }
 
+.update-badge {
+  align-items: center;
+  -webkit-app-region: no-drag;
+  background: color-mix(in srgb, var(--bs-warning) 18%, transparent);
+  border: 1px solid var(--bs-warning);
+  border-radius: 20px;
+  color: var(--bs-warning);
+  cursor: pointer;
+  display: flex;
+  font-size: 0.8rem;
+  font-weight: 600;
+  gap: 6px;
+  padding: 3px 10px;
+
+  &:hover {
+    background: color-mix(in srgb, var(--bs-warning) 28%, transparent);
+  }
+}
+
 .status-pill {
   align-items: center;
   -webkit-app-region: no-drag;

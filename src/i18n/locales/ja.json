@@ -124,6 +124,9 @@
   "about.desc": ".local ドメインを localhost ポートにルーティングするためのローカル リバース プロキシ。",
   "about.modals.buttons.close": "閉じる",
 
+  "update.available": "アップデートがあります",
+  "update.tooltip": "バージョン {version} が利用可能です。クリックして GitHub で表示します。",
+
   "flash.proxy.stopped": "プロキシを停止しました。",
   "flash.proxy.stopFailed": "停止に失敗しました: {error}",
   "flash.proxy.started": "プロキシを開始しました。システムプロキシを設定済みです。",

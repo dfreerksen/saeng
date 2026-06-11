@@ -49,6 +49,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getInfo: () => ipcRenderer.invoke('app:get-info'),
     openExternal: (url) => ipcRenderer.invoke('app:open-external', url),
   },
+  update: {
+    getStatus: () => ipcRenderer.invoke('update:get-status'),
+    onStatus: (callback) => {
+      ipcRenderer.on('update:status', (_, status) => callback(status));
+    },
+  },
   i18n: {
     getStrings: () => ipcRenderer.invoke('i18n:get-strings'),
     getLocales: () => ipcRenderer.invoke('i18n:get-locales'),

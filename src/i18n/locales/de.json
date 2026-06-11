@@ -124,6 +124,9 @@
   "about.desc": "Ein lokaler Reverse-Proxy zum Weiterleiten von .local-Domänen an localhost-Ports.",
   "about.modals.buttons.close": "Schließen",
 
+  "update.available": "Update verfügbar",
+  "update.tooltip": "Version {version} ist verfügbar. Klicken Sie, um sie auf GitHub anzuzeigen.",
+
   "flash.proxy.stopped": "Proxy gestoppt.",
   "flash.proxy.stopFailed": "Stoppen fehlgeschlagen: {error}",
   "flash.proxy.started": "Proxy gestartet. System-Proxy konfiguriert.",

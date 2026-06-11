@@ -124,6 +124,9 @@
   "about.desc": "Un proxy inverse local pour acheminer les domaines .local vers les ports localhost.",
   "about.modals.buttons.close": "Fermer",
 
+  "update.available": "Mise à jour disponible",
+  "update.tooltip": "La version {version} est disponible. Cliquez pour la voir sur GitHub.",
+
   "flash.proxy.stopped": "Proxy arrêté.",
   "flash.proxy.stopFailed": "Échec de l'arrêt : {error}",
   "flash.proxy.started": "Proxy démarré. Proxy système configuré.",

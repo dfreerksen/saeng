@@ -124,6 +124,9 @@
   "about.desc": "وكيل عكسي محلي لتوجيه النطاقات .local إلى منافذ localhost.",
   "about.modals.buttons.close": "يغلق",
 
+  "update.available": "تحديث متوفر",
+  "update.tooltip": "الإصدار {version} متاح. انقر لعرضه على GitHub.",
+
   "flash.proxy.stopped": "تم إيقاف الوكيل (Proxy).",
   "flash.proxy.stopFailed": "فشل إيقاف الوكيل: {error}",
   "flash.proxy.started": "تم تشغيل الوكيل. تم تكوين وكيل النظام.",

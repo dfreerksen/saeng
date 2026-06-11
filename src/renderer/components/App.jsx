@@ -35,6 +35,7 @@ export default function App() {
   const [nodeVersion, setNodeVersion] = useState('');
   const [caPath, setCaPath] = useState('');
   const [caExpiry, setCaExpiry] = useState(null);
+  const [updateInfo, setUpdateInfo] = useState({ updateAvailable: false, latestVersion: null, url: null });
   const [i18nStrings, setI18nStrings] = useState({});
   const logMaxEntriesRef = useRef(DEFAULT_LOG_MAX_ENTRIES);
 
@@ -73,7 +74,7 @@ export default function App() {
       const strings = await window.electronAPI.i18n.getStrings();
       setI18nStrings(strings);
 
-      const [status, mList, logEntries, healthList, appInfo, caPathVal, caExpiryVal, settingsData, localeList] = await Promise.all([
+      const [status, mList, logEntries, healthList, appInfo, caPathVal, caExpiryVal, settingsData, localeList, updateStatus] = await Promise.all([
         window.electronAPI.proxy.status(),
         window.electronAPI.mappings.list(),
         window.electronAPI.requestLog.list(),
@@ -83,6 +84,7 @@ export default function App() {
         window.electronAPI.ssl.getCAExpiry(),
         window.electronAPI.settings.get(),
         window.electronAPI.i18n.getLocales(),
+        window.electronAPI.update.getStatus(),
       ]);
 
       setProxyRunning(status.running);
@@ -96,6 +98,7 @@ export default function App() {
       setCaExpiry(caExpiryVal);
       setSettingsState(settingsData);
       setLocales(localeList);
+      setUpdateInfo(updateStatus);
 
       applyColorMode(settingsData.colorMode || 'auto');
 
@@ -121,6 +124,10 @@ export default function App() {
 
     window.electronAPI.health.onUpdate((result) => {
       setHealthStatuses((prev) => ({ ...prev, [result.id]: result }));
+    });
+
+    window.electronAPI.update.onStatus((status) => {
+      setUpdateInfo(status);
     });
 
     function handleExternalLinks(e) {
@@ -195,7 +202,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <Titlebar proxyRunning={proxyRunning} t={t} />
+      <Titlebar proxyRunning={proxyRunning} updateInfo={updateInfo} t={t} />
       <div className="main-layout">
         <Sidebar
           currentView={currentView}
