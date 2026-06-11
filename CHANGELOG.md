@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-06-11
+
+### Added
+
+- Live request log can optionally capture request/response headers and bodies (up to 64 KB each), viewable in an expandable details row per entry
+- Export the request log as a HAR file for use with browser dev tools or other HTTP debugging tools
+- Window size is now remembered between launches
+
+[1.9.0]: https://github.com/dfreerksen/saeng/releases/tag/v1.9.0
+
 ## [1.8.0] - 2026-06-11
 
 ### Added
