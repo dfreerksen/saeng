@@ -67,6 +67,7 @@ The renderer is a **React 19** app bundled by **esbuild**. SCSS is compiled by *
 | Channel | Description |
 |---|---|
 | `mappings:list/add/remove/update/toggle` | CRUD for domain mappings |
+| `mappings:setGroupEnabled` | Enable/disable every mapping in a domain group at once (takes an array of ids + target enabled state) |
 | `mappings:export/import` | Export/import mappings to/from a JSON file via native save/open dialogs |
 | `proxy:start/stop/status` | Control and query proxy state |
 | `requestLog:list/clear` | Read/clear the in-memory request log |
@@ -74,9 +75,10 @@ The renderer is a **React 19** app bundled by **esbuild**. SCSS is compiled by *
 | `settings:get/set` | Read/write persistent settings |
 | `ssl:get-ca-expiry/regenerate-ca/delete-ca/get-ca-path/reveal-ca/trust-ca` | CA cert management |
 | `app:get-info/open-external` | App metadata, open URL in browser |
+| `update:get-status` | Read the current update-checker status (current/latest version, update availability, release URL) |
 | `i18n:get-strings/get-locales/set-locale` | Internationalisation |
 
-The main process also pushes `proxy:status` events to the renderer when proxy state changes (from the tray menu), and `health:update` events whenever a backend health check completes.
+The main process also pushes `proxy:status` events to the renderer when proxy state changes (from the tray menu), `health:update` events whenever a backend health check completes, and `update:status` events whenever the update checker re-polls GitHub.
 
 ### HTTPS / SSL
 
@@ -90,7 +92,7 @@ The user must install the CA cert into the OS trust store once — `src/ssl/trus
 
 Mapping shape:
 ```js
-{ id, domain, host, port, https, enabled, label, createdAt }
+{ id, domain, host, port, https, enabled, createdAt }
 ```
 `host` is the backend hostname to proxy to (defaults to `127.0.0.1`). It is used for all connection types: plain HTTP, HTTPS CONNECT tunnels, and WebSocket upgrades. `https` on a mapping means the **backend** expects HTTPS — it does not control whether the frontend domain is served over HTTPS (that is the global `settings.httpsEnabled` toggle).
 
@@ -102,6 +104,10 @@ Settings defaults: `{ httpsEnabled: true, startOnLaunch: true, colorMode: 'auto'
 
 `RequestLog` (`src/proxy/requestLog.js`) is an in-memory ring buffer (default cap `DEFAULT_MAX_ENTRIES = 300`, configurable via `settings.logMaxEntries`) that records metadata (no bodies) for each proxied request, including the error reason on failures. It lives on `ProxyManager` and is wired into `HttpProxy` so entries are recorded on the hot path. Toggling `settings.loggingEnabled` calls `requestLog.setEnabled()`, which short-circuits `add()` without clearing existing entries. The renderer's `LogView.jsx` reads/clears it via the `requestLog:list/clear` IPC channels.
 
+### Mapping groups
+
+`MappingsView.jsx` groups mappings by their base domain (`domain + suffix` from `splitDomain()`, e.g. `myapp.local`) into separate `<tbody>` blocks, each with a group header row showing the base domain and a "toggle all" checkbox. That checkbox calls `mappings:setGroupEnabled` (backed by `store.setMappingsEnabled(ids, enabled)`) to enable/disable every mapping in the group in one update. Within a group, rows are ordered by `compareMappings`/`subdomainRank`: the bare domain (no subdomain) first, then named subdomains alphanumerically, then the wildcard `*` subdomain last. Copying a wildcard mapping's URL copies the bare base domain rather than the literal `*.domain` host.
+
 ### Live mapping updates
 
 Adding, removing, toggling, or editing a mapping always calls `ProxyManager.updateMappings()`. While the proxy is running this pushes the change live to both `httpProxy` and `pacServer` — no proxy restart required. It also always forwards the new mapping list to `healthChecker.updateMappings()`, even when the proxy is stopped, so health-check state stays in sync.
@@ -111,6 +117,10 @@ Adding, removing, toggling, or editing a mapping always calls `ProxyManager.upda
 `HealthChecker` (`src/proxy/healthChecker.js`) lives on `ProxyManager` and, when `settings.healthCheckEnabled` is true and the proxy is running (`setProxyRunning()`), periodically opens a raw TCP connection (`net.connect`) to each enabled mapping's `host:port` on a `setInterval` of `settings.healthCheckIntervalMs`, timing out after `settings.healthCheckTimeoutMs`. Each check produces `{ id, status: 'up' | 'down', latencyMs, checkedAt, error }`, stored in an in-memory map and emitted to a listener (mirroring `RequestLog`'s pattern). Newly-enabled mappings are checked immediately rather than waiting for the next tick.
 
 `main.js` wires `healthChecker.setListener()` to push `health:update` events to the renderer, exposes the current map via `health:list`, and starts the checker (`healthChecker.start(mappings)`) on `app.whenReady` regardless of `startOnLaunch`. `settings:set` calls `setEnabled`/`setIntervalMs`/`setTimeoutMs` on the checker when those keys change. The renderer's `MappingsView.jsx` shows a colored status dot with a tooltip next to each domain when `settings.healthCheckEnabled` is true and the mapping is enabled and the proxy is running.
+
+### Update checker
+
+`UpdateChecker` (`src/updateChecker.js`) polls the GitHub releases API (`https://api.github.com/repos/dfreerksen/saeng/releases/latest`) once at startup and then every 24 hours (`CHECK_INTERVAL_MS`), comparing the latest release tag against `pkg.version` via `isNewerVersion()`. Each check produces `{ updateAvailable, currentVersion, latestVersion, url }`, emitted to a listener (mirroring `HealthChecker`'s pattern). `main.js` constructs it on `app.whenReady`, wires `setListener()` to push `update:status` events to the renderer, exposes the current status via `update:get-status`, calls `updateChecker.start()`, and stops it on `before-quit`. The renderer's `Titlebar.jsx` shows an "update available" badge that links to the release URL when `updateInfo.updateAvailable` is true.
 
 ### Startup / shutdown
 

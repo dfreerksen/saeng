@@ -13,12 +13,14 @@ Saeng means "light," "radiance," or "glow" in Thai.
 ## Features
 
 * Map any local domain (with or without subdomain) to a local port
+* Mappings are grouped by base domain, with a toggle to enable/disable a whole group at once
 * Enable/disable individual mappings without removing them
 * HTTPS support via a local CA certificate (with MITM SSL termination)
 * WebSocket pass-through
 * Start proxy automatically on launch
 * System tray integration on macOS, Windows, and Linux
 * Optional backend health checks with live status indicators per mapping
+* Notifies you in the titlebar when a newer version is available on GitHub
 
 ## How it works
 
