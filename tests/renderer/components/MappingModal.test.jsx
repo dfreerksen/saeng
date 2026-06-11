@@ -337,3 +337,69 @@ describe('MappingModal — successful submit', () => {
     await act(async () => { resolve(); });
   });
 });
+
+describe('MappingModal — header overrides', () => {
+  it('starts with no header rows', () => {
+    const { container } = renderAddModal();
+    expect(container.querySelectorAll('.header-row')).toHaveLength(0);
+  });
+
+  it('adds a header row when "Add Header" is clicked', () => {
+    const { container } = renderAddModal();
+    const addButtons = screen.getAllByText('mappings.modals.manage.form.headers.add');
+    fireEvent.click(addButtons[0]);
+    expect(container.querySelectorAll('.header-row')).toHaveLength(1);
+  });
+
+  it('removes a header row when the remove button is clicked', () => {
+    const { container } = renderAddModal();
+    const addButtons = screen.getAllByText('mappings.modals.manage.form.headers.add');
+    fireEvent.click(addButtons[0]);
+    fireEvent.click(container.querySelector('.header-row button'));
+    expect(container.querySelectorAll('.header-row')).toHaveLength(0);
+  });
+
+  it('includes requestHeaders and responseHeaders in onSubmit', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderAddModal({ onSubmit });
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+
+    const addButtons = screen.getAllByText('mappings.modals.manage.form.headers.add');
+    fireEvent.click(addButtons[0]); // request header row
+    fireEvent.click(addButtons[1]); // response header row
+
+    const headerRows = container.querySelectorAll('.header-row');
+    const reqInputs = headerRows[0].querySelectorAll('.form-input');
+    fireEvent.change(reqInputs[0], { target: { value: 'X-Custom' } });
+    fireEvent.change(reqInputs[1], { target: { value: 'request-value' } });
+
+    const resInputs = headerRows[1].querySelectorAll('.form-input');
+    fireEvent.change(resInputs[0], { target: { value: 'X-Resp' } });
+    fireEvent.change(resInputs[1], { target: { value: 'response-value' } });
+
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
+        requestHeaders: [{ name: 'X-Custom', value: 'request-value' }],
+        responseHeaders: [{ name: 'X-Resp', value: 'response-value' }],
+      }));
+    });
+  });
+
+  it('pre-fills request and response header rows in edit mode', () => {
+    const { container } = renderEditModal({
+      mapping: {
+        ...EXISTING_MAPPING,
+        requestHeaders: [{ name: 'X-Req', value: 'req-val' }],
+        responseHeaders: [{ name: 'X-Res', value: 'res-val' }],
+      },
+    });
+    const headerRows = container.querySelectorAll('.header-row');
+    expect(headerRows).toHaveLength(2);
+    expect(headerRows[0].querySelectorAll('.form-input')[0].value).toBe('X-Req');
+    expect(headerRows[0].querySelectorAll('.form-input')[1].value).toBe('req-val');
+    expect(headerRows[1].querySelectorAll('.form-input')[0].value).toBe('X-Res');
+    expect(headerRows[1].querySelectorAll('.form-input')[1].value).toBe('res-val');
+  });
+});

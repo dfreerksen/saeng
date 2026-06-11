@@ -2,6 +2,63 @@ import { useState, useRef, useEffect } from 'react';
 import Modal from './Modal.jsx';
 import { validateDomainPart, splitDomain, DOMAIN_SUFFIXES, DEFAULT_SUFFIX } from '../js/utils.js';
 
+function HeaderListEditor({ headers, onChange, label, hint, t }) {
+  function updateRow(index, field, value) {
+    onChange(headers.map((h, i) => (i === index ? { ...h, [field]: value } : h)));
+  }
+
+  function addRow() {
+    onChange([...headers, { name: '', value: '' }]);
+  }
+
+  function removeRow(index) {
+    onChange(headers.filter((_, i) => i !== index));
+  }
+
+  return (
+    <div className="form-group">
+      <label className="form-label">
+        <span>{label}</span>
+        <span style={{ color: 'var(--saeng-text-muted)' }}>{t('mappings.modals.manage.form.optional')}</span>
+      </label>
+      {headers.map((header, index) => (
+        <div className="header-row" key={index}>
+          <input
+            className="form-input"
+            placeholder={t('mappings.modals.manage.form.headers.name.placeholder')}
+            value={header.name}
+            onChange={(e) => updateRow(index, 'name', e.target.value)}
+            autoComplete="off"
+            spellCheck={false}
+            style={{ flex: 1, minWidth: 0 }}
+          />
+          <input
+            className="form-input"
+            placeholder={t('mappings.modals.manage.form.headers.value.placeholder')}
+            value={header.value}
+            onChange={(e) => updateRow(index, 'value', e.target.value)}
+            autoComplete="off"
+            spellCheck={false}
+            style={{ flex: 1.5, minWidth: 0 }}
+          />
+          <button
+            type="button"
+            className="btn btn-outline-danger"
+            aria-label={t('mappings.modals.manage.form.headers.remove')}
+            onClick={() => removeRow(index)}
+          >
+            <i className="bi bi-trash" />
+          </button>
+        </div>
+      ))}
+      <button type="button" className="btn btn-outline-secondary btn-sm" onClick={addRow}>
+        {t('mappings.modals.manage.form.headers.add')}
+      </button>
+      <div className="form-hint">{hint}</div>
+    </div>
+  );
+}
+
 export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }) {
   const isEditing = !!mapping;
   const parsed = mapping ? splitDomain(mapping.domain) : { subdomain: '', domain: '', suffix: DEFAULT_SUFFIX };
@@ -12,6 +69,8 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
   const [host, setHost] = useState(mapping?.host ?? '127.0.0.1');
   const [port, setPort] = useState(mapping?.port ?? 3000);
   const [https, setHttps] = useState(!!mapping?.https);
+  const [requestHeaders, setRequestHeaders] = useState(mapping?.requestHeaders ?? []);
+  const [responseHeaders, setResponseHeaders] = useState(mapping?.responseHeaders ?? []);
   const [domainError, setDomainError] = useState('');
   const [portError, setPortError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -58,7 +117,14 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
     }
 
     setSubmitting(true);
-    await onSubmit({ domain: fullDomain, host: host.trim() || '127.0.0.1', port: parsedPort, https });
+    await onSubmit({
+      domain: fullDomain,
+      host: host.trim() || '127.0.0.1',
+      port: parsedPort,
+      https,
+      requestHeaders,
+      responseHeaders,
+    });
     setSubmitting(false);
   }
 
@@ -162,6 +228,22 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                 </label>
                 <div className="form-hint" style={{ marginTop: 6 }}>{t('mappings.modals.manage.form.https.hint')}</div>
               </div>
+
+              <HeaderListEditor
+                headers={requestHeaders}
+                onChange={setRequestHeaders}
+                label={t('mappings.modals.manage.form.headers.request.label')}
+                hint={t('mappings.modals.manage.form.headers.request.hint')}
+                t={t}
+              />
+
+              <HeaderListEditor
+                headers={responseHeaders}
+                onChange={setResponseHeaders}
+                label={t('mappings.modals.manage.form.headers.response.label')}
+                hint={t('mappings.modals.manage.form.headers.response.hint')}
+                t={t}
+              />
 
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={onClose}>

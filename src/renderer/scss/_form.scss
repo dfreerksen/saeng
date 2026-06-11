@@ -82,6 +82,13 @@
   }
 }
 
+.header-row {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
 .checkbox-row {
   align-items: center;
   cursor: pointer;

@@ -26,6 +26,18 @@ class HttpProxy {
       .sort((a, b) => b.base.length - a.base.length);
   }
 
+  // Applies a mapping's header overrides ({ name, value } pairs) onto a
+  // headers object, lowercasing names so they replace existing headers
+  // (which Node always reports with lowercase keys) rather than duplicating.
+  _applyHeaderOverrides(headers, overrides) {
+    if (Array.isArray(overrides)) {
+      for (const { name, value } of overrides) {
+        if (name) headers[name.toLowerCase()] = value;
+      }
+    }
+    return headers;
+  }
+
   findMapping(hostname) {
     const lower = hostname.toLowerCase();
 
@@ -173,9 +185,11 @@ class HttpProxy {
       ...(mapping.https && { rejectUnauthorized: false }),
     };
     delete options.headers['proxy-connection'];
+    this._applyHeaderOverrides(options.headers, mapping.requestHeaders);
 
     const proxyReq = backendProto.request(options, (proxyRes) => {
-      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      const headers = this._applyHeaderOverrides({ ...proxyRes.headers }, mapping.responseHeaders);
+      res.writeHead(proxyRes.statusCode, headers);
       proxyRes.pipe(res);
     });
 
@@ -212,9 +226,11 @@ class HttpProxy {
       headers: { ...req.headers },
       ...(mapping.https && { rejectUnauthorized: false }),
     };
+    this._applyHeaderOverrides(options.headers, mapping.requestHeaders);
 
     const proxyReq = backendProto.request(options, (proxyRes) => {
-      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      const headers = this._applyHeaderOverrides({ ...proxyRes.headers }, mapping.responseHeaders);
+      res.writeHead(proxyRes.statusCode, headers);
       proxyRes.pipe(res);
     });
 
@@ -283,9 +299,10 @@ class HttpProxy {
 
     const serverSocket = net.connect(mapping.port, mapping.host || '127.0.0.1', () => {
       // Replay the upgrade request to the backend
+      const headers = this._applyHeaderOverrides({ ...req.headers }, mapping.requestHeaders);
       let requestLine = `${req.method} ${req.url} HTTP/${req.httpVersion}\r\n`;
       serverSocket.write(requestLine);
-      Object.entries(req.headers).forEach(([k, v]) => {
+      Object.entries(headers).forEach(([k, v]) => {
         serverSocket.write(`${k}: ${v}\r\n`);
       });
       serverSocket.write('\r\n');

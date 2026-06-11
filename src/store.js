@@ -14,6 +14,18 @@ const MAX_HEALTH_CHECK_INTERVAL_MS = 300000;
 const MIN_HEALTH_CHECK_TIMEOUT_MS = 500;
 const MAX_HEALTH_CHECK_TIMEOUT_MS = 30000;
 
+const headerListSchema = {
+  type: 'array',
+  default: [],
+  items: {
+    type: 'object',
+    properties: {
+      name: { type: 'string' },
+      value: { type: 'string' },
+    },
+  },
+};
+
 const schema = {
   mappings: {
     type: 'array',
@@ -28,6 +40,8 @@ const schema = {
         https: { type: 'boolean' },
         enabled: { type: 'boolean' },
         createdAt: { type: 'string' },
+        requestHeaders: headerListSchema,
+        responseHeaders: headerListSchema,
       },
     },
   },
@@ -46,6 +60,13 @@ const schema = {
     },
   },
 };
+
+function sanitizeHeaders(list) {
+  if (!Array.isArray(list)) return [];
+  return list
+    .map((h) => ({ name: String(h?.name ?? '').trim(), value: String(h?.value ?? '').trim() }))
+    .filter((h) => h.name);
+}
 
 class AppStore {
   constructor() {
@@ -66,6 +87,8 @@ class AppStore {
       https: !!data.https,
       enabled: true,
       createdAt: new Date().toISOString(),
+      requestHeaders: sanitizeHeaders(data.requestHeaders),
+      responseHeaders: sanitizeHeaders(data.responseHeaders),
     };
     mappings.push(mapping);
     this.store.set('mappings', mappings);
@@ -86,6 +109,8 @@ class AppStore {
         host: data.host || '127.0.0.1',
         port: parseInt(data.port, 10),
         https: !!data.https,
+        requestHeaders: sanitizeHeaders(data.requestHeaders),
+        responseHeaders: sanitizeHeaders(data.responseHeaders),
       };
     });
     this.store.set('mappings', mappings);
@@ -113,8 +138,8 @@ class AppStore {
     const selected = Array.isArray(ids) && ids.length > 0
       ? mappings.filter((m) => ids.includes(m.id))
       : mappings;
-    return selected.map(({ domain, host, port, https, enabled }) => ({
-      domain, host, port, https, enabled,
+    return selected.map(({ domain, host, port, https, enabled, requestHeaders, responseHeaders }) => ({
+      domain, host, port, https, enabled, requestHeaders, responseHeaders,
     }));
   }
 
@@ -129,7 +154,14 @@ class AppStore {
         skipped.push(entry?.domain ?? '');
         continue;
       }
-      const mapping = this.addMapping({ domain, host: entry.host, port, https: entry.https });
+      const mapping = this.addMapping({
+        domain,
+        host: entry.host,
+        port,
+        https: entry.https,
+        requestHeaders: entry.requestHeaders,
+        responseHeaders: entry.responseHeaders,
+      });
       if (entry.enabled === false) this.toggleMapping(mapping.id);
       existingDomains.add(domain);
       added.push(mapping);

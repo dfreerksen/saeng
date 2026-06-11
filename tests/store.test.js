@@ -87,6 +87,23 @@ describe('AppStore.addMapping()', () => {
     store.addMapping({ domain: 'myapp.local', port: 3000 });
     expect(store.getMappings()).toHaveLength(1);
   });
+
+  it('defaults requestHeaders and responseHeaders to empty arrays', () => {
+    const result = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    expect(result.requestHeaders).toEqual([]);
+    expect(result.responseHeaders).toEqual([]);
+  });
+
+  it('sanitizes requestHeaders and responseHeaders, trimming values and dropping empty names', () => {
+    const result = store.addMapping({
+      domain: 'myapp.local',
+      port: 3000,
+      requestHeaders: [{ name: ' Authorization ', value: ' Bearer abc ' }, { name: '  ', value: 'ignored' }],
+      responseHeaders: [{ name: 'X-Test', value: 'hello' }],
+    });
+    expect(result.requestHeaders).toEqual([{ name: 'Authorization', value: 'Bearer abc' }]);
+    expect(result.responseHeaders).toEqual([{ name: 'X-Test', value: 'hello' }]);
+  });
 });
 
 describe('AppStore.removeMapping()', () => {
@@ -135,6 +152,18 @@ describe('AppStore.updateMapping()', () => {
     const m = store.addMapping({ domain: 'myapp.local', port: 3000 });
     const result = store.updateMapping(m.id, { domain: 'new.local', port: 4000 });
     expect(result.domain).toBe('new.local');
+  });
+
+  it('updates and sanitizes requestHeaders and responseHeaders', () => {
+    const m = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const result = store.updateMapping(m.id, {
+      domain: 'myapp.local',
+      port: 3000,
+      requestHeaders: [{ name: 'X-Custom', value: ' 1 ' }, { name: '', value: 'ignored' }],
+      responseHeaders: [{ name: 'Access-Control-Allow-Origin', value: '*' }],
+    });
+    expect(result.requestHeaders).toEqual([{ name: 'X-Custom', value: '1' }]);
+    expect(result.responseHeaders).toEqual([{ name: 'Access-Control-Allow-Origin', value: '*' }]);
   });
 });
 
@@ -212,9 +241,24 @@ describe('AppStore.exportMappings()', () => {
   it('returns all mappings stripped of id and createdAt when no ids given', () => {
     store.addMapping({ domain: 'a.local', port: 1, host: '127.0.0.1', https: false });
     const [result] = store.exportMappings();
-    expect(result).toEqual({ domain: 'a.local', host: '127.0.0.1', port: 1, https: false, enabled: true });
+    expect(result).toEqual({
+      domain: 'a.local', host: '127.0.0.1', port: 1, https: false, enabled: true,
+      requestHeaders: [], responseHeaders: [],
+    });
     expect(result).not.toHaveProperty('id');
     expect(result).not.toHaveProperty('createdAt');
+  });
+
+  it('includes requestHeaders and responseHeaders', () => {
+    store.addMapping({
+      domain: 'a.local',
+      port: 1,
+      requestHeaders: [{ name: 'X-Foo', value: 'bar' }],
+      responseHeaders: [{ name: 'X-Bar', value: 'baz' }],
+    });
+    const [result] = store.exportMappings();
+    expect(result.requestHeaders).toEqual([{ name: 'X-Foo', value: 'bar' }]);
+    expect(result.responseHeaders).toEqual([{ name: 'X-Bar', value: 'baz' }]);
   });
 
   it('returns all mappings when ids is an empty array', () => {
@@ -281,6 +325,17 @@ describe('AppStore.importMappings()', () => {
     ]);
     expect(added).toHaveLength(1);
     expect(skipped).toEqual(['DUP.local']);
+  });
+
+  it('imports requestHeaders and responseHeaders', () => {
+    const { added } = store.importMappings([{
+      domain: 'a.local',
+      port: 1,
+      requestHeaders: [{ name: 'X-Foo', value: 'bar' }],
+      responseHeaders: [{ name: 'X-Bar', value: 'baz' }],
+    }]);
+    expect(added[0].requestHeaders).toEqual([{ name: 'X-Foo', value: 'bar' }]);
+    expect(added[0].responseHeaders).toEqual([{ name: 'X-Bar', value: 'baz' }]);
   });
 });
 

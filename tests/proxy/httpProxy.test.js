@@ -21,6 +21,19 @@ function startBackend(response = 'ok') {
   });
 }
 
+// Backend that echoes the request headers it received as a JSON body, and
+// sets its own response header so response-header overrides can be checked.
+function startEchoBackend() {
+  return new Promise((resolve) => {
+    const server = http.createServer((req, res) => {
+      res.setHeader('X-Original', 'original-value');
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(req.headers));
+    });
+    server.listen(0, '127.0.0.1', () => resolve(server));
+  });
+}
+
 function stopBackend(server) {
   return new Promise((resolve) => server.close(resolve));
 }
@@ -33,7 +46,7 @@ function makeRequest(port, { method = 'GET', path = '/', host } = {}) {
       (res) => {
         let body = '';
         res.on('data', (chunk) => (body += chunk));
-        res.on('end', () => resolve({ statusCode: res.statusCode, body }));
+        res.on('end', () => resolve({ statusCode: res.statusCode, headers: res.headers, body }));
       }
     );
     req.on('error', reject);
@@ -216,6 +229,60 @@ describe('HttpProxy request handling', () => {
     // The important thing is that the proxy attempted to connect, not that it rejected the host
     const { statusCode } = await makeRequest(proxy.getPort(), { host: 'myapp.local:3000' });
     expect(statusCode).toBe(502);
+  });
+
+  it('applies mapping.requestHeaders to the request forwarded to the backend', async () => {
+    const backend = await startEchoBackend();
+    const backendPort = backend.address().port;
+    proxy = new HttpProxy(null);
+    await proxy.start(
+      [{
+        domain: 'headers.local', host: '127.0.0.1', port: backendPort, enabled: true,
+        requestHeaders: [{ name: 'X-Custom', value: 'injected' }],
+      }],
+      { httpsEnabled: false }
+    );
+    const { body } = await makeRequest(proxy.getPort(), { host: 'headers.local' });
+    expect(JSON.parse(body)['x-custom']).toBe('injected');
+    await stopBackend(backend);
+  });
+
+  it('applies mapping.responseHeaders to the response sent to the client, overriding existing headers', async () => {
+    const backend = await startEchoBackend();
+    const backendPort = backend.address().port;
+    proxy = new HttpProxy(null);
+    await proxy.start(
+      [{
+        domain: 'headers.local', host: '127.0.0.1', port: backendPort, enabled: true,
+        responseHeaders: [{ name: 'X-Original', value: 'overridden' }, { name: 'X-New', value: 'added' }],
+      }],
+      { httpsEnabled: false }
+    );
+    const { headers } = await makeRequest(proxy.getPort(), { host: 'headers.local' });
+    expect(headers['x-original']).toBe('overridden');
+    expect(headers['x-new']).toBe('added');
+    await stopBackend(backend);
+  });
+});
+
+describe('HttpProxy._applyHeaderOverrides()', () => {
+  it('lowercases override names and overwrites existing headers without dropping others', () => {
+    const proxy = new HttpProxy(null);
+    const headers = { 'x-existing': 'old', 'content-type': 'text/plain' };
+    const result = proxy._applyHeaderOverrides(headers, [
+      { name: 'X-Existing', value: 'new' },
+      { name: 'X-New', value: 'added' },
+    ]);
+    expect(result['x-existing']).toBe('new');
+    expect(result['x-new']).toBe('added');
+    expect(result['content-type']).toBe('text/plain');
+  });
+
+  it('leaves headers unchanged when overrides is not an array', () => {
+    const proxy = new HttpProxy(null);
+    const headers = { 'x-existing': 'old' };
+    expect(proxy._applyHeaderOverrides(headers, undefined)).toBe(headers);
+    expect(headers).toEqual({ 'x-existing': 'old' });
   });
 });
 
