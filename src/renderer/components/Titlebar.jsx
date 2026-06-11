@@ -1,7 +1,7 @@
 export default function Titlebar({ proxyRunning, updateInfo, t }) {
   return (
     <div className="titlebar">
-      <span className="titlebar-title">Saeng</span>
+      <span className="titlebar-title">{t('titleBar.title')}</span>
       <div className="titlebar-spacer" />
       {updateInfo?.updateAvailable && (
         <button

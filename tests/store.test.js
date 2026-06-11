@@ -387,6 +387,19 @@ describe('AppStore.getSettings() / setSettings()', () => {
     expect(store.setSettings({ logMaxEntries: -50 }).logMaxEntries).toBe(100);
   });
 
+  it('getSettings() defaults logHeadersEnabled and logBodyEnabled to false', () => {
+    expect(store.getSettings().logHeadersEnabled).toBe(false);
+    expect(store.getSettings().logBodyEnabled).toBe(false);
+  });
+
+  it('setSettings() stores logHeadersEnabled and logBodyEnabled', () => {
+    const result = store.setSettings({ logHeadersEnabled: true, logBodyEnabled: true });
+    expect(result.logHeadersEnabled).toBe(true);
+    expect(result.logBodyEnabled).toBe(true);
+    expect(store.getSettings().logHeadersEnabled).toBe(true);
+    expect(store.getSettings().logBodyEnabled).toBe(true);
+  });
+
   it('setSettings() clamps logMaxEntries above the maximum to 100000', () => {
     expect(store.setSettings({ logMaxEntries: 250000 }).logMaxEntries).toBe(100000);
   });

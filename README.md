@@ -15,12 +15,15 @@ Saeng means "light," "radiance," or "glow" in Thai.
 * Map any local domain (with or without subdomain) to a local port
 * Mappings are grouped by base domain, with a toggle to enable/disable a whole group at once
 * Enable/disable individual mappings without removing them
+* Per-mapping custom request/response headers, for injecting CORS headers or auth tokens during local dev
 * HTTPS support via a local CA certificate (with MITM SSL termination)
 * WebSocket pass-through
 * Start proxy automatically on launch
 * System tray integration on macOS, Windows, and Linux
+* Live request log, with optional capture of request/response headers and bodies, and export to a HAR file
 * Optional backend health checks with live status indicators per mapping
 * Notifies you in the titlebar when a newer version is available on GitHub
+* Remembers the window size between launches
 
 ## How it works
 
@@ -39,6 +42,10 @@ HTTPS works by intercepting `CONNECT` tunnel requests and terminating TLS using 
 4. Enable the **HTTPS** toggle on any mapping whose backend speaks HTTPS.
 
 > The HTTPS toggle on a mapping controls whether Saeng connects to the *backend* using HTTPS — not whether the local domain is served over HTTPS. Global HTTPS must be enabled in Settings for the browser-to-proxy leg to use TLS.
+
+## Request log
+
+The **Log** view shows a live list of requests proxied through Saeng. Enable **Log headers** and/or **Log bodies** in Settings to capture request/response headers and bodies (up to 64 KB each) — off by default since they can contain sensitive data. When enabled, each entry can be expanded to inspect the captured details. Use **Export HAR** to save the current log as a `.har` file for use with browser dev tools or other HTTP debugging tools.
 
 ## Health checks
 

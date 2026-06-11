@@ -1,4 +1,6 @@
 {
+  "titleBar.title": "Saeng",
+
   "proxy.status.running": "Proxy đang chạy",
   "proxy.status.stopped": "Proxy đã dừng",
   "proxy.action.start": "Khởi động Proxy",
@@ -75,6 +77,8 @@
   "log.title": "Nhật ký yêu cầu",
   "log.subtitle": "Xem trực tiếp các yêu cầu được chuyển tiếp qua Saeng",
   "log.actions.clear": "Xóa",
+  "log.actions.exportHar": "Xuất HAR",
+  "log.exportHar.dialog.title": "Xuất HAR",
   "log.empty": "Chưa có yêu cầu nào",
   "log.emptyHint": "Các yêu cầu được chuyển tiếp qua Saeng sẽ hiển thị tại đây khi proxy đang hoạt động.",
   "log.table.time": "Thời gian",
@@ -150,6 +154,8 @@
   "flash.copied": "Đã sao chép {url} vào clipboard.",
   "flash.export.success": "Đã xuất {count} ánh xạ sang {path}",
   "flash.export.error": "Xuất thất bại: {error}",
+  "flash.harExport.success": "Đã xuất {count} yêu cầu sang {path}",
+  "flash.harExport.error": "Xuất thất bại: {error}",
   "flash.import.success": "Đã nhập {added} ánh xạ, bỏ qua {skipped} bản trùng lặp",
   "flash.import.error": "Nhập thất bại: {error}",
   "flash.settings.updated": "Cài đặt đã được cập nhật.",

@@ -302,24 +302,72 @@ describe('SettingsView — log max entries', () => {
   });
 });
 
+describe('SettingsView — log headers / body', () => {
+  it('does not render the log headers/body toggles when logging is disabled', () => {
+    renderSettingsView({ settings: { ...SAMPLE_SETTINGS, loggingEnabled: false } });
+    expect(screen.queryByText('settings.requestLogs.logHeaders.label')).not.toBeInTheDocument();
+    expect(screen.queryByText('settings.requestLogs.logBody.label')).not.toBeInTheDocument();
+  });
+
+  it('defaults the log headers toggle to unchecked', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, logHeadersEnabled: undefined } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    expect(toggles[3]).not.toBeChecked();
+  });
+
+  it('checks the log headers toggle when logHeadersEnabled is true', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, logHeadersEnabled: true } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    expect(toggles[3]).toBeChecked();
+  });
+
+  it('calls onSettingsChange with logHeadersEnabled when the headers toggle is changed', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, logHeadersEnabled: false } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    fireEvent.click(toggles[3]);
+    expect(onSettingsChange).toHaveBeenCalledWith({ logHeadersEnabled: true });
+  });
+
+  it('defaults the log body toggle to unchecked', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, logBodyEnabled: undefined } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    expect(toggles[4]).not.toBeChecked();
+  });
+
+  it('checks the log body toggle when logBodyEnabled is true', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, logBodyEnabled: true } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    expect(toggles[4]).toBeChecked();
+  });
+
+  it('calls onSettingsChange with logBodyEnabled when the body toggle is changed', () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, logBodyEnabled: false } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    fireEvent.click(toggles[4]);
+    expect(onSettingsChange).toHaveBeenCalledWith({ logBodyEnabled: true });
+  });
+});
+
 describe('SettingsView — health check enabled', () => {
   it('unchecks the toggle when healthCheckEnabled is not set', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    expect(toggles[3]).not.toBeChecked();
+    expect(toggles[5]).not.toBeChecked();
   });
 
   it('checks the toggle when healthCheckEnabled is true', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    expect(toggles[3]).toBeChecked();
+    expect(toggles[5]).toBeChecked();
   });
 
   it('calls onSettingsChange when the toggle is changed', () => {
     const onSettingsChange = vi.fn().mockResolvedValue(undefined);
     const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: false } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    fireEvent.click(toggles[3]);
+    fireEvent.click(toggles[5]);
     expect(onSettingsChange).toHaveBeenCalledWith({ healthCheckEnabled: true });
   });
 

@@ -13,7 +13,7 @@ class ProxyManager {
     this.httpProxy = null;
     this.pacServer = null;
     const settings = store.getSettings();
-    this.requestLog = new RequestLog(settings.logMaxEntries, settings.loggingEnabled);
+    this.requestLog = new RequestLog(settings.logMaxEntries, settings.loggingEnabled, settings.logHeadersEnabled, settings.logBodyEnabled);
     this.healthChecker = new HealthChecker(settings.healthCheckIntervalMs, settings.healthCheckTimeoutMs, settings.healthCheckEnabled);
     this.healthChecker.setProxyRunning(false);
     this.running = false;

@@ -179,6 +179,16 @@ export default function App() {
     setRequestLog(cleared);
   }
 
+  async function handleExportHar() {
+    const result = await window.electronAPI.requestLog.exportHar();
+    if (result.canceled) return;
+    if (result.success) {
+      showToast(t('flash.harExport.success', { count: result.count, path: result.path }), 'success');
+    } else {
+      showToast(t('flash.harExport.error', { error: result.error }), 'error');
+    }
+  }
+
   async function updateSettings(patch) {
     await window.electronAPI.settings.set(patch);
     setSettingsState((prev) => ({ ...prev, ...patch }));
@@ -232,6 +242,8 @@ export default function App() {
             active={currentView === 'log'}
             entries={requestLog}
             onClear={handleClearLog}
+            onExportHar={handleExportHar}
+            settings={settings}
             t={t}
           />
           <SettingsView

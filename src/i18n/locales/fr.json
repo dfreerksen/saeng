@@ -1,4 +1,6 @@
 {
+  "titleBar.title": "Saeng",
+
   "proxy.status.running": "Proxy en cours d'exécution",
   "proxy.status.stopped": "Proxy arrêté",
   "proxy.action.start": "Démarrer le proxy",
@@ -75,6 +77,8 @@
   "log.title": "Journal des requêtes",
   "log.subtitle": "Vue en temps réel des requêtes transmises via Saeng",
   "log.actions.clear": "Effacer",
+  "log.actions.exportHar": "Exporter le HAR",
+  "log.exportHar.dialog.title": "Exporter le HAR",
   "log.empty": "Aucune requête pour le moment",
   "log.emptyHint": "Les requêtes transmises via Saeng apparaîtront ici tant que le proxy est en cours d'exécution.",
   "log.table.time": "Heure",
@@ -150,6 +154,8 @@
   "flash.copied": "{url} copié dans le presse-papiers.",
   "flash.export.success": "{count} mappages exportés vers {path}",
   "flash.export.error": "Échec de l'exportation : {error}",
+  "flash.harExport.success": "{count} requêtes exportées vers {path}",
+  "flash.harExport.error": "Échec de l'exportation : {error}",
   "flash.import.success": "{added} mappages importés, {skipped} doublons ignorés",
   "flash.import.error": "Échec de l'importation : {error}",
   "flash.settings.updated": "Les paramètres ont été mis à jour.",

@@ -45,6 +45,17 @@ const schema = {
       },
     },
   },
+  windowBounds: {
+    type: 'object',
+    properties: {
+      width: { type: 'number' },
+      height: { type: 'number' },
+    },
+    default: {
+      width: 940,
+      height: 680
+    },
+  },
   settings: {
     type: 'object',
     default: {
@@ -54,6 +65,8 @@ const schema = {
       locale: 'en',
       logMaxEntries: DEFAULT_LOG_MAX_ENTRIES,
       loggingEnabled: true,
+      logHeadersEnabled: false,
+      logBodyEnabled: false,
       healthCheckEnabled: false,
       healthCheckIntervalMs: DEFAULT_HEALTH_CHECK_INTERVAL_MS,
       healthCheckTimeoutMs: DEFAULT_HEALTH_CHECK_TIMEOUT_MS,
@@ -177,6 +190,8 @@ class AppStore {
       locale: 'en',
       logMaxEntries: DEFAULT_LOG_MAX_ENTRIES,
       loggingEnabled: true,
+      logHeadersEnabled: false,
+      logBodyEnabled: false,
       healthCheckEnabled: false,
       healthCheckIntervalMs: DEFAULT_HEALTH_CHECK_INTERVAL_MS,
       healthCheckTimeoutMs: DEFAULT_HEALTH_CHECK_TIMEOUT_MS,
@@ -206,6 +221,14 @@ class AppStore {
     }
     this.store.set('settings', updated);
     return updated;
+  }
+
+  getWindowBounds() {
+    return this.store.get('windowBounds', { width: 940, height: 680 });
+  }
+
+  setWindowBounds(bounds) {
+    this.store.set('windowBounds', { width: bounds.width, height: bounds.height });
   }
 
   getCertDir() {

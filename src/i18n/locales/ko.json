@@ -1,4 +1,6 @@
 {
+  "titleBar.title": "Saeng",
+
   "proxy.status.running": "프록시 실행 중",
   "proxy.status.stopped": "프록시 중지됨",
   "proxy.action.start": "프록시 시작",
@@ -75,6 +77,8 @@
   "log.title": "요청 로그",
   "log.subtitle": "Saeng을 통해 프록시된 요청 실시간 보기",
   "log.actions.clear": "지우기",
+  "log.actions.exportHar": "HAR 내보내기",
+  "log.exportHar.dialog.title": "HAR 내보내기",
   "log.empty": "요청 없음",
   "log.emptyHint": "프록시가 실행되는 동안 Saeng을 통해 프록시된 요청이 여기에 표시됩니다.",
   "log.table.time": "시간",
@@ -150,6 +154,8 @@
   "flash.copied": "{url}이(가) 클립보드에 복사되었습니다.",
   "flash.export.success": "{count}개의 매핑을 {path}(으)로 내보냈습니다",
   "flash.export.error": "내보내기 실패: {error}",
+  "flash.harExport.success": "{count}개의 요청을 {path}(으)로 내보냈습니다",
+  "flash.harExport.error": "내보내기 실패: {error}",
   "flash.import.success": "{added}개의 매핑을 가져왔고, {skipped}개의 중복 항목을 건너뛰었습니다",
   "flash.import.error": "가져오기 실패: {error}",
   "flash.settings.updated": "설정이 업데이트되었습니다.",

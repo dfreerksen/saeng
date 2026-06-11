@@ -71,6 +71,7 @@ The renderer is a **React 19** app bundled by **esbuild**. SCSS is compiled by *
 | `mappings:export/import` | Export/import mappings to/from a JSON file via native save/open dialogs |
 | `proxy:start/stop/status` | Control and query proxy state |
 | `requestLog:list/clear` | Read/clear the in-memory request log |
+| `requestLog:exportHar` | Export the current request log as a HAR file via a native save dialog |
 | `health:list` | Read current backend health-check statuses, keyed by mapping id |
 | `settings:get/set` | Read/write persistent settings |
 | `ssl:get-ca-expiry/regenerate-ca/delete-ca/get-ca-path/reveal-ca/trust-ca` | CA cert management |
@@ -88,21 +89,29 @@ The user must install the CA cert into the OS trust store once — `src/ssl/trus
 
 ### Persistence
 
-`src/store.js` wraps **electron-store v11** (ESM). The store file is `config.json` in `app.getPath('userData')`. The schema has two top-level keys: `mappings` (array) and `settings` (object).
+`src/store.js` wraps **electron-store v11** (ESM). The store file is `config.json` in `app.getPath('userData')`. The schema has three top-level keys: `mappings` (array), `windowBounds` (object), and `settings` (object).
 
 Mapping shape:
 ```js
-{ id, domain, host, port, https, enabled, createdAt }
+{ id, domain, host, port, https, enabled, createdAt, requestHeaders, responseHeaders }
 ```
 `host` is the backend hostname to proxy to (defaults to `127.0.0.1`). It is used for all connection types: plain HTTP, HTTPS CONNECT tunnels, and WebSocket upgrades. `https` on a mapping means the **backend** expects HTTPS — it does not control whether the frontend domain is served over HTTPS (that is the global `settings.httpsEnabled` toggle).
 
-Settings defaults: `{ httpsEnabled: true, startOnLaunch: true, colorMode: 'auto', locale: 'en', logMaxEntries: DEFAULT_LOG_MAX_ENTRIES, loggingEnabled: true, healthCheckEnabled: false, healthCheckIntervalMs: DEFAULT_INTERVAL_MS, healthCheckTimeoutMs: DEFAULT_TIMEOUT_MS }`. `healthCheckIntervalMs` (1 min default, clamped 5s-300s) and `healthCheckTimeoutMs` (2s default, clamped 500ms-30s) come from `src/proxy/healthChecker.js`'s exported defaults and are clamped in `setSettings()`.
+`requestHeaders`/`responseHeaders` are arrays of `{ name, value }` pairs (sanitized via `sanitizeHeaders()`, default `[]`), editable per-mapping in `MappingModal.jsx`. `HttpProxy._applyHeaderOverrides()` lowercases each `name` and sets it on the headers object, so overrides replace rather than duplicate existing headers — `requestHeaders` are applied to the outgoing backend request (including WebSocket upgrade replays) and `responseHeaders` to the response written back to the client.
+
+`windowBounds` (`{ width, height }`, default `940x680`) is read via `store.getWindowBounds()` when creating the `BrowserWindow` and saved via `store.setWindowBounds()` on the window's `close` event, so the app reopens at its last size.
+
+Settings defaults: `{ httpsEnabled: true, startOnLaunch: true, colorMode: 'auto', locale: 'en', logMaxEntries: DEFAULT_LOG_MAX_ENTRIES, loggingEnabled: true, logHeadersEnabled: false, logBodyEnabled: false, healthCheckEnabled: false, healthCheckIntervalMs: DEFAULT_INTERVAL_MS, healthCheckTimeoutMs: DEFAULT_TIMEOUT_MS }`. `healthCheckIntervalMs` (1 min default, clamped 5s-300s) and `healthCheckTimeoutMs` (2s default, clamped 500ms-30s) come from `src/proxy/healthChecker.js`'s exported defaults and are clamped in `setSettings()`.
 
 `store.exportMappings(ids)` / `store.importMappings(list)` back the `mappings:export`/`mappings:import` IPC handlers — export writes `{ mappings: [...] }` JSON via a save dialog, import reads a file (accepting either a bare array or `{ mappings: [...] }`), skipping mappings that already exist.
 
 ### Request log
 
-`RequestLog` (`src/proxy/requestLog.js`) is an in-memory ring buffer (default cap `DEFAULT_MAX_ENTRIES = 300`, configurable via `settings.logMaxEntries`) that records metadata (no bodies) for each proxied request, including the error reason on failures. It lives on `ProxyManager` and is wired into `HttpProxy` so entries are recorded on the hot path. Toggling `settings.loggingEnabled` calls `requestLog.setEnabled()`, which short-circuits `add()` without clearing existing entries. The renderer's `LogView.jsx` reads/clears it via the `requestLog:list/clear` IPC channels.
+`RequestLog` (`src/proxy/requestLog.js`) is an in-memory ring buffer (default cap `DEFAULT_MAX_ENTRIES = 300`, configurable via `settings.logMaxEntries`) that records metadata for each proxied request, including the error reason on failures. It lives on `ProxyManager` and is wired into `HttpProxy` so entries are recorded on the hot path. Toggling `settings.loggingEnabled` calls `requestLog.setEnabled()`, which short-circuits `add()` without clearing existing entries. The renderer's `LogView.jsx` reads/clears it via the `requestLog:list/clear` IPC channels.
+
+When `settings.logHeadersEnabled`/`settings.logBodyEnabled` are true, `HttpProxy._recordRequest()` additionally attaches `requestHeaders`/`responseHeaders` to each entry, and `_captureBody()` captures up to `MAX_BODY_CAPTURE_BYTES` (64 KB) of `requestBody`/`responseBody`, setting `requestBodyTruncated`/`responseBodyTruncated` if the real body was larger. `RequestLog.setLogHeaders()`/`setLogBody()` (called from `settings:set`) control this without restarting the proxy. `LogView.jsx` shows an expandable details row per entry with header tables and body previews when either setting is enabled.
+
+The `requestLog:exportHar` IPC handler writes the current log to a `.har` file (via a save dialog) using `buildHar()` from `src/proxy/har.js`, which converts entries into a HAR 1.2 document (`log.entries[]` with `request`/`response`/`timings`) for use with browser dev tools or other HTTP debugging tools.
 
 ### Mapping groups
 

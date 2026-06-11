@@ -1,4 +1,6 @@
 {
+  "titleBar.title": "Saeng",
+
   "proxy.status.running": "Прокси работает",
   "proxy.status.stopped": "Прокси остановлен",
   "proxy.action.start": "Запустить Прокси",
@@ -75,6 +77,8 @@
   "log.title": "Журнал запросов",
   "log.subtitle": "Просмотр запросов, проходящих через прокси Saeng, в реальном времени",
   "log.actions.clear": "Очистить",
+  "log.actions.exportHar": "Экспорт HAR",
+  "log.exportHar.dialog.title": "Экспорт HAR",
   "log.empty": "Запросов пока нет",
   "log.emptyHint": "Здесь будут отображаться запросы, проходящие через прокси Saeng, пока он запущен.",
   "log.table.time": "Время",
@@ -150,6 +154,8 @@
   "flash.copied": "{url} скопировано в буфер обмена.",
   "flash.export.success": "Экспортировано {count} сопоставлений в {path}",
   "flash.export.error": "Не удалось экспортировать: {error}",
+  "flash.harExport.success": "Экспортировано {count} запросов в {path}",
+  "flash.harExport.error": "Не удалось экспортировать: {error}",
   "flash.import.success": "Импортировано {added} сопоставлений, пропущено {skipped} дубликатов",
   "flash.import.error": "Не удалось импортировать: {error}",
   "flash.settings.updated": "Настройки обновлены.",

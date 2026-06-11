@@ -44,6 +44,7 @@ function renderLogView(props = {}) {
     active: true,
     entries: [],
     onClear: vi.fn(),
+    onExportHar: vi.fn(),
     t,
   };
   return render(<LogView {...defaults} {...props} />);
@@ -64,6 +65,11 @@ describe('LogView — empty state', () => {
   it('disables the clear button when there are no entries', () => {
     renderLogView({ entries: [] });
     expect(screen.getByText('log.actions.clear').closest('button')).toBeDisabled();
+  });
+
+  it('disables the export HAR button when there are no entries', () => {
+    renderLogView({ entries: [] });
+    expect(screen.getByText('log.actions.exportHar').closest('button')).toBeDisabled();
   });
 });
 
@@ -127,6 +133,109 @@ describe('LogView — table with entries', () => {
     expect(button).not.toBeDisabled();
     fireEvent.click(button);
     expect(onClear).toHaveBeenCalledOnce();
+  });
+
+  it('enables the export HAR button and calls onExportHar when clicked', () => {
+    const onExportHar = vi.fn();
+    renderLogView({ entries: SAMPLE_ENTRIES, onExportHar });
+    const button = screen.getByText('log.actions.exportHar').closest('button');
+    expect(button).not.toBeDisabled();
+    fireEvent.click(button);
+    expect(onExportHar).toHaveBeenCalledOnce();
+  });
+});
+
+describe('LogView — request/response details', () => {
+  const ENTRY_WITH_DETAILS = {
+    id: '4',
+    timestamp: 1700000003000,
+    method: 'POST',
+    hostname: 'api.myapp.local',
+    path: '/login',
+    status: 200,
+    latencyMs: 20,
+    https: false,
+    requestHeaders: { host: 'api.myapp.local', 'content-type': 'application/json' },
+    responseHeaders: { 'content-type': 'application/json' },
+    requestBody: '{"user":"alice"}',
+    requestBodyTruncated: false,
+    responseBody: '{"ok":true}',
+    responseBodyTruncated: false,
+  };
+
+  it('does not render a details column when header/body logging is disabled', () => {
+    const { container } = renderLogView({
+      entries: [ENTRY_WITH_DETAILS],
+      settings: { logHeadersEnabled: false, logBodyEnabled: false },
+    });
+    expect(container.querySelector('.log-details-toggle')).not.toBeInTheDocument();
+  });
+
+  it('renders a details toggle when header logging is enabled and the entry has captured headers', () => {
+    const { container } = renderLogView({
+      entries: [ENTRY_WITH_DETAILS],
+      settings: { logHeadersEnabled: true, logBodyEnabled: false },
+    });
+    expect(container.querySelector('.log-details-toggle')).toBeInTheDocument();
+  });
+
+  it('does not render a details toggle for entries without captured details', () => {
+    const { container } = renderLogView({
+      entries: SAMPLE_ENTRIES,
+      settings: { logHeadersEnabled: true, logBodyEnabled: true },
+    });
+    expect(container.querySelector('.log-details-toggle')).not.toBeInTheDocument();
+  });
+
+  it('expands to show request/response headers and bodies when the toggle is clicked', () => {
+    const { container } = renderLogView({
+      entries: [ENTRY_WITH_DETAILS],
+      settings: { logHeadersEnabled: true, logBodyEnabled: true },
+    });
+
+    expect(container.querySelector('.log-details-row')).not.toBeInTheDocument();
+
+    fireEvent.click(container.querySelector('.log-details-toggle'));
+
+    const detailsRow = container.querySelector('.log-details-row');
+    expect(detailsRow).toBeInTheDocument();
+    expect(screen.getAllByText('application/json')).toHaveLength(2);
+    expect(screen.getByText('{"user":"alice"}')).toBeInTheDocument();
+    expect(screen.getByText('{"ok":true}')).toBeInTheDocument();
+  });
+
+  it('collapses the details row when the toggle is clicked again', () => {
+    const { container } = renderLogView({
+      entries: [ENTRY_WITH_DETAILS],
+      settings: { logHeadersEnabled: true, logBodyEnabled: true },
+    });
+
+    const toggle = container.querySelector('.log-details-toggle');
+    fireEvent.click(toggle);
+    expect(container.querySelector('.log-details-row')).toBeInTheDocument();
+
+    fireEvent.click(toggle);
+    expect(container.querySelector('.log-details-row')).not.toBeInTheDocument();
+  });
+
+  it('shows a truncated notice when a body was truncated', () => {
+    const { container } = renderLogView({
+      entries: [{ ...ENTRY_WITH_DETAILS, responseBodyTruncated: true }],
+      settings: { logHeadersEnabled: false, logBodyEnabled: true },
+    });
+
+    fireEvent.click(container.querySelector('.log-details-toggle'));
+    expect(screen.getByText('log.details.truncated')).toBeInTheDocument();
+  });
+
+  it('shows a placeholder when no headers were captured for an entry', () => {
+    const { container } = renderLogView({
+      entries: [{ ...ENTRY_WITH_DETAILS, requestHeaders: undefined, responseHeaders: undefined }],
+      settings: { logHeadersEnabled: true, logBodyEnabled: false },
+    });
+
+    fireEvent.click(container.querySelector('.log-details-toggle'));
+    expect(screen.getAllByText('log.details.noHeaders')).toHaveLength(2);
   });
 });
 

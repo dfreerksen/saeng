@@ -1,4 +1,6 @@
 {
+  "titleBar.title": "Saeng",
+
   "proxy.status.running": "代理运行中",
   "proxy.status.stopped": "代理已停止",
   "proxy.action.start": "启动代理",
@@ -75,6 +77,8 @@
   "log.title": "请求日志",
   "log.subtitle": "经由 Saeng 代理的请求实时视图",
   "log.actions.clear": "清除",
+  "log.actions.exportHar": "导出 HAR",
+  "log.exportHar.dialog.title": "导出 HAR",
   "log.empty": "暂无请求",
   "log.emptyHint": "代理运行时，经由 Saeng 代理的请求将显示在此处。",
   "log.table.time": "时间",
@@ -150,6 +154,8 @@
   "flash.copied": "已将 {url} 复制到剪贴板。",
   "flash.export.success": "已将 {count} 个映射导出到 {path}",
   "flash.export.error": "导出失败：{error}",
+  "flash.harExport.success": "已将 {count} 个请求导出到 {path}",
+  "flash.harExport.error": "导出失败：{error}",
   "flash.import.success": "已导入 {added} 个映射，跳过 {skipped} 个重复项",
   "flash.import.error": "导入失败：{error}",
   "flash.settings.updated": "设置已更新。",

@@ -1,4 +1,6 @@
 {
+  "titleBar.title": "Saeng",
+
   "proxy.status.running": "Proxy läuft",
   "proxy.status.stopped": "Proxy angehalten",
   "proxy.action.start": "Proxy starten",
@@ -75,6 +77,8 @@
   "log.title": "Anfrage-Protokoll",
   "log.subtitle": "Live-Ansicht der über Saeng weitergeleiteten Anfragen",
   "log.actions.clear": "Leeren",
+  "log.actions.exportHar": "HAR exportieren",
+  "log.exportHar.dialog.title": "HAR exportieren",
   "log.empty": "Noch keine Anfragen",
   "log.emptyHint": "Über Saeng weitergeleitete Anfragen erscheinen hier, während der Proxy läuft.",
   "log.table.time": "Zeit",
@@ -150,6 +154,8 @@
   "flash.copied": "{url} in die Zwischenablage kopiert.",
   "flash.export.success": "{count} Zuordnungen nach {path} exportiert",
   "flash.export.error": "Export fehlgeschlagen: {error}",
+  "flash.harExport.success": "{count} Anfragen nach {path} exportiert",
+  "flash.harExport.error": "Export fehlgeschlagen: {error}",
   "flash.import.success": "{added} Zuordnungen importiert, {skipped} Duplikate übersprungen",
   "flash.import.error": "Import fehlgeschlagen: {error}",
   "flash.settings.updated": "Einstellungen wurden aktualisiert.",

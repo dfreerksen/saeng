@@ -1,4 +1,6 @@
 {
+  "titleBar.title": "Saeng",
+
   "proxy.status.running": "Ejecución de proxy",
   "proxy.status.stopped": "Proxy detenido",
   "proxy.action.start": "Iniciar proxy",
@@ -75,6 +77,8 @@
   "log.title": "Registro de solicitudes",
   "log.subtitle": "Vista en tiempo real de las solicitudes reenviadas a través de Saeng",
   "log.actions.clear": "Borrar",
+  "log.actions.exportHar": "Exportar HAR",
+  "log.exportHar.dialog.title": "Exportar HAR",
   "log.empty": "Aún no hay solicitudes",
   "log.emptyHint": "Las solicitudes reenviadas a través de Saeng aparecerán aquí mientras el proxy esté en ejecución.",
   "log.table.time": "Hora",
@@ -150,6 +154,8 @@
   "flash.copied": "{url} copiado al portapapeles.",
   "flash.export.success": "Se exportaron {count} mapeos a {path}",
   "flash.export.error": "Error al exportar: {error}",
+  "flash.harExport.success": "Se exportaron {count} solicitudes a {path}",
+  "flash.harExport.error": "Error al exportar: {error}",
   "flash.import.success": "Se importaron {added} mapeos, se omitieron {skipped} duplicados",
   "flash.import.error": "Error al importar: {error}",
   "flash.settings.updated": "La configuración se ha actualizado.",

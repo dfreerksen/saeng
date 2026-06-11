@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import http from 'http';
 import { EventEmitter } from 'events';
-import { HttpProxy } from '../../src/proxy/httpProxy.js';
+import { HttpProxy, MAX_BODY_CAPTURE_BYTES } from '../../src/proxy/httpProxy.js';
 
 // Helper: build a minimal mock req/res pair for exercising _recordRequest()
 // directly, without spinning up a real server. `res` is an EventEmitter so
@@ -39,18 +39,31 @@ function stopBackend(server) {
 }
 
 // Helper: make a plain HTTP request and return { statusCode, body }
-function makeRequest(port, { method = 'GET', path = '/', host } = {}) {
+function makeRequest(port, { method = 'GET', path = '/', host, body } = {}) {
   return new Promise((resolve, reject) => {
     const req = http.request(
       { hostname: '127.0.0.1', port, method, path, headers: { Host: host } },
       (res) => {
-        let body = '';
-        res.on('data', (chunk) => (body += chunk));
-        res.on('end', () => resolve({ statusCode: res.statusCode, headers: res.headers, body }));
+        let respBody = '';
+        res.on('data', (chunk) => (respBody += chunk));
+        res.on('end', () => resolve({ statusCode: res.statusCode, headers: res.headers, body: respBody }));
       }
     );
     req.on('error', reject);
+    if (body !== undefined) req.write(body);
     req.end();
+  });
+}
+
+// Backend that responds with a fixed-size body, used to exercise body
+// truncation in the request log.
+function startSizedBackend(responseSize) {
+  return new Promise((resolve) => {
+    const server = http.createServer((req, res) => {
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      res.end('y'.repeat(responseSize));
+    });
+    server.listen(0, '127.0.0.1', () => resolve(server));
   });
 }
 
@@ -438,5 +451,96 @@ describe('HttpProxy request logging — end to end', () => {
     await expect(
       makeRequest(proxy.getPort(), { host: 'unlogged.local' })
     ).resolves.toMatchObject({ statusCode: 200 });
+  });
+});
+
+describe('HttpProxy request logging — headers and body capture', () => {
+  let proxy;
+  let backend;
+
+  afterEach(async () => {
+    await proxy?.stop();
+    proxy = null;
+    if (backend) await stopBackend(backend);
+    backend = null;
+  });
+
+  it('omits header and body fields by default', async () => {
+    backend = await startBackend('hello');
+    const add = vi.fn();
+    proxy = new HttpProxy(null, { add });
+    await proxy.start(
+      [{ domain: 'plain.local', host: '127.0.0.1', port: backend.address().port, enabled: true }],
+      { httpsEnabled: false }
+    );
+
+    await makeRequest(proxy.getPort(), { host: 'plain.local' });
+
+    await vi.waitFor(() => expect(add).toHaveBeenCalled());
+    const entry = add.mock.calls[0][0];
+    expect(entry.requestHeaders).toBeUndefined();
+    expect(entry.responseHeaders).toBeUndefined();
+    expect(entry.requestBody).toBeUndefined();
+    expect(entry.responseBody).toBeUndefined();
+  });
+
+  it('captures request and response headers when logHeaders is enabled', async () => {
+    backend = await startBackend('hello');
+    const add = vi.fn();
+    proxy = new HttpProxy(null, { add, logHeaders: true });
+    await proxy.start(
+      [{ domain: 'headers2.local', host: '127.0.0.1', port: backend.address().port, enabled: true }],
+      { httpsEnabled: false }
+    );
+
+    await makeRequest(proxy.getPort(), { host: 'headers2.local' });
+
+    await vi.waitFor(() => expect(add).toHaveBeenCalled());
+    const entry = add.mock.calls[0][0];
+    expect(entry.requestHeaders.host).toBe('headers2.local');
+    expect(entry.responseHeaders).toMatchObject({ date: expect.any(String) });
+    expect(entry.requestBody).toBeUndefined();
+    expect(entry.responseBody).toBeUndefined();
+  });
+
+  it('captures request and response bodies when logBody is enabled', async () => {
+    backend = await startBackend('pong');
+    const add = vi.fn();
+    proxy = new HttpProxy(null, { add, logBody: true });
+    await proxy.start(
+      [{ domain: 'body.local', host: '127.0.0.1', port: backend.address().port, enabled: true }],
+      { httpsEnabled: false }
+    );
+
+    await makeRequest(proxy.getPort(), { host: 'body.local', method: 'POST', body: 'ping' });
+
+    await vi.waitFor(() => expect(add).toHaveBeenCalled());
+    const entry = add.mock.calls[0][0];
+    expect(entry.requestBody).toBe('ping');
+    expect(entry.requestBodyTruncated).toBe(false);
+    expect(entry.responseBody).toBe('pong');
+    expect(entry.responseBodyTruncated).toBe(false);
+    expect(entry.requestHeaders).toBeUndefined();
+    expect(entry.responseHeaders).toBeUndefined();
+  });
+
+  it('truncates bodies larger than the capture limit and flags them', async () => {
+    const bigSize = MAX_BODY_CAPTURE_BYTES + 1000;
+    backend = await startSizedBackend(bigSize);
+    const add = vi.fn();
+    proxy = new HttpProxy(null, { add, logBody: true });
+    await proxy.start(
+      [{ domain: 'big.local', host: '127.0.0.1', port: backend.address().port, enabled: true }],
+      { httpsEnabled: false }
+    );
+
+    await makeRequest(proxy.getPort(), { host: 'big.local', method: 'POST', body: 'x'.repeat(bigSize) });
+
+    await vi.waitFor(() => expect(add).toHaveBeenCalled());
+    const entry = add.mock.calls[0][0];
+    expect(entry.requestBody).toHaveLength(MAX_BODY_CAPTURE_BYTES);
+    expect(entry.requestBodyTruncated).toBe(true);
+    expect(entry.responseBody).toHaveLength(MAX_BODY_CAPTURE_BYTES);
+    expect(entry.responseBodyTruncated).toBe(true);
   });
 });

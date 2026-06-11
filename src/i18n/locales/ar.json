@@ -1,4 +1,6 @@
 {
+  "titleBar.title": "Saeng",
+
   "proxy.status.running": "الوكيل قيد التشغيل",
   "proxy.status.stopped": "الوكيل متوقف",
   "proxy.action.start": "تشغيل الوكيل",
@@ -75,6 +77,8 @@
   "log.title": "سجل الطلبات",
   "log.subtitle": "عرض مباشر للطلبات الموجهة عبر Saeng",
   "log.actions.clear": "مسح",
+  "log.actions.exportHar": "تصدير HAR",
+  "log.exportHar.dialog.title": "تصدير HAR",
   "log.empty": "لا توجد طلبات بعد",
   "log.emptyHint": "ستظهر هنا الطلبات الموجهة عبر Saeng أثناء تشغيل الوكيل (Proxy).",
   "log.table.time": "الوقت",
@@ -150,6 +154,8 @@
   "flash.copied": "تم نسخ {url} إلى الحافظة.",
   "flash.export.success": "تم تصدير {count} من التعيينات إلى {path}",
   "flash.export.error": "فشل التصدير: {error}",
+  "flash.harExport.success": "تم تصدير {count} من الطلبات إلى {path}",
+  "flash.harExport.error": "فشل التصدير: {error}",
   "flash.import.success": "تم استيراد {added} من التعيينات، وتم تخطي {skipped} من التكرارات",
   "flash.import.error": "فشل الاستيراد: {error}",
   "flash.settings.updated": "تم تحديث الإعدادات.",

@@ -23,6 +23,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   requestLog: {
     list: () => ipcRenderer.invoke('requestLog:list'),
     clear: () => ipcRenderer.invoke('requestLog:clear'),
+    exportHar: () => ipcRenderer.invoke('requestLog:exportHar'),
     onEntry: (callback) => {
       ipcRenderer.on('requestLog:entry', (_, entry) => callback(entry));
     },

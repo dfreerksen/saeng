@@ -4,12 +4,14 @@ const DEFAULT_MAX_ENTRIES = 300;
 // renderer's live request inspector. Metadata only — no bodies are kept —
 // so it stays cheap to record on the proxy's hot path.
 class RequestLog {
-  constructor(maxEntries = DEFAULT_MAX_ENTRIES, enabled = true) {
+  constructor(maxEntries = DEFAULT_MAX_ENTRIES, enabled = true, logHeaders = false, logBody = false) {
     this.entries = [];
     this.nextId = 1;
     this.listener = null;
     this.maxEntries = maxEntries;
     this.enabled = enabled;
+    this.logHeaders = logHeaders;
+    this.logBody = logBody;
   }
 
   setListener(listener) {
@@ -23,6 +25,14 @@ class RequestLog {
 
   setEnabled(enabled) {
     this.enabled = enabled;
+  }
+
+  setLogHeaders(logHeaders) {
+    this.logHeaders = logHeaders;
+  }
+
+  setLogBody(logBody) {
+    this.logBody = logBody;
   }
 
   add(entry) {

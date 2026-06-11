@@ -77,4 +77,24 @@ describe('RequestLog', () => {
     log.add({ method: 'GET', path: '/b' });
     expect(log.list().map((e) => e.path)).toEqual(['/b']);
   });
+
+  it('defaults logHeaders and logBody to false', () => {
+    const log = new RequestLog();
+    expect(log.logHeaders).toBe(false);
+    expect(log.logBody).toBe(false);
+  });
+
+  it('accepts logHeaders and logBody via the constructor', () => {
+    const log = new RequestLog(300, true, true, true);
+    expect(log.logHeaders).toBe(true);
+    expect(log.logBody).toBe(true);
+  });
+
+  it('setLogHeaders() and setLogBody() update the flags', () => {
+    const log = new RequestLog();
+    log.setLogHeaders(true);
+    log.setLogBody(true);
+    expect(log.logHeaders).toBe(true);
+    expect(log.logBody).toBe(true);
+  });
 });

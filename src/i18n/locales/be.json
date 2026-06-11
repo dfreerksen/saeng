@@ -1,4 +1,6 @@
 {
+  "titleBar.title": "Saeng",
+
   "proxy.status.running": "Працуе проксі",
   "proxy.status.stopped": "Проксі зупінены",
   "proxy.action.start": "Запусціць проксі",
@@ -75,6 +77,8 @@
   "log.title": "Журнал запытаў",
   "log.subtitle": "Прагляд у рэжыме рэальнага часу запытаў, адпраўленых праз Saeng",
   "log.actions.clear": "Ачысціць",
+  "log.actions.exportHar": "Экспартаваць HAR",
+  "log.exportHar.dialog.title": "Экспартаваць HAR",
   "log.empty": "Пакуль няма запытаў",
   "log.emptyHint": "Запыты, адпраўленыя праз Saeng, будуць адлюстроўвацца тут, пакуль праксі-сервер працуе.",
   "log.table.time": "Час",
@@ -150,6 +154,8 @@
   "flash.copied": "{url} скапіявана ў буфер абмену.",
   "flash.export.success": "Экспартавана {count} адлюстраванняў у {path}",
   "flash.export.error": "Не ўдалося экспартаваць: {error}",
+  "flash.harExport.success": "Экспартавана {count} запытаў у {path}",
+  "flash.harExport.error": "Не ўдалося экспартаваць: {error}",
   "flash.import.success": "Імпартавана {added} адлюстраванняў, прапушчана {skipped} дублікатаў",
   "flash.import.error": "Не ўдалося імпартаваць: {error}",
   "flash.settings.updated": "Налады абноўлены.",

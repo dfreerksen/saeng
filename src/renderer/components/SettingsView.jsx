@@ -17,6 +17,8 @@ const HEALTH_CHECK_TIMEOUT_MAX_MS = 30000;
 const HEALTH_CHECK_TIMEOUT_STEP_MS = 100;
 const HEALTH_CHECK_TIMEOUT_DEFAULT_MS = 2000;
 
+const BODY_CAPTURE_LIMIT_KB = 64;
+
 function clampLogMaxEntries(value) {
   const parsed = parseInt(value, 10);
   if (Number.isNaN(parsed)) return LOG_MAX_ENTRIES_DEFAULT;
@@ -216,27 +218,69 @@ export default function SettingsView({
         </div>
 
         {settings.loggingEnabled && (
-          <div className="setting-row">
-            <div className="setting-info">
-              <div className="setting-name">{t('settings.requestLogs.logMaxEntries.label')}</div>
-              <div className="setting-desc">
-                {t('settings.requestLogs.logMaxEntries.description', {
-                  min: LOG_MAX_ENTRIES_MIN.toLocaleString(),
-                  max: LOG_MAX_ENTRIES_MAX.toLocaleString(),
-                })}
+          <>
+            <div className="setting-row">
+              <div className="setting-info">
+                <div className="setting-name">{t('settings.requestLogs.logMaxEntries.label')}</div>
+                <div className="setting-desc">
+                  {t('settings.requestLogs.logMaxEntries.description', {
+                    min: LOG_MAX_ENTRIES_MIN.toLocaleString(),
+                    max: LOG_MAX_ENTRIES_MAX.toLocaleString(),
+                  })}
+                </div>
               </div>
+              <input
+                className="log-max-entries-input"
+                type="number"
+                min={LOG_MAX_ENTRIES_MIN}
+                max={LOG_MAX_ENTRIES_MAX}
+                step={LOG_MAX_ENTRIES_STEP}
+                value={logMaxEntriesDraft}
+                onChange={(e) => setLogMaxEntriesDraft(e.target.value)}
+                onBlur={commitLogMaxEntries}
+              />
             </div>
-            <input
-              className="log-max-entries-input"
-              type="number"
-              min={LOG_MAX_ENTRIES_MIN}
-              max={LOG_MAX_ENTRIES_MAX}
-              step={LOG_MAX_ENTRIES_STEP}
-              value={logMaxEntriesDraft}
-              onChange={(e) => setLogMaxEntriesDraft(e.target.value)}
-              onBlur={commitLogMaxEntries}
-            />
-          </div>
+
+            <div className="setting-row">
+              <div className="setting-info">
+                <div className="setting-name">{t('settings.requestLogs.logHeaders.label')}</div>
+                <div className="setting-desc">{t('settings.requestLogs.logHeaders.description')}</div>
+              </div>
+              <label className="toggle">
+                <input
+                  type="checkbox"
+                  checked={!!settings.logHeadersEnabled}
+                  onChange={async (e) => {
+                    const checked = e.target.checked;
+                    await onSettingsChange({ logHeadersEnabled: checked });
+                    showToast(checked ? t('flash.logHeaders.enabled') : t('flash.logHeaders.disabled'), 'info');
+                  }}
+                />
+                <span className="toggle-track" />
+              </label>
+            </div>
+
+            <div className="setting-row">
+              <div className="setting-info">
+                <div className="setting-name">{t('settings.requestLogs.logBody.label')}</div>
+                <div className="setting-desc">
+                  {t('settings.requestLogs.logBody.description', { size: BODY_CAPTURE_LIMIT_KB })}
+                </div>
+              </div>
+              <label className="toggle">
+                <input
+                  type="checkbox"
+                  checked={!!settings.logBodyEnabled}
+                  onChange={async (e) => {
+                    const checked = e.target.checked;
+                    await onSettingsChange({ logBodyEnabled: checked });
+                    showToast(checked ? t('flash.logBody.enabled') : t('flash.logBody.disabled'), 'info');
+                  }}
+                />
+                <span className="toggle-track" />
+              </label>
+            </div>
+          </>
         )}
       </div>
 

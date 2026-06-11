@@ -1,4 +1,6 @@
 {
+  "titleBar.title": "Saeng",
+
   "proxy.status.running": "Прокси сървърът работи",
   "proxy.status.stopped": "Прокси сървърът е спрян",
   "proxy.action.start": "Стартирай прокси",
@@ -75,6 +77,8 @@
   "log.title": "Регистър на заявките",
   "log.subtitle": "Изглед на живо на заявки, проксирани чрез Saeng",
   "log.actions.clear": "Изчистване",
+  "log.actions.exportHar": "Експортиране на HAR",
+  "log.exportHar.dialog.title": "Експортиране на HAR",
   "log.empty": "Все още няма заявки",
   "log.emptyHint": "Заявките, проксирани чрез Saeng, ще се показват тук, докато проксито работи.",
   "log.table.time": "Време",
@@ -150,6 +154,8 @@
   "flash.copied": "{url} е копиран в клипборда.",
   "flash.export.success": "Експортирани са {count} съответствия в {path}",
   "flash.export.error": "Неуспешен експорт: {error}",
+  "flash.harExport.success": "Експортирани са {count} заявки в {path}",
+  "flash.harExport.error": "Неуспешен експорт: {error}",
   "flash.import.success": "Импортирани са {added} съответствия, пропуснати са {skipped} дубликата",
   "flash.import.error": "Неуспешен импорт: {error}",
   "flash.settings.updated": "Настройките бяха актуализирани.",

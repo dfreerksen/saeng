@@ -10,6 +10,7 @@ import { CertManager } from './src/proxy/certManager.js';
 import { clearSystemProxy } from './src/systemProxy.js';
 import { trustCA, untrustCA } from './src/ssl/trust.js';
 import { UpdateChecker } from './src/updateChecker.js';
+import { buildHar } from './src/proxy/har.js';
 import pkg from './package.json' with { type: 'json' };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -34,11 +35,12 @@ app.setAboutPanelOptions({
 });
 
 function createWindow() {
+  const { width, height } = store.getWindowBounds();
   mainWindow = new BrowserWindow({
-    width: 940,
-    height: 680,
-    minWidth: 760,
-    minHeight: 520,
+    width,
+    height,
+    minWidth: 800,
+    minHeight: 600,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
@@ -55,6 +57,7 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => mainWindow.show());
 
   mainWindow.on('close', (event) => {
+    store.setWindowBounds(mainWindow.getBounds());
     if ((process.platform === 'darwin' || process.platform === 'win32') && !isQuitting) {
       event.preventDefault();
       mainWindow.hide();
@@ -241,6 +244,25 @@ function setupIPC() {
     return [];
   });
 
+  ipcMain.handle('requestLog:exportHar', async () => {
+    const entries = proxyManager.requestLog.list();
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: i18n.t('log.exportHar.dialog.title'),
+      defaultPath: 'saeng-requests.har',
+      filters: [{ name: 'HAR', extensions: ['har'] }],
+    });
+    if (result.canceled || !result.filePath) {
+      return { canceled: true };
+    }
+    try {
+      const har = buildHar(entries, pkg.version);
+      fs.writeFileSync(result.filePath, JSON.stringify(har, null, 2), 'utf8');
+      return { success: true, path: result.filePath, count: entries.length };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
   ipcMain.handle('health:list', () => proxyManager.healthChecker.getStatuses());
 
   ipcMain.handle('settings:get', () => store.getSettings());
@@ -252,6 +274,12 @@ function setupIPC() {
     }
     if ('loggingEnabled' in patch) {
       proxyManager.requestLog.setEnabled(updated.loggingEnabled);
+    }
+    if ('logHeadersEnabled' in patch) {
+      proxyManager.requestLog.setLogHeaders(updated.logHeadersEnabled);
+    }
+    if ('logBodyEnabled' in patch) {
+      proxyManager.requestLog.setLogBody(updated.logBodyEnabled);
     }
     if ('healthCheckEnabled' in patch) {
       proxyManager.healthChecker.setEnabled(updated.healthCheckEnabled);

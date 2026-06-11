@@ -38,6 +38,7 @@ function makeElectronAPI(overrides = {}) {
     requestLog: {
       list: vi.fn().mockResolvedValue([]),
       clear: vi.fn().mockResolvedValue([]),
+      exportHar: vi.fn().mockResolvedValue({ canceled: true }),
       onEntry: vi.fn(),
       ...overrides.requestLog,
     },
@@ -111,7 +112,7 @@ async function renderApp(overrides = {}) {
 describe('App — initial render', () => {
   it('renders without crashing', async () => {
     await renderApp();
-    expect(screen.getByText('Saeng')).toBeInTheDocument();
+    expect(screen.getByText('titleBar.title')).toBeInTheDocument();
   });
 
   it('calls all required electronAPI methods during init', async () => {
@@ -272,6 +273,46 @@ describe('App — request log', () => {
       expect(clear).toHaveBeenCalledOnce();
       expect(screen.queryByText('myapp.local')).not.toBeInTheDocument();
     });
+  });
+
+  it('exports the request log as HAR and shows a success toast', async () => {
+    const entries = [{ id: '1', timestamp: 1700000000000, method: 'GET', hostname: 'myapp.local', path: '/', status: 200, latencyMs: 10, https: false }];
+    const exportHar = vi.fn().mockResolvedValue({ success: true, count: 1, path: '/tmp/saeng-requests.har' });
+    await renderApp({ requestLog: { list: vi.fn().mockResolvedValue(entries), exportHar } });
+    fireEvent.click(screen.getByText('nav.log').closest('button'));
+
+    fireEvent.click(screen.getByText('log.actions.exportHar').closest('button'));
+
+    await waitFor(() => {
+      expect(exportHar).toHaveBeenCalledOnce();
+      expect(screen.getByText('flash.harExport.success')).toBeInTheDocument();
+    });
+  });
+
+  it('shows an error toast when exporting the request log as HAR fails', async () => {
+    const entries = [{ id: '1', timestamp: 1700000000000, method: 'GET', hostname: 'myapp.local', path: '/', status: 200, latencyMs: 10, https: false }];
+    const exportHar = vi.fn().mockResolvedValue({ success: false, error: 'disk full' });
+    await renderApp({ requestLog: { list: vi.fn().mockResolvedValue(entries), exportHar } });
+    fireEvent.click(screen.getByText('nav.log').closest('button'));
+
+    fireEvent.click(screen.getByText('log.actions.exportHar').closest('button'));
+
+    await waitFor(() => {
+      expect(screen.getByText('flash.harExport.error')).toBeInTheDocument();
+    });
+  });
+
+  it('does not show a toast when the HAR export dialog is canceled', async () => {
+    const entries = [{ id: '1', timestamp: 1700000000000, method: 'GET', hostname: 'myapp.local', path: '/', status: 200, latencyMs: 10, https: false }];
+    const exportHar = vi.fn().mockResolvedValue({ canceled: true });
+    await renderApp({ requestLog: { list: vi.fn().mockResolvedValue(entries), exportHar } });
+    fireEvent.click(screen.getByText('nav.log').closest('button'));
+
+    fireEvent.click(screen.getByText('log.actions.exportHar').closest('button'));
+
+    await waitFor(() => expect(exportHar).toHaveBeenCalledOnce());
+    expect(screen.queryByText('flash.harExport.success')).not.toBeInTheDocument();
+    expect(screen.queryByText('flash.harExport.error')).not.toBeInTheDocument();
   });
 });
 

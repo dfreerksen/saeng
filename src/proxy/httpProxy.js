@@ -3,6 +3,10 @@ import https from 'https';
 import net from 'net';
 import tls from 'tls';
 
+// Cap on how much of a request/response body is captured for the request
+// log, to bound memory use for large uploads/downloads.
+const MAX_BODY_CAPTURE_BYTES = 64 * 1024;
+
 class HttpProxy {
   constructor(certManager, requestLog = null) {
     this.certManager = certManager;
@@ -120,13 +124,45 @@ class HttpProxy {
     return this.httpServer ? this.httpServer.address().port : null;
   }
 
+  // Captures up to MAX_BODY_CAPTURE_BYTES of a request/response body stream
+  // into `record[key]`, alongside `record[`${key}Truncated`]` noting whether
+  // the full body was larger than that.
+  _captureBody(stream, record, key) {
+    const chunks = [];
+    let captured = 0;
+    let total = 0;
+
+    stream.on('data', (chunk) => {
+      total += chunk.length;
+      if (captured < MAX_BODY_CAPTURE_BYTES) {
+        const remaining = MAX_BODY_CAPTURE_BYTES - captured;
+        const piece = chunk.length > remaining ? chunk.subarray(0, remaining) : chunk;
+        chunks.push(piece);
+        captured += piece.length;
+      }
+    });
+
+    stream.on('end', () => {
+      record[key] = Buffer.concat(chunks).toString('utf8');
+      record[`${key}Truncated`] = total > captured;
+    });
+  }
+
   // Records a completed request/response cycle to the request log (if enabled).
   // Hooked on 'finish' so it captures the real status code and total latency
-  // without affecting how the response is streamed to the client.
+  // without affecting how the response is streamed to the client. Returns a
+  // record object the caller can populate with response headers/body as the
+  // proxied response comes in.
   _recordRequest(req, res, hostname, https) {
-    if (!this.requestLog) return;
+    if (!this.requestLog) return null;
 
     const startedAt = Date.now();
+    const { logHeaders, logBody } = this.requestLog;
+
+    const record = {};
+    if (logHeaders) record.requestHeaders = { ...req.headers };
+    if (logBody) this._captureBody(req, record, 'requestBody');
+
     res.on('finish', () => {
       let reqPath = req.url || '/';
       if (reqPath.startsWith('http://') || reqPath.startsWith('https://')) {
@@ -147,15 +183,27 @@ class HttpProxy {
         status: res.statusCode,
         latencyMs: Date.now() - startedAt,
         error: res.proxyError ?? null,
+        ...(logHeaders && {
+          requestHeaders: record.requestHeaders,
+          responseHeaders: record.responseHeaders,
+        }),
+        ...(logBody && {
+          requestBody: record.requestBody,
+          requestBodyTruncated: record.requestBodyTruncated,
+          responseBody: record.responseBody,
+          responseBodyTruncated: record.responseBodyTruncated,
+        }),
       });
     });
+
+    return record;
   }
 
   _handleRequest(req, res) {
     const rawHost = req.headers.host || '';
     const hostname = rawHost.split(':')[0].toLowerCase();
     const mapping = this.findMapping(hostname);
-    this._recordRequest(req, res, hostname, false);
+    const record = this._recordRequest(req, res, hostname, false);
 
     if (!mapping) {
       res.writeHead(502, { 'Content-Type': 'text/plain' });
@@ -189,6 +237,8 @@ class HttpProxy {
 
     const proxyReq = backendProto.request(options, (proxyRes) => {
       const headers = this._applyHeaderOverrides({ ...proxyRes.headers }, mapping.responseHeaders);
+      if (record && this.requestLog.logHeaders) record.responseHeaders = { ...headers };
+      if (record && this.requestLog.logBody) this._captureBody(proxyRes, record, 'responseBody');
       res.writeHead(proxyRes.statusCode, headers);
       proxyRes.pipe(res);
     });
@@ -209,7 +259,7 @@ class HttpProxy {
     const rawHost = req.headers.host || '';
     const hostname = rawHost.split(':')[0].toLowerCase();
     const mapping = this.findMapping(hostname);
-    this._recordRequest(req, res, hostname, true);
+    const record = this._recordRequest(req, res, hostname, true);
 
     if (!mapping) {
       res.writeHead(502, { 'Content-Type': 'text/plain' });
@@ -230,6 +280,8 @@ class HttpProxy {
 
     const proxyReq = backendProto.request(options, (proxyRes) => {
       const headers = this._applyHeaderOverrides({ ...proxyRes.headers }, mapping.responseHeaders);
+      if (record && this.requestLog.logHeaders) record.responseHeaders = { ...headers };
+      if (record && this.requestLog.logBody) this._captureBody(proxyRes, record, 'responseBody');
       res.writeHead(proxyRes.statusCode, headers);
       proxyRes.pipe(res);
     });
@@ -337,4 +389,4 @@ class HttpProxy {
   }
 }
 
-export { HttpProxy };
+export { HttpProxy, MAX_BODY_CAPTURE_BYTES };

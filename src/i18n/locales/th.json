@@ -1,4 +1,6 @@
 {
+  "titleBar.title": "Saeng",
+
   "proxy.status.running": "พร็อกซีทำงานอยู่",
   "proxy.status.stopped": "พร็อกซีหยุดทำงาน",
   "proxy.action.start": "เริ่มพร็อกซี",
@@ -75,6 +77,8 @@
   "log.title": "บันทึกคำขอ",
   "log.subtitle": "แสดงคำขอที่ผ่านพร็อกซี Saeng แบบเรียลไทม์",
   "log.actions.clear": "ล้างข้อมูล",
+  "log.actions.exportHar": "ส่งออก HAR",
+  "log.exportHar.dialog.title": "ส่งออก HAR",
   "log.empty": "ยังไม่มีคำขอ",
   "log.emptyHint": "คำขอที่ผ่านพร็อกซี Saeng จะปรากฏที่นี่ในขณะที่พร็อกซีทำงานอยู่",
   "log.table.time": "เวลา",
@@ -150,6 +154,8 @@
   "flash.copied": "คัดลอก {url} ไปยังคลิปบอร์ดแล้ว",
   "flash.export.success": "ส่งออกการแมป {count} รายการไปยัง {path} แล้ว",
   "flash.export.error": "ส่งออกล้มเหลว: {error}",
+  "flash.harExport.success": "ส่งออกคำขอ {count} รายการไปยัง {path} แล้ว",
+  "flash.harExport.error": "ส่งออกล้มเหลว: {error}",
   "flash.import.success": "นำเข้าการแมป {added} รายการแล้ว ข้ามรายการที่ซ้ำกัน {skipped} รายการ",
   "flash.import.error": "นำเข้าล้มเหลว: {error}",
   "flash.settings.updated": "การตั้งค่าได้รับการอัปเดตแล้ว",

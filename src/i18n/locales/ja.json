@@ -1,4 +1,6 @@
 {
+  "titleBar.title": "Saeng",
+
   "proxy.status.running": "プロキシ稼働中",
   "proxy.status.stopped": "プロキシ停止中",
   "proxy.action.start": "プロキシを開始",
@@ -75,6 +77,8 @@
   "log.title": "リクエストログ",
   "log.subtitle": "Saeng経由でプロキシされたリクエストのリアルタイム表示",
   "log.actions.clear": "クリア",
+  "log.actions.exportHar": "HARをエクスポート",
+  "log.exportHar.dialog.title": "HARをエクスポート",
   "log.empty": "リクエストはまだありません",
   "log.emptyHint": "プロキシの実行中、Saeng経由のリクエストがここに表示されます。",
   "log.table.time": "時刻",
@@ -150,6 +154,8 @@
   "flash.copied": "{url} をクリップボードにコピーしました。",
   "flash.export.success": "{count}件のマッピングを{path}にエクスポートしました",
   "flash.export.error": "エクスポートに失敗しました: {error}",
+  "flash.harExport.success": "{count}件のリクエストを{path}にエクスポートしました",
+  "flash.harExport.error": "エクスポートに失敗しました: {error}",
   "flash.import.success": "{added}件のマッピングをインポートし、{skipped}件の重複をスキップしました",
   "flash.import.error": "インポートに失敗しました: {error}",
   "flash.settings.updated": "設定が更新されました。",
