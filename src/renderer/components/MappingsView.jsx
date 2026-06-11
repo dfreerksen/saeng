@@ -60,7 +60,9 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
     const mapping = mappings.find((m) => m.id === id);
     if (!mapping) return;
     const protocol = settings.httpsEnabled ? 'https' : 'http';
-    const url = `${protocol}://${mapping.domain}`;
+    const { subdomain, domain, suffix } = splitDomain(mapping.domain);
+    const host = subdomain === '*' ? `${domain}${suffix}` : mapping.domain;
+    const url = `${protocol}://${host}`;
     showToast(t('flash.copied', { url }), 'success');
     navigator.clipboard.writeText(url);
   }

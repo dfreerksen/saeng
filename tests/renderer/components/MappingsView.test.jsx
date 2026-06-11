@@ -428,4 +428,11 @@ describe('MappingsView — copy', () => {
     fireEvent.click(screen.getByRole('button', { name: (_, el) => el.classList.contains('btn-copy') }));
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('https://myapp.local');
   });
+
+  it('writes the base domain to clipboard for a wildcard subdomain mapping', () => {
+    const wildcardMapping = { id: '3', domain: '*.myapp.local', port: 5000, https: false, enabled: true };
+    renderMappingsView({ mappings: [wildcardMapping], settings: { httpsEnabled: true } });
+    fireEvent.click(screen.getByRole('button', { name: (_, el) => el.classList.contains('btn-copy') }));
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith('https://myapp.local');
+  });
 });
