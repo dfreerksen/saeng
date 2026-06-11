@@ -3,9 +3,8 @@ import Tooltip from './Tooltip.jsx';
 
 function subdomainRank(subdomain) {
   if (subdomain === '') return 0;
-  if (subdomain === '*') return 1;
-  if (/^[0-9]/.test(subdomain)) return 2;
-  return 3;
+  if (subdomain === '*') return 2;
+  return 1;
 }
 
 function compareMappings(a, b) {

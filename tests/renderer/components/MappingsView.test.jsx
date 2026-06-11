@@ -137,7 +137,7 @@ describe('MappingsView — group member ordering', () => {
     expect(cells[1].textContent).toBe('api.myapp.local');
   });
 
-  it('places a wildcard subdomain after the bare domain but before named subdomains', () => {
+  it('places a wildcard subdomain after the bare domain and named subdomains', () => {
     const mappings = [
       { id: '1', domain: 'api.myapp.local', port: 4000, https: false, enabled: true },
       { id: '2', domain: '*.myapp.local', port: 3000, https: false, enabled: true },
@@ -146,8 +146,8 @@ describe('MappingsView — group member ordering', () => {
     const { container } = renderMappingsView({ mappings });
     const cells = container.querySelectorAll('td.domain-cell');
     expect(cells[0].textContent).toBe('myapp.local');
-    expect(cells[1].textContent).toBe('*.myapp.local');
-    expect(cells[2].textContent).toBe('api.myapp.local');
+    expect(cells[1].textContent).toBe('api.myapp.local');
+    expect(cells[2].textContent).toBe('*.myapp.local');
   });
 
   it('places numeric subdomains before alphabetic subdomains', () => {
