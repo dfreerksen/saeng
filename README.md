@@ -10,6 +10,8 @@ Saeng means "light," "radiance," or "glow" in Thai.
 
 ![Saeng Mappings](./screenshot-mappings.png "Saeng Mappings")
 ![Saeng Mocks](./screenshot-mocks.png "Saeng Mocks")
+![Saeng Log](./screenshot-log.png "Saeng Log")
+![Saeng Settings](./screenshot-settings.png "Saeng Settings")
 
 ## Features
 
