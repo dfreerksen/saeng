@@ -143,7 +143,9 @@ function setupIPC() {
 
   ipcMain.handle('mappings:remove', (_, id) => {
     store.removeMapping(id);
+    store.removeMocksForMapping(id);
     proxyManager.updateMappings(store.getMappings());
+    proxyManager.updateMocks(store.getMocks());
     return store.getMappings();
   });
 
@@ -210,6 +212,87 @@ function setupIPC() {
       proxyManager.updateMappings(store.getMappings());
     }
     return { success: true, added: added.length, skipped: skipped.length, mappings: store.getMappings() };
+  });
+
+  ipcMain.handle('mocks:list', () => store.getMocks());
+
+  ipcMain.handle('mocks:add', (_, data) => {
+    try {
+      store.addMock(data);
+      proxyManager.updateMocks(store.getMocks());
+      return { success: true, mocks: store.getMocks() };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  ipcMain.handle('mocks:update', (_, id, data) => {
+    try {
+      store.updateMock(id, data);
+      proxyManager.updateMocks(store.getMocks());
+      return { success: true, mocks: store.getMocks() };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  ipcMain.handle('mocks:remove', (_, id) => {
+    store.removeMock(id);
+    proxyManager.updateMocks(store.getMocks());
+    return store.getMocks();
+  });
+
+  ipcMain.handle('mocks:toggle', (_, id) => {
+    store.toggleMock(id);
+    proxyManager.updateMocks(store.getMocks());
+    return store.getMocks();
+  });
+
+  ipcMain.handle('mocks:export', async (_, ids) => {
+    const data = store.exportMocks(ids);
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: i18n.t('mocks.modals.export.dialog.title'),
+      defaultPath: 'saeng-mocks.json',
+      filters: [{ name: 'JSON', extensions: ['json'] }],
+    });
+    if (result.canceled || !result.filePath) {
+      return { canceled: true };
+    }
+    try {
+      fs.writeFileSync(result.filePath, JSON.stringify({ mocks: data }, null, 2), 'utf8');
+      return { success: true, path: result.filePath, count: data.length };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  ipcMain.handle('mocks:import', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: i18n.t('mocks.modals.import.dialog.title'),
+      properties: ['openFile'],
+      filters: [{ name: 'JSON', extensions: ['json'] }],
+    });
+    if (result.canceled || !result.filePaths?.length) {
+      return { canceled: true };
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(fs.readFileSync(result.filePaths[0], 'utf8'));
+    } catch (err) {
+      return { success: false, error: i18n.t('mocks.modals.import.error.readFailed', { error: err.message }) };
+    }
+
+    const list = Array.isArray(parsed) ? parsed : parsed?.mocks;
+    if (!Array.isArray(list)) {
+      return { success: false, error: i18n.t('mocks.modals.import.error.invalidFormat') };
+    }
+
+    const { added, skipped } = store.importMocks(list);
+    if (added.length > 0) {
+      proxyManager.updateMocks(store.getMocks());
+    }
+    return { success: true, added: added.length, skipped: skipped.length, mocks: store.getMocks() };
   });
 
   ipcMain.handle('proxy:start', async () => {

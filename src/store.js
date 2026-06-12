@@ -26,6 +26,10 @@ const headerListSchema = {
   },
 };
 
+const MIN_MOCK_STATUS_CODE = 100;
+const MAX_MOCK_STATUS_CODE = 599;
+const DEFAULT_MOCK_STATUS_CODE = 200;
+
 const schema = {
   mappings: {
     type: 'array',
@@ -42,6 +46,25 @@ const schema = {
         createdAt: { type: 'string' },
         requestHeaders: headerListSchema,
         responseHeaders: headerListSchema,
+        mocksEnabled: { type: 'boolean', default: false },
+      },
+    },
+  },
+  mocks: {
+    type: 'array',
+    default: [],
+    items: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        mappingId: { type: 'string' },
+        enabled: { type: 'boolean' },
+        method: { type: 'string' },
+        pathPattern: { type: 'string' },
+        statusCode: { type: 'number' },
+        headers: headerListSchema,
+        body: { type: 'string' },
+        createdAt: { type: 'string' },
       },
     },
   },
@@ -81,6 +104,26 @@ function sanitizeHeaders(list) {
     .filter((h) => h.name);
 }
 
+function sanitizeMockMethod(method) {
+  const trimmed = String(method ?? '').trim().toUpperCase();
+  return trimmed || '*';
+}
+
+function sanitizeMockStatusCode(statusCode) {
+  const parsed = parseInt(statusCode, 10);
+  if (Number.isNaN(parsed)) return DEFAULT_MOCK_STATUS_CODE;
+  return Math.min(MAX_MOCK_STATUS_CODE, Math.max(MIN_MOCK_STATUS_CODE, parsed));
+}
+
+// Throws a descriptive error if `pattern` is not a valid regular expression.
+function validatePathPattern(pattern) {
+  try {
+    new RegExp(pattern);
+  } catch (err) {
+    throw new Error(`Invalid path pattern: ${err.message}`, { cause: err });
+  }
+}
+
 class AppStore {
   constructor() {
     this.store = new ElectronStore({ schema, name: 'config' });
@@ -102,6 +145,7 @@ class AppStore {
       createdAt: new Date().toISOString(),
       requestHeaders: sanitizeHeaders(data.requestHeaders),
       responseHeaders: sanitizeHeaders(data.responseHeaders),
+      mocksEnabled: !!data.mocksEnabled,
     };
     mappings.push(mapping);
     this.store.set('mappings', mappings);
@@ -124,6 +168,7 @@ class AppStore {
         https: !!data.https,
         requestHeaders: sanitizeHeaders(data.requestHeaders),
         responseHeaders: sanitizeHeaders(data.responseHeaders),
+        mocksEnabled: !!data.mocksEnabled,
       };
     });
     this.store.set('mappings', mappings);
@@ -178,6 +223,113 @@ class AppStore {
       if (entry.enabled === false) this.toggleMapping(mapping.id);
       existingDomains.add(domain);
       added.push(mapping);
+    }
+    return { added, skipped };
+  }
+
+  getMocks() {
+    return this.store.get('mocks', []);
+  }
+
+  addMock(data) {
+    const pathPattern = String(data?.pathPattern ?? '');
+    validatePathPattern(pathPattern);
+    const mocks = this.getMocks();
+    const mock = {
+      id: randomUUID(),
+      mappingId: data.mappingId,
+      enabled: data.enabled !== false,
+      method: sanitizeMockMethod(data.method),
+      pathPattern,
+      statusCode: sanitizeMockStatusCode(data.statusCode),
+      headers: sanitizeHeaders(data.headers),
+      body: String(data?.body ?? ''),
+      createdAt: new Date().toISOString(),
+    };
+    mocks.push(mock);
+    this.store.set('mocks', mocks);
+    return mock;
+  }
+
+  updateMock(id, data) {
+    const pathPattern = String(data?.pathPattern ?? '');
+    validatePathPattern(pathPattern);
+    const mocks = this.getMocks().map((m) => {
+      if (m.id !== id) return m;
+      return {
+        ...m,
+        mappingId: data.mappingId,
+        enabled: data.enabled !== false,
+        method: sanitizeMockMethod(data.method),
+        pathPattern,
+        statusCode: sanitizeMockStatusCode(data.statusCode),
+        headers: sanitizeHeaders(data.headers),
+        body: String(data?.body ?? ''),
+      };
+    });
+    this.store.set('mocks', mocks);
+    return mocks.find((m) => m.id === id);
+  }
+
+  removeMock(id) {
+    const mocks = this.getMocks().filter((m) => m.id !== id);
+    this.store.set('mocks', mocks);
+  }
+
+  toggleMock(id) {
+    const mocks = this.getMocks().map((m) =>
+      m.id === id ? { ...m, enabled: !m.enabled } : m
+    );
+    this.store.set('mocks', mocks);
+    return mocks.find((m) => m.id === id);
+  }
+
+  removeMocksForMapping(mappingId) {
+    const mocks = this.getMocks().filter((m) => m.mappingId !== mappingId);
+    this.store.set('mocks', mocks);
+  }
+
+  exportMocks(ids) {
+    const mocks = this.getMocks();
+    const mappingById = new Map(this.getMappings().map((m) => [m.id, m]));
+    const selected = Array.isArray(ids) && ids.length > 0
+      ? mocks.filter((m) => ids.includes(m.id))
+      : mocks;
+    return selected
+      .map((m) => {
+        const mapping = mappingById.get(m.mappingId);
+        if (!mapping) return null;
+        const { enabled, method, pathPattern, statusCode, headers, body } = m;
+        return { domain: mapping.domain, enabled, method, pathPattern, statusCode, headers, body };
+      })
+      .filter((entry) => entry !== null);
+  }
+
+  importMocks(list) {
+    const mappingByDomain = new Map(this.getMappings().map((m) => [m.domain.toLowerCase(), m]));
+    const added = [];
+    const skipped = [];
+    for (const entry of list) {
+      const domain = typeof entry?.domain === 'string' ? entry.domain.toLowerCase().trim() : '';
+      const mapping = mappingByDomain.get(domain);
+      if (!mapping) {
+        skipped.push(entry?.domain ?? '');
+        continue;
+      }
+      try {
+        const mock = this.addMock({
+          mappingId: mapping.id,
+          enabled: entry.enabled,
+          method: entry.method,
+          pathPattern: entry.pathPattern,
+          statusCode: entry.statusCode,
+          headers: entry.headers,
+          body: entry.body,
+        });
+        added.push(mock);
+      } catch {
+        skipped.push(entry?.domain ?? '');
+      }
     }
     return { added, skipped };
   }

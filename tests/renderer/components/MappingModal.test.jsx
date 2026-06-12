@@ -76,6 +76,12 @@ describe('MappingModal — add mode', () => {
     const httpsCheckbox = container.querySelector('.checkbox-row input[type="checkbox"]');
     expect(httpsCheckbox).not.toBeChecked();
   });
+
+  it('starts with mocksEnabled unchecked', () => {
+    const { container } = renderAddModal();
+    const checkboxes = container.querySelectorAll('.checkbox-row input[type="checkbox"]');
+    expect(checkboxes[1]).not.toBeChecked();
+  });
 });
 
 describe('MappingModal — edit mode', () => {
@@ -106,6 +112,12 @@ describe('MappingModal — edit mode', () => {
     const { container } = renderEditModal();
     const httpsCheckbox = container.querySelector('.checkbox-row input[type="checkbox"]');
     expect(httpsCheckbox).toBeChecked();
+  });
+
+  it('pre-fills the mocksEnabled checkbox when the mapping has mocking enabled', () => {
+    const { container } = renderEditModal({ mapping: { ...EXISTING_MAPPING, mocksEnabled: true } });
+    const checkboxes = container.querySelectorAll('.checkbox-row input[type="checkbox"]');
+    expect(checkboxes[1]).toBeChecked();
   });
 
   it('pre-fills the host input', () => {
@@ -321,6 +333,30 @@ describe('MappingModal — successful submit', () => {
     fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ port: 8080 }));
+    });
+  });
+
+  it('includes mocksEnabled: false in onSubmit by default', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderAddModal({ onSubmit });
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ mocksEnabled: false }));
+    });
+  });
+
+  it('includes mocksEnabled: true in onSubmit when the checkbox is checked', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderAddModal({ onSubmit });
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    const checkboxes = container.querySelectorAll('.checkbox-row input[type="checkbox"]');
+    fireEvent.click(checkboxes[1]);
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ mocksEnabled: true }));
     });
   });
 

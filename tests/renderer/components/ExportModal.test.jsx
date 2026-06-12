@@ -10,14 +10,15 @@ import ExportModal from '../../../src/renderer/components/ExportModal.jsx';
 
 const t = (key) => key;
 
-const SAMPLE_MAPPINGS = [
-  { id: '1', domain: 'myapp.local' },
-  { id: '2', domain: 'api.local' },
+const SAMPLE_ITEMS = [
+  { id: '1', label: 'myapp.local' },
+  { id: '2', label: 'api.local' },
 ];
 
 function renderExportModal(props = {}) {
   const defaults = {
-    mappings: SAMPLE_MAPPINGS,
+    items: SAMPLE_ITEMS,
+    i18nPrefix: 'mappings.modals.export',
     onClose: vi.fn(),
     onSubmit: vi.fn().mockResolvedValue(undefined),
     t,

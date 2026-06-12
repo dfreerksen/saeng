@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Titlebar from './Titlebar.jsx';
 import Sidebar from './Sidebar.jsx';
 import MappingsView from './MappingsView.jsx';
+import MocksView from './MocksView.jsx';
 import LogView from './LogView.jsx';
 import SettingsView from './SettingsView.jsx';
 import MappingModal from './MappingModal.jsx';
+import MockModal from './MockModal.jsx';
 import ExportModal from './ExportModal.jsx';
 import AboutModal from './AboutModal.jsx';
 import Toast from './Toast.jsx';
@@ -23,6 +25,7 @@ function applyColorMode(mode) {
 export default function App() {
   const [proxyRunning, setProxyRunning] = useState(false);
   const [mappings, setMappings] = useState([]);
+  const [mocks, setMocks] = useState([]);
   const [requestLog, setRequestLog] = useState([]);
   const [healthStatuses, setHealthStatuses] = useState({});
   const [settings, setSettingsState] = useState({});
@@ -74,9 +77,10 @@ export default function App() {
       const strings = await window.electronAPI.i18n.getStrings();
       setI18nStrings(strings);
 
-      const [status, mList, logEntries, healthList, appInfo, caPathVal, caExpiryVal, settingsData, localeList, updateStatus] = await Promise.all([
+      const [status, mList, mocksList, logEntries, healthList, appInfo, caPathVal, caExpiryVal, settingsData, localeList, updateStatus] = await Promise.all([
         window.electronAPI.proxy.status(),
         window.electronAPI.mappings.list(),
+        window.electronAPI.mocks.list(),
         window.electronAPI.requestLog.list(),
         window.electronAPI.health.list(),
         window.electronAPI.app.getInfo(),
@@ -89,6 +93,7 @@ export default function App() {
 
       setProxyRunning(status.running);
       setMappings(mList);
+      setMocks(mocksList);
       setRequestLog(logEntries);
       setHealthStatuses(healthList);
       setAppVersion(appInfo.version);
@@ -174,6 +179,17 @@ export default function App() {
     }
   }
 
+  async function handleImportMocks() {
+    const result = await window.electronAPI.mocks.import();
+    if (result.canceled) return;
+    if (result.success) {
+      setMocks(result.mocks);
+      showToast(t('flash.mocksImport.success', { added: result.added, skipped: result.skipped }), result.added > 0 ? 'success' : 'info');
+    } else {
+      showToast(t('flash.mocksImport.error', { error: result.error }), 'error');
+    }
+  }
+
   async function handleClearLog() {
     const cleared = await window.electronAPI.requestLog.clear();
     setRequestLog(cleared);
@@ -210,6 +226,14 @@ export default function App() {
     showToast(t('flash.settings.updated'), 'info');
   }
 
+  const mockableMappings = mappings.filter((m) => m.mocksEnabled);
+
+  function mockModalMappings(mock) {
+    if (!mock || mockableMappings.some((m) => m.id === mock.mappingId)) return mockableMappings;
+    const current = mappings.find((m) => m.id === mock.mappingId);
+    return current ? [...mockableMappings, current] : mockableMappings;
+  }
+
   return (
     <div className="app">
       <Titlebar proxyRunning={proxyRunning} updateInfo={updateInfo} t={t} />
@@ -235,6 +259,19 @@ export default function App() {
             onEdit={(mapping) => setModal({ type: 'edit', mapping })}
             onExport={() => setModal({ type: 'export' })}
             onImport={handleImportMappings}
+            showToast={showToast}
+            t={t}
+          />
+          <MocksView
+            active={currentView === 'mocks'}
+            mocks={mocks}
+            mappings={mappings}
+            mockableMappings={mockableMappings}
+            setMocks={setMocks}
+            onAdd={() => setModal({ type: 'addMock' })}
+            onEdit={(mock) => setModal({ type: 'editMock', mock })}
+            onExport={() => setModal({ type: 'exportMocks' })}
+            onImport={handleImportMocks}
             showToast={showToast}
             t={t}
           />
@@ -291,9 +328,45 @@ export default function App() {
         />
       )}
 
+      {modal?.type === 'addMock' && (
+        <MockModal
+          mappings={mockableMappings}
+          onClose={() => setModal(null)}
+          onSubmit={async (data) => {
+            const result = await window.electronAPI.mocks.add(data);
+            if (result.success) {
+              setMocks(result.mocks);
+              setModal(null);
+              showToast(t('flash.mock.added'), 'success');
+            }
+            return result;
+          }}
+          t={t}
+        />
+      )}
+
+      {modal?.type === 'editMock' && (
+        <MockModal
+          mock={modal.mock}
+          mappings={mockModalMappings(modal.mock)}
+          onClose={() => setModal(null)}
+          onSubmit={async (data) => {
+            const result = await window.electronAPI.mocks.update(modal.mock.id, data);
+            if (result.success) {
+              setMocks(result.mocks);
+              setModal(null);
+              showToast(t('flash.mock.updated'), 'success');
+            }
+            return result;
+          }}
+          t={t}
+        />
+      )}
+
       {modal?.type === 'export' && (
         <ExportModal
-          mappings={mappings}
+          items={mappings.map((m) => ({ id: m.id, label: m.domain }))}
+          i18nPrefix="mappings.modals.export"
           onClose={() => setModal(null)}
           onSubmit={async (ids) => {
             const result = await window.electronAPI.mappings.export(ids);
@@ -303,6 +376,28 @@ export default function App() {
               showToast(t('flash.export.success', { count: result.count, path: result.path }), 'success');
             } else {
               showToast(t('flash.export.error', { error: result.error }), 'error');
+            }
+          }}
+          t={t}
+        />
+      )}
+
+      {modal?.type === 'exportMocks' && (
+        <ExportModal
+          items={mocks.map((m) => ({
+            id: m.id,
+            label: `${m.method === '*' ? t('mocks.modals.manage.form.method.any') : m.method} ${m.pathPattern}`,
+          }))}
+          i18nPrefix="mocks.modals.export"
+          onClose={() => setModal(null)}
+          onSubmit={async (ids) => {
+            const result = await window.electronAPI.mocks.export(ids);
+            if (result.canceled) return;
+            if (result.success) {
+              setModal(null);
+              showToast(t('flash.mocksExport.success', { count: result.count, path: result.path }), 'success');
+            } else {
+              showToast(t('flash.mocksExport.error', { error: result.error }), 'error');
             }
           }}
           t={t}

@@ -1,63 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Modal from './Modal.jsx';
+import HeaderListEditor from './HeaderListEditor.jsx';
 import { validateDomainPart, splitDomain, DOMAIN_SUFFIXES, DEFAULT_SUFFIX } from '../js/utils.js';
-
-function HeaderListEditor({ headers, onChange, label, hint, t }) {
-  function updateRow(index, field, value) {
-    onChange(headers.map((h, i) => (i === index ? { ...h, [field]: value } : h)));
-  }
-
-  function addRow() {
-    onChange([...headers, { name: '', value: '' }]);
-  }
-
-  function removeRow(index) {
-    onChange(headers.filter((_, i) => i !== index));
-  }
-
-  return (
-    <div className="form-group">
-      <label className="form-label">
-        <span>{label}</span>
-        <span style={{ color: 'var(--saeng-text-muted)' }}>{t('mappings.modals.manage.form.optional')}</span>
-      </label>
-      {headers.map((header, index) => (
-        <div className="header-row" key={index}>
-          <input
-            className="form-input"
-            placeholder={t('mappings.modals.manage.form.headers.name.placeholder')}
-            value={header.name}
-            onChange={(e) => updateRow(index, 'name', e.target.value)}
-            autoComplete="off"
-            spellCheck={false}
-            style={{ flex: 1, minWidth: 0 }}
-          />
-          <input
-            className="form-input"
-            placeholder={t('mappings.modals.manage.form.headers.value.placeholder')}
-            value={header.value}
-            onChange={(e) => updateRow(index, 'value', e.target.value)}
-            autoComplete="off"
-            spellCheck={false}
-            style={{ flex: 1.5, minWidth: 0 }}
-          />
-          <button
-            type="button"
-            className="btn btn-outline-danger"
-            aria-label={t('mappings.modals.manage.form.headers.remove')}
-            onClick={() => removeRow(index)}
-          >
-            <i className="bi bi-trash" />
-          </button>
-        </div>
-      ))}
-      <button type="button" className="btn btn-outline-secondary btn-sm" onClick={addRow}>
-        {t('mappings.modals.manage.form.headers.add')}
-      </button>
-      <div className="form-hint">{hint}</div>
-    </div>
-  );
-}
 
 export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }) {
   const isEditing = !!mapping;
@@ -69,6 +13,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
   const [host, setHost] = useState(mapping?.host ?? '127.0.0.1');
   const [port, setPort] = useState(mapping?.port ?? 3000);
   const [https, setHttps] = useState(!!mapping?.https);
+  const [mocksEnabled, setMocksEnabled] = useState(!!mapping?.mocksEnabled);
   const [requestHeaders, setRequestHeaders] = useState(mapping?.requestHeaders ?? []);
   const [responseHeaders, setResponseHeaders] = useState(mapping?.responseHeaders ?? []);
   const [domainError, setDomainError] = useState('');
@@ -122,6 +67,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
       host: host.trim() || '127.0.0.1',
       port: parsedPort,
       https,
+      mocksEnabled,
       requestHeaders,
       responseHeaders,
     });
@@ -227,6 +173,18 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                   <span>{t('mappings.modals.manage.form.https.label')}</span>
                 </label>
                 <div className="form-hint" style={{ marginTop: 6 }}>{t('mappings.modals.manage.form.https.hint')}</div>
+              </div>
+
+              <div className="form-group">
+                <label className="checkbox-row">
+                  <input
+                    type="checkbox"
+                    checked={mocksEnabled}
+                    onChange={(e) => setMocksEnabled(e.target.checked)}
+                  />
+                  <span>{t('mappings.modals.manage.form.mocksEnabled.label')}</span>
+                </label>
+                <div className="form-hint" style={{ marginTop: 6 }}>{t('mappings.modals.manage.form.mocksEnabled.hint')}</div>
               </div>
 
               <HeaderListEditor

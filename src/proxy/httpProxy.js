@@ -13,6 +13,7 @@ class HttpProxy {
     this.requestLog = requestLog;
     this.mappings = new Map();
     this.wildcards = [];
+    this.mocks = new Map();
     this.httpServer = null;
     this.internalHttpsServer = null;
     this.internalHttpsPort = null;
@@ -52,6 +53,69 @@ class HttpProxy {
       ({ base }) => lower !== base && lower.endsWith(`.${base}`)
     );
     return wildcard?.mapping;
+  }
+
+  // Compiles the enabled mock rules into a Map<mappingId, CompiledMock[]>,
+  // preserving array order so the first matching rule wins. Rules with an
+  // invalid pathPattern are skipped defensively (the store validates on
+  // save, but mappings between processes could in theory drift).
+  updateMocks(mocks) {
+    const byMapping = new Map();
+    for (const mock of mocks) {
+      if (!mock.enabled) continue;
+      let regex;
+      try {
+        regex = new RegExp(mock.pathPattern);
+      } catch {
+        continue;
+      }
+      const list = byMapping.get(mock.mappingId) ?? [];
+      list.push({
+        method: (mock.method || '*').toUpperCase(),
+        regex,
+        statusCode: mock.statusCode,
+        headers: mock.headers,
+        body: mock.body,
+      });
+      byMapping.set(mock.mappingId, list);
+    }
+    this.mocks = byMapping;
+  }
+
+  // Returns the first enabled mock rule for `mapping` whose method and path
+  // regex match the request, or null if mocking is off or nothing matches.
+  _findMock(mapping, method, pathname) {
+    if (!mapping.mocksEnabled) return null;
+    const mocks = this.mocks.get(mapping.id);
+    if (!mocks) return null;
+    const upperMethod = method.toUpperCase();
+    return mocks.find(
+      (mock) => (mock.method === '*' || mock.method === upperMethod) && mock.regex.test(pathname)
+    ) ?? null;
+  }
+
+  // Writes a mocked response directly to the client without contacting the
+  // backend. Drains the request body so its stream doesn't hang, and (when
+  // request-log detail is enabled) records the response headers/body since
+  // there's no proxied stream to capture them from.
+  _serveMock(mock, req, res, record) {
+    req.resume();
+
+    const headers = this._applyHeaderOverrides({}, mock.headers);
+    if (!('content-type' in headers)) headers['content-type'] = 'text/plain; charset=utf-8';
+    const body = mock.body || '';
+
+    if (record) {
+      record.mocked = true;
+      if (this.requestLog?.logHeaders) record.responseHeaders = { ...headers };
+      if (this.requestLog?.logBody) {
+        record.responseBody = body;
+        record.responseBodyTruncated = false;
+      }
+    }
+
+    res.writeHead(mock.statusCode, headers);
+    res.end(body);
   }
 
   async start(mappings, settings) {
@@ -183,6 +247,7 @@ class HttpProxy {
         status: res.statusCode,
         latencyMs: Date.now() - startedAt,
         error: res.proxyError ?? null,
+        mocked: record?.mocked ?? false,
         ...(logHeaders && {
           requestHeaders: record.requestHeaders,
           responseHeaders: record.responseHeaders,
@@ -221,6 +286,12 @@ class HttpProxy {
         console.error(`Failed to parse URL ${reqPath}:`, err);
         // fall through with original
       }
+    }
+
+    const mock = this._findMock(mapping, req.method, (reqPath || '/').split('?')[0]);
+    if (mock) {
+      this._serveMock(mock, req, res, record);
+      return;
     }
 
     const backendProto = mapping.https ? https : http;
@@ -264,6 +335,12 @@ class HttpProxy {
     if (!mapping) {
       res.writeHead(502, { 'Content-Type': 'text/plain' });
       res.end(`Saeng: no mapping for ${hostname}`);
+      return;
+    }
+
+    const mock = this._findMock(mapping, req.method, (req.url || '/').split('?')[0]);
+    if (mock) {
+      this._serveMock(mock, req, res, record);
       return;
     }
 

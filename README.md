@@ -16,6 +16,7 @@ Saeng means "light," "radiance," or "glow" in Thai.
 * Mappings are grouped by base domain, with a toggle to enable/disable a whole group at once
 * Enable/disable individual mappings without removing them
 * Per-mapping custom request/response headers, for injecting CORS headers or auth tokens during local dev
+* Mock responses per domain — match requests by method and path regex and return a canned status, headers, and body without hitting the backend
 * HTTPS support via a local CA certificate (with MITM SSL termination)
 * WebSocket pass-through
 * Start proxy automatically on launch
@@ -50,6 +51,10 @@ The **Log** view shows a live list of requests proxied through Saeng. Enable **L
 ## Health checks
 
 Enable **Backend health checks** in Settings to have Saeng periodically ping each enabled mapping's `host:port` while the proxy is running. A status dot next to each domain in the mappings table shows whether the backend is reachable, with a tooltip showing the latency or error. The check interval and timeout are configurable in Settings.
+
+## Mocks
+
+Enable **mocking** on a mapping (in the mapping's edit form), then add mock rules in the **Mocks** view. Each mock matches requests for that domain by HTTP method and a path pattern (a regular expression matched against the request path, without the query string) and returns a canned status code, headers, and body instead of forwarding the request to the backend. The first matching rule wins. Mocking applies to HTTP and HTTPS requests, but not WebSocket upgrades or raw HTTPS tunnels. Mocked requests are flagged with a "MOCK" badge in the request log. Mocks can be exported/imported as JSON, matched up by domain.
 
 ## Requirements
 
@@ -140,12 +145,18 @@ $ act -n release # dry run
 $ act release
 ```
 
-### Release
+## Release
 
 Update the version it `package.json` and run `npm install`. Then run the release process using a Claude command and follow the instructions
 
 ```bash
 /release
+```
+
+## Translations
+
+```bash
+/i18n-check
 ```
 
 ## License

@@ -339,6 +339,254 @@ describe('AppStore.importMappings()', () => {
   });
 });
 
+describe('AppStore mocksEnabled on mappings', () => {
+  it('defaults mocksEnabled to false on addMapping', () => {
+    const result = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    expect(result.mocksEnabled).toBe(false);
+  });
+
+  it('coerces mocksEnabled to a boolean on addMapping', () => {
+    expect(store.addMapping({ domain: 'a.local', port: 1, mocksEnabled: 1 }).mocksEnabled).toBe(true);
+    expect(store.addMapping({ domain: 'b.local', port: 2, mocksEnabled: 0 }).mocksEnabled).toBe(false);
+    expect(store.addMapping({ domain: 'c.local', port: 3, mocksEnabled: true }).mocksEnabled).toBe(true);
+  });
+
+  it('updates mocksEnabled via updateMapping', () => {
+    const m = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const updated = store.updateMapping(m.id, { domain: 'myapp.local', port: 3000, mocksEnabled: true });
+    expect(updated.mocksEnabled).toBe(true);
+  });
+});
+
+describe('AppStore.getMocks()', () => {
+  it('returns an empty array when no mocks have been added', () => {
+    expect(store.getMocks()).toEqual([]);
+  });
+});
+
+describe('AppStore.addMock()', () => {
+  it('returns the newly created mock with a generated id and createdAt', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const result = store.addMock({ mappingId: mapping.id, method: 'get', pathPattern: '^/api/ping$', statusCode: '200', body: '{"ok":true}' });
+    expect(result.id).toBeDefined();
+    expect(result.mappingId).toBe(mapping.id);
+    expect(result.method).toBe('GET');
+    expect(result.pathPattern).toBe('^/api/ping$');
+    expect(result.statusCode).toBe(200);
+    expect(result.body).toBe('{"ok":true}');
+    expect(() => new Date(result.createdAt)).not.toThrow();
+  });
+
+  it('defaults method to "*" when not provided', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const result = store.addMock({ mappingId: mapping.id, pathPattern: '.*' });
+    expect(result.method).toBe('*');
+  });
+
+  it('defaults enabled to true', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const result = store.addMock({ mappingId: mapping.id, pathPattern: '.*' });
+    expect(result.enabled).toBe(true);
+  });
+
+  it('persists enabled as false when explicitly set', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const result = store.addMock({ mappingId: mapping.id, pathPattern: '.*', enabled: false });
+    expect(result.enabled).toBe(false);
+  });
+
+  it('clamps statusCode to the valid range', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    expect(store.addMock({ mappingId: mapping.id, pathPattern: '.*', statusCode: 50 }).statusCode).toBe(100);
+    expect(store.addMock({ mappingId: mapping.id, pathPattern: '.*', statusCode: 999 }).statusCode).toBe(599);
+  });
+
+  it('defaults statusCode to 200 when not a number', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    expect(store.addMock({ mappingId: mapping.id, pathPattern: '.*', statusCode: 'banana' }).statusCode).toBe(200);
+  });
+
+  it('sanitizes headers', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const result = store.addMock({
+      mappingId: mapping.id,
+      pathPattern: '.*',
+      headers: [{ name: ' X-Test ', value: ' 1 ' }, { name: '', value: 'ignored' }],
+    });
+    expect(result.headers).toEqual([{ name: 'X-Test', value: '1' }]);
+  });
+
+  it('throws a descriptive error for an invalid regex pathPattern', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    expect(() => store.addMock({ mappingId: mapping.id, pathPattern: '(unterminated' })).toThrow(/Invalid path pattern/);
+  });
+
+  it('does not persist a mock when pathPattern is invalid', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    expect(() => store.addMock({ mappingId: mapping.id, pathPattern: '(unterminated' })).toThrow();
+    expect(store.getMocks()).toHaveLength(0);
+  });
+
+  it('persists the mock so getMocks() includes it', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    store.addMock({ mappingId: mapping.id, pathPattern: '.*' });
+    expect(store.getMocks()).toHaveLength(1);
+  });
+});
+
+describe('AppStore.updateMock()', () => {
+  it('updates the mock fields and returns the updated mock', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const mock = store.addMock({ mappingId: mapping.id, method: 'get', pathPattern: '^/old$', statusCode: 200, body: 'old' });
+    const updated = store.updateMock(mock.id, { mappingId: mapping.id, method: 'post', pathPattern: '^/new$', statusCode: 201, body: 'new' });
+    expect(updated.method).toBe('POST');
+    expect(updated.pathPattern).toBe('^/new$');
+    expect(updated.statusCode).toBe(201);
+    expect(updated.body).toBe('new');
+  });
+
+  it('does not change id or createdAt', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const mock = store.addMock({ mappingId: mapping.id, pathPattern: '.*' });
+    const updated = store.updateMock(mock.id, { mappingId: mapping.id, pathPattern: '.*' });
+    expect(updated.id).toBe(mock.id);
+    expect(updated.createdAt).toBe(mock.createdAt);
+  });
+
+  it('throws a descriptive error for an invalid regex pathPattern and leaves the mock unchanged', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const mock = store.addMock({ mappingId: mapping.id, pathPattern: '^/old$' });
+    expect(() => store.updateMock(mock.id, { mappingId: mapping.id, pathPattern: '(unterminated' })).toThrow(/Invalid path pattern/);
+    expect(store.getMocks().find((m) => m.id === mock.id).pathPattern).toBe('^/old$');
+  });
+});
+
+describe('AppStore.removeMock()', () => {
+  it('removes the mock with the given id', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const mock = store.addMock({ mappingId: mapping.id, pathPattern: '.*' });
+    store.removeMock(mock.id);
+    expect(store.getMocks()).toHaveLength(0);
+  });
+
+  it('leaves other mocks untouched', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const a = store.addMock({ mappingId: mapping.id, pathPattern: '^/a$' });
+    const b = store.addMock({ mappingId: mapping.id, pathPattern: '^/b$' });
+    store.removeMock(a.id);
+    const remaining = store.getMocks();
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0].id).toBe(b.id);
+  });
+});
+
+describe('AppStore.toggleMock()', () => {
+  it('flips enabled from true to false and back', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const mock = store.addMock({ mappingId: mapping.id, pathPattern: '.*' });
+    expect(mock.enabled).toBe(true);
+    store.toggleMock(mock.id);
+    expect(store.getMocks()[0].enabled).toBe(false);
+    store.toggleMock(mock.id);
+    expect(store.getMocks()[0].enabled).toBe(true);
+  });
+});
+
+describe('AppStore.removeMocksForMapping()', () => {
+  it('removes all mocks belonging to the given mapping', () => {
+    const a = store.addMapping({ domain: 'a.local', port: 1 });
+    const b = store.addMapping({ domain: 'b.local', port: 2 });
+    store.addMock({ mappingId: a.id, pathPattern: '^/a1$' });
+    store.addMock({ mappingId: a.id, pathPattern: '^/a2$' });
+    const bMock = store.addMock({ mappingId: b.id, pathPattern: '^/b$' });
+    store.removeMocksForMapping(a.id);
+    const remaining = store.getMocks();
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0].id).toBe(bMock.id);
+  });
+});
+
+describe('AppStore.exportMocks()', () => {
+  it('returns mocks with the mapping domain instead of mappingId', () => {
+    const mapping = store.addMapping({ domain: 'a.local', port: 1 });
+    store.addMock({ mappingId: mapping.id, method: 'GET', pathPattern: '^/api$', statusCode: 200, body: 'hi' });
+    const [result] = store.exportMocks();
+    expect(result).toEqual({
+      domain: 'a.local', enabled: true, method: 'GET', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'hi',
+    });
+    expect(result).not.toHaveProperty('id');
+    expect(result).not.toHaveProperty('mappingId');
+    expect(result).not.toHaveProperty('createdAt');
+  });
+
+  it('returns all mocks when ids is an empty array', () => {
+    const mapping = store.addMapping({ domain: 'a.local', port: 1 });
+    store.addMock({ mappingId: mapping.id, pathPattern: '^/a$' });
+    store.addMock({ mappingId: mapping.id, pathPattern: '^/b$' });
+    expect(store.exportMocks([])).toHaveLength(2);
+  });
+
+  it('returns only the mocks matching the given ids', () => {
+    const mapping = store.addMapping({ domain: 'a.local', port: 1 });
+    const a = store.addMock({ mappingId: mapping.id, pathPattern: '^/a$' });
+    store.addMock({ mappingId: mapping.id, pathPattern: '^/b$' });
+    const result = store.exportMocks([a.id]);
+    expect(result).toHaveLength(1);
+    expect(result[0].pathPattern).toBe('^/a$');
+  });
+
+  it('omits mocks whose mapping no longer exists', () => {
+    const mapping = store.addMapping({ domain: 'a.local', port: 1 });
+    store.addMock({ mappingId: mapping.id, pathPattern: '^/a$' });
+    store.removeMapping(mapping.id);
+    expect(store.exportMocks()).toHaveLength(0);
+  });
+});
+
+describe('AppStore.importMocks()', () => {
+  it('adds a mock matched to the mapping with the given domain', () => {
+    const mapping = store.addMapping({ domain: 'a.local', port: 1 });
+    const { added, skipped } = store.importMocks([
+      { domain: 'A.Local', method: 'get', pathPattern: '^/api$', statusCode: '201', body: 'ok' },
+    ]);
+    expect(added).toHaveLength(1);
+    expect(skipped).toHaveLength(0);
+    expect(added[0].mappingId).toBe(mapping.id);
+    expect(added[0].method).toBe('GET');
+    expect(added[0].statusCode).toBe(201);
+    expect(store.getMocks()).toHaveLength(1);
+  });
+
+  it('persists enabled as false when entry.enabled is false', () => {
+    store.addMapping({ domain: 'a.local', port: 1 });
+    store.importMocks([{ domain: 'a.local', pathPattern: '.*', enabled: false }]);
+    expect(store.getMocks()[0].enabled).toBe(false);
+  });
+
+  it('skips entries whose domain does not match any mapping', () => {
+    const { added, skipped } = store.importMocks([{ domain: 'missing.local', pathPattern: '.*' }]);
+    expect(added).toHaveLength(0);
+    expect(skipped).toEqual(['missing.local']);
+  });
+
+  it('skips entries with an invalid path pattern', () => {
+    store.addMapping({ domain: 'a.local', port: 1 });
+    const { added, skipped } = store.importMocks([{ domain: 'a.local', pathPattern: '(unterminated' }]);
+    expect(added).toHaveLength(0);
+    expect(skipped).toEqual(['a.local']);
+  });
+
+  it('imports headers', () => {
+    store.addMapping({ domain: 'a.local', port: 1 });
+    const { added } = store.importMocks([{
+      domain: 'a.local',
+      pathPattern: '.*',
+      headers: [{ name: 'X-Foo', value: 'bar' }],
+    }]);
+    expect(added[0].headers).toEqual([{ name: 'X-Foo', value: 'bar' }]);
+  });
+});
+
 describe('AppStore.getSettings() / setSettings()', () => {
   it('getSettings() returns the default settings when nothing has been set', () => {
     const settings = store.getSettings();

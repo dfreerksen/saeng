@@ -43,6 +43,7 @@ class ProxyManager {
     this.pacServer.updateMappings(mappings);
 
     const proxyPort = await this.httpProxy.start(mappings, settings);
+    this.httpProxy.updateMocks(this.store.getMocks());
 
     await this.pacServer.start(proxyPort);
 
@@ -79,6 +80,11 @@ class ProxyManager {
     if (!this.running) return;
     this.httpProxy?.updateMappings(mappings);
     this.pacServer?.updateMappings(mappings);
+  }
+
+  updateMocks(mocks) {
+    if (!this.running) return;
+    this.httpProxy?.updateMocks(mocks);
   }
 }
 

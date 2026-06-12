@@ -3,5 +3,19 @@
     "allow": [
       "Bash(grep -E \"\\\\.\\(rb|js|jsx|tsx\\)$\")"
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/validate-locale-json.mjs",
+            "statusMessage": "Validating locale JSON..."
+          }
+        ]
+      }
+    ]
   }
 }

@@ -126,6 +126,16 @@ describe('LogView — table with entries', () => {
     expect(screen.getByText('12 ms')).toBeInTheDocument();
   });
 
+  it('shows a MOCK badge for mocked entries', () => {
+    renderLogView({ entries: [{ ...SAMPLE_ENTRIES[0], mocked: true }] });
+    expect(screen.getByText('log.table.mock')).toHaveClass('badge-mock');
+  });
+
+  it('does not show a MOCK badge for non-mocked entries', () => {
+    renderLogView({ entries: SAMPLE_ENTRIES });
+    expect(screen.queryByText('log.table.mock')).not.toBeInTheDocument();
+  });
+
   it('enables the clear button and calls onClear when clicked', () => {
     const onClear = vi.fn();
     renderLogView({ entries: SAMPLE_ENTRIES, onClear });

@@ -8,6 +8,13 @@ export default function Sidebar({ currentView, setCurrentView, loggingEnabled, p
         <i className="bi bi-arrow-left-right" />
         <span>{t('nav.mappings')}</span>
       </button>
+      <button
+        className={`nav-item${currentView === 'mocks' ? ' active' : ''}`}
+        onClick={() => setCurrentView('mocks')}
+      >
+        <i className="bi bi-magic" />
+        <span>{t('nav.mocks')}</span>
+      </button>
       {loggingEnabled && (
         <button
           className={`nav-item${currentView === 'log' ? ' active' : ''}`}

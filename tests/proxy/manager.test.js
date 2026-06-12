@@ -5,6 +5,7 @@ vi.mock('../../src/proxy/httpProxy.js', () => ({
     this.start = vi.fn().mockResolvedValue(54321);
     this.stop = vi.fn().mockResolvedValue(undefined);
     this.updateMappings = vi.fn();
+    this.updateMocks = vi.fn();
   }),
 }));
 
@@ -48,7 +49,7 @@ import { RequestLog } from '../../src/proxy/requestLog.js';
 import { HealthChecker } from '../../src/proxy/healthChecker.js';
 import { setSystemProxy, clearSystemProxy } from '../../src/systemProxy.js';
 
-const mockStore = { getCertDir: () => '/tmp/test-certs', getSettings: () => ({ logMaxEntries: 300, loggingEnabled: true, logHeadersEnabled: false, logBodyEnabled: false }) };
+const mockStore = { getCertDir: () => '/tmp/test-certs', getSettings: () => ({ logMaxEntries: 300, loggingEnabled: true, logHeadersEnabled: false, logBodyEnabled: false }), getMocks: () => [] };
 const mappings = [{ domain: 'myapp.local', port: 3000, enabled: true }];
 const settings = { httpsEnabled: false };
 
@@ -187,6 +188,34 @@ describe('ProxyManager.updateMappings()', () => {
   });
 });
 
+describe('ProxyManager — mocks wiring', () => {
+  it('pushes the store mocks to HttpProxy on start()', async () => {
+    const mocks = [{ id: 'mock1', mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/api$', statusCode: 200, headers: [], body: '' }];
+    const store = { ...mockStore, getMocks: () => mocks };
+    const manager = new ProxyManager(store);
+    await manager.start(mappings, settings);
+    const httpInstance = vi.mocked(HttpProxy).mock.instances[0];
+    expect(httpInstance.updateMocks).toHaveBeenCalledWith(mocks);
+  });
+
+  describe('ProxyManager.updateMocks()', () => {
+    it('does nothing when the proxy is not running', () => {
+      const manager = new ProxyManager(mockStore);
+      manager.updateMocks([]);
+      expect(vi.mocked(HttpProxy)).not.toHaveBeenCalled();
+    });
+
+    it('pushes updates to HttpProxy when running', async () => {
+      const manager = new ProxyManager(mockStore);
+      await manager.start(mappings, settings);
+      const httpInstance = vi.mocked(HttpProxy).mock.instances[0];
+      const newMocks = [{ id: 'mock1', mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/api$', statusCode: 200, headers: [], body: '' }];
+      manager.updateMocks(newMocks);
+      expect(httpInstance.updateMocks).toHaveBeenLastCalledWith(newMocks);
+    });
+  });
+});
+
 describe('ProxyManager — health checker wiring', () => {
   it('creates a HealthChecker', () => {
     const manager = new ProxyManager(mockStore);
@@ -203,6 +232,7 @@ describe('ProxyManager — health checker wiring', () => {
         healthCheckTimeoutMs: 5000,
         healthCheckEnabled: true,
       }),
+      getMocks: () => [],
     };
     new ProxyManager(store);
     expect(vi.mocked(HealthChecker)).toHaveBeenCalledWith(30000, 5000, true);

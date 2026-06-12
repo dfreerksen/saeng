@@ -91,6 +91,7 @@ function buildEntry(entry) {
     cache: {},
     timings: { send: 0, wait: time, receive: 0 },
     ...(entry.error && { comment: entry.error }),
+    ...(entry.mocked && { _mocked: true }),
   };
 }
 

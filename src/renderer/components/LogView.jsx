@@ -124,6 +124,9 @@ export default function LogView({ active, entries, onClear, onExportHar, setting
                         <span className={`badge ${statusBadgeClass(entry.status)}`} title={entry.error || undefined}>
                           {entry.status ?? '—'}
                         </span>
+                        {entry.mocked && (
+                          <span className="badge badge-mock">{t('log.table.mock')}</span>
+                        )}
                       </td>
                       <td style={{ textAlign: 'right' }}>
                         {entry.latencyMs != null ? `${entry.latencyMs} ms` : '—'}

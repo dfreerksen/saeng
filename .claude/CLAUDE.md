@@ -69,6 +69,8 @@ The renderer is a **React 19** app bundled by **esbuild**. SCSS is compiled by *
 | `mappings:list/add/remove/update/toggle` | CRUD for domain mappings |
 | `mappings:setGroupEnabled` | Enable/disable every mapping in a domain group at once (takes an array of ids + target enabled state) |
 | `mappings:export/import` | Export/import mappings to/from a JSON file via native save/open dialogs |
+| `mocks:list/add/update/remove/toggle` | CRUD for mock response rules |
+| `mocks:export/import` | Export/import mock rules to/from a JSON file via native save/open dialogs |
 | `proxy:start/stop/status` | Control and query proxy state |
 | `requestLog:list/clear` | Read/clear the in-memory request log |
 | `requestLog:exportHar` | Export the current request log as a HAR file via a native save dialog |
@@ -89,13 +91,13 @@ The user must install the CA cert into the OS trust store once — `src/ssl/trus
 
 ### Persistence
 
-`src/store.js` wraps **electron-store v11** (ESM). The store file is `config.json` in `app.getPath('userData')`. The schema has three top-level keys: `mappings` (array), `windowBounds` (object), and `settings` (object).
+`src/store.js` wraps **electron-store v11** (ESM). The store file is `config.json` in `app.getPath('userData')`. The schema has four top-level keys: `mappings` (array), `mocks` (array), `windowBounds` (object), and `settings` (object).
 
 Mapping shape:
 ```js
-{ id, domain, host, port, https, enabled, createdAt, requestHeaders, responseHeaders }
+{ id, domain, host, port, https, enabled, createdAt, requestHeaders, responseHeaders, mocksEnabled }
 ```
-`host` is the backend hostname to proxy to (defaults to `127.0.0.1`). It is used for all connection types: plain HTTP, HTTPS CONNECT tunnels, and WebSocket upgrades. `https` on a mapping means the **backend** expects HTTPS — it does not control whether the frontend domain is served over HTTPS (that is the global `settings.httpsEnabled` toggle).
+`host` is the backend hostname to proxy to (defaults to `127.0.0.1`). It is used for all connection types: plain HTTP, HTTPS CONNECT tunnels, and WebSocket upgrades. `https` on a mapping means the **backend** expects HTTPS — it does not control whether the frontend domain is served over HTTPS (that is the global `settings.httpsEnabled` toggle). `mocksEnabled` (default `false`) gates whether any mock rules for this mapping are applied — see [Mocks](#mocks).
 
 `requestHeaders`/`responseHeaders` are arrays of `{ name, value }` pairs (sanitized via `sanitizeHeaders()`, default `[]`), editable per-mapping in `MappingModal.jsx`. `HttpProxy._applyHeaderOverrides()` lowercases each `name` and sets it on the headers object, so overrides replace rather than duplicate existing headers — `requestHeaders` are applied to the outgoing backend request (including WebSocket upgrade replays) and `responseHeaders` to the response written back to the client.
 
@@ -111,7 +113,21 @@ Settings defaults: `{ httpsEnabled: true, startOnLaunch: true, colorMode: 'auto'
 
 When `settings.logHeadersEnabled`/`settings.logBodyEnabled` are true, `HttpProxy._recordRequest()` additionally attaches `requestHeaders`/`responseHeaders` to each entry, and `_captureBody()` captures up to `MAX_BODY_CAPTURE_BYTES` (64 KB) of `requestBody`/`responseBody`, setting `requestBodyTruncated`/`responseBodyTruncated` if the real body was larger. `RequestLog.setLogHeaders()`/`setLogBody()` (called from `settings:set`) control this without restarting the proxy. `LogView.jsx` shows an expandable details row per entry with header tables and body previews when either setting is enabled.
 
-The `requestLog:exportHar` IPC handler writes the current log to a `.har` file (via a save dialog) using `buildHar()` from `src/proxy/har.js`, which converts entries into a HAR 1.2 document (`log.entries[]` with `request`/`response`/`timings`) for use with browser dev tools or other HTTP debugging tools.
+The `requestLog:exportHar` IPC handler writes the current log to a `.har` file (via a save dialog) using `buildHar()` from `src/proxy/har.js`, which converts entries into a HAR 1.2 document (`log.entries[]` with `request`/`response`/`timings`) for use with browser dev tools or other HTTP debugging tools. Log entries served from a mock have `mocked: true`, shown as a "MOCK" badge in `LogView.jsx` and exported as `_mocked: true` on the HAR entry.
+
+### Mocks
+
+`mocks` is a separate top-level store array, independent of `mappings`, with shape:
+```js
+{ id, mappingId, enabled, method, pathPattern, statusCode, headers, body, createdAt }
+```
+`method` is uppercased, or `*` to match any method (`sanitizeMockMethod()`). `pathPattern` is a regular expression matched against the request path **without the query string**; `validatePathPattern()` throws if it doesn't compile, both on `store.addMock()`/`updateMock()` and client-side in `MockModal.jsx`. `statusCode` is clamped to 100-599 (default 200, via `sanitizeMockStatusCode()`). `headers` is a `requestHeaders`-style array applied to the mocked response via `_applyHeaderOverrides()`.
+
+A mock only takes effect if its mapping has `mocksEnabled: true`. `HttpProxy.updateMocks(mocks)` compiles all enabled mocks into a `Map<mappingId, CompiledMock[]>` (regexes pre-compiled, invalid patterns skipped defensively), called by `ProxyManager` on proxy start and whenever mocks change (mirroring `updateMappings()`'s live-update pattern — no restart required). For each plain HTTP or HTTPS (post-MITM) request, `_findMock()` returns the first rule whose method and `pathPattern` match; `_serveMock()` drains the request body, writes the mocked status/headers/body directly to the client without contacting the backend, and marks the log record `mocked: true`. Mocking does not apply to WebSocket upgrades or raw HTTPS tunnels (when global HTTPS is disabled).
+
+`store.removeMocksForMapping(mappingId)` is called from the `mappings:remove` handler to delete orphaned mocks when their mapping is removed. `store.exportMocks(ids)`/`importMocks(list)` mirror the mapping export/import functions but key on the mapping's `domain` rather than `mappingId` (so exports are portable across stores) — import skips entries whose `domain` doesn't match an existing mapping.
+
+In the renderer, `MocksView.jsx` groups mocks by mapping domain (mirroring `MappingsView.jsx`), `MockModal.jsx` is the add/edit form, and `MockRegexHelpModal.jsx` shows example `pathPattern` regexes with copy-to-clipboard. `MockModal.jsx` and `MappingModal.jsx` share the extracted `HeaderListEditor.jsx` component for editing header lists. `ExportModal.jsx` was generalized to take `items`/`i18nPrefix` props so it can be reused for both mapping and mock exports.
 
 ### Mapping groups
 

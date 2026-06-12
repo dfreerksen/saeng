@@ -116,4 +116,14 @@ describe('buildHar()', () => {
     const har = buildHar([BASE_ENTRY], '1.0.0');
     expect(har.log.entries[0].comment).toBeUndefined();
   });
+
+  it('includes _mocked: true when the entry was served from a mock', () => {
+    const har = buildHar([{ ...BASE_ENTRY, mocked: true }], '1.0.0');
+    expect(har.log.entries[0]._mocked).toBe(true);
+  });
+
+  it('omits _mocked when the entry was not mocked', () => {
+    const har = buildHar([{ ...BASE_ENTRY, mocked: false }], '1.0.0');
+    expect(har.log.entries[0]._mocked).toBeUndefined();
+  });
 });

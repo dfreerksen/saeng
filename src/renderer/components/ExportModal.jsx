@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import Modal from './Modal.jsx';
 
-export default function ExportModal({ mappings, onClose, onSubmit, t }) {
-  const [selected, setSelected] = useState(() => new Set(mappings.map((m) => m.id)));
+export default function ExportModal({ items, i18nPrefix, onClose, onSubmit, t }) {
+  const [selected, setSelected] = useState(() => new Set(items.map((i) => i.id)));
   const [submitting, setSubmitting] = useState(false);
 
-  const allSelected = mappings.length > 0 && selected.size === mappings.length;
+  const allSelected = items.length > 0 && selected.size === items.length;
 
   function toggleAll() {
-    setSelected(allSelected ? new Set() : new Set(mappings.map((m) => m.id)));
+    setSelected(allSelected ? new Set() : new Set(items.map((i) => i.id)));
   }
 
   function toggleOne(id) {
@@ -33,33 +33,33 @@ export default function ExportModal({ mappings, onClose, onSubmit, t }) {
       <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content">
           <div className="modal-header">
-            <h1 className="modal-title fs-5">{t('mappings.modals.export.title')}</h1>
+            <h1 className="modal-title fs-5">{t(`${i18nPrefix}.title`)}</h1>
             <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
           </div>
           <div className="modal-body">
             <form onSubmit={handleSubmit} noValidate>
-              <p className="form-hint" style={{ marginTop: 0 }}>{t('mappings.modals.export.description')}</p>
+              <p className="form-hint" style={{ marginTop: 0 }}>{t(`${i18nPrefix}.description`)}</p>
 
               <label className="checkbox-row">
                 <input type="checkbox" checked={allSelected} onChange={toggleAll} />
-                <span>{t('mappings.modals.export.selectAll')}</span>
+                <span>{t(`${i18nPrefix}.selectAll`)}</span>
               </label>
 
               <div className="export-list">
-                {mappings.map((m) => (
-                  <label key={m.id} className="checkbox-row">
+                {items.map((item) => (
+                  <label key={item.id} className="checkbox-row">
                     <input
                       type="checkbox"
-                      checked={selected.has(m.id)}
-                      onChange={() => toggleOne(m.id)}
+                      checked={selected.has(item.id)}
+                      onChange={() => toggleOne(item.id)}
                     />
-                    <span>{m.domain}</span>
+                    <span>{item.label}</span>
                   </label>
                 ))}
               </div>
 
               <div className="form-hint">
-                {t('mappings.modals.export.selectedCount', { count: selected.size, total: mappings.length })}
+                {t(`${i18nPrefix}.selectedCount`, { count: selected.size, total: items.length })}
               </div>
 
               <div className="modal-footer">
@@ -67,7 +67,7 @@ export default function ExportModal({ mappings, onClose, onSubmit, t }) {
                   {t('mappings.modals.manage.buttons.cancel')}
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={submitting || selected.size === 0}>
-                  {t('mappings.modals.export.buttons.submit')}
+                  {t(`${i18nPrefix}.buttons.submit`)}
                 </button>
               </div>
             </form>

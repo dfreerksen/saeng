@@ -95,6 +95,16 @@ describe('MappingsView — table with mappings', () => {
     expect(mappingCheckboxes[0]).toBeChecked();
     expect(mappingCheckboxes[1]).not.toBeChecked();
   });
+
+  it('shows a mock indicator next to the domain when mocksEnabled is true', () => {
+    const { container } = renderMappingsView({ mappings: [{ ...SAMPLE_MAPPINGS[0], mocksEnabled: true }] });
+    expect(container.querySelector('td.domain-cell .mock-indicator')).toBeInTheDocument();
+  });
+
+  it('does not show a mock indicator when mocksEnabled is false', () => {
+    const { container } = renderMappingsView({ mappings: [SAMPLE_MAPPINGS[0]] });
+    expect(container.querySelector('td.domain-cell .mock-indicator')).not.toBeInTheDocument();
+  });
 });
 
 describe('MappingsView — group headers', () => {

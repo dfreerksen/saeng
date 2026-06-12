@@ -143,6 +143,11 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
                             </Tooltip>
                           )}
                           {m.domain}
+                          {m.mocksEnabled && (
+                            <Tooltip title={t('mappings.table.mocksEnabled')}>
+                              <i className="bi bi-magic mock-indicator" />
+                            </Tooltip>
+                          )}
                         </td>
                         <td>
                           <span className={`badge badge-${proto}`}>{proto.toUpperCase()}</span>

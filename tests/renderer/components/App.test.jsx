@@ -35,6 +35,14 @@ function makeElectronAPI(overrides = {}) {
       import: vi.fn().mockResolvedValue({ canceled: true }),
       ...overrides.mappings,
     },
+    mocks: {
+      list: vi.fn().mockResolvedValue([]),
+      add: vi.fn().mockResolvedValue({ success: true, mocks: [] }),
+      update: vi.fn().mockResolvedValue({ success: true, mocks: [] }),
+      remove: vi.fn().mockResolvedValue([]),
+      toggle: vi.fn().mockResolvedValue([]),
+      ...overrides.mocks,
+    },
     requestLog: {
       list: vi.fn().mockResolvedValue([]),
       clear: vi.fn().mockResolvedValue([]),
@@ -499,6 +507,176 @@ describe('App — export mappings', () => {
       expect(screen.getByText('flash.export.error')).toBeInTheDocument();
     });
     expect(screen.getByText('mappings.modals.export.title')).toBeInTheDocument();
+  });
+});
+
+describe('App — import mocks', () => {
+  it('does nothing when the import dialog is canceled', async () => {
+    const importFn = vi.fn().mockResolvedValue({ canceled: true });
+    await renderApp({ mocks: { import: importFn } });
+    fireEvent.click(screen.getByText('mocks.actions.import').closest('button'));
+    await waitFor(() => expect(importFn).toHaveBeenCalledOnce());
+    expect(screen.queryByText('flash.mocksImport.success')).not.toBeInTheDocument();
+    expect(screen.queryByText('flash.mocksImport.error')).not.toBeInTheDocument();
+  });
+
+  it('refreshes mocks and shows a result toast on successful import', async () => {
+    const newMocks = [{ id: 'mock1', mappingId: 'm1', method: 'GET', pathPattern: '^/api$', statusCode: 200, enabled: true }];
+    const importFn = vi.fn().mockResolvedValue({ canceled: false, success: true, added: 1, skipped: 0, mocks: newMocks });
+    await renderApp({ mocks: { import: importFn } });
+    fireEvent.click(screen.getByText('mocks.actions.import').closest('button'));
+    await waitFor(() => {
+      expect(screen.getByText('flash.mocksImport.success')).toBeInTheDocument();
+    });
+    expect(screen.getByText('^/api$')).toBeInTheDocument();
+  });
+
+  it('shows an error toast when import fails', async () => {
+    const importFn = vi.fn().mockResolvedValue({ canceled: false, success: false, error: 'boom' });
+    await renderApp({ mocks: { import: importFn } });
+    fireEvent.click(screen.getByText('mocks.actions.import').closest('button'));
+    await waitFor(() => {
+      expect(screen.getByText('flash.mocksImport.error')).toBeInTheDocument();
+    });
+  });
+});
+
+describe('App — export mocks', () => {
+  const sampleMocks = [
+    { id: 'mock1', mappingId: 'm1', method: 'GET', pathPattern: '^/api$', statusCode: 200, enabled: true },
+  ];
+
+  it('opens the export modal when the export button is clicked', async () => {
+    await renderApp({ mocks: { list: vi.fn().mockResolvedValue(sampleMocks) } });
+    fireEvent.click(screen.getByText('mocks.actions.export').closest('button'));
+    expect(screen.getByText('mocks.modals.export.title')).toBeInTheDocument();
+  });
+
+  it('keeps the modal open without toasting when export is canceled', async () => {
+    const exportFn = vi.fn().mockResolvedValue({ canceled: true });
+    await renderApp({ mocks: { list: vi.fn().mockResolvedValue(sampleMocks), export: exportFn } });
+    fireEvent.click(screen.getByText('mocks.actions.export').closest('button'));
+    fireEvent.click(screen.getByText('mocks.modals.export.buttons.submit'));
+    await waitFor(() => expect(exportFn).toHaveBeenCalledWith(['mock1']));
+    expect(screen.getByText('mocks.modals.export.title')).toBeInTheDocument();
+    expect(screen.queryByText('flash.mocksExport.success')).not.toBeInTheDocument();
+  });
+
+  it('closes the modal and shows a success toast on successful export', async () => {
+    const exportFn = vi.fn().mockResolvedValue({ canceled: false, success: true, count: 1, path: '/tmp/export.json' });
+    await renderApp({ mocks: { list: vi.fn().mockResolvedValue(sampleMocks), export: exportFn } });
+    fireEvent.click(screen.getByText('mocks.actions.export').closest('button'));
+    fireEvent.click(screen.getByText('mocks.modals.export.buttons.submit'));
+    await waitFor(() => {
+      expect(screen.queryByText('mocks.modals.export.title')).not.toBeInTheDocument();
+      expect(screen.getByText('flash.mocksExport.success')).toBeInTheDocument();
+    });
+  });
+
+  it('keeps the modal open and shows an error toast when export fails', async () => {
+    const exportFn = vi.fn().mockResolvedValue({ canceled: false, success: false, error: 'boom' });
+    await renderApp({ mocks: { list: vi.fn().mockResolvedValue(sampleMocks), export: exportFn } });
+    fireEvent.click(screen.getByText('mocks.actions.export').closest('button'));
+    fireEvent.click(screen.getByText('mocks.modals.export.buttons.submit'));
+    await waitFor(() => {
+      expect(screen.getByText('flash.mocksExport.error')).toBeInTheDocument();
+    });
+    expect(screen.getByText('mocks.modals.export.title')).toBeInTheDocument();
+  });
+});
+
+describe('App — add mock modal', () => {
+  const mockableMappings = [
+    { id: 'm1', domain: 'myapp.local', host: '127.0.0.1', port: 3000, https: false, enabled: true, mocksEnabled: true },
+  ];
+
+  it('opens the add mock modal when the add button is clicked', async () => {
+    await renderApp({ mappings: { list: vi.fn().mockResolvedValue(mockableMappings) } });
+    fireEvent.click(screen.getByText('mocks.actions.add').closest('button'));
+    expect(screen.getByText('mocks.modals.manage.addTitle')).toBeInTheDocument();
+  });
+
+  it('closes the add mock modal when cancel is clicked', async () => {
+    await renderApp({ mappings: { list: vi.fn().mockResolvedValue(mockableMappings) } });
+    fireEvent.click(screen.getByText('mocks.actions.add').closest('button'));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.cancel'));
+    await waitFor(() => {
+      expect(screen.queryByText('mocks.modals.manage.addTitle')).not.toBeInTheDocument();
+    });
+  });
+
+  it('adds a mock, refreshes the list, closes the modal, and shows a success toast', async () => {
+    const newMocks = [{ id: 'mock1', mappingId: 'm1', method: '*', pathPattern: '^/api$', statusCode: 200, enabled: true }];
+    const addFn = vi.fn().mockResolvedValue({ success: true, mocks: newMocks });
+    await renderApp({ mappings: { list: vi.fn().mockResolvedValue(mockableMappings) }, mocks: { add: addFn } });
+    fireEvent.click(screen.getByText('mocks.actions.add').closest('button'));
+    const pathInput = screen.getByPlaceholderText('mocks.modals.manage.form.path.placeholder');
+    fireEvent.change(pathInput, { target: { value: '^/api$' } });
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
+    await waitFor(() => {
+      expect(addFn).toHaveBeenCalledWith(expect.objectContaining({ mappingId: 'm1', pathPattern: '^/api$' }));
+      expect(screen.getByText('flash.mock.added')).toBeInTheDocument();
+      expect(screen.queryByText('mocks.modals.manage.addTitle')).not.toBeInTheDocument();
+    });
+    expect(screen.getByText('^/api$')).toBeInTheDocument();
+  });
+});
+
+describe('App — edit mock modal', () => {
+  const sampleMocks = [
+    { id: 'mock1', mappingId: 'm1', method: 'GET', pathPattern: '^/api$', statusCode: 200, enabled: true },
+  ];
+
+  it('opens the edit mock modal pre-filled when the edit button is clicked', async () => {
+    const sampleMappings = [
+      { id: 'm1', domain: 'myapp.local', host: '127.0.0.1', port: 3000, https: false, enabled: true, mocksEnabled: true },
+    ];
+    const { container } = await renderApp({
+      mappings: { list: vi.fn().mockResolvedValue(sampleMappings) },
+      mocks: { list: vi.fn().mockResolvedValue(sampleMocks) },
+    });
+    fireEvent.click(container.querySelector('#view-mocks .btn-edit'));
+    expect(screen.getByText('mocks.modals.manage.editTitle')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('mocks.modals.manage.form.path.placeholder').value).toBe('^/api$');
+  });
+
+  it('updates a mock, refreshes the list, closes the modal, and shows a success toast', async () => {
+    const sampleMappings = [
+      { id: 'm1', domain: 'myapp.local', host: '127.0.0.1', port: 3000, https: false, enabled: true, mocksEnabled: true },
+    ];
+    const updatedMocks = [{ ...sampleMocks[0], pathPattern: '^/api/v2$' }];
+    const updateFn = vi.fn().mockResolvedValue({ success: true, mocks: updatedMocks });
+    const { container } = await renderApp({
+      mappings: { list: vi.fn().mockResolvedValue(sampleMappings) },
+      mocks: { list: vi.fn().mockResolvedValue(sampleMocks), update: updateFn },
+    });
+    fireEvent.click(container.querySelector('#view-mocks .btn-edit'));
+    const pathInput = screen.getByPlaceholderText('mocks.modals.manage.form.path.placeholder');
+    fireEvent.change(pathInput, { target: { value: '^/api/v2$' } });
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.update'));
+    await waitFor(() => {
+      expect(updateFn).toHaveBeenCalledWith('mock1', expect.objectContaining({ pathPattern: '^/api/v2$' }));
+      expect(screen.getByText('flash.mock.updated')).toBeInTheDocument();
+      expect(screen.queryByText('mocks.modals.manage.editTitle')).not.toBeInTheDocument();
+    });
+    expect(screen.getByText('^/api/v2$')).toBeInTheDocument();
+  });
+
+  it('includes the mock\'s current mapping in the select even when mocking is disabled for it', async () => {
+    const sampleMappings = [
+      { id: 'm1', domain: 'myapp.local', host: '127.0.0.1', port: 3000, https: false, enabled: true, mocksEnabled: false },
+      { id: 'm2', domain: 'other.local', host: '127.0.0.1', port: 4000, https: false, enabled: true, mocksEnabled: true },
+    ];
+    const { container } = await renderApp({
+      mappings: { list: vi.fn().mockResolvedValue(sampleMappings) },
+      mocks: { list: vi.fn().mockResolvedValue(sampleMocks) },
+    });
+    fireEvent.click(container.querySelector('#view-mocks .btn-edit'));
+    const mappingSelect = container.querySelector('.modal-body select');
+    expect(mappingSelect.value).toBe('m1');
+    const optionDomains = [...mappingSelect.querySelectorAll('option')].map((o) => o.textContent);
+    expect(optionDomains).toContain('myapp.local');
+    expect(optionDomains).toContain('other.local');
   });
 });
 

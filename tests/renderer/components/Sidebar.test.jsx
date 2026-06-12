@@ -24,6 +24,11 @@ describe('Sidebar', () => {
     expect(screen.getByText('nav.mappings')).toBeInTheDocument();
   });
 
+  it('renders the mocks nav item', () => {
+    renderSidebar();
+    expect(screen.getByText('nav.mocks')).toBeInTheDocument();
+  });
+
   it('renders the log nav item', () => {
     renderSidebar();
     expect(screen.getByText('nav.log')).toBeInTheDocument();
@@ -51,12 +56,21 @@ describe('Sidebar', () => {
     expect(navItems[1]).not.toHaveClass('active');
   });
 
-  it('applies active class to log button when currentView is log', () => {
-    const { container } = renderSidebar({ currentView: 'log' });
+  it('applies active class to mocks button when currentView is mocks', () => {
+    const { container } = renderSidebar({ currentView: 'mocks' });
     const navItems = container.querySelectorAll('.nav-item');
     expect(navItems[0]).not.toHaveClass('active');
     expect(navItems[1]).toHaveClass('active');
     expect(navItems[2]).not.toHaveClass('active');
+  });
+
+  it('applies active class to log button when currentView is log', () => {
+    const { container } = renderSidebar({ currentView: 'log' });
+    const navItems = container.querySelectorAll('.nav-item');
+    expect(navItems[0]).not.toHaveClass('active');
+    expect(navItems[1]).not.toHaveClass('active');
+    expect(navItems[2]).toHaveClass('active');
+    expect(navItems[3]).not.toHaveClass('active');
   });
 
   it('applies active class to settings button when currentView is settings', () => {
@@ -64,7 +78,8 @@ describe('Sidebar', () => {
     const navItems = container.querySelectorAll('.nav-item');
     expect(navItems[0]).not.toHaveClass('active');
     expect(navItems[1]).not.toHaveClass('active');
-    expect(navItems[2]).toHaveClass('active');
+    expect(navItems[2]).not.toHaveClass('active');
+    expect(navItems[3]).toHaveClass('active');
   });
 
   it('calls setCurrentView("mappings") when mappings button is clicked', () => {
@@ -72,6 +87,13 @@ describe('Sidebar', () => {
     renderSidebar({ setCurrentView });
     fireEvent.click(screen.getByText('nav.mappings').closest('button'));
     expect(setCurrentView).toHaveBeenCalledWith('mappings');
+  });
+
+  it('calls setCurrentView("mocks") when mocks button is clicked', () => {
+    const setCurrentView = vi.fn();
+    renderSidebar({ setCurrentView });
+    fireEvent.click(screen.getByText('nav.mocks').closest('button'));
+    expect(setCurrentView).toHaveBeenCalledWith('mocks');
   });
 
   it('calls setCurrentView("log") when log button is clicked', () => {

@@ -12,6 +12,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
     export: (ids) => ipcRenderer.invoke('mappings:export', ids),
     import: () => ipcRenderer.invoke('mappings:import'),
   },
+  mocks: {
+    list: () => ipcRenderer.invoke('mocks:list'),
+    add: (data) => ipcRenderer.invoke('mocks:add', data),
+    update: (id, data) => ipcRenderer.invoke('mocks:update', id, data),
+    remove: (id) => ipcRenderer.invoke('mocks:remove', id),
+    toggle: (id) => ipcRenderer.invoke('mocks:toggle', id),
+    export: (ids) => ipcRenderer.invoke('mocks:export', ids),
+    import: () => ipcRenderer.invoke('mocks:import'),
+  },
   proxy: {
     start: () => ipcRenderer.invoke('proxy:start'),
     stop: () => ipcRenderer.invoke('proxy:stop'),
