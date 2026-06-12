@@ -156,11 +156,14 @@ Update the version it `package.json` and run `npm install`. Then run the release
 /release
 ```
 
-## Translations
+## Claude
 
-```bash
-/i18n-check
-```
+| Command | Description |
+| :--- | :--- |
+| `/release` | See above |
+| `/i18n-check` | Audits the translation files against the English baseline. It checks for missing keys, extra/stale keys, and untranslated values |
+| `/ipc-check` | Audits the three places that must stay in sync for every Electron IPC channel. Run it after adding/renaming/removing IPC channels |
+| `/screenshot-refresh` | Run the app and make screenshots of each section for the README.md file |
 
 ## License
 
