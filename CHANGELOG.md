@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-06-12
+
+### Added
+
+- Mock response rules: return a canned status code, headers, and body for requests matching a method and path pattern, without hitting the backend
+- New "Mocks" view to add, edit, remove, export, and import mock rules, with a path-pattern regex help reference
+- Per-mapping "Enable mocking for this domain" toggle to control whether mock rules apply
+- Request log shows a "MOCK" badge for mocked responses, and HAR exports mark them with `_mocked: true`
+
+[1.10.0]: https://github.com/dfreerksen/saeng/releases/tag/v1.10.0
+
 ## [1.9.0] - 2026-06-11
 
 ### Added
