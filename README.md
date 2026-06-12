@@ -8,7 +8,8 @@ Saeng works on macOS, Windows, and Linux
 
 Saeng means "light," "radiance," or "glow" in Thai.
 
-![Saeng](./screenshot.png "Saeng")
+![Saeng Mappings](./screenshot-mappings.png "Saeng Mappings")
+![Saeng Mocks](./screenshot-mocks.png "Saeng Mocks")
 
 ## Features
 
