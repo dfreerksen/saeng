@@ -534,7 +534,7 @@ describe('SettingsView — health check timeout', () => {
 describe('SettingsView — CA management', () => {
   it('calls electronAPI.ssl.revealCA when reveal button is clicked', () => {
     renderSettingsView();
-    const revealBtn = screen.getByText('settings.cert.actions.show').closest('button');
+    const revealBtn = screen.getByText('settings.cert.actions.show.mac').closest('button');
     fireEvent.click(revealBtn);
     expect(window.electronAPI.ssl.revealCA).toHaveBeenCalledOnce();
   });

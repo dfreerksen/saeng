@@ -369,13 +369,13 @@ export default function SettingsView({
           </div>
         )}
 
-        <Tooltip title={t('settings.cert.actions.show')}>
+        <Tooltip title={t(`settings.cert.actions.show.${os}`)}>
           <button
             className="btn btn-outline-secondary"
             onClick={() => window.electronAPI.ssl.revealCA()}
           >
             <i className="bi bi-folder2-open" />
-            <span className="d-none d-md-inline">{t('settings.cert.actions.show')}</span>
+            <span className="d-none d-md-inline">{t(`settings.cert.actions.show.${os}`)}</span>
           </button>
         </Tooltip>
 
@@ -438,18 +438,7 @@ export default function SettingsView({
           </button>
         </Tooltip>
 
-        {os === 'mac' && (
-          <p
-            style={{ fontSize: 'var(--saeng-font-size-small)', color: 'var(--saeng-text-muted)', marginTop: 10 }}
-            dangerouslySetInnerHTML={{ __html: t('settings.cert.platformNote.mac') }}
-          />
-        )}
-        {os === 'windows' && (
-          <p
-            style={{ fontSize: 'var(--saeng-font-size-small)', color: 'var(--saeng-text-muted)', marginTop: 10 }}
-            dangerouslySetInnerHTML={{ __html: t('settings.cert.platformNote.windows') }}
-          />
-        )}
+        <p className="cert-platform-note">{t(`settings.cert.platformNote.${os}`)}</p>
       </div>
     </div>
   );
