@@ -1,7 +1,7 @@
 const REPO = 'dfreerksen/saeng';
 const RELEASES_URL = `https://api.github.com/repos/${REPO}/releases/latest`;
 const REPO_URL = `https://github.com/${REPO}`;
-const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // 1 day
+const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 function parseVersion(version) {
   return String(version).replace(/^v/, '').split('.').map((part) => parseInt(part, 10) || 0);

@@ -108,17 +108,17 @@ describe('UpdateChecker.start()/stop()', () => {
     vi.unstubAllGlobals();
   });
 
-  it('checks immediately and then once per day', async () => {
+  it('checks immediately and then every 6 hours', async () => {
     const checker = new UpdateChecker('1.6.1');
     checker.start();
     await vi.advanceTimersByTimeAsync(0);
     expect(fetch).toHaveBeenCalledTimes(1);
 
-    await vi.advanceTimersByTimeAsync(24 * 60 * 60 * 1000);
+    await vi.advanceTimersByTimeAsync(6 * 60 * 60 * 1000);
     expect(fetch).toHaveBeenCalledTimes(2);
 
     checker.stop();
-    await vi.advanceTimersByTimeAsync(24 * 60 * 60 * 1000);
+    await vi.advanceTimersByTimeAsync(6 * 60 * 60 * 1000);
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 });
