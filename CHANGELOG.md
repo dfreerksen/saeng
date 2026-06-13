@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.1] - 2026-06-13
+
+### Changed
+
+- Mock rules for a disabled mapping are now shown as read-only in the Mocks view
+- Automatic update check now runs every 6 hours instead of once a day
+
+[1.10.1]: https://github.com/dfreerksen/saeng/releases/tag/v1.10.1
+
 ## [1.10.0] - 2026-06-12
 
 ### Added
