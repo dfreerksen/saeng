@@ -106,7 +106,7 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
                 <th scope="col">{t('mappings.table.domain')}</th>
                 <th scope="col">{t('mappings.table.protocol')}</th>
                 <th scope="col">{t('mappings.table.enabled')}</th>
-                <th scope="col" style={{ textAlign: 'right' }}>{t('mappings.table.actions')}</th>
+                <th scope="col" className="text-end">{t('mappings.table.actions')}</th>
               </tr>
             </thead>
             {[...groups.entries()].map(([groupKey, groupMappings]) => {

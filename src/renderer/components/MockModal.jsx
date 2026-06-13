@@ -90,7 +90,7 @@ export default function MockModal({ mock, mappings, onClose, onSubmit, t }) {
               <div className="form-group">
                 <label className="form-label">
                   <span>{t('mocks.modals.manage.form.mapping.label')}</span>
-                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('mappings.modals.manage.form.required')}</span>
+                  <span className="form-label-hint">{t('mappings.modals.manage.form.required')}</span>
                 </label>
                 <select
                   className="form-input"
@@ -123,7 +123,7 @@ export default function MockModal({ mock, mappings, onClose, onSubmit, t }) {
               <div className="form-group">
                 <label className="form-label">
                   <span>{t('mocks.modals.manage.form.path.label')}</span>
-                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('mappings.modals.manage.form.required')}</span>
+                  <span className="form-label-hint">{t('mappings.modals.manage.form.required')}</span>
                 </label>
                 <input
                   ref={pathInputRef}
@@ -141,7 +141,7 @@ export default function MockModal({ mock, mappings, onClose, onSubmit, t }) {
               <div className="form-group">
                 <label className="form-label">
                   <span>{t('mocks.modals.manage.form.status.label')}</span>
-                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('mappings.modals.manage.form.required')}</span>
+                  <span className="form-label-hint">{t('mappings.modals.manage.form.required')}</span>
                 </label>
                 <input
                   className="form-input"
@@ -167,7 +167,7 @@ export default function MockModal({ mock, mappings, onClose, onSubmit, t }) {
               <div className="form-group">
                 <label className="form-label">
                   <span>{t('mocks.modals.manage.form.body.label')}</span>
-                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('mappings.modals.manage.form.optional')}</span>
+                  <span className="form-label-hint">{t('mappings.modals.manage.form.optional')}</span>
                 </label>
                 <textarea
                   className="form-input"

@@ -9,8 +9,7 @@ export default function Modal({ onClose, children }) {
   return (
     <>
       <div
-        className="modal fade show"
-        style={{ display: 'block' }}
+        className="modal fade show d-block"
         onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       >
         {children}

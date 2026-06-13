@@ -89,29 +89,27 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
               <div className="form-group">
                 <label className="form-label">
                   <span>{t('mappings.modals.manage.form.domain.label')}</span>
-                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('mappings.modals.manage.form.required')}</span>
+                  <span className="form-label-hint">{t('mappings.modals.manage.form.required')}</span>
                 </label>
                 <div className="domain-row">
                   <input
-                    className="form-input"
+                    className="form-input flex-1"
                     placeholder={t('mappings.modals.manage.form.subdomain.placeholder')}
                     value={subdomain}
                     onChange={(e) => setSubdomain(e.target.value.toLowerCase())}
                     autoComplete="off"
                     spellCheck={false}
-                    style={{ flex: 1, minWidth: 0 }}
                   />
                   <span className="domain-sep">.</span>
                   <input
                     ref={domainInputRef}
-                    className="form-input"
+                    className="form-input flex-1-5"
                     placeholder={t('mappings.modals.manage.form.domain.placeholder')}
                     value={domain}
                     onChange={(e) => setDomain(e.target.value.toLowerCase())}
                     autoComplete="off"
                     spellCheck={false}
                     required
-                    style={{ flex: 1.5, minWidth: 0 }}
                   />
                   <select
                     className="domain-suffix-select"
@@ -131,7 +129,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
               <div className="form-group">
                 <label className="form-label">
                   <span>{t('mappings.modals.manage.form.host.label')}</span>
-                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('mappings.modals.manage.form.optional')}</span>
+                  <span className="form-label-hint">{t('mappings.modals.manage.form.optional')}</span>
                 </label>
                 <input
                   className="form-input"
@@ -147,7 +145,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
               <div className="form-group">
                 <label className="form-label">
                   <span>{t('mappings.modals.manage.form.port.label')}</span>
-                  <span style={{ color: 'var(--saeng-text-muted)' }}>{t('mappings.modals.manage.form.required')}</span>
+                  <span className="form-label-hint">{t('mappings.modals.manage.form.required')}</span>
                 </label>
                 <input
                   className="form-input"
@@ -172,7 +170,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                   />
                   <span>{t('mappings.modals.manage.form.https.label')}</span>
                 </label>
-                <div className="form-hint" style={{ marginTop: 6 }}>{t('mappings.modals.manage.form.https.hint')}</div>
+                <div className="form-hint mt-1">{t('mappings.modals.manage.form.https.hint')}</div>
               </div>
 
               <div className="form-group">
@@ -184,7 +182,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                   />
                   <span>{t('mappings.modals.manage.form.mocksEnabled.label')}</span>
                 </label>
-                <div className="form-hint" style={{ marginTop: 6 }}>{t('mappings.modals.manage.form.mocksEnabled.hint')}</div>
+                <div className="form-hint mt-1">{t('mappings.modals.manage.form.mocksEnabled.hint')}</div>
               </div>
 
               <HeaderListEditor

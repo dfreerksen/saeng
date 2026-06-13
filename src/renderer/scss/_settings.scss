@@ -95,6 +95,13 @@
   }
 }
 
+.cert-description {
+  color: var(--saeng-primary-complement-color);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
 .cert-platform-note {
   color: var(--saeng-text-muted);
   font-size: var(--saeng-font-size-small);

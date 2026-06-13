@@ -78,7 +78,7 @@ export default function MocksView({ active, mocks, mappings, mockableMappings, s
                 <th scope="col">{t('mocks.table.path')}</th>
                 <th scope="col">{t('mocks.table.status')}</th>
                 <th scope="col">{t('mocks.table.enabled')}</th>
-                <th scope="col" style={{ textAlign: 'right' }}>{t('mocks.table.actions')}</th>
+                <th scope="col" className="text-end">{t('mocks.table.actions')}</th>
               </tr>
             </thead>
             {[...groups.entries()].map(([groupKey, groupMocks]) => (

@@ -357,10 +357,9 @@ export default function SettingsView({
       <div className="settings-section">
         <div className="settings-section-title">{t('settings.cert.title')}</div>
 
-        <p
-          style={{ fontSize: 13, color: 'var(--saeng-primary-complement-color)', marginBottom: 12, lineHeight: 1.6 }}
-          dangerouslySetInnerHTML={{ __html: t('settings.cert.description') }}
-        />
+        <p className="cert-description">
+          {t('settings.cert.description')}
+        </p>
 
         <div className="ca-info-box">{caPath || t('settings.cert.actions.generating')}</div>
         {expiryInfo && (

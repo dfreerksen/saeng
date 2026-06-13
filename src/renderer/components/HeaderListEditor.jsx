@@ -15,27 +15,25 @@ export default function HeaderListEditor({ headers, onChange, label, hint, t }) 
     <div className="form-group">
       <label className="form-label">
         <span>{label}</span>
-        <span style={{ color: 'var(--saeng-text-muted)' }}>{t('mappings.modals.manage.form.optional')}</span>
+        <span className="form-label-hint">{t('mappings.modals.manage.form.optional')}</span>
       </label>
       {headers.map((header, index) => (
         <div className="header-row" key={index}>
           <input
-            className="form-input"
+            className="form-input flex-1"
             placeholder={t('mappings.modals.manage.form.headers.name.placeholder')}
             value={header.name}
             onChange={(e) => updateRow(index, 'name', e.target.value)}
             autoComplete="off"
             spellCheck={false}
-            style={{ flex: 1, minWidth: 0 }}
           />
           <input
-            className="form-input"
+            className="form-input flex-1-5"
             placeholder={t('mappings.modals.manage.form.headers.value.placeholder')}
             value={header.value}
             onChange={(e) => updateRow(index, 'value', e.target.value)}
             autoComplete="off"
             spellCheck={false}
-            style={{ flex: 1.5, minWidth: 0 }}
           />
           <button
             type="button"

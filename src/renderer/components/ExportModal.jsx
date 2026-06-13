@@ -38,7 +38,7 @@ export default function ExportModal({ items, i18nPrefix, onClose, onSubmit, t })
           </div>
           <div className="modal-body">
             <form onSubmit={handleSubmit} noValidate>
-              <p className="form-hint" style={{ marginTop: 0 }}>{t(`${i18nPrefix}.description`)}</p>
+              <p className="form-hint mt-0">{t(`${i18nPrefix}.description`)}</p>
 
               <label className="checkbox-row">
                 <input type="checkbox" checked={allSelected} onChange={toggleAll} />

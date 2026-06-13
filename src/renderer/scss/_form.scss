@@ -29,6 +29,10 @@
   color: var(--saeng-text-muted);
 }
 
+.form-label-hint {
+  color: var(--saeng-text-muted);
+}
+
 .domain-row {
   align-items: center;
   display: flex;
@@ -87,6 +91,16 @@
   display: flex;
   gap: 6px;
   margin-bottom: 6px;
+}
+
+.flex-1 {
+  flex: 1;
+  min-width: 0;
+}
+
+.flex-1-5 {
+  flex: 1.5;
+  min-width: 0;
 }
 
 .checkbox-row {

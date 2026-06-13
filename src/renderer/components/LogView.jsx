@@ -103,7 +103,7 @@ export default function LogView({ active, entries, onClear, onExportHar, setting
                 <th scope="col">{t('log.table.host')}</th>
                 <th scope="col">{t('log.table.path')}</th>
                 <th scope="col">{t('log.table.status')}</th>
-                <th scope="col" style={{ textAlign: 'right' }}>{t('log.table.latency')}</th>
+                <th scope="col" className="text-end">{t('log.table.latency')}</th>
                 {showDetails && <th scope="col" />}
               </tr>
             </thead>
@@ -128,11 +128,11 @@ export default function LogView({ active, entries, onClear, onExportHar, setting
                           <span className="badge badge-mock">{t('log.table.mock')}</span>
                         )}
                       </td>
-                      <td style={{ textAlign: 'right' }}>
+                      <td className="text-end">
                         {entry.latencyMs != null ? `${entry.latencyMs} ms` : '—'}
                       </td>
                       {showDetails && (
-                        <td style={{ textAlign: 'right' }}>
+                        <td className="text-end">
                           {expandable && (
                             <button
                               className="btn btn-sm btn-link log-details-toggle"
