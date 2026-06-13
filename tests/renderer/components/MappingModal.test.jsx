@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('../../../src/renderer/components/Modal.jsx', () => ({
   default: ({ children }) => <div data-testid="modal-wrapper">{children}</div>,
@@ -18,10 +18,6 @@ const EXISTING_MAPPING = {
   https: true,
   enabled: true,
 };
-
-const OTHER_MAPPINGS = [
-  { id: 'xyz', domain: 'other.local', port: 5000, https: false, enabled: true },
-];
 
 function renderAddModal(props = {}) {
   const defaults = {
