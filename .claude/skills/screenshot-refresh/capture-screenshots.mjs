@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Launches the real Electron app with remote debugging enabled, drives the
 // renderer via the Chrome DevTools Protocol (native fetch/WebSocket, no deps),
-// and captures a PNG per sidebar view, per theme, to the repo root as
+// and captures a PNG per sidebar view, per theme, to assets/screenshots/ as
 // screenshot-<theme>-<view>.png.
 
 import { spawn, execSync } from 'node:child_process';
@@ -34,7 +34,7 @@ const scale = Number(flag('scale', '2'));
 // Comma-separated list of 'light'/'dark'. Pass --theme= (empty) to capture a
 // single pass without overriding data-bs-theme, using legacy screenshot-<view>.png names.
 const themes = flag('theme', 'light,dark').split(',').map((t) => t.trim()).filter(Boolean);
-const outDir = path.resolve(root, flag('out-dir', '.'));
+const outDir = path.resolve(root, flag('out-dir', 'assets/screenshots'));
 const port = Number(flag('port', '9333'));
 
 for (const v of views) {

@@ -8,12 +8,12 @@ Saeng works on macOS, Windows, and Linux.
 
 Saeng means "light," "radiance," or "glow" in Thai.
 
-![Saeng Mappings](./screenshot-dark-mappings.png "Saeng Mappings")
+![Saeng Mappings](./assets/screenshots/screenshot-dark-mappings.png "Saeng Mappings")
 
 |  | Mappings | Mocks | Logs | Settings |
 | :---: | :---: | :---: | :---: | :---: |
-| Dark | [![Saeng Mappings](./screenshot-dark-mappings.png "Saeng Mappings")](./screenshot-dark-mappings.png) | [![Saeng Mocks](./screenshot-dark-mocks.png "Saeng Mocks")](./screenshot-dark-mocks.png) | [![Saeng Log](./screenshot-dark-log.png "Saeng Log")](./screenshot-dark-log.png) | [![Saeng Settings](./screenshot-dark-settings.png "Saeng Settings")](./screenshot-dark-settings.png) |
-| Light | [![Saeng Mappings](./screenshot-light-mappings.png "Saeng Mappings")](./screenshot-light-mappings.png) | [![Saeng Mocks](./screenshot-light-mocks.png "Saeng Mocks")](./screenshot-light-mocks.png) | [![Saeng Log](./screenshot-light-log.png "Saeng Log")](./screenshot-light-log.png) | [![Saeng Settings](./screenshot-light-settings.png "Saeng Settings")](./screenshot-light-settings.png) |
+| Dark | [![Saeng Mappings](./assets/screenshots/screenshot-dark-mappings.png "Saeng Mappings")](./assets/screenshots/screenshot-dark-mappings.png) | [![Saeng Mocks](./assets/screenshots/screenshot-dark-mocks.png "Saeng Mocks")](./assets/screenshots/screenshot-dark-mocks.png) | [![Saeng Log](./assets/screenshots/screenshot-dark-log.png "Saeng Log")](./assets/screenshots/screenshot-dark-log.png) | [![Saeng Settings](./assets/screenshots/screenshot-dark-settings.png "Saeng Settings")](./assets/screenshots/screenshot-dark-settings.png) |
+| Light | [![Saeng Mappings](./assets/screenshots/screenshot-light-mappings.png "Saeng Mappings")](./assets/screenshots/screenshot-light-mappings.png) | [![Saeng Mocks](./assets/screenshots/screenshot-light-mocks.png "Saeng Mocks")](./assets/screenshots/screenshot-light-mocks.png) | [![Saeng Log](./assets/screenshots/screenshot-light-log.png "Saeng Log")](./assets/screenshots/screenshot-light-log.png) | [![Saeng Settings](./assets/screenshots/screenshot-light-settings.png "Saeng Settings")](./assets/screenshots/screenshot-light-settings.png) |
 
 ## How it works
 
