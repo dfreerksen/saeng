@@ -110,6 +110,7 @@ These are Claude Code slash commands available when working in this repo.
 | Command | Description |
 | :--- | :--- |
 | `/release` | See above |
+| `/deps-update` | Audit outdated npm dependencies grouped by major/minor/patch, then apply updates and verify with lint and tests |
 | `/i18n-check` | Audits the translation files against the English baseline. It checks for missing keys, extra/stale keys, and untranslated values |
 | `/ipc-check` | Audits the three places that must stay in sync for every Electron IPC channel. Run it after adding/renaming/removing IPC channels |
 | `/screenshot-refresh` | Run the app and make screenshots of each section for the README.md file |
