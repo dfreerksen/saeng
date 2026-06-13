@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Launches the real Electron app with remote debugging enabled, drives the
 // renderer via the Chrome DevTools Protocol (native fetch/WebSocket, no deps),
-// and captures a PNG per sidebar view to the repo root as screenshot-<view>.png.
+// and captures a PNG per sidebar view, per theme, to the repo root as
+// screenshot-<theme>-<view>.png.
 
 import { spawn, execSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -30,13 +31,22 @@ const views = flag('views', 'mappings,mocks,log,settings').split(',').map((v) =>
 const width = Number(flag('width', '1356'));
 const height = Number(flag('height', '796'));
 const scale = Number(flag('scale', '2'));
-const theme = flag('theme', null); // 'light' | 'dark' | null (leave as-is)
+// Comma-separated list of 'light'/'dark'. Pass --theme= (empty) to capture a
+// single pass without overriding data-bs-theme, using legacy screenshot-<view>.png names.
+const themes = flag('theme', 'light,dark').split(',').map((t) => t.trim()).filter(Boolean);
 const outDir = path.resolve(root, flag('out-dir', '.'));
 const port = Number(flag('port', '9333'));
 
 for (const v of views) {
   if (!NAV_ICONS[v]) {
     console.error(`Unknown view "${v}". Valid views: ${Object.keys(NAV_ICONS).join(', ')}`);
+    process.exit(1);
+  }
+}
+
+for (const t of themes) {
+  if (t !== 'light' && t !== 'dark') {
+    console.error(`Unknown theme "${t}". Valid themes: light, dark`);
     process.exit(1);
   }
 }
@@ -135,36 +145,44 @@ async function main() {
 
     await waitForAppReady(ws);
 
-    if (theme) {
-      await cdpSend(ws, 'Runtime.evaluate', {
-        expression: `document.documentElement.setAttribute('data-bs-theme', '${theme}')`,
-      });
-    }
-
     fs.mkdirSync(outDir, { recursive: true });
 
-    for (const view of views) {
-      const icon = NAV_ICONS[view];
-      const { result } = await cdpSend(ws, 'Runtime.evaluate', {
-        expression: `(() => {
-          const icon = document.querySelector('.nav-item i.${icon}');
-          if (!icon) return false;
-          icon.closest('button').click();
-          return true;
-        })()`,
-        returnByValue: true,
-      });
-      if (!result?.value) {
-        console.warn(`  Skipping "${view}": no .nav-item with icon .${icon} found (is it hidden, e.g. logging disabled?)`);
-        continue;
+    // themes is empty when --theme= was passed explicitly: do a single pass
+    // without overriding data-bs-theme, using legacy screenshot-<view>.png names.
+    const passes = themes.length ? themes : [null];
+
+    for (const themeName of passes) {
+      if (themeName) {
+        await cdpSend(ws, 'Runtime.evaluate', {
+          expression: `document.documentElement.setAttribute('data-bs-theme', '${themeName}')`,
+        });
+        await sleep(200);
       }
 
-      await sleep(500);
+      for (const view of views) {
+        const icon = NAV_ICONS[view];
+        const { result } = await cdpSend(ws, 'Runtime.evaluate', {
+          expression: `(() => {
+            const icon = document.querySelector('.nav-item i.${icon}');
+            if (!icon) return false;
+            icon.closest('button').click();
+            return true;
+          })()`,
+          returnByValue: true,
+        });
+        if (!result?.value) {
+          console.warn(`  Skipping "${view}": no .nav-item with icon .${icon} found (is it hidden, e.g. logging disabled?)`);
+          continue;
+        }
 
-      const { data } = await cdpSend(ws, 'Page.captureScreenshot', { format: 'png' });
-      const outPath = path.join(outDir, `screenshot-${view}.png`);
-      fs.writeFileSync(outPath, Buffer.from(data, 'base64'));
-      console.log(`  Wrote ${path.relative(root, outPath)}`);
+        await sleep(500);
+
+        const { data } = await cdpSend(ws, 'Page.captureScreenshot', { format: 'png' });
+        const suffix = themeName ? `-${themeName}` : '';
+        const outPath = path.join(outDir, `screenshot${suffix}-${view}.png`);
+        fs.writeFileSync(outPath, Buffer.from(data, 'base64'));
+        console.log(`  Wrote ${path.relative(root, outPath)}`);
+      }
     }
   } finally {
     ws?.close();
