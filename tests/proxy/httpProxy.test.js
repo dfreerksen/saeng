@@ -694,6 +694,21 @@ describe('HttpProxy mocked responses — end to end', () => {
     expect(headers['x-mock']).toBe('yes');
   });
 
+  it('adds the X-Saeng-Mock header to mocked responses', async () => {
+    backend = await startCountingBackend();
+    proxy = new HttpProxy(null);
+    await proxy.start(
+      [{ id: 'm1', domain: 'mocked.local', host: '127.0.0.1', port: backend.address().port, enabled: true, mocksEnabled: true }],
+      { httpsEnabled: false }
+    );
+    proxy.updateMocks([
+      { mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/.*$', statusCode: 200, headers: [], body: 'hello' },
+    ]);
+
+    const { headers } = await makeRequest(proxy.getPort(), { host: 'mocked.local', path: '/anything' });
+    expect(headers['x-saeng-mock']).toBe('true');
+  });
+
   it('falls through to the backend when mocksEnabled is false, even if a rule would match', async () => {
     backend = await startCountingBackend('from-backend');
     proxy = new HttpProxy(null);

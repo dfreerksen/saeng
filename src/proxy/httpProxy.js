@@ -103,6 +103,7 @@ class HttpProxy {
 
     const headers = this._applyHeaderOverrides({}, mock.headers);
     if (!('content-type' in headers)) headers['content-type'] = 'text/plain; charset=utf-8';
+    headers['x-saeng-mock'] = 'true';
     const body = mock.body || '';
 
     if (record) {
