@@ -226,7 +226,7 @@ export default function App() {
     showToast(t('flash.settings.updated'), 'info');
   }
 
-  const mockableMappings = mappings.filter((m) => m.mocksEnabled);
+  const mockableMappings = mappings.filter((m) => m.enabled && m.mocksEnabled);
 
   function mockModalMappings(mock) {
     if (!mock || mockableMappings.some((m) => m.id === mock.mappingId)) return mockableMappings;

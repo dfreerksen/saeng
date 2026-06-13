@@ -2,8 +2,7 @@ import { useState } from 'react';
 import Tooltip from './Tooltip.jsx';
 import MockRegexHelpModal from './MockRegexHelpModal.jsx';
 
-function buildGroups(mocks, mappings) {
-  const mapById = new Map(mappings.map((m) => [m.id, m]));
+function buildGroups(mocks, mapById) {
   const groups = new Map();
   for (const mock of mocks) {
     const mapping = mapById.get(mock.mappingId);
@@ -30,7 +29,8 @@ export default function MocksView({ active, mocks, mappings, mockableMappings, s
     setMocks(updated);
   }
 
-  const groups = buildGroups(mocks, mappings);
+  const mapById = new Map(mappings.map((m) => [m.id, m]));
+  const groups = buildGroups(mocks, mapById);
 
   return (
     <div className={`view${active ? ' active' : ''}`} id="view-mocks">
@@ -90,7 +90,9 @@ export default function MocksView({ active, mocks, mappings, mockableMappings, s
                     </div>
                   </td>
                 </tr>
-                {groupMocks.map((mock) => (
+                {groupMocks.map((mock) => {
+                  const mappingDisabled = !mapById.get(mock.mappingId)?.enabled;
+                  return (
                   <tr key={mock.id}>
                     <td>
                       <span className="badge badge-http">
@@ -104,6 +106,7 @@ export default function MocksView({ active, mocks, mappings, mockableMappings, s
                         <input
                           type="checkbox"
                           checked={mock.enabled}
+                          disabled={mappingDisabled}
                           onChange={() => handleToggle(mock.id)}
                         />
                         <span className="toggle-track" />
@@ -112,7 +115,7 @@ export default function MocksView({ active, mocks, mappings, mockableMappings, s
                     <td>
                       <div className="actions-cell">
                         <Tooltip title={t('mappings.table.actions.edit')}>
-                          <button className="btn btn-outline-primary btn-edit" onClick={() => onEdit(mock)}>
+                          <button className="btn btn-outline-primary btn-edit" onClick={() => onEdit(mock)} disabled={mappingDisabled}>
                             <i className="bi bi-pencil" />
                           </button>
                         </Tooltip>
@@ -124,7 +127,8 @@ export default function MocksView({ active, mocks, mappings, mockableMappings, s
                       </div>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             ))}
           </table>

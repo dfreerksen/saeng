@@ -143,6 +143,33 @@ describe('MocksView — table with mocks', () => {
   });
 });
 
+describe('MocksView — disabled mapping', () => {
+  const DISABLED_MAPPINGS = [
+    { id: 'm1', domain: 'myapp.local', port: 3000, https: false, enabled: false },
+    { id: 'm2', domain: 'api.myapp.local', port: 4000, https: true, enabled: true },
+  ];
+
+  it('disables the toggle for a mock whose mapping is disabled', () => {
+    const { container } = renderMocksView({ mocks: SAMPLE_MOCKS, mappings: DISABLED_MAPPINGS });
+    const toggles = container.querySelectorAll('input[type="checkbox"]');
+    expect(toggles[0]).toBeDisabled();
+    expect(toggles[1]).not.toBeDisabled();
+  });
+
+  it('disables the edit button for a mock whose mapping is disabled', () => {
+    const { container } = renderMocksView({ mocks: SAMPLE_MOCKS, mappings: DISABLED_MAPPINGS });
+    const editButtons = [...container.querySelectorAll('.btn-edit')];
+    expect(editButtons[0]).toBeDisabled();
+    expect(editButtons[1]).not.toBeDisabled();
+  });
+
+  it('does not disable the delete button for a mock whose mapping is disabled', () => {
+    const { container } = renderMocksView({ mocks: SAMPLE_MOCKS, mappings: DISABLED_MAPPINGS });
+    const deleteButtons = [...container.querySelectorAll('.btn-delete')];
+    expect(deleteButtons[0]).not.toBeDisabled();
+  });
+});
+
 describe('MocksView — toggle', () => {
   it('calls electronAPI.mocks.toggle with the mock id', async () => {
     const { container } = renderMocksView({ mocks: SAMPLE_MOCKS });
