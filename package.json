@@ -99,6 +99,9 @@
         }
       ]
     },
+    "dmg": {
+      "background": "assets/backgrounds/mac/background.png"
+    },
     "win": {
       "icon": "assets/icons/win/icon.png",
       "artifactName": "${productName}-${version}.${ext}",
