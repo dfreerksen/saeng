@@ -9,15 +9,21 @@ const SUPPORTED_LOCALES = [
   { code: 'be', name: 'беларускі', dir: 'ltr' }, // Belarusian
   { code: 'bg', name: 'Български', dir: 'ltr' }, // Bulgarian
   { code: 'zh', name: '中文', dir: 'ltr' }, // Chinese (Simplified)
+  { code: 'nl', name: 'Nederlands', dir: 'ltr' }, // Dutch
   { code: 'en', name: 'English', dir: 'ltr' }, // English
   { code: 'fr', name: 'Français', dir: 'ltr' }, // French
   { code: 'de', name: 'Deutsch', dir: 'ltr' }, // German
+  { code: 'id', name: 'Bahasa Indonesia', dir: 'ltr' }, // Indonesian
+  { code: 'it', name: 'Italiano', dir: 'ltr' }, // Italian
   { code: 'ja', name: '日本語', dir: 'ltr' }, // Japanese
   { code: 'ko', name: '한국어', dir: 'ltr' }, // Korean
+  { code: 'pl', name: 'Polski', dir: 'ltr' }, // Polish
   { code: 'ru', name: 'Русский', dir: 'ltr' }, // Russian
   { code: 'pt', name: 'Português', dir: 'ltr' }, // Portuguese (Brazil)
   { code: 'es', name: 'Español', dir: 'ltr' }, // Spanish
+  { code: 'sv', name: 'Svenska', dir: 'ltr' }, // Swedish
   { code: 'th', name: 'แบบไทย', dir: 'ltr' }, // Thai
+  { code: 'tr', name: 'Türkçe', dir: 'ltr' }, // Turkish
   { code: 'vi', name: 'Tiếng Việt', dir: 'ltr' }, // Vietnamese
   { code: 'uk', name: 'Українська', dir: 'ltr' }, // Ukrainian
 ];
