@@ -1,4 +1,5 @@
 import { Fragment, useState } from 'react';
+import { FILTER_TABS, matchesFilter } from '../js/logFilter.js';
 
 const BODY_CAPTURE_LIMIT_KB = 64;
 
@@ -57,7 +58,12 @@ function BodyContent({ body, truncated, t }) {
 
 export default function LogView({ active, entries, onClear, onExportHar, settings, t }) {
   const [expandedIds, setExpandedIds] = useState(() => new Set());
+  const [activeFilter, setActiveFilter] = useState('all');
   const showDetails = !!(settings?.logHeadersEnabled || settings?.logBodyEnabled);
+
+  const filteredEntries = activeFilter === 'all'
+    ? entries
+    : entries.filter((e) => matchesFilter(e, activeFilter));
 
   function toggleExpanded(id) {
     setExpandedIds((prev) => {
@@ -87,12 +93,29 @@ export default function LogView({ active, entries, onClear, onExportHar, setting
         </div>
       </div>
 
+      <div className="log-filter-bar">
+        {FILTER_TABS.map((f) => (
+          <button
+            key={f}
+            className={`log-filter-btn${activeFilter === f ? ' active' : ''}`}
+            onClick={() => setActiveFilter(f)}
+          >
+            {t(`log.filter.${f}`)}
+          </button>
+        ))}
+      </div>
+
       <div className="table-responsive">
         {entries.length === 0 ? (
           <div className="empty-state" id="logEmptyState">
             <i className="bi bi-list-columns-reverse fs-1" />
             <div className="empty-state-text">{t('log.empty')}</div>
             <div className="empty-state-hint">{t('log.emptyHint')}</div>
+          </div>
+        ) : filteredEntries.length === 0 ? (
+          <div className="empty-state">
+            <i className="bi bi-funnel fs-1" />
+            <div className="empty-state-text">{t('log.filterEmpty')}</div>
           </div>
         ) : (
           <table className="table table-borderless table-striped table-hover" id="logTable">
@@ -108,7 +131,7 @@ export default function LogView({ active, entries, onClear, onExportHar, setting
               </tr>
             </thead>
             <tbody>
-              {[...entries].reverse().map((entry) => {
+              {[...filteredEntries].reverse().map((entry) => {
                 const expandable = showDetails && hasDetails(entry);
                 const isExpanded = expandable && expandedIds.has(entry.id);
                 return (

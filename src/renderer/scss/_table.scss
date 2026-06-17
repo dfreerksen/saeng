@@ -105,6 +105,43 @@
   margin-left: 6px;
 }
 
+.log-filter-bar {
+  border-bottom: 1px solid var(--saeng-border);
+  display: flex;
+  gap: 2px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.log-filter-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  color: var(--saeng-text-muted);
+  cursor: pointer;
+  font-size: var(--saeng-font-size-small);
+  margin-bottom: -5px;
+  padding: 4px 10px 8px;
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--saeng-text);
+  }
+
+  &.active {
+    border-bottom-color: var(--saeng-accent);
+    color: var(--saeng-accent);
+    font-weight: 600;
+  }
+}
+
 .log-time-cell,
 .log-path-cell {
   color: var(--saeng-primary-complement-color);

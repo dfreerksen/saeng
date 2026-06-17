@@ -249,6 +249,105 @@ describe('LogView — request/response details', () => {
   });
 });
 
+describe('LogView — filter bar', () => {
+  const FILTER_ENTRIES = [
+    {
+      id: 'f1',
+      timestamp: 1700000000000,
+      method: 'GET',
+      hostname: 'myapp.local',
+      path: '/index.html',
+      status: 200,
+      latencyMs: 10,
+      https: false,
+      responseHeaders: { 'content-type': 'text/html' },
+    },
+    {
+      id: 'f2',
+      timestamp: 1700000001000,
+      method: 'GET',
+      hostname: 'myapp.local',
+      path: '/app.js',
+      status: 200,
+      latencyMs: 5,
+      https: false,
+      responseHeaders: { 'content-type': 'application/javascript' },
+    },
+    {
+      id: 'f3',
+      timestamp: 1700000002000,
+      method: 'GET',
+      hostname: 'myapp.local',
+      path: '/api/data',
+      status: 200,
+      latencyMs: 20,
+      https: true,
+      responseHeaders: {},
+    },
+  ];
+
+  it('renders a button for every filter tab', () => {
+    const { container } = renderLogView({ entries: FILTER_ENTRIES });
+    const buttons = container.querySelectorAll('.log-filter-btn');
+    expect(buttons).toHaveLength(16);
+  });
+
+  it('marks the "all" tab active by default', () => {
+    const { container } = renderLogView({ entries: FILTER_ENTRIES });
+    const active = container.querySelector('.log-filter-btn.active');
+    expect(active).toHaveTextContent('log.filter.all');
+  });
+
+  it('moves the active class to the clicked tab', () => {
+    const { container } = renderLogView({ entries: FILTER_ENTRIES });
+    fireEvent.click(screen.getByText('log.filter.js'));
+    expect(container.querySelector('.log-filter-btn.active')).toHaveTextContent('log.filter.js');
+  });
+
+  it('filters rows to only the matching entries', () => {
+    const { container } = renderLogView({ entries: FILTER_ENTRIES });
+    fireEvent.click(screen.getByText('log.filter.js'));
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(screen.getByText('/app.js')).toBeInTheDocument();
+  });
+
+  it('shows all entries when the "all" tab is active', () => {
+    const { container } = renderLogView({ entries: FILTER_ENTRIES });
+    fireEvent.click(screen.getByText('log.filter.https'));
+    fireEvent.click(screen.getByText('log.filter.all'));
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(3);
+  });
+
+  it('shows the filter empty state when no entries match the active filter', () => {
+    renderLogView({ entries: FILTER_ENTRIES });
+    fireEvent.click(screen.getByText('log.filter.ws'));
+    expect(screen.getByText('log.filterEmpty')).toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+  });
+
+  it('does not show the filter empty state when switching back to a matching filter', () => {
+    renderLogView({ entries: FILTER_ENTRIES });
+    fireEvent.click(screen.getByText('log.filter.ws'));
+    fireEvent.click(screen.getByText('log.filter.all'));
+    expect(screen.queryByText('log.filterEmpty')).not.toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+  });
+
+  it('filters https entries correctly', () => {
+    const { container } = renderLogView({ entries: FILTER_ENTRIES });
+    fireEvent.click(screen.getByText('log.filter.https'));
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(screen.getByText('/api/data')).toBeInTheDocument();
+  });
+
+  it('filters doc entries correctly', () => {
+    const { container } = renderLogView({ entries: FILTER_ENTRIES });
+    fireEvent.click(screen.getByText('log.filter.doc'));
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(screen.getByText('/index.html')).toBeInTheDocument();
+  });
+});
+
 describe('LogView — active state', () => {
   it('applies the active class when active is true', () => {
     const { container } = renderLogView({ active: true });
