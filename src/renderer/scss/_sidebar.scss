@@ -38,43 +38,6 @@
   opacity: 0.8;
 }
 
-.sidebar-footer {
-  border-top: 1px solid var(--saeng-border);
-  margin-top: auto;
-  padding: 8px 4px 0;
-}
-
-.proxy-toggle-btn {
-  background: transparent;
-  border: 1px solid var(--saeng-accent);
-  border-radius: var(--saeng-radius-sm);
-  color: var(--saeng-accent);
-  cursor: pointer;
-  font-weight: 600;
-  padding: 9px;
-  width: 100%;
-}
-
-.proxy-toggle-btn:hover {
-  background: var(--saeng-accent);
-  color: #fff;
-}
-
-.proxy-toggle-btn.running {
-  border-color: var(--bs-danger);
-  color: var(--bs-danger);
-}
-
-.proxy-toggle-btn.running:hover {
-  background: var(--bs-danger);
-  color: #fff;
-}
-
-.proxy-toggle-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
 .about-btn {
   align-items: center;
   background: none;

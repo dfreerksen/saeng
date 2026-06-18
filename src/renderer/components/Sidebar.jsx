@@ -1,4 +1,4 @@
-export default function Sidebar({ currentView, setCurrentView, loggingEnabled, proxyRunning, onProxyToggle, onAbout, t }) {
+export default function Sidebar({ currentView, setCurrentView, loggingEnabled, onAbout, t }) {
   return (
     <nav className="sidebar">
       <button
@@ -35,14 +35,6 @@ export default function Sidebar({ currentView, setCurrentView, loggingEnabled, p
         <i className="bi bi-info-circle" />
         <span>{t('nav.about')}</span>
       </button>
-      <div className="sidebar-footer">
-        <button
-          className={`proxy-toggle-btn${proxyRunning ? ' running' : ''}`}
-          onClick={onProxyToggle}
-        >
-          {proxyRunning ? t('proxy.action.stop') : t('proxy.action.start')}
-        </button>
-      </div>
     </nav>
   );
 }

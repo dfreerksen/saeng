@@ -53,9 +53,20 @@
   border: 1px solid var(--saeng-border);
   border-radius: 20px;
   color: var(--saeng-primary-complement-color);
+  cursor: pointer;
   display: flex;
+  font-size: inherit;
   gap: 6px;
   padding: 3px 10px 3px 8px;
+
+  &:hover {
+    background: var(--saeng-bg-hover);
+    border-color: var(--bs-success);
+  }
+
+  &.running:hover {
+    border-color: var(--bs-danger);
+  }
 }
 
 .status-dot {

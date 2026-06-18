@@ -378,7 +378,7 @@ describe('App — health checks', () => {
 describe('App — proxy toggle', () => {
   it('starts the proxy when toggle is clicked while stopped', async () => {
     await renderApp();
-    fireEvent.click(document.querySelector('.proxy-toggle-btn'));
+    fireEvent.click(document.querySelector('.status-pill'));
     await waitFor(() => {
       expect(window.electronAPI.proxy.start).toHaveBeenCalledOnce();
     });
@@ -386,7 +386,7 @@ describe('App — proxy toggle', () => {
 
   it('updates the proxy status dot to running after start', async () => {
     await renderApp();
-    fireEvent.click(document.querySelector('.proxy-toggle-btn'));
+    fireEvent.click(document.querySelector('.status-pill'));
     await waitFor(() => {
       expect(document.querySelector('.status-dot')).toHaveClass('running');
     });
@@ -394,7 +394,7 @@ describe('App — proxy toggle', () => {
 
   it('stops the proxy when toggle is clicked while running', async () => {
     await renderApp({ proxy: { status: vi.fn().mockResolvedValue({ running: true }) } });
-    fireEvent.click(document.querySelector('.proxy-toggle-btn'));
+    fireEvent.click(document.querySelector('.status-pill'));
     await waitFor(() => {
       expect(window.electronAPI.proxy.stop).toHaveBeenCalledOnce();
     });

@@ -10,8 +10,6 @@ function renderSidebar(props = {}) {
     currentView: 'mappings',
     setCurrentView: vi.fn(),
     loggingEnabled: true,
-    proxyRunning: false,
-    onProxyToggle: vi.fn(),
     onAbout: vi.fn(),
     t,
   };
@@ -117,30 +115,4 @@ describe('Sidebar', () => {
     expect(onAbout).toHaveBeenCalledOnce();
   });
 
-  it('shows proxy.action.start text when proxy is not running', () => {
-    renderSidebar({ proxyRunning: false });
-    expect(screen.getByText('proxy.action.start')).toBeInTheDocument();
-  });
-
-  it('shows proxy.action.stop text when proxy is running', () => {
-    renderSidebar({ proxyRunning: true });
-    expect(screen.getByText('proxy.action.stop')).toBeInTheDocument();
-  });
-
-  it('applies running class to toggle button when proxy is running', () => {
-    const { container } = renderSidebar({ proxyRunning: true });
-    expect(container.querySelector('.proxy-toggle-btn')).toHaveClass('running');
-  });
-
-  it('does not apply running class to toggle button when proxy is stopped', () => {
-    const { container } = renderSidebar({ proxyRunning: false });
-    expect(container.querySelector('.proxy-toggle-btn')).not.toHaveClass('running');
-  });
-
-  it('calls onProxyToggle when proxy toggle button is clicked', () => {
-    const onProxyToggle = vi.fn();
-    const { container } = renderSidebar({ onProxyToggle });
-    fireEvent.click(container.querySelector('.proxy-toggle-btn'));
-    expect(onProxyToggle).toHaveBeenCalledOnce();
-  });
 });

@@ -236,14 +236,12 @@ export default function App() {
 
   return (
     <div className="app">
-      <Titlebar proxyRunning={proxyRunning} updateInfo={updateInfo} t={t} />
+      <Titlebar proxyRunning={proxyRunning} updateInfo={updateInfo} onProxyToggle={handleProxyToggle} t={t} />
       <div className="main-layout">
         <Sidebar
           currentView={currentView}
           setCurrentView={setCurrentView}
           loggingEnabled={settings.loggingEnabled !== false}
-          proxyRunning={proxyRunning}
-          onProxyToggle={handleProxyToggle}
           onAbout={() => setModal({ type: 'about' })}
           t={t}
         />
