@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import http from 'http';
+import net from 'net';
 import { EventEmitter } from 'events';
 import { HttpProxy, MAX_BODY_CAPTURE_BYTES } from '../../src/proxy/httpProxy.js';
 
@@ -53,6 +54,25 @@ function makeRequest(port, { method = 'GET', path = '/', host, body } = {}) {
     if (body !== undefined) req.write(body);
     req.end();
   });
+}
+
+// Creates a minimal mock TCP socket suitable for _handleConnect and
+// _handleWebSocketUpgrade tests. All methods are vi.fn() so they can be
+// asserted against; _written collects everything passed to write().
+function makeMockSocket() {
+  const socket = new EventEmitter();
+  const _written = [];
+  socket.write = vi.fn((data) => { _written.push(data); return true; });
+  socket.end = vi.fn();
+  socket.destroy = vi.fn();
+  socket.pipe = vi.fn();
+  socket._written = _written;
+  return socket;
+}
+
+// Joins all data written to a mock socket into a single string.
+function writtenText(socket) {
+  return socket._written.map((d) => (Buffer.isBuffer(d) ? d.toString() : String(d))).join('');
 }
 
 // Backend that responds with a fixed-size body, used to exercise body
@@ -776,5 +796,269 @@ describe('HttpProxy mocked responses — end to end', () => {
     const { statusCode, body } = await makeRequest(proxy.getPort(), { host: 'mocked.local', path: '/api/echo', method: 'POST', body: 'request-body' });
     expect(statusCode).toBe(200);
     expect(body).toBe('mocked');
+  });
+});
+
+describe('HttpProxy._handleConnect()', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('writes 502 Bad Gateway and closes the socket for an unmapped hostname', () => {
+    const proxy = new HttpProxy(null);
+    const socket = makeMockSocket();
+
+    proxy._handleConnect({ url: 'unknown.local:443' }, socket, Buffer.alloc(0));
+
+    expect(writtenText(socket)).toContain('502 Bad Gateway');
+    expect(socket.end).toHaveBeenCalled();
+  });
+
+  it('opens a raw TCP tunnel when httpsEnabled is false', async () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{ domain: 'myapp.local', port: 3000, host: '10.0.0.1', enabled: true }]);
+
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    // Defer cb so the source's `const serverSocket = net.connect(...)` is out of TDZ
+    // before the callback body references it.
+    vi.spyOn(net, 'connect').mockImplementation((port, host, cb) => {
+      process.nextTick(cb);
+      return serverSocket;
+    });
+
+    proxy._handleConnect({ url: 'myapp.local:443' }, clientSocket, Buffer.alloc(0));
+
+    expect(net.connect).toHaveBeenCalledWith(3000, '10.0.0.1', expect.any(Function));
+    expect(writtenText(clientSocket)).toContain('200 Connection Established');
+
+    await new Promise((r) => process.nextTick(r));
+
+    expect(serverSocket.pipe).toHaveBeenCalledWith(clientSocket);
+    expect(clientSocket.pipe).toHaveBeenCalledWith(serverSocket);
+  });
+
+  it('defaults the backend host to 127.0.0.1 when mapping.host is not set', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{ domain: 'myapp.local', port: 3000, enabled: true }]);
+
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockReturnValue(serverSocket); // no cb needed — only checking args
+
+    proxy._handleConnect({ url: 'myapp.local:443' }, clientSocket, Buffer.alloc(0));
+
+    expect(net.connect).toHaveBeenCalledWith(3000, '127.0.0.1', expect.any(Function));
+  });
+
+  it('uses the MITM tunnel when httpsEnabled is true and internalHttpsPort is set', async () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{ domain: 'secure.local', port: 8443, host: '127.0.0.1', enabled: true }]);
+    proxy.httpsEnabled = true;
+    proxy.internalHttpsPort = 12345;
+
+    const clientSocket = makeMockSocket();
+    const tunnelSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockImplementation((port, host, cb) => {
+      process.nextTick(cb);
+      return tunnelSocket;
+    });
+
+    proxy._handleConnect({ url: 'secure.local:443' }, clientSocket, Buffer.alloc(0));
+
+    expect(net.connect).toHaveBeenCalledWith(12345, '127.0.0.1', expect.any(Function));
+    expect(writtenText(clientSocket)).toContain('200 Connection Established');
+
+    await new Promise((r) => process.nextTick(r));
+
+    expect(tunnelSocket.pipe).toHaveBeenCalledWith(clientSocket);
+    expect(clientSocket.pipe).toHaveBeenCalledWith(tunnelSocket);
+  });
+
+  it('forwards head data to the server socket after connecting (raw tunnel)', async () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{ domain: 'myapp.local', port: 3000, enabled: true }]);
+
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockImplementation((port, host, cb) => {
+      process.nextTick(cb);
+      return serverSocket;
+    });
+
+    const head = Buffer.from('initial-data');
+    proxy._handleConnect({ url: 'myapp.local:443' }, clientSocket, head);
+
+    await new Promise((r) => process.nextTick(r));
+
+    expect(serverSocket.write).toHaveBeenCalledWith(head);
+  });
+
+  it('destroys the client socket when the server socket errors (raw tunnel)', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{ domain: 'myapp.local', port: 3000, enabled: true }]);
+
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockReturnValue(serverSocket);
+
+    proxy._handleConnect({ url: 'myapp.local:443' }, clientSocket, Buffer.alloc(0));
+    serverSocket.emit('error', new Error('ECONNREFUSED'));
+
+    expect(clientSocket.destroy).toHaveBeenCalled();
+  });
+
+  it('destroys the server socket when the client socket errors (raw tunnel)', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{ domain: 'myapp.local', port: 3000, enabled: true }]);
+
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockReturnValue(serverSocket);
+
+    proxy._handleConnect({ url: 'myapp.local:443' }, clientSocket, Buffer.alloc(0));
+    clientSocket.emit('error', new Error('client gone'));
+
+    expect(serverSocket.destroy).toHaveBeenCalled();
+  });
+});
+
+describe('HttpProxy._handleWebSocketUpgrade()', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('closes the socket immediately for an unmapped hostname', () => {
+    const proxy = new HttpProxy(null);
+    const socket = makeMockSocket();
+
+    proxy._handleWebSocketUpgrade(
+      { headers: { host: 'unknown.local' }, method: 'GET', url: '/', httpVersion: '1.1' },
+      socket,
+      Buffer.alloc(0)
+    );
+
+    expect(socket.end).toHaveBeenCalled();
+  });
+
+  it('connects to the backend and replays the HTTP upgrade request', async () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{
+      domain: 'ws.local', port: 9000, host: '127.0.0.1', enabled: true, requestHeaders: [],
+    }]);
+
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockImplementation((port, host, cb) => {
+      process.nextTick(cb);
+      return serverSocket;
+    });
+
+    proxy._handleWebSocketUpgrade(
+      {
+        headers: { host: 'ws.local', connection: 'Upgrade', upgrade: 'websocket' },
+        method: 'GET',
+        url: '/chat',
+        httpVersion: '1.1',
+      },
+      clientSocket,
+      Buffer.alloc(0)
+    );
+
+    expect(net.connect).toHaveBeenCalledWith(9000, '127.0.0.1', expect.any(Function));
+
+    await new Promise((r) => process.nextTick(r));
+
+    const sent = writtenText(serverSocket);
+    expect(sent).toContain('GET /chat HTTP/1.1');
+    expect(sent).toContain('upgrade: websocket');
+    expect(serverSocket.pipe).toHaveBeenCalledWith(clientSocket);
+    expect(clientSocket.pipe).toHaveBeenCalledWith(serverSocket);
+  });
+
+  it('applies mapping.requestHeaders overrides when replaying the upgrade', async () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{
+      domain: 'ws.local', port: 9000, host: '127.0.0.1', enabled: true,
+      requestHeaders: [{ name: 'X-Forwarded-Proto', value: 'wss' }],
+    }]);
+
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockImplementation((port, host, cb) => {
+      process.nextTick(cb);
+      return serverSocket;
+    });
+
+    proxy._handleWebSocketUpgrade(
+      { headers: { host: 'ws.local' }, method: 'GET', url: '/', httpVersion: '1.1' },
+      clientSocket,
+      Buffer.alloc(0)
+    );
+
+    await new Promise((r) => process.nextTick(r));
+
+    expect(writtenText(serverSocket)).toContain('x-forwarded-proto: wss');
+  });
+
+  it('forwards head data to the server socket after connecting', async () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{
+      domain: 'ws.local', port: 9000, host: '127.0.0.1', enabled: true, requestHeaders: [],
+    }]);
+
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockImplementation((port, host, cb) => {
+      process.nextTick(cb);
+      return serverSocket;
+    });
+
+    const head = Buffer.from('ws-head');
+    proxy._handleWebSocketUpgrade(
+      { headers: { host: 'ws.local' }, method: 'GET', url: '/', httpVersion: '1.1' },
+      clientSocket,
+      head
+    );
+
+    await new Promise((r) => process.nextTick(r));
+
+    expect(serverSocket.write).toHaveBeenCalledWith(head);
+  });
+
+  it('destroys the client socket when the server socket errors', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{
+      domain: 'ws.local', port: 9000, enabled: true, requestHeaders: [],
+    }]);
+
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockReturnValue(serverSocket);
+
+    proxy._handleWebSocketUpgrade(
+      { headers: { host: 'ws.local' }, method: 'GET', url: '/', httpVersion: '1.1' },
+      clientSocket,
+      Buffer.alloc(0)
+    );
+    serverSocket.emit('error', new Error('backend gone'));
+
+    expect(clientSocket.destroy).toHaveBeenCalled();
+  });
+
+  it('destroys the server socket when the client socket errors', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{
+      domain: 'ws.local', port: 9000, enabled: true, requestHeaders: [],
+    }]);
+
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockReturnValue(serverSocket);
+
+    proxy._handleWebSocketUpgrade(
+      { headers: { host: 'ws.local' }, method: 'GET', url: '/', httpVersion: '1.1' },
+      clientSocket,
+      Buffer.alloc(0)
+    );
+    clientSocket.emit('error', new Error('client gone'));
+
+    expect(serverSocket.destroy).toHaveBeenCalled();
   });
 });
