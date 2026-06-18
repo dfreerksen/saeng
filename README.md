@@ -43,7 +43,7 @@ If you are on an Intel chip (x86_64) Mac, you want the x64 dmg. If you are on a 
 * WebSocket pass-through
 * Start proxy automatically on launch
 * System tray integration on macOS, Windows, and Linux
-* Live request log, with optional capture of request/response headers and bodies, and export to a HAR file
+* Live request log with filter tabs (HTTP, HTTPS, WebSocket, JSON, XHR, document, CSS, JS, font, image, and more), with optional capture of request/response headers and bodies, and export to a HAR file
 * Optional backend health checks with live status indicators per mapping
 * Notifies you in the titlebar when a newer version is available on GitHub
 * Remembers the window size between launches
@@ -59,7 +59,7 @@ If you are on an Intel chip (x86_64) Mac, you want the x64 dmg. If you are on a 
 
 ### Request log
 
-The **Log** view shows a live list of requests proxied through Saeng. Enable **Log headers** and/or **Log bodies** in Settings to capture request/response headers and bodies (up to 64 KB each) — off by default since they can contain sensitive data. When enabled, each entry can be expanded to inspect the captured details. Use **Export HAR** to save the current log as a `.har` file for use with browser dev tools or other HTTP debugging tools.
+The **Log** view shows a live list of requests proxied through Saeng. Use the filter tabs above the log to narrow entries by request type (HTTP, HTTPS, WebSocket, JSON, XHR, document, CSS, JS, font, image, manifest, WASM, GraphQL, and more). Enable **Log headers** and/or **Log bodies** in Settings to capture request/response headers and bodies (up to 64 KB each) — off by default since they can contain sensitive data. When enabled, each entry can be expanded to inspect the captured details. Use **Export HAR** to save the current log as a `.har` file for use with browser dev tools or other HTTP debugging tools.
 
 ### Health checks
 
@@ -67,7 +67,7 @@ Enable **Backend health checks** in Settings to have Saeng periodically ping eac
 
 ### Mocks
 
-Enable **mocking** on a mapping (in the mapping's edit form), then add mock rules in the **Mocks** view. Each mock matches requests for that domain by HTTP method and a path pattern (a regular expression matched against the request path, without the query string) and returns a canned status code, headers, and body instead of forwarding the request to the backend. The first matching rule wins. Mocking applies to HTTP and HTTPS requests, but not WebSocket upgrades or raw HTTPS tunnels. Mocked requests are flagged with a "MOCK" badge in the request log. Mocks can be exported/imported as JSON, matched up by domain.
+Enable **mocking** on a mapping (in the mapping's edit form), then add mock rules in the **Mocks** view. Each mock matches requests for that domain by HTTP method and a path pattern (a regular expression matched against the request path, without the query string) and returns a canned status code, headers, and body instead of forwarding the request to the backend. The first matching rule wins. Mocking applies to HTTP and HTTPS requests, but not WebSocket upgrades or raw HTTPS tunnels. Every mocked response includes an `X-Saeng-Mock: true` header. Mocked requests are flagged with a "MOCK" badge in the request log. Mocks can be exported/imported as JSON, matched up by domain.
 
 ## Development
 

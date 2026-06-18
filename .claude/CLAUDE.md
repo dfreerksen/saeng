@@ -115,6 +115,8 @@ When `settings.logHeadersEnabled`/`settings.logBodyEnabled` are true, `HttpProxy
 
 The `requestLog:exportHar` IPC handler writes the current log to a `.har` file (via a save dialog) using `buildHar()` from `src/proxy/har.js`, which converts entries into a HAR 1.2 document (`log.entries[]` with `request`/`response`/`timings`) for use with browser dev tools or other HTTP debugging tools. Log entries served from a mock have `mocked: true`, shown as a "MOCK" badge in `LogView.jsx` and exported as `_mocked: true` on the HAR entry.
 
+`src/renderer/js/logFilter.js` exports `FILTER_TABS` (an ordered list of filter tab names: `all`, `http`, `https`, `ws`, `json`, `xhr`, `doc`, `css`, `js`, `font`, `img`, `manifest`, `wasm`, `graphql`, `wml`, `other`) and `matchesFilter(entry, filter)`, which classifies a log entry by inspecting `content-type` response headers, request path extension, and request metadata. `LogView.jsx` renders a tab bar using `FILTER_TABS` and applies `matchesFilter` client-side to the already-fetched log entries — no IPC required for filtering.
+
 ### Mocks
 
 `mocks` is a separate top-level store array, independent of `mappings`, with shape:
@@ -123,7 +125,7 @@ The `requestLog:exportHar` IPC handler writes the current log to a `.har` file (
 ```
 `method` is uppercased, or `*` to match any method (`sanitizeMockMethod()`). `pathPattern` is a regular expression matched against the request path **without the query string**; `validatePathPattern()` throws if it doesn't compile, both on `store.addMock()`/`updateMock()` and client-side in `MockModal.jsx`. `statusCode` is clamped to 100-599 (default 200, via `sanitizeMockStatusCode()`). `headers` is a `requestHeaders`-style array applied to the mocked response via `_applyHeaderOverrides()`.
 
-A mock only takes effect if its mapping has `mocksEnabled: true`. `HttpProxy.updateMocks(mocks)` compiles all enabled mocks into a `Map<mappingId, CompiledMock[]>` (regexes pre-compiled, invalid patterns skipped defensively), called by `ProxyManager` on proxy start and whenever mocks change (mirroring `updateMappings()`'s live-update pattern — no restart required). For each plain HTTP or HTTPS (post-MITM) request, `_findMock()` returns the first rule whose method and `pathPattern` match; `_serveMock()` drains the request body, writes the mocked status/headers/body directly to the client without contacting the backend, and marks the log record `mocked: true`. Mocking does not apply to WebSocket upgrades or raw HTTPS tunnels (when global HTTPS is disabled).
+A mock only takes effect if its mapping has `mocksEnabled: true`. `HttpProxy.updateMocks(mocks)` compiles all enabled mocks into a `Map<mappingId, CompiledMock[]>` (regexes pre-compiled, invalid patterns skipped defensively), called by `ProxyManager` on proxy start and whenever mocks change (mirroring `updateMappings()`'s live-update pattern — no restart required). For each plain HTTP or HTTPS (post-MITM) request, `_findMock()` returns the first rule whose method and `pathPattern` match; `_serveMock()` drains the request body, writes the mocked status/headers/body directly to the client without contacting the backend, always sets `x-saeng-mock: true` on the response, and marks the log record `mocked: true`. Mocking does not apply to WebSocket upgrades or raw HTTPS tunnels (when global HTTPS is disabled).
 
 `store.removeMocksForMapping(mappingId)` is called from the `mappings:remove` handler to delete orphaned mocks when their mapping is removed. `store.exportMocks(ids)`/`importMocks(list)` mirror the mapping export/import functions but key on the mapping's `domain` rather than `mappingId` (so exports are portable across stores) — import skips entries whose `domain` doesn't match an existing mapping.
 
@@ -145,7 +147,7 @@ Adding, removing, toggling, or editing a mapping always calls `ProxyManager.upda
 
 ### Update checker
 
-`UpdateChecker` (`src/updateChecker.js`) polls the GitHub releases API (`https://api.github.com/repos/dfreerksen/saeng/releases/latest`) once at startup and then every 24 hours (`CHECK_INTERVAL_MS`), comparing the latest release tag against `pkg.version` via `isNewerVersion()`. Each check produces `{ updateAvailable, currentVersion, latestVersion, url }`, emitted to a listener (mirroring `HealthChecker`'s pattern). `main.js` constructs it on `app.whenReady`, wires `setListener()` to push `update:status` events to the renderer, exposes the current status via `update:get-status`, calls `updateChecker.start()`, and stops it on `before-quit`. The renderer's `Titlebar.jsx` shows an "update available" badge that links to the release URL when `updateInfo.updateAvailable` is true.
+`UpdateChecker` (`src/updateChecker.js`) polls the GitHub releases API (`https://api.github.com/repos/dfreerksen/saeng/releases/latest`) once at startup and then every 6 hours (`CHECK_INTERVAL_MS`), comparing the latest release tag against `pkg.version` via `isNewerVersion()`. Each check produces `{ updateAvailable, currentVersion, latestVersion, url }`, emitted to a listener (mirroring `HealthChecker`'s pattern). `main.js` constructs it on `app.whenReady`, wires `setListener()` to push `update:status` events to the renderer, exposes the current status via `update:get-status`, calls `updateChecker.start()`, and stops it on `before-quit`. The renderer's `Titlebar.jsx` shows an "update available" badge that links to the release URL when `updateInfo.updateAvailable` is true.
 
 ### Startup / shutdown
 
@@ -155,7 +157,7 @@ On `app.before-quit`: stops the health checker and tears down the proxy (which c
 
 ### Internationalisation
 
-`src/i18n/i18n.js` loads locale JSON from `src/i18n/locales/`. Supports 15 languages including RTL (Arabic). The renderer uses a `t(key, vars)` helper in `App.jsx` that mirrors the main-process `i18n.t()`. Locale is persisted in settings and applied to `<html lang>` and `dir` attributes at runtime.
+`src/i18n/i18n.js` loads locale JSON from `src/i18n/locales/`. Supports 21 languages (`ar`, `be`, `bg`, `de`, `en`, `es`, `fr`, `id`, `it`, `ja`, `ko`, `nl`, `pl`, `pt`, `ru`, `sv`, `th`, `tr`, `uk`, `vi`, `zh`) including RTL (Arabic). The renderer uses a `t(key, vars)` helper in `App.jsx` that mirrors the main-process `i18n.t()`. Locale is persisted in settings and applied to `<html lang>` and `dir` attributes at runtime.
 
 ## Tests
 
