@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2026-06-18
+
+### Added
+
+- Request log now has filter tabs to narrow entries by type (HTTP, HTTPS, WebSocket, JSON, XHR, document, CSS, JS, font, image, and more)
+- Proxy status indicator now includes start and stop controls
+- New translations: Italian, Dutch, Polish, Turkish, Indonesian, and Swedish
+
+### Changed
+
+- Mock responses always include the `X-Saeng-Mock: true` response header
+
+[1.12.0]: https://github.com/dfreerksen/saeng/releases/tag/v1.12.0
+
 ## [1.11.0] - 2026-06-13
 
 ### Changed
