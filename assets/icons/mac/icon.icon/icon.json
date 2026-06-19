@@ -1,14 +1,16 @@
 {
   "fill" : {
-    "solid" : "display-p3:0.78449,0.86849,1.00000,1.00000"
+    "solid" : "display-p3:0.28650,0.33520,0.38303,1.00000"
   },
   "groups" : [
     {
       "layers" : [
         {
+          "fill" : "none",
           "glass" : true,
-          "image-name" : "icon.png",
-          "name" : "icon"
+          "hidden" : false,
+          "image-name" : "logo.svg",
+          "name" : "logo"
         }
       ],
       "shadow" : {
@@ -22,9 +24,8 @@
     }
   ],
   "supported-platforms" : {
-    "circles" : [
-      "watchOS"
-    ],
-    "squares" : "shared"
+    "squares" : [
+      "macOS"
+    ]
   }
 }
