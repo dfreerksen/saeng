@@ -1,4 +1,4 @@
-# Saeng
+![Saeng](./assets/logo.png "Saeng")
 
 Local domain proxy manager for local development domains.
 
