@@ -34,30 +34,40 @@ export default function MocksView({ active, mocks, mappings, mockableMappings, s
 
   return (
     <div className={`view${active ? ' active' : ''}`} id="view-mocks">
-      <div className="view-header">
-        <div>
-          <div className="view-title">{t('mocks.title')}</div>
-          <div className="view-subtitle">{t('mocks.subtitle')}</div>
+      <header className="container-fluid p-0">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h4 className="m-0">{t('mocks.title')}</h4>
+            <h6 className="subtitle">{t('mocks.subtitle')}</h6>
+          </div>
+          <div class="btn-group" role="group" aria-label="Actions">
+            <Tooltip title={t('mocks.actions.import')}>
+              <button className="btn btn-outline-secondary" onClick={onImport}>
+                <i className="bi bi-upload" />
+                <span className="ms-2 d-none d-lg-inline">{t('mocks.actions.import')}</span>
+              </button>
+            </Tooltip>
+            <Tooltip title={t('mocks.actions.export')}>
+              <button className="btn btn-outline-secondary" onClick={onExport} disabled={mocks.length === 0}>
+                <i className="bi bi-download" />
+                <span className="ms-2 d-none d-lg-inline">{t('mocks.actions.export')}</span>
+              </button>
+            </Tooltip>
+            <Tooltip title={t('mocks.actions.help')}>
+              <button className="btn btn-outline-secondary" onClick={() => setShowHelp(true)}>
+                <i className="bi bi-question-circle" />
+                <span className="ms-2 d-none d-lg-inline">{t('mocks.actions.help')}</span>
+              </button>
+            </Tooltip>
+            <Tooltip title={t('mocks.actions.add')}>
+              <button className="btn btn-primary" onClick={onAdd} disabled={mockableMappings.length === 0}>
+                <i className="bi bi-plus" />
+                <span className="ms-2 d-none d-lg-inline">{t('mocks.actions.add')}</span>
+              </button>
+            </Tooltip>
+          </div>
         </div>
-        <div className="view-header-actions">
-          <button className="btn btn-outline-secondary" onClick={onImport}>
-            <i className="bi bi-upload" />
-            <span>{t('mocks.actions.import')}</span>
-          </button>
-          <button className="btn btn-outline-secondary" onClick={onExport} disabled={mocks.length === 0}>
-            <i className="bi bi-download" />
-            <span>{t('mocks.actions.export')}</span>
-          </button>
-          <button className="btn btn-outline-secondary" onClick={() => setShowHelp(true)}>
-            <i className="bi bi-question-circle" />
-            <span>{t('mocks.actions.help')}</span>
-          </button>
-          <button className="btn btn-primary" onClick={onAdd} disabled={mockableMappings.length === 0}>
-            <i className="bi bi-plus" />
-            <span>{t('mocks.actions.add')}</span>
-          </button>
-        </div>
-      </div>
+      </header>
 
       {showHelp && (
         <MockRegexHelpModal onClose={() => setShowHelp(false)} showToast={showToast} t={t} />

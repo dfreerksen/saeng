@@ -71,26 +71,34 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
 
   return (
     <div className={`view${active ? ' active' : ''}`} id="view-mappings">
-      <div className="view-header">
-        <div>
-          <div className="view-title">{t('mappings.title')}</div>
-          <div className="view-subtitle">{t('mappings.subtitle')}</div>
+      <header className="container-fluid p-0">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h4 className="m-0">{t('mappings.title')}</h4>
+            <h6 className="subtitle">{t('mappings.subtitle')}</h6>
+          </div>
+          <div class="btn-group" role="group" aria-label="Actions">
+            <Tooltip title={t('mappings.actions.import')}>
+              <button className="btn btn-outline-secondary" onClick={onImport}>
+                <i className="bi bi-upload" />
+                <span className="ms-2 d-none d-lg-inline">{t('mappings.actions.import')}</span>
+              </button>
+            </Tooltip>
+            <Tooltip title={t('mappings.actions.export')}>
+              <button className="btn btn-outline-secondary" onClick={onExport} disabled={mappings.length === 0}>
+                <i className="bi bi-download" />
+                <span className="ms-2 d-none d-lg-inline">{t('mappings.actions.export')}</span>
+              </button>
+            </Tooltip>
+            <Tooltip title={t('mappings.actions.add')}>
+              <button className="btn btn-primary" onClick={onAdd}>
+                <i className="bi bi-plus" />
+                <span className="ms-2 d-none d-lg-inline">{t('mappings.actions.add')}</span>
+              </button>
+            </Tooltip>
+          </div>
         </div>
-        <div className="view-header-actions">
-          <button className="btn btn-outline-secondary" onClick={onImport}>
-            <i className="bi bi-upload" />
-            <span>{t('mappings.actions.import')}</span>
-          </button>
-          <button className="btn btn-outline-secondary" onClick={onExport} disabled={mappings.length === 0}>
-            <i className="bi bi-download" />
-            <span>{t('mappings.actions.export')}</span>
-          </button>
-          <button className="btn btn-primary" onClick={onAdd}>
-            <i className="bi bi-plus" />
-            <span>{t('mappings.actions.add')}</span>
-          </button>
-        </div>
-      </div>
+      </header>
 
       <div className="table-responsive">
         {mappings.length === 0 ? (

@@ -7,7 +7,7 @@ export default function Toast({ toasts }) {
     <div id="toast">
       {toasts.map(({ id, message, type }) => (
         <div key={id} className={`alert alert-${type} d-flex align-items-center`}>
-          <i className={`bi bi-${ICONS[type] ?? 'info-circle'}`} />
+          <i className={`bi bi-${ICONS[type] ?? 'info-circle'} me-2`} />
           <div>{message}</div>
         </div>
       ))}

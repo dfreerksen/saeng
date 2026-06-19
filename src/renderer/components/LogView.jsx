@@ -1,5 +1,6 @@
 import { Fragment, useState } from 'react';
 import { FILTER_TABS, matchesFilter } from '../js/logFilter.js';
+import Tooltip from './Tooltip.jsx';
 
 const BODY_CAPTURE_LIMIT_KB = 64;
 
@@ -76,22 +77,28 @@ export default function LogView({ active, entries, onClear, onExportHar, setting
 
   return (
     <div className={`view${active ? ' active' : ''}`} id="view-log">
-      <div className="view-header">
-        <div>
-          <div className="view-title">{t('log.title')}</div>
-          <div className="view-subtitle">{t('log.subtitle')}</div>
+      <header className="container-fluid p-0">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h4 className="m-0">{t('log.title')}</h4>
+            <h6 className="subtitle">{t('log.subtitle')}</h6>
+          </div>
+          <div class="btn-group" role="group" aria-label="Actions">
+            <Tooltip title={t('log.actions.exportHar')}>
+            <button className="btn btn-outline-secondary" onClick={onExportHar} disabled={entries.length === 0}>
+              <i className="bi bi-download" />
+              <span className="ms-2 d-none d-lg-inline">{t('log.actions.exportHar')}</span>
+            </button>
+          </Tooltip>
+          <Tooltip title={t('log.actions.clear')}>
+            <button className="btn btn-outline-secondary" onClick={onClear} disabled={entries.length === 0}>
+              <i className="bi bi-trash" />
+              <span className="ms-2 d-none d-lg-inline">{t('log.actions.clear')}</span>
+            </button>
+          </Tooltip>
+          </div>
         </div>
-        <div className="view-header-actions">
-          <button className="btn btn-outline-secondary" onClick={onExportHar} disabled={entries.length === 0}>
-            <i className="bi bi-download" />
-            <span>{t('log.actions.exportHar')}</span>
-          </button>
-          <button className="btn btn-outline-secondary" onClick={onClear} disabled={entries.length === 0}>
-            <i className="bi bi-trash" />
-            <span>{t('log.actions.clear')}</span>
-          </button>
-        </div>
-      </div>
+      </header>
 
       <div className="log-filter-bar">
         {FILTER_TABS.map((f) => (

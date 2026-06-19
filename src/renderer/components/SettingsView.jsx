@@ -110,12 +110,14 @@ export default function SettingsView({
 
   return (
     <div className={`view${active ? ' active' : ''}`} id="view-settings">
-      <div className="view-header">
-        <div>
-          <div className="view-title">{t('settings.title')}</div>
-          <div className="view-subtitle">{t('settings.subtitle')}</div>
+      <header className="container-fluid p-0">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h4 className="m-0">{t('settings.title')}</h4>
+            <h6 className="subtitle">{t('settings.subtitle')}</h6>
+          </div>
         </div>
-      </div>
+      </header>
 
       <div className="settings-section">
         <div className="settings-section-title">{t('settings.preferences.title')}</div>
@@ -368,74 +370,76 @@ export default function SettingsView({
           </div>
         )}
 
-        <Tooltip title={t(`settings.cert.actions.show.${os}`)}>
-          <button
-            className="btn btn-outline-secondary"
-            onClick={() => window.electronAPI.ssl.revealCA()}
-          >
-            <i className="bi bi-folder2-open" />
-            <span className="d-none d-md-inline">{t(`settings.cert.actions.show.${os}`)}</span>
-          </button>
-        </Tooltip>
+        <div class="btn-group" role="group" aria-label="Certificate Actions">
+          <Tooltip title={t(`settings.cert.actions.show.${os}`)}>
+            <button
+              className="btn btn-outline-secondary"
+              onClick={() => window.electronAPI.ssl.revealCA()}
+            >
+              <i className="bi bi-folder2-open" />
+              <span className="ms-2 d-none d-lg-inline">{t(`settings.cert.actions.show.${os}`)}</span>
+            </button>
+          </Tooltip>
 
-        <Tooltip title={t('settings.cert.actions.install')}>
-          <button
-            className="btn btn-outline-primary"
-            disabled={trustingCA}
-            onClick={async () => {
-              setTrustingCA(true);
-              const result = await window.electronAPI.ssl.trustCA();
-              setTrustingCA(false);
-              if (result.success) {
-                showToast(t('flash.ca.trusted'), 'success', 5000);
-              } else {
-                showToast(result.message, 'error', 6000);
-              }
-            }}
-          >
-            <i className="bi bi-shield-check" />
-            <span className="d-none d-md-inline">
-              {trustingCA ? t('settings.cert.actions.installing') : t('settings.cert.actions.install')}
-            </span>
-          </button>
-        </Tooltip>
+          <Tooltip title={t('settings.cert.actions.install')}>
+            <button
+              className="btn btn-outline-primary"
+              disabled={trustingCA}
+              onClick={async () => {
+                setTrustingCA(true);
+                const result = await window.electronAPI.ssl.trustCA();
+                setTrustingCA(false);
+                if (result.success) {
+                  showToast(t('flash.ca.trusted'), 'success', 5000);
+                } else {
+                  showToast(result.message, 'error', 6000);
+                }
+              }}
+            >
+              <i className="bi bi-shield-check" />
+              <span className="ms-2 d-none d-lg-inline">
+                {trustingCA ? t('settings.cert.actions.installing') : t('settings.cert.actions.install')}
+              </span>
+            </button>
+          </Tooltip>
 
-        <Tooltip title={t('settings.cert.actions.regenerate')}>
-          <button
-            className="btn btn-outline-warning"
-            disabled={regeneratingCA}
-            onClick={async () => {
-              if (!confirm(t('settings.cert.confirm.regenerate'))) return;
-              setRegeneratingCA(true);
-              const newExpiry = await window.electronAPI.ssl.regenerateCA();
-              setCaExpiry(newExpiry);
-              setRegeneratingCA(false);
-              showToast(t('flash.ca.regenerated'), 'success', 5000);
-            }}
-          >
-            <i className="bi bi-arrow-repeat" />
-            <span className="d-none d-md-inline">{t('settings.cert.actions.regenerate')}</span>
-          </button>
-        </Tooltip>
+          <Tooltip title={t('settings.cert.actions.regenerate')}>
+            <button
+              className="btn btn-outline-warning"
+              disabled={regeneratingCA}
+              onClick={async () => {
+                if (!confirm(t('settings.cert.confirm.regenerate'))) return;
+                setRegeneratingCA(true);
+                const newExpiry = await window.electronAPI.ssl.regenerateCA();
+                setCaExpiry(newExpiry);
+                setRegeneratingCA(false);
+                showToast(t('flash.ca.regenerated'), 'success', 5000);
+              }}
+            >
+              <i className="bi bi-arrow-repeat" />
+              <span className="ms-2 d-none d-lg-inline">{t('settings.cert.actions.regenerate')}</span>
+            </button>
+          </Tooltip>
 
-        <Tooltip title={t('settings.cert.actions.delete')}>
-          <button
-            className="btn btn-outline-danger"
-            disabled={deletingCA}
-            onClick={async () => {
-              if (!confirm(t('settings.cert.confirm.delete'))) return;
-              setDeletingCA(true);
-              const result = await window.electronAPI.ssl.deleteCA();
-              setCaExpiry(null);
-              setDeletingCA(false);
-              showToast(t('flash.ca.deleted'), 'info', 5000);
-              if (result?.warning) showToast(result.warning, 'info', 6000);
-            }}
-          >
-            <i className="bi bi-trash" />
-            <span className="d-none d-md-inline">{t('settings.cert.actions.delete')}</span>
-          </button>
-        </Tooltip>
+          <Tooltip title={t('settings.cert.actions.delete')}>
+            <button
+              className="btn btn-outline-danger"
+              disabled={deletingCA}
+              onClick={async () => {
+                if (!confirm(t('settings.cert.confirm.delete'))) return;
+                setDeletingCA(true);
+                const result = await window.electronAPI.ssl.deleteCA();
+                setCaExpiry(null);
+                setDeletingCA(false);
+                showToast(t('flash.ca.deleted'), 'info', 5000);
+                if (result?.warning) showToast(result.warning, 'info', 6000);
+              }}
+            >
+              <i className="bi bi-trash" />
+              <span className="ms-2 d-none d-lg-inline">{t('settings.cert.actions.delete')}</span>
+            </button>
+          </Tooltip>
+        </div>
 
         <p className="cert-platform-note">{t(`settings.cert.platformNote.${os}`)}</p>
       </div>

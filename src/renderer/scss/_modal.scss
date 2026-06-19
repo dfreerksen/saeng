@@ -1,13 +1,12 @@
 /* Apply blur to the modal itself */
 .modal {
-  // -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
 }
 
 /* Optional: Reduce opacity of the default black backdrop to allow blur to show */
 .modal-backdrop {
   background-color: color-mix(in srgb, var(--bs-modal-bg) 100%, transparent);
-  opacity: 0.2;
 }
 
 .export-list {
