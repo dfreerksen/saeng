@@ -46,9 +46,6 @@ jobs:
   release-win:
     name: Build (Windows)
     runs-on: windows-latest
-    permissions:
-      contents: write
-      actions: read
 
     steps:
       - uses: actions/checkout@v6
@@ -61,56 +58,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build (unsigned)
+      - name: Build
         run: npm run build
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          CSC_IDENTITY_AUTO_DISCOVERY: false
-
-      - name: Find installer
-        id: installer
-        shell: pwsh
-        run: |
-          $exe = Get-ChildItem dist\Saeng-*.exe | Select-Object -First 1
-          "path=$($exe.FullName)" >> $env:GITHUB_OUTPUT
-
-      - name: Upload unsigned installer
-        id: upload-unsigned
-        uses: actions/upload-artifact@v4
-        with:
-          name: unsigned-installer
-          path: ${{ steps.installer.outputs.path }}
-
-      - name: Sign with Signpath
-        uses: SignPath/github-action-submit-signing-request@v2
-        with:
-          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
-          organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
-          project-slug: 'saeng'
-          signing-policy-slug: 'release-signing'
-          artifact-configuration-slug: 'windows-installer'
-          github-artifact-id: '${{ steps.upload-unsigned.outputs.artifact-id }}'
-          output-artifact-directory: 'dist-signed'
-          wait-for-completion: true
-
-      - name: Update latest.yml with signed installer hash
-        shell: pwsh
-        run: |
-          $signed = Get-ChildItem dist-signed\Saeng-*.exe | Select-Object -First 1
-          $bytes = [System.IO.File]::ReadAllBytes($signed.FullName)
-          $hash = [Convert]::ToBase64String([System.Security.Cryptography.SHA512]::Create().ComputeHash($bytes))
-          $size = $signed.Length
-          $yml = Get-Content dist\latest.yml -Raw
-          $yml = $yml -replace 'sha512: \S+', "sha512: $hash"
-          $yml = $yml -replace 'size: \d+', "size: $size"
-          $yml | Set-Content dist\latest.yml
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v3
         with:
           token: ${{ secrets.GH_TOKEN }}
           files: |
-            dist-signed/Saeng-*.exe
+            dist/Saeng-*.exe
             dist/Saeng-*.exe.blockmap
             dist/latest.yml
 
