@@ -8,11 +8,11 @@ export default function AboutModal({ version, electronVersion, nodeVersion, reac
         <div className="modal-content">
           <div className="modal-body">
             <div className="about-header text-center">
-              <img src="images/logo.svg" className="about-icon" alt={t('titleBar.title')} />
-              <div className="about-name">{t('titleBar.title')}</div>
+              <img src="images/logo.svg" className="about-icon" alt={t('application.name')} />
+              <div className="about-name">{t('application.name')}</div>
               <div className="about-version">{version ? `v${version}` : ''}</div>
             </div>
-            <p className="about-desc text-center">{t('about.desc')}</p>
+            <p className="about-desc text-center px-5 mb-3">{t('about.desc')}</p>
             <p className="text-center">
               <span>{t('about.github')}</span><br />
               <a href="https://github.com/dfreerksen/saeng" target="_blank" rel="noopener noreferrer">github.com/dfreerksen/saeng</a><br />

@@ -1,5 +1,5 @@
 {
-  "titleBar.title": "Saeng",
+  "application.name": "Saeng",
   "proxy.status.running": "Proxy đang chạy",
   "proxy.status.stopped": "Proxy đã dừng",
   "proxy.action.start": "Khởi động Proxy",

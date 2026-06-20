@@ -1,7 +1,7 @@
 export default function Titlebar({ proxyRunning, updateInfo, onProxyToggle, t }) {
   return (
     <div className="titlebar">
-      <span className="titlebar-title">{t('titleBar.title')}</span>
+      <span className="titlebar-title">{t('application.name')}</span>
       <div className="titlebar-spacer" />
       {updateInfo?.updateAvailable && (
         <button

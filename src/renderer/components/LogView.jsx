@@ -179,7 +179,7 @@ export default function LogView({ active, entries, onClear, onExportHar, setting
 
   return (
     <div className={`view${active ? ' active' : ''}`} id="view-log">
-      <header className="container-fluid p-0">
+      <header className="container-fluid p-0 mb-3">
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <h4 className="m-0">{t('log.title')}</h4>

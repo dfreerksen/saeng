@@ -1,5 +1,5 @@
 {
-  "titleBar.title": "Saeng",
+  "application.name": "Saeng",
   "proxy.status.running": "Proxy berjalan",
   "proxy.status.stopped": "Proxy dihentikan",
   "proxy.action.start": "Mulai Proxy",

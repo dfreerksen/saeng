@@ -1,5 +1,5 @@
 {
-  "titleBar.title": "Saeng",
+  "application.name": "Saeng",
 
   "proxy.status.running": "Proxy running",
   "proxy.status.stopped": "Proxy stopped",
@@ -247,7 +247,7 @@
   "about.github": "This application is open source and can be found on GitHub:",
   "about.thanks": "Thanks for using Saeng!",
   "about.contributors": "Contributors:",
-  "about.contribution.creator": "Creator", 
+  "about.contribution.creator": "Creator",
   "about.modals.buttons.close": "Close",
 
   "update.available": "Update Available",

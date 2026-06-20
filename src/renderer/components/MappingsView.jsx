@@ -71,7 +71,7 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
 
   return (
     <div className={`view${active ? ' active' : ''}`} id="view-mappings">
-      <header className="container-fluid p-0">
+      <header className="container-fluid p-0 mb-3">
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <h4 className="m-0">{t('mappings.title')}</h4>

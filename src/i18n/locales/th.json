@@ -1,5 +1,5 @@
 {
-  "titleBar.title": "Saeng",
+  "application.name": "Saeng",
   "proxy.status.running": "พร็อกซีทำงานอยู่",
   "proxy.status.stopped": "พร็อกซีหยุดทำงาน",
   "proxy.action.start": "เริ่มพร็อกซี",

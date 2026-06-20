@@ -1,5 +1,5 @@
 {
-  "titleBar.title": "Saeng",
+  "application.name": "Saeng",
   "proxy.status.running": "代理运行中",
   "proxy.status.stopped": "代理已停止",
   "proxy.action.start": "启动代理",

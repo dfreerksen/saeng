@@ -14,7 +14,7 @@ For each locale (`ar`, `be`, `bg`, `de`, `es`, `fr`, `ja`, `ko`, `pt`, `ru`, `th
 - **Missing keys** — present in `en.json` but absent from the locale file. These need to be added and translated.
 - **Extra keys** — present in the locale file but not in `en.json`. Usually stale leftovers from removed strings; confirm before deleting.
 - **Possibly untranslated** — the locale's value is byte-identical to the English value. This is a heuristic, not a verdict — many of these are intentional:
-  - App name (`titleBar.title: "Saeng"`)
+  - App name (`application.name: "Saeng"`)
   - Placeholders/examples (`mappings.modals.manage.form.domain.placeholder: "myapp"`, regex patterns)
   - Loanwords some languages keep in English (`"Mocks"`, `"Status"`, `"Proxy"`, `"MOCK"`, `"Actions"`)
 

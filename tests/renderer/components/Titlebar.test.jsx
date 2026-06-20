@@ -12,14 +12,14 @@ beforeEach(() => {
 describe('Titlebar', () => {
   it('renders the app name', () => {
     render(<Titlebar proxyRunning={false} t={t} />);
-    expect(screen.getByText('titleBar.title')).toBeInTheDocument();
+    expect(screen.getByText('application.name')).toBeInTheDocument();
   });
 
   it('delegates the app name to the t() function', () => {
     const customT = vi.fn((key) => `[${key}]`);
     render(<Titlebar proxyRunning={false} t={customT} />);
-    expect(customT).toHaveBeenCalledWith('titleBar.title');
-    expect(screen.getByText('[titleBar.title]')).toBeInTheDocument();
+    expect(customT).toHaveBeenCalledWith('application.name');
+    expect(screen.getByText('[application.name]')).toBeInTheDocument();
   });
 
   it('shows stopped status dot when proxy is not running', () => {

@@ -307,7 +307,7 @@ describe('LogView — filter bar', () => {
   it('renders a button for every filter tab', () => {
     const { container } = renderLogView({ entries: FILTER_ENTRIES });
     const buttons = container.querySelectorAll('.log-filter-btn');
-    expect(buttons).toHaveLength(16);
+    expect(buttons).toHaveLength(14);
   });
 
   it('marks the "all" tab active by default', () => {
@@ -331,7 +331,7 @@ describe('LogView — filter bar', () => {
 
   it('shows all entries when the "all" tab is active', () => {
     const { container } = renderLogView({ entries: FILTER_ENTRIES });
-    fireEvent.click(screen.getByText('log.filter.https'));
+    fireEvent.click(screen.getByText('log.filter.js'));
     fireEvent.click(screen.getByText('log.filter.all'));
     expect(container.querySelectorAll('tbody tr')).toHaveLength(3);
   });
@@ -351,9 +351,9 @@ describe('LogView — filter bar', () => {
     expect(screen.getByRole('table')).toBeInTheDocument();
   });
 
-  it('filters https entries correctly', () => {
+  it('filters other entries correctly', () => {
     const { container } = renderLogView({ entries: FILTER_ENTRIES });
-    fireEvent.click(screen.getByText('log.filter.https'));
+    fireEvent.click(screen.getByText('log.filter.other'));
     expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
     expect(screen.getByText('/api/data')).toBeInTheDocument();
   });

@@ -1,5 +1,5 @@
 {
-  "titleBar.title": "Saeng",
+  "application.name": "Saeng",
   "proxy.status.running": "프록시 실행 중",
   "proxy.status.stopped": "프록시 중지됨",
   "proxy.action.start": "프록시 시작",

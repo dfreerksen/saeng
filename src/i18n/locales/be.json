@@ -1,5 +1,5 @@
 {
-  "titleBar.title": "Saeng",
+  "application.name": "Saeng",
   "proxy.status.running": "Працуе проксі",
   "proxy.status.stopped": "Проксі зупінены",
   "proxy.action.start": "Запусціць проксі",

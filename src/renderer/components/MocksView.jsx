@@ -34,7 +34,7 @@ export default function MocksView({ active, mocks, mappings, mockableMappings, s
 
   return (
     <div className={`view${active ? ' active' : ''}`} id="view-mocks">
-      <header className="container-fluid p-0">
+      <header className="container-fluid p-0 mb-3">
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <h4 className="m-0">{t('mocks.title')}</h4>
