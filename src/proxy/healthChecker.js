@@ -101,7 +101,6 @@ class HealthChecker {
     return new Promise((resolve) => {
       const startedAt = Date.now();
       const target = `${mapping.host || '127.0.0.1'}:${mapping.port}`;
-      console.log(`Saeng: health check - pinging ${mapping.domain} (${target})...`);
 
       const socket = net.connect({ host: mapping.host || '127.0.0.1', port: mapping.port });
       socket.setTimeout(this.timeoutMs);
@@ -122,7 +121,6 @@ class HealthChecker {
       };
 
       socket.once('connect', () => {
-        console.info(`Saeng: health check - ${mapping.domain} (${target}) is up`);
         finish('up');
       });
       socket.once('timeout', () => {
