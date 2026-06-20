@@ -6,7 +6,7 @@
     "email": "dfreerksen@gmail.com",
     "url": "https://github.com/dfreerksen"
   },
-  "description": "Local domain proxy manager for .local development domains",
+  "description": "Local domain proxy manager for local development domains",
   "keywords": [
     "mac",
     "windows",
