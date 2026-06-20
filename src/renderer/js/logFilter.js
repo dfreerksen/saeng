@@ -1,4 +1,4 @@
-export const FILTER_TABS = ['all', 'http', 'https', 'ws', 'json', 'xhr', 'doc', 'css', 'js', 'font', 'img', 'manifest', 'wasm', 'graphql', 'wml', 'other'];
+export const FILTER_TABS = ['all', 'ws', 'json', 'xhr', 'doc', 'css', 'js', 'font', 'img', 'manifest', 'wasm', 'graphql', 'wml', 'other'];
 
 function getHeader(headers, name) {
   if (!headers) return null;
@@ -21,8 +21,6 @@ function pathExt(path, exts) {
 export function matchesFilter(entry, filter) {
   switch (filter) {
     case 'all': return true;
-    case 'http': return !entry.https;
-    case 'https': return !!entry.https;
     case 'ws': return !!entry.websocket;
     case 'json':
       return hasContentType(entry.responseHeaders, 'json') || pathExt(entry.path, ['.json']);
@@ -56,7 +54,7 @@ export function matchesFilter(entry, filter) {
     case 'wml':
       return hasContentType(entry.responseHeaders, 'wml') || pathExt(entry.path, ['.wml']);
     case 'other': {
-      const specific = FILTER_TABS.filter((f) => f !== 'all' && f !== 'other' && f !== 'http' && f !== 'https');
+      const specific = FILTER_TABS.filter((f) => f !== 'all' && f !== 'other');
       return !specific.some((f) => matchesFilter(entry, f));
     }
     default: return true;

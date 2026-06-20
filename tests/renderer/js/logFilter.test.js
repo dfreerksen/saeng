@@ -11,7 +11,7 @@ describe('FILTER_TABS', () => {
 
   it('contains the expected set of filter names', () => {
     expect(FILTER_TABS).toEqual(
-      ['all', 'http', 'https', 'ws', 'json', 'xhr', 'doc', 'css', 'js', 'font', 'img', 'manifest', 'wasm', 'graphql', 'wml', 'other'],
+      ['all', 'ws', 'json', 'xhr', 'doc', 'css', 'js', 'font', 'img', 'manifest', 'wasm', 'graphql', 'wml', 'other'],
     );
   });
 });
@@ -41,28 +41,6 @@ describe('matchesFilter() — all', () => {
 describe('matchesFilter() — unknown filter', () => {
   it('defaults to true for unknown filter values', () => {
     expect(matchesFilter(entry(), 'nonexistent')).toBe(true);
-  });
-});
-
-// ── matchesFilter — http / https ───────────────────────────────────────────────
-
-describe('matchesFilter() — http', () => {
-  it('matches when https is false', () => {
-    expect(matchesFilter(entry({ https: false }), 'http')).toBe(true);
-  });
-
-  it('does not match when https is true', () => {
-    expect(matchesFilter(entry({ https: true }), 'http')).toBe(false);
-  });
-});
-
-describe('matchesFilter() — https', () => {
-  it('matches when https is true', () => {
-    expect(matchesFilter(entry({ https: true }), 'https')).toBe(true);
-  });
-
-  it('does not match when https is false', () => {
-    expect(matchesFilter(entry({ https: false }), 'https')).toBe(false);
   });
 });
 
