@@ -108,6 +108,48 @@ async function waitForAppReady(ws, timeoutMs = 20000) {
   throw new Error('Timed out waiting for the Saeng UI to render');
 }
 
+async function injectFakeLogEntries(ws) {
+  const { result } = await cdpSend(ws, 'Runtime.evaluate', {
+    expression: `(() => {
+      const now = Date.now();
+      const entries = [
+        { id: 1, method: 'GET', hostname: 'webapp.local', path: '/', status: 200, https: false, websocket: false, timestamp: now - 12400, latencyMs: 34, mocked: false, error: null },
+        { id: 2, method: 'POST', hostname: 'webapp.local', path: '/api/auth/login', status: 201, https: true, websocket: false, timestamp: now - 9800, latencyMs: 87, mocked: false, error: null },
+        { id: 3, method: 'GET', hostname: 'api.webapp.local', path: '/v2/users?page=1&limit=25', status: 200, https: true, websocket: false, timestamp: now - 7200, latencyMs: 156, mocked: true, error: null },
+        { id: 4, method: 'GET', hostname: 'dashboard.local', path: '/assets/styles.css', status: 304, https: false, websocket: false, timestamp: now - 4100, latencyMs: 8, mocked: false, error: null },
+        { id: 5, method: 'PUT', hostname: 'webapp.local', path: '/api/users/42/profile', status: 500, https: true, websocket: false, timestamp: now - 2300, latencyMs: 203, mocked: false, error: 'ECONNREFUSED' },
+        { id: 6, method: 'GET', hostname: 'dashboard.local', path: '/events', status: 101, https: false, websocket: true, timestamp: now - 500, latencyMs: 5, mocked: false, error: null },
+      ];
+
+      const root = document.getElementById('root');
+      const containerKey = Object.keys(root).find(k => k.startsWith('__reactContainer'));
+      if (!containerKey) return 'no-container';
+
+      function findAppFiber(f) {
+        if (!f) return null;
+        if (typeof f.type === 'function' && f.type.name === 'App') return f;
+        return findAppFiber(f.child) || findAppFiber(f.sibling);
+      }
+
+      const appFiber = findAppFiber(root[containerKey]);
+      if (!appFiber) return 'no-app';
+
+      // requestLog is the 4th useState hook (index 3)
+      let hook = appFiber.memoizedState;
+      for (let i = 0; i < 3; i++) {
+        if (!hook) return 'hook-' + i;
+        hook = hook.next;
+      }
+
+      if (!hook?.queue?.dispatch) return 'no-dispatch';
+      hook.queue.dispatch(entries);
+      return 'ok';
+    })()`,
+    returnByValue: true,
+  });
+  return result?.value;
+}
+
 async function main() {
   console.log('Building renderer assets...');
   execSync('npm run sass:build && npm run js:build', { cwd: root, stdio: 'inherit' });
@@ -173,6 +215,13 @@ async function main() {
         if (!result?.value) {
           console.warn(`  Skipping "${view}": no .nav-item with icon .${icon} found (is it hidden, e.g. logging disabled?)`);
           continue;
+        }
+
+        if (view === 'log') {
+          const injected = await injectFakeLogEntries(ws);
+          if (injected !== 'ok') {
+            console.warn(`  Log entry injection returned: ${injected}`);
+          }
         }
 
         await sleep(500);
