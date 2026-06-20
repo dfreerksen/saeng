@@ -1,17 +1,14 @@
 {
   "titleBar.title": "Saeng",
-
   "proxy.status.running": "Proxy in esecuzione",
   "proxy.status.stopped": "Proxy arrestato",
   "proxy.action.start": "Avvia proxy",
   "proxy.action.stop": "Ferma proxy",
-
   "nav.mappings": "Mappature",
   "nav.mocks": "Mock",
   "nav.log": "Registro",
   "nav.settings": "Impostazioni",
   "nav.about": "Informazioni",
-
   "mappings.title": "Mappature di dominio",
   "mappings.subtitle": "Instrada i domini locali verso le porte locali",
   "mappings.actions.add": "Aggiungi mappatura",
@@ -32,24 +29,20 @@
   "mappings.table.actions.delete": "Rimuovi",
   "mappings.table.actions.confirm.remove": "Rimuovere {domain}?",
   "mappings.table.mocksEnabled": "Mocking abilitato per questo dominio",
-
   "mappings.modals.export.title": "Esporta mappature",
   "mappings.modals.export.description": "Scegli quali mappature includere nel file esportato.",
   "mappings.modals.export.selectAll": "Seleziona tutto",
   "mappings.modals.export.selectedCount": "{count} di {total} selezionati",
   "mappings.modals.export.buttons.submit": "Esporta",
   "mappings.modals.export.dialog.title": "Esporta mappature",
-
   "mappings.modals.import.dialog.title": "Importa mappature",
   "mappings.modals.import.error.invalidFormat": "Il file selezionato non è un'esportazione di mappature valida.",
   "mappings.modals.import.error.readFailed": "Impossibile leggere il file selezionato: {error}",
-
   "mappings.modals.manage.addTitle": "Aggiungi mappatura di dominio",
   "mappings.modals.manage.editTitle": "Modifica mappatura",
   "mappings.modals.manage.buttons.add": "Aggiungi mappatura",
   "mappings.modals.manage.buttons.update": "Salva modifiche",
   "mappings.modals.manage.buttons.cancel": "Annulla",
-
   "mappings.modals.manage.form.domain.label": "Dominio",
   "mappings.modals.manage.form.required": "(obbligatorio)",
   "mappings.modals.manage.form.optional": "(facoltativo)",
@@ -77,7 +70,6 @@
   "mappings.modals.manage.form.headers.value.placeholder": "Valore header",
   "mappings.modals.manage.form.headers.add": "Aggiungi header",
   "mappings.modals.manage.form.headers.remove": "Rimuovi header",
-
   "mocks.title": "Mock",
   "mocks.subtitle": "Restituisce risposte predefinite per le richieste corrispondenti anziché raggiungere il backend",
   "mocks.actions.add": "Aggiungi mock",
@@ -92,18 +84,15 @@
   "mocks.table.enabled": "Abilitato",
   "mocks.table.actions": "Azioni",
   "mocks.table.actions.confirm.remove": "Rimuovere questo mock?",
-
   "mocks.modals.export.title": "Esporta mock",
   "mocks.modals.export.description": "Scegli quali mock includere nel file esportato.",
   "mocks.modals.export.selectAll": "Seleziona tutto",
   "mocks.modals.export.selectedCount": "{count} di {total} selezionati",
   "mocks.modals.export.buttons.submit": "Esporta",
   "mocks.modals.export.dialog.title": "Esporta mock",
-
   "mocks.modals.import.dialog.title": "Importa mock",
   "mocks.modals.import.error.invalidFormat": "Il file selezionato non è un'esportazione di mock valida.",
   "mocks.modals.import.error.readFailed": "Impossibile leggere il file selezionato: {error}",
-
   "mocks.modals.manage.addTitle": "Aggiungi mock",
   "mocks.modals.manage.editTitle": "Modifica mock",
   "mocks.modals.manage.form.mapping.label": "Mappatura di dominio",
@@ -123,7 +112,6 @@
   "mocks.modals.manage.form.headers.hint": "Header aggiunti alla risposta simulata (es. Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "Corpo della risposta",
   "mocks.modals.manage.form.body.hint": "Corpo restituito per le richieste corrispondenti.",
-
   "mocks.modals.regexHelp.title": "Esempi di pattern di percorso",
   "mocks.modals.regexHelp.intro": "I pattern di percorso sono espressioni regolari confrontate con il percorso della richiesta, senza la stringa di query. Clicca sull'icona di copia per copiare un pattern negli appunti.",
   "mocks.modals.regexHelp.table.pattern": "Pattern",
@@ -137,7 +125,6 @@
   "mocks.modals.regexHelp.examples.extension": "Corrisponde a qualsiasi percorso che termina con .json",
   "mocks.modals.regexHelp.examples.alternation": "Corrisponde a uno dei due percorsi specifici",
   "mocks.modals.regexHelp.examples.any": "Corrisponde a ogni richiesta (catch-all)",
-
   "log.title": "Registro richieste",
   "log.subtitle": "Visualizzazione in tempo reale delle richieste instradate tramite Saeng",
   "log.actions.clear": "Cancella",
@@ -147,8 +134,6 @@
   "log.emptyHint": "Le richieste instradate tramite Saeng appariranno qui mentre il proxy è in esecuzione.",
   "log.filterEmpty": "Nessun risultato per questo filtro",
   "log.filter.all": "Tutti",
-  "log.filter.http": "HTTP",
-  "log.filter.https": "HTTPS",
   "log.filter.ws": "WS",
   "log.filter.json": "JSON",
   "log.filter.xhr": "Fetch/XHR",
@@ -180,10 +165,18 @@
   "log.details.noBody": "Nessun corpo acquisito.",
   "log.details.emptyBody": "(corpo vuoto)",
   "log.details.truncated": "Corpo troncato a {size} KB.",
-
+  "log.detail.general": "Generale",
+  "log.detail.headers": "Intestazioni",
+  "log.detail.response": "Risposta",
+  "log.detail.close": "Chiudi",
+  "log.detail.requestUrl": "URL della richiesta",
+  "log.detail.requestMethod": "Metodo della richiesta",
+  "log.detail.statusCode": "Codice di stato",
+  "log.detail.protocol": "Protocollo",
+  "log.detail.enableHeaders": "Abilita la registrazione delle intestazioni nelle Impostazioni per catturare le intestazioni.",
+  "log.detail.enableBody": "Abilita la registrazione del corpo nelle Impostazioni per catturare i corpi delle risposte.",
   "settings.title": "Impostazioni",
   "settings.subtitle": "Configura il comportamento del proxy e i certificati SSL",
-
   "settings.preferences.title": "Preferenze",
   "settings.preferences.colorMode.label": "Modalità colore",
   "settings.preferences.colorMode.description": "Modalità colore utilizzata nell'interfaccia.",
@@ -192,13 +185,11 @@
   "settings.preferences.colorMode.options.dark": "Scuro",
   "settings.preferences.language.label": "Lingua",
   "settings.preferences.language.description": "Lingua di visualizzazione per l'interfaccia di Saeng.",
-
   "settings.proxy.title": "Proxy",
   "settings.proxy.httpsEnabled.label": "Abilita HTTPS (terminazione SSL)",
   "settings.proxy.httpsEnabled.description": "Intercetta il traffico HTTPS con un certificato CA locale. Richiede il passaggio di fiducia del browser indicato di seguito.",
   "settings.proxy.startOnLaunch.label": "Avvia proxy all'apertura",
   "settings.proxy.startOnLaunch.description": "Avvia automaticamente il proxy quando si apre Saeng.",
-
   "settings.requestLogs.title": "Registri richieste",
   "settings.requestLogs.logRequests.label": "Registra richieste",
   "settings.requestLogs.logRequests.description": "Registra le richieste instradate tramite proxy nel registro richieste.",
@@ -208,7 +199,6 @@
   "settings.requestLogs.logHeaders.description": "Acquisisce gli header di richiesta e risposta nel registro richieste. Disabilitato per impostazione predefinita — gli header possono includere dati sensibili come cookie e token di autenticazione.",
   "settings.requestLogs.logBody.label": "Registra corpi",
   "settings.requestLogs.logBody.description": "Acquisisce i corpi di richiesta e risposta nel registro richieste (fino a {size} KB ciascuno). Disabilitato per impostazione predefinita — i corpi possono essere grandi o contenere dati sensibili.",
-
   "settings.healthChecks.title": "Verifiche di stato",
   "settings.healthChecks.enableCheck.label": "Abilita verifiche di stato del backend",
   "settings.healthChecks.enableCheck.description": "Esegue periodicamente il ping di host:porta di ogni mappatura e mostra un indicatore di stato accanto al dominio.",
@@ -216,7 +206,6 @@
   "settings.healthChecks.interval.description": "Con quale frequenza eseguire il ping di ogni backend, in secondi ({min}-{max}).",
   "settings.healthChecks.timeout.label": "Timeout verifica",
   "settings.healthChecks.timeout.description": "Quanto tempo attendere una risposta prima di contrassegnare una verifica come non riuscita, in millisecondi ({min}-{max}).",
-
   "settings.cert.title": "Autorità di certificazione SSL",
   "settings.cert.description": "Per servire HTTPS sui domini locali, Saeng genera un certificato CA locale. È necessario installarlo e considerarlo attendibile nel portachiavi di sistema una volta sola.",
   "settings.cert.actions.generating": "Generazione certificato CA in corso...",
@@ -234,13 +223,14 @@
   "settings.cert.platformNote.windows": "Su Windows: esegue certutil con elevazione UAC.",
   "settings.cert.platformNote.linux": "Su Linux: aggiungere manualmente il certificato CA all'archivio di attendibilità del sistema.",
   "settings.cert.platformNote.unknown": "Aggiungere manualmente il certificato CA all'archivio di attendibilità del sistema.",
-
-  "about.desc": "Un proxy inverso locale per instradare i domini .local verso le porte localhost.",
+  "about.desc": "Un proxy inverso locale per instradare i domini locali verso le porte localhost.",
+  "about.github": "Questa applicazione è open source e può essere trovata su GitHub:",
+  "about.thanks": "Grazie per aver utilizzato Saeng!",
+  "about.contributors": "Collaboratori:",
+  "about.contribution.creator": "Creatore",
   "about.modals.buttons.close": "Chiudi",
-
   "update.available": "Aggiornamento disponibile",
   "update.tooltip": "La versione {version} è disponibile. Clicca per visualizzarla su GitHub.",
-
   "flash.proxy.stopped": "Proxy arrestato.",
   "flash.proxy.stopFailed": "Arresto non riuscito: {error}",
   "flash.proxy.started": "Proxy avviato. Proxy di sistema configurato.",
@@ -283,7 +273,6 @@
   "flash.ca.untrust.windows": "Impossibile revocare l'attendibilità del CA su Windows. Questo non è un errore",
   "flash.ca.untrust.linux": "La rimozione dell'attendibilità su Linux non è ancora supportata. Rimuovere manualmente il certificato CA dall'archivio di attendibilità del sistema.",
   "flash.ca.untrust.other": "Piattaforma non supportata per la revoca dell'attendibilità del certificato CA. Rimuovere manualmente il certificato CA dall'archivio di attendibilità del sistema.",
-
   "tray.open": "Apri Saeng",
   "tray.startProxy": "Avvia proxy",
   "tray.stopProxy": "Ferma proxy",

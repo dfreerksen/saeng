@@ -36,6 +36,8 @@ export default function App() {
   const [appVersion, setAppVersion] = useState('');
   const [electronVersion, setElectronVersion] = useState('');
   const [nodeVersion, setNodeVersion] = useState('');
+  const [reactVersion, setReactVersion] = useState('');
+  const [bootstrapVersion, setBootstrapVersion] = useState('');
   const [caPath, setCaPath] = useState('');
   const [caExpiry, setCaExpiry] = useState(null);
   const [updateInfo, setUpdateInfo] = useState({ updateAvailable: false, latestVersion: null, url: null });
@@ -99,6 +101,8 @@ export default function App() {
       setAppVersion(appInfo.version);
       setElectronVersion(appInfo.electron);
       setNodeVersion(appInfo.node);
+      setReactVersion(appInfo.react);
+      setBootstrapVersion(appInfo.bootstrap);
       setCaPath(caPathVal);
       setCaExpiry(caExpiryVal);
       setSettingsState(settingsData);
@@ -407,6 +411,8 @@ export default function App() {
           version={appVersion}
           electronVersion={electronVersion}
           nodeVersion={nodeVersion}
+          reactVersion={reactVersion}
+          bootstrapVersion={bootstrapVersion}
           onClose={() => setModal(null)}
           t={t}
         />

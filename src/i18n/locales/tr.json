@@ -1,17 +1,14 @@
 {
   "titleBar.title": "Saeng",
-
   "proxy.status.running": "Proxy çalışıyor",
   "proxy.status.stopped": "Proxy durduruldu",
   "proxy.action.start": "Proxy'yi Başlat",
   "proxy.action.stop": "Proxy'yi Durdur",
-
   "nav.mappings": "Eşlemeler",
   "nav.mocks": "Mocks",
   "nav.log": "Günlük",
   "nav.settings": "Ayarlar",
   "nav.about": "Hakkında",
-
   "mappings.title": "Alan Adı Eşlemeleri",
   "mappings.subtitle": "Yerel alan adlarını yerel portlara yönlendir",
   "mappings.actions.add": "Eşleme Ekle",
@@ -32,24 +29,20 @@
   "mappings.table.actions.delete": "Kaldır",
   "mappings.table.actions.confirm.remove": "{domain} kaldırılsın mı?",
   "mappings.table.mocksEnabled": "Bu alan adı için mocking etkin",
-
   "mappings.modals.export.title": "Eşlemeleri Dışa Aktar",
   "mappings.modals.export.description": "Dışa aktarılan dosyaya hangi eşlemelerin dahil edileceğini seçin.",
   "mappings.modals.export.selectAll": "Tümünü Seç",
   "mappings.modals.export.selectedCount": "{total} içinden {count} seçildi",
   "mappings.modals.export.buttons.submit": "Dışa Aktar",
   "mappings.modals.export.dialog.title": "Eşlemeleri Dışa Aktar",
-
   "mappings.modals.import.dialog.title": "Eşlemeleri İçe Aktar",
   "mappings.modals.import.error.invalidFormat": "Seçilen dosya geçerli bir eşleme dışa aktarımı değil.",
   "mappings.modals.import.error.readFailed": "Seçilen dosya okunamadı: {error}",
-
   "mappings.modals.manage.addTitle": "Alan Adı Eşlemesi Ekle",
   "mappings.modals.manage.editTitle": "Eşlemeyi Düzenle",
   "mappings.modals.manage.buttons.add": "Eşleme Ekle",
   "mappings.modals.manage.buttons.update": "Değişiklikleri Kaydet",
   "mappings.modals.manage.buttons.cancel": "İptal",
-
   "mappings.modals.manage.form.domain.label": "Alan Adı",
   "mappings.modals.manage.form.required": "(zorunlu)",
   "mappings.modals.manage.form.optional": "(isteğe bağlı)",
@@ -77,7 +70,6 @@
   "mappings.modals.manage.form.headers.value.placeholder": "Başlık değeri",
   "mappings.modals.manage.form.headers.add": "Başlık ekle",
   "mappings.modals.manage.form.headers.remove": "Başlığı kaldır",
-
   "mocks.title": "Mocks",
   "mocks.subtitle": "Backend'e ulaşmak yerine eşleşen istekler için hazır yanıtlar döndür",
   "mocks.actions.add": "Mock Ekle",
@@ -92,18 +84,15 @@
   "mocks.table.enabled": "Etkin",
   "mocks.table.actions": "İşlemler",
   "mocks.table.actions.confirm.remove": "Bu mock kaldırılsın mı?",
-
   "mocks.modals.export.title": "Mocks Dışa Aktar",
   "mocks.modals.export.description": "Dışa aktarılan dosyaya hangi mock'ların dahil edileceğini seçin.",
   "mocks.modals.export.selectAll": "Tümünü Seç",
   "mocks.modals.export.selectedCount": "{total} içinden {count} seçildi",
   "mocks.modals.export.buttons.submit": "Dışa Aktar",
   "mocks.modals.export.dialog.title": "Mocks Dışa Aktar",
-
   "mocks.modals.import.dialog.title": "Mocks İçe Aktar",
   "mocks.modals.import.error.invalidFormat": "Seçilen dosya geçerli bir mocks dışa aktarımı değil.",
   "mocks.modals.import.error.readFailed": "Seçilen dosya okunamadı: {error}",
-
   "mocks.modals.manage.addTitle": "Mock Ekle",
   "mocks.modals.manage.editTitle": "Mock'ı Düzenle",
   "mocks.modals.manage.form.mapping.label": "Alan Adı Eşlemesi",
@@ -123,7 +112,6 @@
   "mocks.modals.manage.form.headers.hint": "Mock yanıtına eklenen başlıklar (örn. Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "Yanıt Gövdesi",
   "mocks.modals.manage.form.body.hint": "Eşleşen istekler için döndürülen gövde.",
-
   "mocks.modals.regexHelp.title": "Yol Deseni Örnekleri",
   "mocks.modals.regexHelp.intro": "Yol desenleri, istek yoluyla eşleştirilen düzenli ifadelerdir, sorgu dizesi olmadan. Bir deseni panoya kopyalamak için kopyalama simgesine tıklayın.",
   "mocks.modals.regexHelp.table.pattern": "Desen",
@@ -137,7 +125,6 @@
   "mocks.modals.regexHelp.examples.extension": ".json ile biten herhangi bir yolu eşleştirir",
   "mocks.modals.regexHelp.examples.alternation": "İki belirli yoldan birini eşleştirir",
   "mocks.modals.regexHelp.examples.any": "Her isteği eşleştirir (tümünü yakala)",
-
   "log.title": "İstek Günlüğü",
   "log.subtitle": "Saeng üzerinden proxy'lenen isteklerin canlı görünümü",
   "log.actions.clear": "Temizle",
@@ -147,8 +134,6 @@
   "log.emptyHint": "Proxy çalışırken Saeng üzerinden proxy'lenen istekler burada görünecek.",
   "log.filterEmpty": "Bu filtre için eşleşme yok",
   "log.filter.all": "Tümü",
-  "log.filter.http": "HTTP",
-  "log.filter.https": "HTTPS",
   "log.filter.ws": "WS",
   "log.filter.json": "JSON",
   "log.filter.xhr": "Fetch/XHR",
@@ -180,10 +165,18 @@
   "log.details.noBody": "Gövde yakalanmadı.",
   "log.details.emptyBody": "(boş gövde)",
   "log.details.truncated": "Gövde {size} KB'a kısaltıldı.",
-
+  "log.detail.general": "Genel",
+  "log.detail.headers": "Başlıklar",
+  "log.detail.response": "Yanıt",
+  "log.detail.close": "Kapat",
+  "log.detail.requestUrl": "İstek URL'si",
+  "log.detail.requestMethod": "İstek Metodu",
+  "log.detail.statusCode": "Durum Kodu",
+  "log.detail.protocol": "Protokol",
+  "log.detail.enableHeaders": "Başlıkları yakalamak için Ayarlar'da başlık günlüğünü etkinleştirin.",
+  "log.detail.enableBody": "Yanıt gövdelerini yakalamak için Ayarlar'da gövde günlüğünü etkinleştirin.",
   "settings.title": "Ayarlar",
   "settings.subtitle": "Proxy davranışını ve SSL sertifikalarını yapılandır",
-
   "settings.preferences.title": "Tercihler",
   "settings.preferences.colorMode.label": "Renk Modu",
   "settings.preferences.colorMode.description": "Arayüzde kullanılan renk modu.",
@@ -192,13 +185,11 @@
   "settings.preferences.colorMode.options.dark": "Koyu",
   "settings.preferences.language.label": "Dil",
   "settings.preferences.language.description": "Saeng arayüzü için görüntüleme dili.",
-
   "settings.proxy.title": "Proxy",
   "settings.proxy.httpsEnabled.label": "HTTPS'yi Etkinleştir (SSL sonlandırma)",
   "settings.proxy.httpsEnabled.description": "Yerel bir CA sertifikasıyla HTTPS trafiğini yakala. Aşağıdaki tarayıcı güven adımı gereklidir.",
   "settings.proxy.startOnLaunch.label": "Başlangıçta proxy'yi başlat",
   "settings.proxy.startOnLaunch.description": "Saeng açıldığında proxy'yi otomatik olarak başlat.",
-
   "settings.requestLogs.title": "İstek Günlükleri",
   "settings.requestLogs.logRequests.label": "İstekleri günlükle",
   "settings.requestLogs.logRequests.description": "Proxy'lenen istekleri istek günlüğüne kaydet.",
@@ -208,7 +199,6 @@
   "settings.requestLogs.logHeaders.description": "İstek günlüğünde istek ve yanıt başlıklarını yakala. Varsayılan olarak kapalı — başlıklar çerezler ve kimlik doğrulama tokenları gibi hassas veriler içerebilir.",
   "settings.requestLogs.logBody.label": "Gövdeleri günlükle",
   "settings.requestLogs.logBody.description": "İstek günlüğünde istek ve yanıt gövdelerini yakala (her biri en fazla {size} KB). Varsayılan olarak kapalı — gövdeler büyük olabilir veya hassas veri içerebilir.",
-
   "settings.healthChecks.title": "Durum Kontrolleri",
   "settings.healthChecks.enableCheck.label": "Backend durum kontrollerini etkinleştir",
   "settings.healthChecks.enableCheck.description": "Her eşlemenin host:port'unu periyodik olarak ping'le ve alan adının yanında durum göstergesi göster.",
@@ -216,7 +206,6 @@
   "settings.healthChecks.interval.description": "Her backend'in ne sıklıkla ping'leneceği, saniye cinsinden ({min}-{max}).",
   "settings.healthChecks.timeout.label": "Kontrol zaman aşımı",
   "settings.healthChecks.timeout.description": "Bir kontrolü başarısız olarak işaretlemeden önce yanıt için ne kadar bekleneceği, milisaniye cinsinden ({min}-{max}).",
-
   "settings.cert.title": "SSL Sertifika Yetkilisi",
   "settings.cert.description": "Yerel alan adlarında HTTPS sunmak için Saeng yerel bir CA sertifikası oluşturur. Sistem anahtarlığınıza bir kez kurmanız ve güvenmeniz gerekir.",
   "settings.cert.actions.generating": "CA sertifikası oluşturuluyor...",
@@ -234,13 +223,14 @@
   "settings.cert.platformNote.windows": "Windows'ta: UAC yükseltmesiyle certutil çalıştırır.",
   "settings.cert.platformNote.linux": "Linux'ta: CA sertifikasını sistem güven deponuza manuel olarak ekleyin.",
   "settings.cert.platformNote.unknown": "CA sertifikasını sistem güven deponuza manuel olarak ekleyin.",
-
-  "about.desc": "Yerel .local alan adlarını localhost portlarına yönlendirmek için yerel ters proxy.",
+  "about.desc": "Yerel alan adlarını localhost portlarına yönlendirmek için yerel ters proxy.",
+  "about.github": "Bu uygulama açık kaynaklıdır ve GitHub üzerinde bulunabilir:",
+  "about.thanks": "Saeng kullandığınız için teşekkürler!",
+  "about.contributors": "Katkıda bulunanlar:",
+  "about.contribution.creator": "Oluşturucu",
   "about.modals.buttons.close": "Kapat",
-
   "update.available": "Güncelleme Mevcut",
   "update.tooltip": "{version} sürümü mevcut. GitHub'da görüntülemek için tıklayın.",
-
   "flash.proxy.stopped": "Proxy durduruldu.",
   "flash.proxy.stopFailed": "Durdurulamadı: {error}",
   "flash.proxy.started": "Proxy başlatıldı. Sistem proxy'si yapılandırıldı.",
@@ -283,7 +273,6 @@
   "flash.ca.untrust.windows": "Windows'ta CA güveni kaldırılamadı. Bu bir hata değil",
   "flash.ca.untrust.linux": "Linux'ta güven kaldırma henüz desteklenmiyor. Lütfen CA sertifikasını sistem güven deponuzdan manuel olarak kaldırın.",
   "flash.ca.untrust.other": "CA sertifikasının güvenini kaldırmak için desteklenmeyen platform. Lütfen CA sertifikasını sistem güven deponuzdan manuel olarak kaldırın.",
-
   "tray.open": "Saeng'i Aç",
   "tray.startProxy": "Proxy'yi Başlat",
   "tray.stopProxy": "Proxy'yi Durdur",

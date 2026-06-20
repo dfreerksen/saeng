@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="-11.5 -10.23174 128 128"
+   version="1.1"
+   id="svg3"
+   sodipodi:docname="react.svg"
+   width="128"
+   height="128"
+   inkscape:version="1.4.4 (dcaf3e7d, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs3" />
+  <sodipodi:namedview
+     id="namedview3"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.4179971"
+     inkscape:cx="2.1156601"
+     inkscape:cy="75.105935"
+     inkscape:window-width="1481"
+     inkscape:window-height="682"
+     inkscape:window-x="0"
+     inkscape:window-y="31"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg3" />
+  <title
+     id="title1">React Logo</title>
+  <circle
+     cx="52.5"
+     cy="53.768261"
+     r="11.408695"
+     fill="#61dafb"
+     id="circle1"
+     style="stroke-width:5.56522" />
+  <ellipse
+     rx="61.217392"
+     ry="23.373913"
+     id="ellipse1"
+     cx="52.5"
+     cy="53.768261"
+     style="fill:none;stroke:#61dafb;stroke-width:5.56522" />
+  <ellipse
+     rx="61.217392"
+     ry="23.373911"
+     transform="rotate(60)"
+     id="ellipse2"
+     cx="72.814682"
+     cy="-18.582203"
+     style="fill:none;stroke:#61dafb;stroke-width:5.56522" />
+  <ellipse
+     rx="61.217392"
+     ry="23.373911"
+     transform="rotate(120)"
+     id="ellipse3"
+     cx="20.314678"
+     cy="-72.350464"
+     style="fill:none;stroke:#61dafb;stroke-width:5.56522" />
+  <metadata
+     id="metadata3">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>React Logo</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

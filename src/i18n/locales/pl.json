@@ -1,17 +1,14 @@
 {
   "titleBar.title": "Saeng",
-
   "proxy.status.running": "Proxy uruchomiony",
   "proxy.status.stopped": "Proxy zatrzymany",
   "proxy.action.start": "Uruchom Proxy",
   "proxy.action.stop": "Zatrzymaj Proxy",
-
   "nav.mappings": "Mapowania",
   "nav.mocks": "Mocks",
   "nav.log": "Dziennik",
   "nav.settings": "Ustawienia",
   "nav.about": "O aplikacji",
-
   "mappings.title": "Mapowania domen",
   "mappings.subtitle": "Przekieruj lokalne domeny na lokalne porty",
   "mappings.actions.add": "Dodaj mapowanie",
@@ -32,24 +29,20 @@
   "mappings.table.actions.delete": "Usuń",
   "mappings.table.actions.confirm.remove": "Usunąć {domain}?",
   "mappings.table.mocksEnabled": "Mockowanie włączone dla tej domeny",
-
   "mappings.modals.export.title": "Eksportuj mapowania",
   "mappings.modals.export.description": "Wybierz mapowania do uwzględnienia w eksportowanym pliku.",
   "mappings.modals.export.selectAll": "Zaznacz wszystkie",
   "mappings.modals.export.selectedCount": "{count} z {total} zaznaczonych",
   "mappings.modals.export.buttons.submit": "Eksportuj",
   "mappings.modals.export.dialog.title": "Eksportuj mapowania",
-
   "mappings.modals.import.dialog.title": "Importuj mapowania",
   "mappings.modals.import.error.invalidFormat": "Wybrany plik nie jest prawidłowym eksportem mapowań.",
   "mappings.modals.import.error.readFailed": "Nie można odczytać wybranego pliku: {error}",
-
   "mappings.modals.manage.addTitle": "Dodaj mapowanie domeny",
   "mappings.modals.manage.editTitle": "Edytuj mapowanie",
   "mappings.modals.manage.buttons.add": "Dodaj mapowanie",
   "mappings.modals.manage.buttons.update": "Zapisz zmiany",
   "mappings.modals.manage.buttons.cancel": "Anuluj",
-
   "mappings.modals.manage.form.domain.label": "Domena",
   "mappings.modals.manage.form.required": "(wymagane)",
   "mappings.modals.manage.form.optional": "(opcjonalne)",
@@ -77,7 +70,6 @@
   "mappings.modals.manage.form.headers.value.placeholder": "Wartość nagłówka",
   "mappings.modals.manage.form.headers.add": "Dodaj nagłówek",
   "mappings.modals.manage.form.headers.remove": "Usuń nagłówek",
-
   "mocks.title": "Mocks",
   "mocks.subtitle": "Zwracaj gotowe odpowiedzi dla pasujących żądań zamiast wysyłać do backendu",
   "mocks.actions.add": "Dodaj Mock",
@@ -92,18 +84,15 @@
   "mocks.table.enabled": "Włączono",
   "mocks.table.actions": "Akcje",
   "mocks.table.actions.confirm.remove": "Usunąć ten mock?",
-
   "mocks.modals.export.title": "Eksportuj Mocks",
   "mocks.modals.export.description": "Wybierz moki do uwzględnienia w eksportowanym pliku.",
   "mocks.modals.export.selectAll": "Zaznacz wszystkie",
   "mocks.modals.export.selectedCount": "{count} z {total} zaznaczonych",
   "mocks.modals.export.buttons.submit": "Eksportuj",
   "mocks.modals.export.dialog.title": "Eksportuj Mocks",
-
   "mocks.modals.import.dialog.title": "Importuj Mocks",
   "mocks.modals.import.error.invalidFormat": "Wybrany plik nie jest prawidłowym eksportem mocków.",
   "mocks.modals.import.error.readFailed": "Nie można odczytać wybranego pliku: {error}",
-
   "mocks.modals.manage.addTitle": "Dodaj Mock",
   "mocks.modals.manage.editTitle": "Edytuj Mock",
   "mocks.modals.manage.form.mapping.label": "Mapowanie domeny",
@@ -123,7 +112,6 @@
   "mocks.modals.manage.form.headers.hint": "Nagłówki dodawane do odpowiedzi mock (np. Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "Treść odpowiedzi",
   "mocks.modals.manage.form.body.hint": "Treść zwracana dla pasujących żądań.",
-
   "mocks.modals.regexHelp.title": "Przykłady wzorców ścieżek",
   "mocks.modals.regexHelp.intro": "Wzorce ścieżek to wyrażenia regularne dopasowane do ścieżki żądania, bez ciągu zapytania. Kliknij ikonę kopiowania, aby skopiować wzorzec do schowka.",
   "mocks.modals.regexHelp.table.pattern": "Wzorzec",
@@ -137,7 +125,6 @@
   "mocks.modals.regexHelp.examples.extension": "Dopasowuje dowolną ścieżkę kończącą się na .json",
   "mocks.modals.regexHelp.examples.alternation": "Dopasowuje jedną z dwóch określonych ścieżek",
   "mocks.modals.regexHelp.examples.any": "Dopasowuje każde żądanie (wszystko)",
-
   "log.title": "Dziennik żądań",
   "log.subtitle": "Podgląd na żywo żądań przesyłanych przez Saeng",
   "log.actions.clear": "Wyczyść",
@@ -147,8 +134,6 @@
   "log.emptyHint": "Żądania przesyłane przez Saeng pojawią się tutaj, gdy proxy jest uruchomione.",
   "log.filterEmpty": "Brak dopasowań dla tego filtra",
   "log.filter.all": "Wszystkie",
-  "log.filter.http": "HTTP",
-  "log.filter.https": "HTTPS",
   "log.filter.ws": "WS",
   "log.filter.json": "JSON",
   "log.filter.xhr": "Fetch/XHR",
@@ -180,10 +165,18 @@
   "log.details.noBody": "Brak przechwyconej treści.",
   "log.details.emptyBody": "(pusta treść)",
   "log.details.truncated": "Treść skrócona do {size} KB.",
-
+  "log.detail.general": "Ogólne",
+  "log.detail.headers": "Nagłówki",
+  "log.detail.response": "Odpowiedź",
+  "log.detail.close": "Zamknij",
+  "log.detail.requestUrl": "URL żądania",
+  "log.detail.requestMethod": "Metoda żądania",
+  "log.detail.statusCode": "Kod statusu",
+  "log.detail.protocol": "Protokół",
+  "log.detail.enableHeaders": "Włącz rejestrowanie nagłówków w Ustawieniach, aby przechwytywać nagłówki.",
+  "log.detail.enableBody": "Włącz rejestrowanie treści w Ustawieniach, aby przechwytywać treść odpowiedzi.",
   "settings.title": "Ustawienia",
   "settings.subtitle": "Konfiguruj zachowanie proxy i certyfikaty SSL",
-
   "settings.preferences.title": "Preferencje",
   "settings.preferences.colorMode.label": "Tryb koloru",
   "settings.preferences.colorMode.description": "Tryb koloru używany w interfejsie.",
@@ -192,13 +185,11 @@
   "settings.preferences.colorMode.options.dark": "Ciemny",
   "settings.preferences.language.label": "Język",
   "settings.preferences.language.description": "Język wyświetlania interfejsu Saeng.",
-
   "settings.proxy.title": "Proxy",
   "settings.proxy.httpsEnabled.label": "Włącz HTTPS (zakończenie SSL)",
   "settings.proxy.httpsEnabled.description": "Przechwytuj ruch HTTPS za pomocą lokalnego certyfikatu CA. Wymaga kroku zaufania w przeglądarce poniżej.",
   "settings.proxy.startOnLaunch.label": "Uruchom proxy przy starcie",
   "settings.proxy.startOnLaunch.description": "Automatycznie uruchamiaj proxy przy otwarciu Saeng.",
-
   "settings.requestLogs.title": "Dziennik żądań",
   "settings.requestLogs.logRequests.label": "Rejestruj żądania",
   "settings.requestLogs.logRequests.description": "Rejestruj żądania proxy w dzienniku żądań.",
@@ -208,7 +199,6 @@
   "settings.requestLogs.logHeaders.description": "Przechwytuj nagłówki żądań i odpowiedzi w dzienniku żądań. Domyślnie wyłączone — nagłówki mogą zawierać poufne dane, takie jak ciasteczka i tokeny uwierzytelniania.",
   "settings.requestLogs.logBody.label": "Rejestruj treść",
   "settings.requestLogs.logBody.description": "Przechwytuj treść żądań i odpowiedzi w dzienniku żądań (do {size} KB każda). Domyślnie wyłączone — treść może być duża lub zawierać poufne dane.",
-
   "settings.healthChecks.title": "Sprawdzenia stanu",
   "settings.healthChecks.enableCheck.label": "Włącz sprawdzenia stanu backendu",
   "settings.healthChecks.enableCheck.description": "Okresowo pinguj host:port każdego mapowania i wyświetlaj wskaźnik stanu obok domeny.",
@@ -216,7 +206,6 @@
   "settings.healthChecks.interval.description": "Jak często pingować każdy backend, w sekundach ({min}-{max}).",
   "settings.healthChecks.timeout.label": "Limit czasu sprawdzenia",
   "settings.healthChecks.timeout.description": "Jak długo czekać na odpowiedź przed oznaczeniem sprawdzenia jako nieudanego, w milisekundach ({min}-{max}).",
-
   "settings.cert.title": "Urząd certyfikacji SSL",
   "settings.cert.description": "Aby obsługiwać HTTPS na lokalnych domenach, Saeng generuje lokalny certyfikat CA. Musisz go zainstalować i zaufać mu w systemowym pęku kluczy raz.",
   "settings.cert.actions.generating": "Generowanie certyfikatu CA...",
@@ -234,13 +223,14 @@
   "settings.cert.platformNote.windows": "W systemie Windows: uruchamia certutil z podniesieniem uprawnień UAC.",
   "settings.cert.platformNote.linux": "Na Linuxie: ręcznie dodaj certyfikat CA do systemowego magazynu zaufania.",
   "settings.cert.platformNote.unknown": "Ręcznie dodaj certyfikat CA do systemowego magazynu zaufania.",
-
-  "about.desc": "Lokalny odwrotny proxy do przekierowywania domen .local na porty localhost.",
+  "about.desc": "Lokalny odwrotny proxy do przekierowywania lokalnych domen na porty localhost.",
+  "about.github": "Ta aplikacja jest open source i można ją znaleźć na GitHub:",
+  "about.thanks": "Dziękujemy za korzystanie z Saeng!",
+  "about.contributors": "Współtwórcy:",
+  "about.contribution.creator": "Twórca",
   "about.modals.buttons.close": "Zamknij",
-
   "update.available": "Dostępna aktualizacja",
   "update.tooltip": "Wersja {version} jest dostępna. Kliknij, aby zobaczyć na GitHub.",
-
   "flash.proxy.stopped": "Proxy zatrzymane.",
   "flash.proxy.stopFailed": "Nie udało się zatrzymać: {error}",
   "flash.proxy.started": "Proxy uruchomione. Skonfigurowano systemowe proxy.",
@@ -283,7 +273,6 @@
   "flash.ca.untrust.windows": "Nie udało się cofnąć zaufania CA w systemie Windows. To nie jest błąd",
   "flash.ca.untrust.linux": "Usuwanie zaufania na Linuxie jeszcze nie jest obsługiwane. Usuń certyfikat CA z systemowego magazynu zaufania ręcznie.",
   "flash.ca.untrust.other": "Nieobsługiwana platforma dla cofania zaufania certyfikatowi CA. Usuń certyfikat CA z systemowego magazynu zaufania ręcznie.",
-
   "tray.open": "Otwórz Saeng",
   "tray.startProxy": "Uruchom Proxy",
   "tray.stopProxy": "Zatrzymaj Proxy",

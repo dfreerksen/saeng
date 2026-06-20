@@ -12,6 +12,8 @@ import { trustCA, untrustCA } from './src/ssl/trust.js';
 import { UpdateChecker } from './src/updateChecker.js';
 import { buildHar } from './src/proxy/har.js';
 import pkg from './package.json' with { type: 'json' };
+import bootstrapPkg from 'bootstrap/package.json' with { type: 'json' };
+import reactPkg from 'react/package.json' with { type: 'json' };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -410,6 +412,8 @@ function setupIPC() {
     version: pkg.version,
     electron: process.versions.electron,
     node: process.versions.node,
+    bootstrap: bootstrapPkg.version,
+    react: reactPkg.version,
   }));
 
   ipcMain.handle('update:get-status', () => updateChecker.getStatus());

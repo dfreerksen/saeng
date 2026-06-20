@@ -1,17 +1,14 @@
 {
   "titleBar.title": "Saeng",
-
   "proxy.status.running": "Proxy actief",
   "proxy.status.stopped": "Proxy gestopt",
   "proxy.action.start": "Proxy starten",
   "proxy.action.stop": "Proxy stoppen",
-
   "nav.mappings": "Mappingen",
   "nav.mocks": "Mocks",
   "nav.log": "Logboek",
   "nav.settings": "Instellingen",
   "nav.about": "Over",
-
   "mappings.title": "Domeinmappingen",
   "mappings.subtitle": "Lokale domeinen doorsturen naar lokale poorten",
   "mappings.actions.add": "Mapping toevoegen",
@@ -32,24 +29,20 @@
   "mappings.table.actions.delete": "Verwijderen",
   "mappings.table.actions.confirm.remove": "{domain} verwijderen?",
   "mappings.table.mocksEnabled": "Mocking ingeschakeld voor dit domein",
-
   "mappings.modals.export.title": "Mappingen exporteren",
   "mappings.modals.export.description": "Kies welke mappingen in het geëxporteerde bestand worden opgenomen.",
   "mappings.modals.export.selectAll": "Alles selecteren",
   "mappings.modals.export.selectedCount": "{count} van {total} geselecteerd",
   "mappings.modals.export.buttons.submit": "Exporteren",
   "mappings.modals.export.dialog.title": "Mappingen exporteren",
-
   "mappings.modals.import.dialog.title": "Mappingen importeren",
   "mappings.modals.import.error.invalidFormat": "Het geselecteerde bestand is geen geldige mappingenexport.",
   "mappings.modals.import.error.readFailed": "Het geselecteerde bestand kon niet worden gelezen: {error}",
-
   "mappings.modals.manage.addTitle": "Domeinmapping toevoegen",
   "mappings.modals.manage.editTitle": "Mapping bewerken",
   "mappings.modals.manage.buttons.add": "Mapping toevoegen",
   "mappings.modals.manage.buttons.update": "Wijzigingen opslaan",
   "mappings.modals.manage.buttons.cancel": "Annuleren",
-
   "mappings.modals.manage.form.domain.label": "Domein",
   "mappings.modals.manage.form.required": "(verplicht)",
   "mappings.modals.manage.form.optional": "(optioneel)",
@@ -77,7 +70,6 @@
   "mappings.modals.manage.form.headers.value.placeholder": "Headerwaarde",
   "mappings.modals.manage.form.headers.add": "Header toevoegen",
   "mappings.modals.manage.form.headers.remove": "Header verwijderen",
-
   "mocks.title": "Mocks",
   "mocks.subtitle": "Geeft vaste responsen terug voor overeenkomende verzoeken in plaats van de backend te bereiken",
   "mocks.actions.add": "Mock toevoegen",
@@ -92,18 +84,15 @@
   "mocks.table.enabled": "Ingeschakeld",
   "mocks.table.actions": "Acties",
   "mocks.table.actions.confirm.remove": "Deze mock verwijderen?",
-
   "mocks.modals.export.title": "Mocks exporteren",
   "mocks.modals.export.description": "Kies welke mocks in het geëxporteerde bestand worden opgenomen.",
   "mocks.modals.export.selectAll": "Alles selecteren",
   "mocks.modals.export.selectedCount": "{count} van {total} geselecteerd",
   "mocks.modals.export.buttons.submit": "Exporteren",
   "mocks.modals.export.dialog.title": "Mocks exporteren",
-
   "mocks.modals.import.dialog.title": "Mocks importeren",
   "mocks.modals.import.error.invalidFormat": "Het geselecteerde bestand is geen geldige mocksexport.",
   "mocks.modals.import.error.readFailed": "Het geselecteerde bestand kon niet worden gelezen: {error}",
-
   "mocks.modals.manage.addTitle": "Mock toevoegen",
   "mocks.modals.manage.editTitle": "Mock bewerken",
   "mocks.modals.manage.form.mapping.label": "Domeinmapping",
@@ -123,7 +112,6 @@
   "mocks.modals.manage.form.headers.hint": "Headers die worden toegevoegd aan de nagebootste respons (bijv. Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "Responsinhoud",
   "mocks.modals.manage.form.body.hint": "Inhoud die wordt teruggegeven voor overeenkomende verzoeken.",
-
   "mocks.modals.regexHelp.title": "Voorbeelden van padpatronen",
   "mocks.modals.regexHelp.intro": "Padpatronen zijn reguliere expressies die worden vergeleken met het verzoekpad, zonder de querystring. Klik op het kopieerknop om een patroon naar het klembord te kopiëren.",
   "mocks.modals.regexHelp.table.pattern": "Patroon",
@@ -137,7 +125,6 @@
   "mocks.modals.regexHelp.examples.extension": "Komt overeen met elk pad dat eindigt op .json",
   "mocks.modals.regexHelp.examples.alternation": "Komt overeen met een van twee specifieke paden",
   "mocks.modals.regexHelp.examples.any": "Komt overeen met elk verzoek (catch-all)",
-
   "log.title": "Verzoeklogboek",
   "log.subtitle": "Live weergave van verzoeken die via Saeng worden gerouteerd",
   "log.actions.clear": "Wissen",
@@ -147,8 +134,6 @@
   "log.emptyHint": "Verzoeken die via Saeng worden gerouteerd verschijnen hier terwijl de proxy actief is.",
   "log.filterEmpty": "Geen resultaten voor dit filter",
   "log.filter.all": "Alle",
-  "log.filter.http": "HTTP",
-  "log.filter.https": "HTTPS",
   "log.filter.ws": "WS",
   "log.filter.json": "JSON",
   "log.filter.xhr": "Fetch/XHR",
@@ -180,10 +165,18 @@
   "log.details.noBody": "Geen inhoud vastgelegd.",
   "log.details.emptyBody": "(lege inhoud)",
   "log.details.truncated": "Inhoud afgekapt tot {size} KB.",
-
+  "log.detail.general": "Algemeen",
+  "log.detail.headers": "Headers",
+  "log.detail.response": "Antwoord",
+  "log.detail.close": "Sluiten",
+  "log.detail.requestUrl": "Verzoek-URL",
+  "log.detail.requestMethod": "Verzoekmethode",
+  "log.detail.statusCode": "Statuscode",
+  "log.detail.protocol": "Protocol",
+  "log.detail.enableHeaders": "Schakel header-logging in bij Instellingen om headers vast te leggen.",
+  "log.detail.enableBody": "Schakel body-logging in bij Instellingen om responsinhoud vast te leggen.",
   "settings.title": "Instellingen",
   "settings.subtitle": "Proxigedrag en SSL-certificaten instellen",
-
   "settings.preferences.title": "Voorkeuren",
   "settings.preferences.colorMode.label": "Kleurmodus",
   "settings.preferences.colorMode.description": "Kleurmodus die in de interface wordt gebruikt.",
@@ -192,13 +185,11 @@
   "settings.preferences.colorMode.options.dark": "Donker",
   "settings.preferences.language.label": "Taal",
   "settings.preferences.language.description": "Weergavetaal voor de Saeng-interface.",
-
   "settings.proxy.title": "Proxy",
   "settings.proxy.httpsEnabled.label": "HTTPS inschakelen (SSL-beëindiging)",
   "settings.proxy.httpsEnabled.description": "HTTPS-verkeer onderscheppen met een lokaal CA-certificaat. Vereist de vertrouwensstap in de browser hieronder.",
   "settings.proxy.startOnLaunch.label": "Proxy starten bij opstarten",
   "settings.proxy.startOnLaunch.description": "De proxy automatisch starten wanneer Saeng wordt geopend.",
-
   "settings.requestLogs.title": "Verzoeklogboeken",
   "settings.requestLogs.logRequests.label": "Verzoeken registreren",
   "settings.requestLogs.logRequests.description": "Via proxy gerouteerde verzoeken vastleggen in het verzoeklogboek.",
@@ -208,7 +199,6 @@
   "settings.requestLogs.logHeaders.description": "Verzoek- en responsheaders vastleggen in het verzoeklogboek. Standaard uitgeschakeld — headers kunnen gevoelige gegevens bevatten zoals cookies en auth-tokens.",
   "settings.requestLogs.logBody.label": "Inhoud registreren",
   "settings.requestLogs.logBody.description": "Verzoek- en responsinhoud vastleggen in het verzoeklogboek (tot {size} KB per stuk). Standaard uitgeschakeld — inhoud kan groot zijn of gevoelige gegevens bevatten.",
-
   "settings.healthChecks.title": "Statuscontroles",
   "settings.healthChecks.enableCheck.label": "Backend-statuscontroles inschakelen",
   "settings.healthChecks.enableCheck.description": "Periodiek de host:poort van elke mapping pingen en een statusindicator naast het domein weergeven.",
@@ -216,7 +206,6 @@
   "settings.healthChecks.interval.description": "Hoe vaak elke backend wordt gepingd, in seconden ({min}-{max}).",
   "settings.healthChecks.timeout.label": "Controle-time-out",
   "settings.healthChecks.timeout.description": "Hoe lang gewacht wordt op een respons voordat een controle als mislukt wordt gemarkeerd, in milliseconden ({min}-{max}).",
-
   "settings.cert.title": "SSL-certificaatautoriteit",
   "settings.cert.description": "Om HTTPS op lokale domeinen te leveren, genereert Saeng een lokaal CA-certificaat. U moet dit eenmalig installeren en vertrouwen in uw systeemsleutelhanger.",
   "settings.cert.actions.generating": "CA-certificaat genereren...",
@@ -234,13 +223,14 @@
   "settings.cert.platformNote.windows": "Op Windows: voert certutil uit met UAC-verhoging.",
   "settings.cert.platformNote.linux": "Op Linux: voeg het CA-certificaat handmatig toe aan uw systeemvertrouwensopslag.",
   "settings.cert.platformNote.unknown": "Voeg het CA-certificaat handmatig toe aan uw systeemvertrouwensopslag.",
-
-  "about.desc": "Een lokale reverse proxy voor het doorsturen van .local-domeinen naar localhost-poorten.",
+  "about.desc": "Een lokale reverse proxy voor het doorsturen van lokale domeinen naar localhost-poorten.",
+  "about.github": "Deze applicatie is open source en is te vinden op GitHub:",
+  "about.thanks": "Bedankt voor het gebruik van Saeng!",
+  "about.contributors": "Bijdragers:",
+  "about.contribution.creator": "Maker",
   "about.modals.buttons.close": "Sluiten",
-
   "update.available": "Update beschikbaar",
   "update.tooltip": "Versie {version} is beschikbaar. Klik om op GitHub te bekijken.",
-
   "flash.proxy.stopped": "Proxy gestopt.",
   "flash.proxy.stopFailed": "Stoppen mislukt: {error}",
   "flash.proxy.started": "Proxy gestart. Systeemproxy geconfigureerd.",
@@ -283,7 +273,6 @@
   "flash.ca.untrust.windows": "CA-vertrouwen intrekken op Windows mislukt. Dit is geen fout",
   "flash.ca.untrust.linux": "Vertrouwen intrekken op Linux wordt nog niet ondersteund. Verwijder het CA-certificaat handmatig uit uw systeemvertrouwensopslag.",
   "flash.ca.untrust.other": "Niet-ondersteund platform voor het intrekken van het vertrouwen van het CA-certificaat. Verwijder het CA-certificaat handmatig uit uw systeemvertrouwensopslag.",
-
   "tray.open": "Saeng openen",
   "tray.startProxy": "Proxy starten",
   "tray.stopProxy": "Proxy stoppen",
