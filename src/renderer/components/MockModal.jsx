@@ -1,10 +1,22 @@
 import { useState, useRef, useEffect } from 'react';
 import Modal from './Modal.jsx';
 import HeaderListEditor from './HeaderListEditor.jsx';
+import Tooltip from './Tooltip.jsx';
 
 const HTTP_METHODS = ['*', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
 
-export default function MockModal({ mock, mappings, onClose, onSubmit, t }) {
+const REGEX_EXAMPLES = [
+  { pattern: '^/api/users$', descriptionKey: 'mocks.modals.manage.help.examples.exact' },
+  { pattern: '^/api/users/\\d+$', descriptionKey: 'mocks.modals.manage.help.examples.numericId' },
+  { pattern: '^/api/users/[^/]+$', descriptionKey: 'mocks.modals.manage.help.examples.anySegment' },
+  { pattern: '^/api/users(/.*)?$', descriptionKey: 'mocks.modals.manage.help.examples.prefix' },
+  { pattern: '^/api/users/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$', descriptionKey: 'mocks.modals.manage.help.examples.uuid' },
+  { pattern: '\\.json$', descriptionKey: 'mocks.modals.manage.help.examples.extension' },
+  { pattern: '^/(users|accounts)$', descriptionKey: 'mocks.modals.manage.help.examples.alternation' },
+  { pattern: '.*', descriptionKey: 'mocks.modals.manage.help.examples.any' },
+];
+
+export default function MockModal({ mock, mappings, onClose, onSubmit, showToast, t }) {
   const isEditing = !!mock;
 
   const [mappingId, setMappingId] = useState(mock?.mappingId ?? mappings[0]?.id ?? '');
@@ -17,6 +29,7 @@ export default function MockModal({ mock, mappings, onClose, onSubmit, t }) {
   const [pathError, setPathError] = useState('');
   const [statusError, setStatusError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   const pathInputRef = useRef(null);
 
@@ -75,119 +88,165 @@ export default function MockModal({ mock, mappings, onClose, onSubmit, t }) {
     }
   }
 
+  function handleCopy(pattern) {
+    navigator.clipboard.writeText(pattern);
+    showToast(t('flash.copied', { url: pattern }), 'success');
+  }
+
   return (
     <Modal onClose={onClose}>
-      <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div className={`modal-dialog modal-dialog-centered modal-dialog-scrollable${showHelp ? ' mock-modal-expanded' : ''}`}>
         <div className="modal-content">
           <div className="modal-header">
             <h1 className="modal-title fs-5">
               {isEditing ? t('mocks.modals.manage.editTitle') : t('mocks.modals.manage.addTitle')}
             </h1>
-            <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
+            <div className="mock-modal-header-actions">
+              <button type="button" className={`btn btn-help${showHelp ? ' active' : ''}`} onClick={() => setShowHelp(!showHelp)} />
+              <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
+            </div>
           </div>
-          <div className="modal-body">
-            <form onSubmit={handleSubmit} noValidate>
-              <div className="form-group">
-                <label className="form-label">
-                  <span>{t('mocks.modals.manage.form.mapping.label')}</span>
-                  <span className="form-label-hint">{t('mappings.modals.manage.form.required')}</span>
-                </label>
-                <select
-                  className="form-input"
-                  value={mappingId}
-                  onChange={(e) => setMappingId(e.target.value)}
-                >
-                  <option value="">{t('mocks.modals.manage.form.mapping.placeholder')}</option>
-                  {mappings.map((m) => (
-                    <option key={m.id} value={m.id}>{m.domain}</option>
-                  ))}
-                </select>
-                {mappingError && <div className="form-error visible">{mappingError}</div>}
-              </div>
+          <div className={`modal-body${showHelp ? ' mock-modal-body-split' : ''}`}>
+            <div className={showHelp ? 'mock-modal-form-pane' : undefined}>
+              <form onSubmit={handleSubmit} noValidate>
+                <div className="form-group">
+                  <label className="form-label">
+                    <span>{t('mocks.modals.manage.form.mapping.label')}</span>
+                    <span className="form-label-hint">{t('mappings.modals.manage.form.required')}</span>
+                  </label>
+                  <select
+                    className="form-input"
+                    value={mappingId}
+                    onChange={(e) => setMappingId(e.target.value)}
+                  >
+                    <option value="">{t('mocks.modals.manage.form.mapping.placeholder')}</option>
+                    {mappings.map((m) => (
+                      <option key={m.id} value={m.id}>{m.domain}</option>
+                    ))}
+                  </select>
+                  {mappingError && <div className="form-error visible">{mappingError}</div>}
+                </div>
 
-              <div className="form-group">
-                <label className="form-label">
-                  <span>{t('mocks.modals.manage.form.method.label')}</span>
-                </label>
-                <select
-                  className="form-input"
-                  value={method}
-                  onChange={(e) => setMethod(e.target.value)}
-                >
-                  {HTTP_METHODS.map((m) => (
-                    <option key={m} value={m}>{m === '*' ? t('mocks.modals.manage.form.method.any') : m}</option>
-                  ))}
-                </select>
-              </div>
+                <div className="form-group">
+                  <label className="form-label">
+                    <span>{t('mocks.modals.manage.form.method.label')}</span>
+                  </label>
+                  <select
+                    className="form-input"
+                    value={method}
+                    onChange={(e) => setMethod(e.target.value)}
+                  >
+                    {HTTP_METHODS.map((m) => (
+                      <option key={m} value={m}>{m === '*' ? t('mocks.modals.manage.form.method.any') : m}</option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className="form-group">
-                <label className="form-label">
-                  <span>{t('mocks.modals.manage.form.path.label')}</span>
-                  <span className="form-label-hint">{t('mappings.modals.manage.form.required')}</span>
-                </label>
-                <input
-                  ref={pathInputRef}
-                  className="form-input"
-                  placeholder={t('mocks.modals.manage.form.path.placeholder')}
-                  value={pathPattern}
-                  onChange={(e) => setPathPattern(e.target.value)}
-                  autoComplete="off"
-                  spellCheck={false}
+                <div className="form-group">
+                  <label className="form-label">
+                    <span>{t('mocks.modals.manage.form.path.label')}</span>
+                    <span className="form-label-hint">{t('mappings.modals.manage.form.required')}</span>
+                  </label>
+                  <input
+                    ref={pathInputRef}
+                    className="form-input"
+                    placeholder={t('mocks.modals.manage.form.path.placeholder')}
+                    value={pathPattern}
+                    onChange={(e) => setPathPattern(e.target.value)}
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                  <div className="form-hint">{t('mocks.modals.manage.form.path.hint')}</div>
+                  {pathError && <div className="form-error visible">{pathError}</div>}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    <span>{t('mocks.modals.manage.form.status.label')}</span>
+                    <span className="form-label-hint">{t('mappings.modals.manage.form.required')}</span>
+                  </label>
+                  <input
+                    className="form-input"
+                    type="number"
+                    min="100"
+                    max="599"
+                    value={statusCode}
+                    onChange={(e) => setStatusCode(e.target.value)}
+                    autoComplete="off"
+                  />
+                  <div className="form-hint">{t('mocks.modals.manage.form.status.hint')}</div>
+                  {statusError && <div className="form-error visible">{statusError}</div>}
+                </div>
+
+                <HeaderListEditor
+                  headers={headers}
+                  onChange={setHeaders}
+                  label={t('mocks.modals.manage.form.headers.label')}
+                  hint={t('mocks.modals.manage.form.headers.hint')}
+                  t={t}
                 />
-                <div className="form-hint">{t('mocks.modals.manage.form.path.hint')}</div>
-                {pathError && <div className="form-error visible">{pathError}</div>}
-              </div>
 
-              <div className="form-group">
-                <label className="form-label">
-                  <span>{t('mocks.modals.manage.form.status.label')}</span>
-                  <span className="form-label-hint">{t('mappings.modals.manage.form.required')}</span>
-                </label>
-                <input
-                  className="form-input"
-                  type="number"
-                  min="100"
-                  max="599"
-                  value={statusCode}
-                  onChange={(e) => setStatusCode(e.target.value)}
-                  autoComplete="off"
-                />
-                <div className="form-hint">{t('mocks.modals.manage.form.status.hint')}</div>
-                {statusError && <div className="form-error visible">{statusError}</div>}
-              </div>
+                <div className="form-group">
+                  <label className="form-label">
+                    <span>{t('mocks.modals.manage.form.body.label')}</span>
+                    <span className="form-label-hint">{t('mappings.modals.manage.form.optional')}</span>
+                  </label>
+                  <textarea
+                    className="form-input"
+                    rows={6}
+                    value={body}
+                    onChange={(e) => setBody(e.target.value)}
+                    spellCheck={false}
+                  />
+                  <div className="form-hint">{t('mocks.modals.manage.form.body.hint')}</div>
+                </div>
 
-              <HeaderListEditor
-                headers={headers}
-                onChange={setHeaders}
-                label={t('mocks.modals.manage.form.headers.label')}
-                hint={t('mocks.modals.manage.form.headers.hint')}
-                t={t}
-              />
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={onClose}>
+                    {t('mappings.modals.manage.buttons.cancel')}
+                  </button>
+                  <button type="submit" className="btn btn-primary" disabled={submitting}>
+                    {isEditing ? t('mappings.modals.manage.buttons.update') : t('mappings.modals.manage.buttons.add')}
+                  </button>
+                </div>
+              </form>
+            </div>
 
-              <div className="form-group">
-                <label className="form-label">
-                  <span>{t('mocks.modals.manage.form.body.label')}</span>
-                  <span className="form-label-hint">{t('mappings.modals.manage.form.optional')}</span>
-                </label>
-                <textarea
-                  className="form-input"
-                  rows={6}
-                  value={body}
-                  onChange={(e) => setBody(e.target.value)}
-                  spellCheck={false}
-                />
-                <div className="form-hint">{t('mocks.modals.manage.form.body.hint')}</div>
+            {showHelp && (
+              <div className="mock-modal-help-pane">
+                <h6 className="mb-2">{t('mocks.modals.manage.help.title')}</h6>
+                <p className="form-hint">{t('mocks.modals.manage.help.intro')}</p>
+                <table className="table table-borderless table-striped">
+                  <thead>
+                    <tr>
+                      <th scope="col">{t('mocks.modals.manage.help.table.pattern')}</th>
+                      <th scope="col" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {REGEX_EXAMPLES.map((example) => (
+                      <tr key={example.pattern}>
+                        <td className="log-path-cell">
+                          <code>{example.pattern}</code>
+                          <div className="form-hint mb-0">{t(example.descriptionKey)}</div>
+                        </td>
+                        <td className="text-end">
+                          <Tooltip title={t('mocks.modals.manage.help.copy')}>
+                            <button
+                              type="button"
+                              className="btn btn-outline-secondary btn-copy"
+                              onClick={() => handleCopy(example.pattern)}
+                            >
+                              <i className="bi bi-clipboard" />
+                            </button>
+                          </Tooltip>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={onClose}>
-                  {t('mappings.modals.manage.buttons.cancel')}
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {isEditing ? t('mappings.modals.manage.buttons.update') : t('mappings.modals.manage.buttons.add')}
-                </button>
-              </div>
-            </form>
+            )}
           </div>
         </div>
       </div>

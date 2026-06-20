@@ -1,6 +1,4 @@
-import { useState } from 'react';
 import Tooltip from './Tooltip.jsx';
-import MockRegexHelpModal from './MockRegexHelpModal.jsx';
 
 function buildGroups(mocks, mapById) {
   const groups = new Map();
@@ -13,8 +11,7 @@ function buildGroups(mocks, mapById) {
   return groups;
 }
 
-export default function MocksView({ active, mocks, mappings, mockableMappings, setMocks, onAdd, onEdit, onExport, onImport, showToast, t }) {
-  const [showHelp, setShowHelp] = useState(false);
+export default function MocksView({ active, mocks, mappings, mockableMappings, setMocks, onAdd, onEdit, onExport, onImport, t }) {
 
   async function handleToggle(id) {
     const updated = await window.electronAPI.mocks.toggle(id);
@@ -53,12 +50,6 @@ export default function MocksView({ active, mocks, mappings, mockableMappings, s
                 <span className="ms-2 d-none d-lg-inline">{t('mocks.actions.export')}</span>
               </button>
             </Tooltip>
-            <Tooltip title={t('mocks.actions.help')}>
-              <button className="btn btn-outline-secondary" onClick={() => setShowHelp(true)}>
-                <i className="bi bi-question-circle" />
-                <span className="ms-2 d-none d-lg-inline">{t('mocks.actions.help')}</span>
-              </button>
-            </Tooltip>
             <Tooltip title={t('mocks.actions.add')}>
               <button className="btn btn-primary" onClick={onAdd} disabled={mockableMappings.length === 0}>
                 <i className="bi bi-plus" />
@@ -68,10 +59,6 @@ export default function MocksView({ active, mocks, mappings, mockableMappings, s
           </div>
         </div>
       </header>
-
-      {showHelp && (
-        <MockRegexHelpModal onClose={() => setShowHelp(false)} showToast={showToast} t={t} />
-      )}
 
       <div className="table-responsive">
         {mocks.length === 0 ? (

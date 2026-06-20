@@ -1,14 +1,22 @@
 // @vitest-environment jsdom
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../../../src/renderer/components/Modal.jsx', () => ({
   default: ({ children }) => <div data-testid="modal-wrapper">{children}</div>,
 }));
 
+vi.mock('../../../src/renderer/components/Tooltip.jsx', () => ({
+  default: ({ children }) => children,
+}));
+
 import MockModal from '../../../src/renderer/components/MockModal.jsx';
 
-const t = (key) => key;
+const t = (key, vars) => (vars ? `${key}:${JSON.stringify(vars)}` : key);
+
+beforeEach(() => {
+  Object.assign(navigator, { clipboard: { writeText: vi.fn() } });
+});
 
 const SAMPLE_MAPPINGS = [
   { id: 'm1', domain: 'myapp.local', port: 3000, https: false, enabled: true },
@@ -30,6 +38,7 @@ function renderAddModal(props = {}) {
     mappings: SAMPLE_MAPPINGS,
     onClose: vi.fn(),
     onSubmit: vi.fn(),
+    showToast: vi.fn(),
     t,
   };
   return render(<MockModal {...defaults} {...props} />);
@@ -339,5 +348,69 @@ describe('MockModal — successful submit', () => {
     await waitFor(() => {
       expect(screen.getByText('Invalid path pattern: boom')).toBeInTheDocument();
     });
+  });
+});
+
+describe('MockModal — help panel', () => {
+  function getHelpBtn(container) {
+    return container.querySelector('.btn-help');
+  }
+
+  it('renders the help button in the header', () => {
+    const { container } = renderAddModal();
+    expect(getHelpBtn(container)).toBeInTheDocument();
+    expect(getHelpBtn(container).closest('.modal-header')).toBeInTheDocument();
+  });
+
+  it('does not show the help panel by default', () => {
+    renderAddModal();
+    expect(screen.queryByText('mocks.modals.manage.help.title')).not.toBeInTheDocument();
+  });
+
+  it('shows the help panel when the help button is clicked', () => {
+    const { container } = renderAddModal();
+    fireEvent.click(getHelpBtn(container));
+    expect(screen.getByText('mocks.modals.manage.help.title')).toBeInTheDocument();
+    expect(container.querySelector('.mock-modal-help-pane')).toBeInTheDocument();
+  });
+
+  it('adds the expanded class to the modal dialog when help is shown', () => {
+    const { container } = renderAddModal();
+    fireEvent.click(getHelpBtn(container));
+    expect(container.querySelector('.mock-modal-expanded')).toBeInTheDocument();
+  });
+
+  it('hides the help panel when the help button is clicked again', () => {
+    const { container } = renderAddModal();
+    const helpBtn = getHelpBtn(container);
+    fireEvent.click(helpBtn);
+    expect(screen.getByText('mocks.modals.manage.help.title')).toBeInTheDocument();
+    fireEvent.click(helpBtn);
+    expect(screen.queryByText('mocks.modals.manage.help.title')).not.toBeInTheDocument();
+  });
+
+  it('renders regex examples in the help panel', () => {
+    const { container } = renderAddModal();
+    fireEvent.click(getHelpBtn(container));
+    expect(screen.getByText('^/api/users$')).toBeInTheDocument();
+    expect(screen.getByText('mocks.modals.manage.help.examples.exact')).toBeInTheDocument();
+  });
+
+  it('copies a pattern to the clipboard and shows a toast', () => {
+    const showToast = vi.fn();
+    const { container } = renderAddModal({ showToast });
+    fireEvent.click(getHelpBtn(container));
+    const firstCopyBtn = container.querySelector('.mock-modal-help-pane .btn-copy');
+    fireEvent.click(firstCopyBtn);
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith('^/api/users$');
+    expect(showToast).toHaveBeenCalledWith('flash.copied:{"url":"^/api/users$"}', 'success');
+  });
+
+  it('marks the help button active when the panel is open', () => {
+    const { container } = renderAddModal();
+    const helpBtn = getHelpBtn(container);
+    expect(helpBtn).not.toHaveClass('active');
+    fireEvent.click(helpBtn);
+    expect(helpBtn).toHaveClass('active');
   });
 });

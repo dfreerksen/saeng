@@ -31,7 +31,6 @@ function renderMocksView(props = {}) {
     onEdit: vi.fn(),
     onExport: vi.fn(),
     onImport: vi.fn(),
-    showToast: vi.fn(),
     t,
   };
   return render(<MocksView {...defaults} {...props} />);
@@ -277,31 +276,6 @@ describe('MocksView — export button', () => {
   it('is enabled when there are mocks', () => {
     renderMocksView({ mocks: SAMPLE_MOCKS });
     expect(screen.getByText('mocks.actions.export').closest('button')).not.toBeDisabled();
-  });
-});
-
-describe('MocksView — help modal', () => {
-  it('renders the help button', () => {
-    renderMocksView();
-    expect(screen.getByText('mocks.actions.help')).toBeInTheDocument();
-  });
-
-  it('does not show the help modal by default', () => {
-    renderMocksView();
-    expect(screen.queryByText('mocks.modals.regexHelp.title')).not.toBeInTheDocument();
-  });
-
-  it('opens the help modal when the help button is clicked', () => {
-    renderMocksView();
-    fireEvent.click(screen.getByText('mocks.actions.help').closest('button'));
-    expect(screen.getByText('mocks.modals.regexHelp.title')).toBeInTheDocument();
-  });
-
-  it('closes the help modal when the close button is clicked', () => {
-    renderMocksView();
-    fireEvent.click(screen.getByText('mocks.actions.help').closest('button'));
-    fireEvent.click(screen.getByText('about.modals.buttons.close'));
-    expect(screen.queryByText('mocks.modals.regexHelp.title')).not.toBeInTheDocument();
   });
 });
 

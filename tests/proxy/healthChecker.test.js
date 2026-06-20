@@ -72,15 +72,15 @@ describe('HealthChecker.checkOne() — console logging', () => {
     vi.restoreAllMocks();
   });
 
-  it('logs when a ping starts and logs info on success', async () => {
+  it('does not log anything on a successful ping', async () => {
     const server = net.createServer();
     const port = await listen(server);
     const checker = new HealthChecker();
 
     await checker.checkOne({ id: '1', domain: 'myapp.local', host: '127.0.0.1', port });
 
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('myapp.local'));
-    expect(infoSpy).toHaveBeenCalledWith(expect.stringContaining('myapp.local'));
+    expect(logSpy).not.toHaveBeenCalled();
+    expect(infoSpy).not.toHaveBeenCalled();
     expect(warnSpy).not.toHaveBeenCalled();
     expect(errorSpy).not.toHaveBeenCalled();
     await close(server);

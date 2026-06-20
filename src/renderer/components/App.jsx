@@ -274,7 +274,6 @@ export default function App() {
             onEdit={(mock) => setModal({ type: 'editMock', mock })}
             onExport={() => setModal({ type: 'exportMocks' })}
             onImport={handleImportMocks}
-            showToast={showToast}
             t={t}
           />
           <LogView
@@ -343,6 +342,7 @@ export default function App() {
             }
             return result;
           }}
+          showToast={showToast}
           t={t}
         />
       )}
@@ -361,6 +361,7 @@ export default function App() {
             }
             return result;
           }}
+          showToast={showToast}
           t={t}
         />
       )}
