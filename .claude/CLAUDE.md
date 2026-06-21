@@ -103,7 +103,7 @@ Mapping shape:
 
 `windowBounds` (`{ width, height }`, default `940x680`) is read via `store.getWindowBounds()` when creating the `BrowserWindow` and saved via `store.setWindowBounds()` on the window's `close` event, so the app reopens at its last size.
 
-Settings defaults: `{ httpsEnabled: true, startOnLaunch: true, colorMode: 'auto', locale: 'en', logMaxEntries: DEFAULT_LOG_MAX_ENTRIES, loggingEnabled: true, logHeadersEnabled: false, logBodyEnabled: false, healthCheckEnabled: false, healthCheckIntervalMs: DEFAULT_INTERVAL_MS, healthCheckTimeoutMs: DEFAULT_TIMEOUT_MS }`. `healthCheckIntervalMs` (1 min default, clamped 5s-300s) and `healthCheckTimeoutMs` (2s default, clamped 500ms-30s) come from `src/proxy/healthChecker.js`'s exported defaults and are clamped in `setSettings()`.
+Settings defaults: `{ httpsEnabled: true, startOnLaunch: true, colorMode: 'auto', locale: 'en', iconMode: 'both', logMaxEntries: DEFAULT_LOG_MAX_ENTRIES, loggingEnabled: true, logHeadersEnabled: false, logBodyEnabled: false, healthCheckEnabled: false, healthCheckIntervalMs: DEFAULT_INTERVAL_MS, healthCheckTimeoutMs: DEFAULT_TIMEOUT_MS }`. `healthCheckIntervalMs` (1 min default, clamped 5s-300s) and `healthCheckTimeoutMs` (2s default, clamped 500ms-30s) come from `src/proxy/healthChecker.js`'s exported defaults and are clamped in `setSettings()`. `iconMode` is validated to one of `both`, `tray`, `dock` (default `both`).
 
 `store.exportMappings(ids)` / `store.importMappings(list)` back the `mappings:export`/`mappings:import` IPC handlers — export writes `{ mappings: [...] }` JSON via a save dialog, import reads a file (accepting either a bare array or `{ mappings: [...] }`), skipping mappings that already exist.
 
@@ -151,9 +151,15 @@ Adding, removing, toggling, or editing a mapping always calls `ProxyManager.upda
 
 ### Startup / shutdown
 
-On `app.whenReady`: clears any leftover system proxy pointing at our PAC URL (avoiding stomping VPN-managed settings on other interfaces), pre-warms the CA cert, creates the window/tray, starts the health checker, then optionally auto-starts the proxy if `settings.startOnLaunch` is true.
+On `app.whenReady`: clears any leftover system proxy pointing at our PAC URL (avoiding stomping VPN-managed settings on other interfaces), pre-warms the CA cert, creates the window, conditionally creates the tray (if `iconMode` is `tray` or `both`), hides the dock if `iconMode` is `tray` (macOS), starts the health checker, then optionally auto-starts the proxy if `settings.startOnLaunch` is true.
 
-On `app.before-quit`: stops the health checker and tears down the proxy (which calls `clearSystemProxy`) before exit. On macOS and Windows, closing the window hides it rather than quitting; the tray keeps the app alive. On Linux, closing the window quits.
+On `app.before-quit`: stops the health checker and tears down the proxy (which calls `clearSystemProxy`) before exit. On macOS and Windows, closing the window hides it rather than quitting when a tray icon is active (`iconMode` is `tray` or `both`); otherwise closing quits. On Linux, closing the window always quits.
+
+### Icon mode
+
+`settings.iconMode` controls where the app icon appears: `both` (default, tray + dock/taskbar), `tray` (tray only, dock hidden on macOS), or `dock` (dock/taskbar only, no tray). Changing the setting at runtime dynamically creates/destroys the tray and shows/hides the dock. When `iconMode` is `dock`, closing the window quits the app on all platforms since there is no tray to keep it alive.
+
+Tray icons live in `assets/icons/tray/` with platform-specific variants: macOS uses template images (`tray.png` + `tray@2x.png` with `setTemplateImage(true)`), Windows uses `tray.ico`, Linux uses `tray.png`. Dock/app icons are in `assets/icons/dock/` (per-platform subdirectories referenced by `electron-builder` config in `package.json`). The about panel icon is `assets/icons/about/icon.png`.
 
 ### Internationalisation
 

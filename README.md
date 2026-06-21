@@ -30,7 +30,13 @@ HTTPS works by intercepting `CONNECT` tunnel requests and terminating TLS using 
 
 All releases are available from [Github](https://github.com/dfreerksen/saeng/releases/).
 
-If you are on an Intel chip (x86_64) Mac, you want the x64 dmg. If you are on a Apple Silicon chip (M1/M2/M3/etc.) Mac, you want the arm64 dmg. 
+If you are on an Intel chip (x86_64) Mac, you want the x64 dmg. If you are on a Apple Silicon chip (M1/M2/M3/etc.) Mac, you want the arm64 dmg.
+
+For now, the app is not signed. If this becomes a problem in macOS, bypass Gatekeeper to allow opening it by running
+
+```bash
+xattr -cr /Applications/Saeng.app
+```
 
 ## Features
 
@@ -42,6 +48,7 @@ If you are on an Intel chip (x86_64) Mac, you want the x64 dmg. If you are on a 
 * HTTPS support via a local CA certificate (with MITM SSL termination)
 * WebSocket pass-through
 * Start proxy automatically on launch
+* Configurable icon mode — show the app in the system tray, dock/taskbar, or both
 * System tray integration on macOS, Windows, and Linux
 * Live request log with filter tabs (HTTP, HTTPS, WebSocket, JSON, XHR, document, CSS, JS, font, image, and more), with optional capture of request/response headers and bodies, and export to a HAR file
 * Optional backend health checks with live status indicators per mapping
@@ -68,6 +75,14 @@ Enable **Backend health checks** in Settings to have Saeng periodically ping eac
 ### Mocks
 
 Enable **mocking** on a mapping (in the mapping's edit form), then add mock rules in the **Mocks** view. Each mock matches requests for that domain by HTTP method and a path pattern (a regular expression matched against the request path, without the query string) and returns a canned status code, headers, and body instead of forwarding the request to the backend. The first matching rule wins. Mocking applies to HTTP and HTTPS requests, but not WebSocket upgrades or raw HTTPS tunnels. Every mocked response includes an `X-Saeng-Mock: true` header. Mocked requests are flagged with a "MOCK" badge in the request log. Mocks can be exported/imported as JSON, matched up by domain.
+
+### Icon mode
+
+Choose where the Saeng icon appears via the **Icon Mode** setting in Settings:
+
+- **Both** (default) — the app appears in the system tray/menu bar and the dock/taskbar.
+- **Tray only** — the app runs in the system tray/menu bar only; the dock/taskbar icon is hidden (macOS).
+- **Dock only** — the app appears in the dock/taskbar only; no system tray icon. Closing the window quits the app since there is no tray to keep it alive.
 
 ## Development
 
