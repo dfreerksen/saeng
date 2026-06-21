@@ -131,6 +131,50 @@ describe('SettingsView — locale', () => {
   });
 });
 
+describe('SettingsView — icon mode', () => {
+  it('renders icon mode select with the current value', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, iconMode: 'tray' } });
+    const select = container.querySelector('.icon-mode-select');
+    expect(select.value).toBe('tray');
+  });
+
+  it('defaults to both when iconMode is not set', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, iconMode: undefined } });
+    const select = container.querySelector('.icon-mode-select');
+    expect(select.value).toBe('both');
+  });
+
+  it('calls onSettingsChange when icon mode is changed', async () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({ onSettingsChange });
+    const select = container.querySelector('.icon-mode-select');
+    fireEvent.change(select, { target: { value: 'dock' } });
+    await waitFor(() => {
+      expect(onSettingsChange).toHaveBeenCalledWith({ iconMode: 'dock' });
+    });
+  });
+
+  it('shows a toast after changing icon mode', async () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const showToast = vi.fn();
+    const { container } = renderSettingsView({ onSettingsChange, showToast });
+    const select = container.querySelector('.icon-mode-select');
+    fireEvent.change(select, { target: { value: 'tray' } });
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith('flash.settings.updated', 'info');
+    });
+  });
+
+  it('renders three options with OS-specific labels', () => {
+    const { container } = renderSettingsView();
+    const options = container.querySelectorAll('.icon-mode-select option');
+    expect(options).toHaveLength(3);
+    expect(options[0].value).toBe('both');
+    expect(options[1].value).toBe('tray');
+    expect(options[2].value).toBe('dock');
+  });
+});
+
 describe('SettingsView — proxy toggles', () => {
   it('renders httpsEnabled checkbox as checked when setting is true', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, httpsEnabled: true } });

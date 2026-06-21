@@ -86,6 +86,7 @@ const schema = {
       startOnLaunch: true,
       colorMode: 'auto',
       locale: 'en',
+      iconMode: 'both',
       logMaxEntries: DEFAULT_LOG_MAX_ENTRIES,
       loggingEnabled: true,
       logHeadersEnabled: false,
@@ -340,6 +341,7 @@ class AppStore {
       startOnLaunch: false,
       colorMode: 'auto',
       locale: 'en',
+      iconMode: 'both',
       logMaxEntries: DEFAULT_LOG_MAX_ENTRIES,
       loggingEnabled: true,
       logHeadersEnabled: false,
@@ -370,6 +372,12 @@ class AppStore {
       updated.healthCheckTimeoutMs = Number.isNaN(parsed)
         ? DEFAULT_HEALTH_CHECK_TIMEOUT_MS
         : Math.min(MAX_HEALTH_CHECK_TIMEOUT_MS, Math.max(MIN_HEALTH_CHECK_TIMEOUT_MS, parsed));
+    }
+    if ('iconMode' in patch) {
+      const valid = ['both', 'tray', 'dock'];
+      if (!valid.includes(patch.iconMode)) {
+        updated.iconMode = 'both';
+      }
     }
     this.store.set('settings', updated);
     return updated;

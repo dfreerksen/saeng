@@ -717,6 +717,21 @@ describe('AppStore.getSettings() / setSettings()', () => {
   it('setSettings() falls back to the default when healthCheckTimeoutMs is not a number', () => {
     expect(store.setSettings({ healthCheckTimeoutMs: 'banana' }).healthCheckTimeoutMs).toBe(2000);
   });
+
+  it('getSettings() defaults iconMode to "both"', () => {
+    expect(store.getSettings().iconMode).toBe('both');
+  });
+
+  it('setSettings() stores a valid iconMode value', () => {
+    expect(store.setSettings({ iconMode: 'tray' }).iconMode).toBe('tray');
+    expect(store.setSettings({ iconMode: 'dock' }).iconMode).toBe('dock');
+    expect(store.setSettings({ iconMode: 'both' }).iconMode).toBe('both');
+  });
+
+  it('setSettings() falls back to "both" for an invalid iconMode', () => {
+    expect(store.setSettings({ iconMode: 'invalid' }).iconMode).toBe('both');
+    expect(store.setSettings({ iconMode: '' }).iconMode).toBe('both');
+  });
 });
 
 describe('AppStore.getCertDir()', () => {

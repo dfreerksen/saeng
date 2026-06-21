@@ -33,7 +33,7 @@ app.setAboutPanelOptions({
   applicationVersion: pkg.version,
   copyright: `© ${new Date().getFullYear()} ${pkg.author.name}`,
   credits: pkg.description,
-  iconPath: path.join(__dirname, 'resources/icons/icon.png')
+  iconPath: path.join(__dirname, 'assets/icons/about/icon.png')
 });
 
 function createWindow() {
@@ -60,7 +60,9 @@ function createWindow() {
 
   mainWindow.on('close', (event) => {
     store.setWindowBounds(mainWindow.getBounds());
-    if ((process.platform === 'darwin' || process.platform === 'win32') && !isQuitting) {
+    const currentIconMode = store.getSettings().iconMode || 'both';
+    const hasTray = currentIconMode === 'tray' || currentIconMode === 'both';
+    if (hasTray && (process.platform === 'darwin' || process.platform === 'win32') && !isQuitting) {
       event.preventDefault();
       mainWindow.hide();
     }
@@ -72,17 +74,36 @@ function createWindow() {
 }
 
 function createTray() {
-  const iconPaths = {
-    darwin: path.join(__dirname, 'assets/icons/mac/icon.icon/Assets/icon.png'),
-    win32: path.join(__dirname, 'assets/icons/win/icon.png'),
-    linux: path.join(__dirname, 'assets/icons/linux/icon.png'),
-  };
   let img = nativeImage.createEmpty();
-  const iconPath = iconPaths[process.platform];
-  if (iconPath && fs.existsSync(iconPath)) {
-    const loaded = nativeImage.createFromPath(iconPath);
-    if (!loaded.isEmpty()) img = loaded;
+  const trayDir = path.join(__dirname, 'assets/icons/tray');
+
+  if (process.platform === 'darwin') {
+    const icon1x = path.join(trayDir, 'mac/tray.png');
+    const icon2x = path.join(trayDir, 'mac/tray@2x.png');
+    if (fs.existsSync(icon1x)) {
+      const loaded = nativeImage.createFromPath(icon1x);
+      if (!loaded.isEmpty()) {
+        if (fs.existsSync(icon2x)) {
+          loaded.addRepresentation({ scaleFactor: 2, dataURL: nativeImage.createFromPath(icon2x).toDataURL() });
+        }
+        loaded.setTemplateImage(true);
+        img = loaded;
+      }
+    }
+  } else if (process.platform === 'win32') {
+    const iconPath = path.join(trayDir, 'windows/tray.ico');
+    if (fs.existsSync(iconPath)) {
+      const loaded = nativeImage.createFromPath(iconPath);
+      if (!loaded.isEmpty()) img = loaded;
+    }
+  } else {
+    const iconPath = path.join(trayDir, 'linux/tray.png');
+    if (fs.existsSync(iconPath)) {
+      const loaded = nativeImage.createFromPath(iconPath);
+      if (!loaded.isEmpty()) img = loaded;
+    }
   }
+
   tray = new Tray(img);
 
   updateTrayMenu(false);
@@ -104,7 +125,6 @@ function updateTrayMenu(running) {
         else mainWindow.show();
       },
     },
-    { type: 'separator' },
     {
       label: i18n.t(running ? 'tray.stopProxy' : 'tray.startProxy'),
       async click() {
@@ -375,6 +395,21 @@ function setupIPC() {
     if ('healthCheckTimeoutMs' in patch) {
       proxyManager.healthChecker.setTimeoutMs(updated.healthCheckTimeoutMs);
     }
+    if ('iconMode' in patch) {
+      const newMode = updated.iconMode;
+      if ((newMode === 'tray' || newMode === 'both') && !tray) {
+        createTray();
+        updateTrayMenu(proxyManager.isRunning());
+      } else if (newMode === 'dock' && tray) {
+        tray.destroy();
+        tray = null;
+      }
+      if (newMode === 'tray') {
+        app.dock?.hide();
+      } else {
+        app.dock?.show();
+      }
+    }
     return updated;
   });
 
@@ -470,8 +505,17 @@ app.whenReady().then(async () => {
   });
 
   setupIPC();
+
+  const iconMode = store.getSettings().iconMode || 'both';
+  if (iconMode === 'tray') {
+    app.dock?.hide();
+  }
+
   createWindow();
-  createTray();
+
+  if (iconMode === 'tray' || iconMode === 'both') {
+    createTray();
+  }
 
   proxyManager.healthChecker.start(store.getMappings());
   updateChecker.start();
@@ -491,7 +535,9 @@ app.on('activate', () => {
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform === 'linux') {
+  const currentIconMode = store.getSettings().iconMode || 'both';
+  const hasTray = currentIconMode === 'tray' || currentIconMode === 'both';
+  if (process.platform === 'linux' || !hasTray) {
     app.quit();
   }
 });

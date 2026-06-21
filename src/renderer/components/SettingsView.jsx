@@ -153,6 +153,25 @@ export default function SettingsView({
             ))}
           </select>
         </div>
+
+        <div className="setting-row">
+          <div className="setting-info">
+            <div className="setting-name">{t('settings.preferences.iconMode.label')}</div>
+            <div className="setting-desc">{t('settings.preferences.iconMode.description')}</div>
+          </div>
+          <select
+            className="icon-mode-select"
+            value={settings.iconMode || 'both'}
+            onChange={async (e) => {
+              await onSettingsChange({ iconMode: e.target.value });
+              showToast(t('flash.settings.updated'), 'info');
+            }}
+          >
+            <option value="both">{t(`settings.preferences.iconMode.options.both.${os}`)}</option>
+            <option value="tray">{t(`settings.preferences.iconMode.options.tray.${os}`)}</option>
+            <option value="dock">{t(`settings.preferences.iconMode.options.dock.${os}`)}</option>
+          </select>
+        </div>
       </div>
 
       <div className="settings-section">

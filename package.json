@@ -1,5 +1,6 @@
 {
   "name": "saeng",
+  "productName": "Saeng",
   "version": "1.14.0",
   "author": {
     "name": "David Freerksen",
@@ -86,9 +87,12 @@
       "src/**",
       "!src/renderer/scss/**/*.scss"
     ],
+    "dmg": {
+      "background": "assets/backgrounds/mac/background.png"
+    },
     "mac": {
       "category": "public.app-category.developer-tools",
-      "icon": "assets/icons/mac/icon.icon",
+      "icon": "assets/icons/dock/mac/icon.icon",
       "target": [
         {
           "target": "dmg",
@@ -99,18 +103,15 @@
         }
       ]
     },
-    "dmg": {
-      "background": "assets/backgrounds/mac/background.png"
-    },
     "win": {
-      "icon": "assets/icons/win/icon.png",
+      "icon": "assets/icons/dock/windows/icon.png",
       "artifactName": "${productName}-${version}.${ext}",
       "target": [
         "nsis"
       ]
     },
     "linux": {
-      "icon": "assets/icons/linux/icon.png",
+      "icon": "assets/icons/dock/linux/icon.png",
       "target": [
         "AppImage",
         "deb"
