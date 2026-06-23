@@ -445,8 +445,6 @@ function setupIPC() {
     version: pkg.version,
     electron: process.versions.electron,
     node: process.versions.node,
-    bootstrap: pkg.devDependencies.bootstrap.replace(/^[\^~]/, ''),
-    react: pkg.devDependencies.react.replace(/^[\^~]/, ''),
   }));
 
   ipcMain.handle('update:get-status', () => updateChecker.getStatus());

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, version as reactVersion } from 'react';
 import Titlebar from './Titlebar.jsx';
 import Sidebar from './Sidebar.jsx';
 import MappingsView from './MappingsView.jsx';
@@ -11,6 +11,7 @@ import ExportModal from './ExportModal.jsx';
 import AboutModal from './AboutModal.jsx';
 import Toast from './Toast.jsx';
 import { getOS } from '../js/os.js';
+import { Tooltip as BsTooltip } from 'bootstrap';
 
 const DEFAULT_LOG_MAX_ENTRIES = 300;
 
@@ -36,8 +37,7 @@ export default function App() {
   const [appVersion, setAppVersion] = useState('');
   const [electronVersion, setElectronVersion] = useState('');
   const [nodeVersion, setNodeVersion] = useState('');
-  const [reactVersion, setReactVersion] = useState('');
-  const [bootstrapVersion, setBootstrapVersion] = useState('');
+  const bootstrapVersion = BsTooltip.VERSION || '';
   const [caPath, setCaPath] = useState('');
   const [caExpiry, setCaExpiry] = useState(null);
   const [updateInfo, setUpdateInfo] = useState({ updateAvailable: false, latestVersion: null, url: null });
@@ -101,8 +101,6 @@ export default function App() {
       setAppVersion(appInfo.version);
       setElectronVersion(appInfo.electron);
       setNodeVersion(appInfo.node);
-      setReactVersion(appInfo.react);
-      setBootstrapVersion(appInfo.bootstrap);
       setCaPath(caPathVal);
       setCaExpiry(caExpiryVal);
       setSettingsState(settingsData);
