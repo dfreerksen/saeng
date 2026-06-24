@@ -1,4 +1,5 @@
 import js from "@eslint/js";
+import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import globals from "globals";
 import { defineConfig } from "eslint/config";
@@ -20,7 +21,8 @@ export default defineConfig([
   },
   {
     files: ["**/*.jsx"],
-    plugins: { js, "react-hooks": reactHooks },
+    plugins: { js, react, "react-hooks": reactHooks },
+    settings: { react: { version: "19" } },
     extends: ["js/recommended"],
     languageOptions: {
       globals: {
@@ -33,6 +35,7 @@ export default defineConfig([
       },
     },
     rules: {
+      "react/no-unknown-property": "error",
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
     }

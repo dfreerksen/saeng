@@ -72,12 +72,12 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
   return (
     <div className={`view${active ? ' active' : ''}`} id="view-mappings">
       <header className="container-fluid p-0 mb-3">
-        <div class="d-flex justify-content-between align-items-center">
+        <div className="d-flex justify-content-between align-items-center">
           <div>
             <h4 className="m-0">{t('mappings.title')}</h4>
             <h6 className="subtitle">{t('mappings.subtitle')}</h6>
           </div>
-          <div class="btn-group" role="group" aria-label="Actions">
+          <div className="btn-group" role="group" aria-label="Actions">
             <Tooltip title={t('mappings.actions.import')}>
               <button className="btn btn-outline-secondary" onClick={onImport}>
                 <i className="bi bi-upload" />

@@ -1,6 +1,6 @@
 ![Saeng](./assets/logo.png "Saeng")
 
-Local domain proxy manager for local development domains.
+Local reverse proxy that maps custom development domains to localhost ports.
 
 Saeng routes local defined domains to localhost ports using a PAC (Proxy Auto-Config) file — no `/etc/hosts` edits, no elevated port binding, no `sudo`. Add a mapping, start the proxy, and `http://myapp.local` goes straight to your local server.
 

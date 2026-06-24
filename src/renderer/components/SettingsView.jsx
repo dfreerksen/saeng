@@ -111,7 +111,7 @@ export default function SettingsView({
   return (
     <div className={`view${active ? ' active' : ''}`} id="view-settings">
       <header className="container-fluid p-0 mb-3">
-        <div class="d-flex justify-content-between align-items-center">
+        <div className="d-flex justify-content-between align-items-center">
           <div>
             <h4 className="m-0">{t('settings.title')}</h4>
             <h6 className="subtitle">{t('settings.subtitle')}</h6>
@@ -389,7 +389,7 @@ export default function SettingsView({
           </div>
         )}
 
-        <div class="btn-group" role="group" aria-label="Certificate Actions">
+        <div className="btn-group" role="group" aria-label="Certificate Actions">
           <Tooltip title={t(`settings.cert.actions.show.${os}`)}>
             <button
               className="btn btn-outline-secondary"
