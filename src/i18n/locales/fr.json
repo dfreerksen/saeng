@@ -110,7 +110,7 @@
   "mocks.modals.manage.form.headers.label": "En-têtes de réponse",
   "mocks.modals.manage.form.headers.hint": "En-têtes ajoutés à la réponse simulée (ex. Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "Corps de la réponse",
-  "mocks.modals.manage.form.body.hint": "Corps renvoyé pour les requêtes correspondantes.",
+  "mocks.modals.manage.form.body.hint": "Corps renvoyé pour les requêtes correspondantes. Prend en charge les variables dynamiques : {{timestamp}}, {{uuid}}, {{isoDate}}, {{request.method}}, {{request.path}}, {{request.body}}, {{request.host}}, {{request.header.Name}}, {{match.N}} (groupes de capture regex).",
   "mocks.modals.manage.help.title": "Exemples de modèles de chemin",
   "mocks.modals.manage.help.intro": "Les modèles de chemin sont des expressions régulières comparées au chemin de la requête, sans la chaîne de requête. Cliquez sur l'icône de copie pour copier un modèle dans le presse-papiers.",
   "mocks.modals.manage.help.table.pattern": "Modèle",

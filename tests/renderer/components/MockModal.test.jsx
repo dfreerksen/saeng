@@ -351,6 +351,44 @@ describe('MockModal — successful submit', () => {
   });
 });
 
+describe('MockModal — mapping sort order', () => {
+  const UNSORTED_MAPPINGS = [
+    { id: 'm-wild', domain: '*.myapp.local', port: 3000, https: false, enabled: true },
+    { id: 'm-sub', domain: 'api.myapp.local', port: 4000, https: false, enabled: true },
+    { id: 'm-bare', domain: 'myapp.local', port: 5000, https: false, enabled: true },
+    { id: 'm-other', domain: 'other.test', port: 6000, https: false, enabled: true },
+  ];
+
+  it('renders mapping options sorted by base domain, then subdomain rank', () => {
+    const { container } = renderAddModal({ mappings: UNSORTED_MAPPINGS });
+    const options = [...container.querySelectorAll('.form-input')[0].querySelectorAll('option')];
+    const domains = options.filter((o) => o.value).map((o) => o.textContent);
+    expect(domains).toEqual([
+      'myapp.local',
+      'api.myapp.local',
+      '*.myapp.local',
+      'other.test',
+    ]);
+  });
+
+  it('defaults the mapping select to the first sorted mapping, not the first in the array', () => {
+    const { container } = renderAddModal({ mappings: UNSORTED_MAPPINGS });
+    const mappingSelect = container.querySelectorAll('.form-input')[0];
+    expect(mappingSelect.value).toBe('m-bare');
+  });
+
+  it('submits the first sorted mapping id when no explicit selection is made', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderAddModal({ mappings: UNSORTED_MAPPINGS, onSubmit });
+    const pathInput = container.querySelectorAll('.form-input')[2];
+    fireEvent.change(pathInput, { target: { value: '^/test$' } });
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ mappingId: 'm-bare' }));
+    });
+  });
+});
+
 describe('MockModal — help panel', () => {
   function getHelpBtn(container) {
     return container.querySelector('.btn-help');

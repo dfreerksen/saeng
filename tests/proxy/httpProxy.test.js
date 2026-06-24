@@ -163,15 +163,15 @@ describe('HttpProxy._findMock()', () => {
     const proxy = new HttpProxy(null);
     proxy.updateMocks([{ mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'any' }]);
     const mapping = { id: 'm1', mocksEnabled: true };
-    expect(proxy._findMock(mapping, 'GET', '/api')?.body).toBe('any');
-    expect(proxy._findMock(mapping, 'POST', '/api')?.body).toBe('any');
+    expect(proxy._findMock(mapping, 'GET', '/api')?.mock.body).toBe('any');
+    expect(proxy._findMock(mapping, 'POST', '/api')?.mock.body).toBe('any');
   });
 
   it('matches a mock only for its configured method (case-insensitive)', () => {
     const proxy = new HttpProxy(null);
     proxy.updateMocks([{ mappingId: 'm1', enabled: true, method: 'post', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'posted' }]);
     const mapping = { id: 'm1', mocksEnabled: true };
-    expect(proxy._findMock(mapping, 'POST', '/api')?.body).toBe('posted');
+    expect(proxy._findMock(mapping, 'POST', '/api')?.mock.body).toBe('posted');
     expect(proxy._findMock(mapping, 'GET', '/api')).toBeNull();
   });
 
@@ -179,7 +179,7 @@ describe('HttpProxy._findMock()', () => {
     const proxy = new HttpProxy(null);
     proxy.updateMocks([{ mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/api/users/\\d+$', statusCode: 200, headers: [], body: 'user' }]);
     const mapping = { id: 'm1', mocksEnabled: true };
-    expect(proxy._findMock(mapping, 'GET', '/api/users/42')?.body).toBe('user');
+    expect(proxy._findMock(mapping, 'GET', '/api/users/42')?.mock.body).toBe('user');
     expect(proxy._findMock(mapping, 'GET', '/api/users/abc')).toBeNull();
   });
 
@@ -190,7 +190,16 @@ describe('HttpProxy._findMock()', () => {
       { mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/api/ping$', statusCode: 200, headers: [], body: 'second' },
     ]);
     const mapping = { id: 'm1', mocksEnabled: true };
-    expect(proxy._findMock(mapping, 'GET', '/api/ping')?.body).toBe('first');
+    expect(proxy._findMock(mapping, 'GET', '/api/ping')?.mock.body).toBe('first');
+  });
+
+  it('returns the regex match result with capture groups', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMocks([{ mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/api/users/(\\d+)$', statusCode: 200, headers: [], body: '' }]);
+    const mapping = { id: 'm1', mocksEnabled: true };
+    const result = proxy._findMock(mapping, 'GET', '/api/users/42');
+    expect(result.match[0]).toBe('/api/users/42');
+    expect(result.match[1]).toBe('42');
   });
 });
 
@@ -796,6 +805,37 @@ describe('HttpProxy mocked responses — end to end', () => {
     const { statusCode, body } = await makeRequest(proxy.getPort(), { host: 'mocked.local', path: '/api/echo', method: 'POST', body: 'request-body' });
     expect(statusCode).toBe(200);
     expect(body).toBe('mocked');
+  });
+
+  it('interpolates template placeholders in the mock body', async () => {
+    backend = await startCountingBackend();
+    proxy = new HttpProxy(null);
+    await proxy.start(
+      [{ id: 'm1', domain: 'mocked.local', host: '127.0.0.1', port: backend.address().port, enabled: true, mocksEnabled: true }],
+      { httpsEnabled: false }
+    );
+    proxy.updateMocks([
+      { mappingId: 'm1', enabled: true, method: 'POST', pathPattern: '^/api/echo$', statusCode: 200, headers: [], body: '{"method":"{{request.method}}","body":"{{request.body}}"}' },
+    ]);
+
+    const { body } = await makeRequest(proxy.getPort(), { host: 'mocked.local', path: '/api/echo', method: 'POST', body: 'hello' });
+    expect(JSON.parse(body)).toEqual({ method: 'POST', body: 'hello' });
+    expect(backendHits).toBe(0);
+  });
+
+  it('interpolates regex capture groups via {{match.N}} placeholders', async () => {
+    backend = await startCountingBackend();
+    proxy = new HttpProxy(null);
+    await proxy.start(
+      [{ id: 'm1', domain: 'mocked.local', host: '127.0.0.1', port: backend.address().port, enabled: true, mocksEnabled: true }],
+      { httpsEnabled: false }
+    );
+    proxy.updateMocks([
+      { mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/api/users/(\\d+)$', statusCode: 200, headers: [], body: '{"id":{{match.1}}}' },
+    ]);
+
+    const { body } = await makeRequest(proxy.getPort(), { host: 'mocked.local', path: '/api/users/42' });
+    expect(JSON.parse(body)).toEqual({ id: 42 });
   });
 });
 

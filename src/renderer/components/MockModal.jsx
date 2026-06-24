@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import Modal from './Modal.jsx';
 import HeaderListEditor from './HeaderListEditor.jsx';
 import Tooltip from './Tooltip.jsx';
+import { splitDomain } from '../js/utils.js';
 
 const HTTP_METHODS = ['*', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
 
@@ -16,10 +17,29 @@ const REGEX_EXAMPLES = [
   { pattern: '.*', descriptionKey: 'mocks.modals.manage.help.examples.any' },
 ];
 
+function subdomainRank(subdomain) {
+  if (subdomain === '') return 0;
+  if (subdomain === '*') return 2;
+  return 1;
+}
+
+function compareMappings(a, b) {
+  const splitA = splitDomain(a.domain);
+  const splitB = splitDomain(b.domain);
+  const baseA = splitA.domain + splitA.suffix;
+  const baseB = splitB.domain + splitB.suffix;
+  const baseCmp = baseA.localeCompare(baseB, undefined, { numeric: true });
+  if (baseCmp !== 0) return baseCmp;
+  const rankDiff = subdomainRank(splitA.subdomain) - subdomainRank(splitB.subdomain);
+  if (rankDiff !== 0) return rankDiff;
+  return splitA.subdomain.localeCompare(splitB.subdomain, undefined, { numeric: true });
+}
+
 export default function MockModal({ mock, mappings, onClose, onSubmit, showToast, t }) {
   const isEditing = !!mock;
 
-  const [mappingId, setMappingId] = useState(mock?.mappingId ?? mappings[0]?.id ?? '');
+  const sortedMappings = useMemo(() => [...mappings].sort(compareMappings), [mappings]);
+  const [mappingId, setMappingId] = useState(mock?.mappingId ?? sortedMappings[0]?.id ?? '');
   const [method, setMethod] = useState(mock?.method ?? '*');
   const [pathPattern, setPathPattern] = useState(mock?.pathPattern ?? '');
   const [statusCode, setStatusCode] = useState(mock?.statusCode ?? 200);
@@ -120,7 +140,7 @@ export default function MockModal({ mock, mappings, onClose, onSubmit, showToast
                     onChange={(e) => setMappingId(e.target.value)}
                   >
                     <option value="">{t('mocks.modals.manage.form.mapping.placeholder')}</option>
-                    {mappings.map((m) => (
+                    {sortedMappings.map((m) => (
                       <option key={m.id} value={m.id}>{m.domain}</option>
                     ))}
                   </select>

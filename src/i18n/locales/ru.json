@@ -110,7 +110,7 @@
   "mocks.modals.manage.form.headers.label": "Заголовки ответа",
   "mocks.modals.manage.form.headers.hint": "Заголовки, добавляемые к замоканному ответу (например, Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "Тело ответа",
-  "mocks.modals.manage.form.body.hint": "Тело, возвращаемое для подходящих запросов.",
+  "mocks.modals.manage.form.body.hint": "Тело, возвращаемое для подходящих запросов. Поддерживает динамические заполнители: {{timestamp}}, {{uuid}}, {{isoDate}}, {{request.method}}, {{request.path}}, {{request.body}}, {{request.host}}, {{request.header.Name}}, {{match.N}} (группы захвата регулярного выражения).",
   "mocks.modals.manage.help.title": "Примеры шаблонов пути",
   "mocks.modals.manage.help.intro": "Шаблоны пути — это регулярные выражения, сравниваемые с путём запроса без строки запроса. Нажмите на значок копирования, чтобы скопировать шаблон в буфер обмена.",
   "mocks.modals.manage.help.table.pattern": "Шаблон",

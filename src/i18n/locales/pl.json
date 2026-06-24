@@ -110,7 +110,7 @@
   "mocks.modals.manage.form.headers.label": "Nagłówki odpowiedzi",
   "mocks.modals.manage.form.headers.hint": "Nagłówki dodawane do odpowiedzi mock (np. Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "Treść odpowiedzi",
-  "mocks.modals.manage.form.body.hint": "Treść zwracana dla pasujących żądań.",
+  "mocks.modals.manage.form.body.hint": "Treść zwracana dla pasujących żądań. Obsługuje dynamiczne symbole zastępcze: {{timestamp}}, {{uuid}}, {{isoDate}}, {{request.method}}, {{request.path}}, {{request.body}}, {{request.host}}, {{request.header.Name}}, {{match.N}} (grupy przechwytywania wyrażeń regularnych).",
   "mocks.modals.manage.help.title": "Przykłady wzorców ścieżek",
   "mocks.modals.manage.help.intro": "Wzorce ścieżek to wyrażenia regularne dopasowane do ścieżki żądania, bez ciągu zapytania. Kliknij ikonę kopiowania, aby skopiować wzorzec do schowka.",
   "mocks.modals.manage.help.table.pattern": "Wzorzec",

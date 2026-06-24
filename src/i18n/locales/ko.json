@@ -110,7 +110,7 @@
   "mocks.modals.manage.form.headers.label": "응답 헤더",
   "mocks.modals.manage.form.headers.hint": "목 응답에 추가되는 헤더입니다(예: Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "응답 본문",
-  "mocks.modals.manage.form.body.hint": "일치하는 요청에 대해 반환되는 본문입니다.",
+  "mocks.modals.manage.form.body.hint": "일치하는 요청에 대해 반환되는 본문입니다. 동적 플레이스홀더 지원: {{timestamp}}, {{uuid}}, {{isoDate}}, {{request.method}}, {{request.path}}, {{request.body}}, {{request.host}}, {{request.header.Name}}, {{match.N}} (정규식 캡처 그룹).",
   "mocks.modals.manage.help.title": "경로 패턴 예시",
   "mocks.modals.manage.help.intro": "경로 패턴은 쿼리 문자열을 제외한 요청 경로와 비교되는 정규식입니다. 복사 아이콘을 클릭하면 패턴이 클립보드에 복사됩니다.",
   "mocks.modals.manage.help.table.pattern": "패턴",

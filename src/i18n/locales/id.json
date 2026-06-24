@@ -110,7 +110,7 @@
   "mocks.modals.manage.form.headers.label": "Header Respons",
   "mocks.modals.manage.form.headers.hint": "Header yang ditambahkan ke respons mock (mis. Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "Isi Respons",
-  "mocks.modals.manage.form.body.hint": "Isi yang dikembalikan untuk permintaan yang cocok.",
+  "mocks.modals.manage.form.body.hint": "Isi yang dikembalikan untuk permintaan yang cocok. Mendukung placeholder dinamis: {{timestamp}}, {{uuid}}, {{isoDate}}, {{request.method}}, {{request.path}}, {{request.body}}, {{request.host}}, {{request.header.Name}}, {{match.N}} (grup tangkapan regex).",
   "mocks.modals.manage.help.title": "Contoh Pola Jalur",
   "mocks.modals.manage.help.intro": "Pola jalur adalah ekspresi reguler yang dicocokkan dengan jalur permintaan, tanpa string kueri. Klik ikon salin untuk menyalin pola ke clipboard.",
   "mocks.modals.manage.help.table.pattern": "Pola",

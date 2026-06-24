@@ -110,7 +110,7 @@
   "mocks.modals.manage.form.headers.label": "响应标头",
   "mocks.modals.manage.form.headers.hint": "添加到模拟响应中的标头(例如 Content-Type、Access-Control-Allow-Origin)。",
   "mocks.modals.manage.form.body.label": "响应正文",
-  "mocks.modals.manage.form.body.hint": "为匹配的请求返回的正文。",
+  "mocks.modals.manage.form.body.hint": "为匹配的请求返回的正文。支持动态占位符：{{timestamp}}、{{uuid}}、{{isoDate}}、{{request.method}}、{{request.path}}、{{request.body}}、{{request.host}}、{{request.header.Name}}、{{match.N}}（正则表达式捕获组）。",
   "mocks.modals.manage.help.title": "路径模式示例",
   "mocks.modals.manage.help.intro": "路径模式是与请求路径(不含查询字符串)匹配的正则表达式。点击复制图标可将模式复制到剪贴板。",
   "mocks.modals.manage.help.table.pattern": "模式",

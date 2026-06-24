@@ -110,7 +110,7 @@
   "mocks.modals.manage.form.headers.label": "Header di risposta",
   "mocks.modals.manage.form.headers.hint": "Header aggiunti alla risposta simulata (es. Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "Corpo della risposta",
-  "mocks.modals.manage.form.body.hint": "Corpo restituito per le richieste corrispondenti.",
+  "mocks.modals.manage.form.body.hint": "Corpo restituito per le richieste corrispondenti. Supporta segnaposto dinamici: {{timestamp}}, {{uuid}}, {{isoDate}}, {{request.method}}, {{request.path}}, {{request.body}}, {{request.host}}, {{request.header.Name}}, {{match.N}} (gruppi di cattura regex).",
   "mocks.modals.manage.help.title": "Esempi di pattern di percorso",
   "mocks.modals.manage.help.intro": "I pattern di percorso sono espressioni regolari confrontate con il percorso della richiesta, senza la stringa di query. Clicca sull'icona di copia per copiare un pattern negli appunti.",
   "mocks.modals.manage.help.table.pattern": "Pattern",

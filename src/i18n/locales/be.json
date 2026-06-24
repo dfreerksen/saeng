@@ -110,7 +110,7 @@
   "mocks.modals.manage.form.headers.label": "Загалоўкі адказу",
   "mocks.modals.manage.form.headers.hint": "Загалоўкі, якія дадаюцца да замакаванага адказу (напрыклад, Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "Цела адказу",
-  "mocks.modals.manage.form.body.hint": "Цела, якое вяртаецца для адпаведных запытаў.",
+  "mocks.modals.manage.form.body.hint": "Цела, якое вяртаецца для адпаведных запытаў. Падтрымлівае дынамічныя запаўняльнікі: {{timestamp}}, {{uuid}}, {{isoDate}}, {{request.method}}, {{request.path}}, {{request.body}}, {{request.host}}, {{request.header.Name}}, {{match.N}} (групы захопу рэгулярнага выразу).",
   "mocks.modals.manage.help.title": "Прыклады шаблонаў шляху",
   "mocks.modals.manage.help.intro": "Шаблоны шляху — гэта рэгулярныя выразы, якія параўноўваюцца са шляхам запыту без радка запыту. Націсніце на значок капіявання, каб скапіяваць шаблон у буфер абмену.",
   "mocks.modals.manage.help.table.pattern": "Шаблон",

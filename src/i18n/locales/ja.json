@@ -110,7 +110,7 @@
   "mocks.modals.manage.form.headers.label": "レスポンスヘッダー",
   "mocks.modals.manage.form.headers.hint": "モックされたレスポンスに追加されるヘッダー(例: Content-Type、Access-Control-Allow-Origin)。",
   "mocks.modals.manage.form.body.label": "レスポンスボディ",
-  "mocks.modals.manage.form.body.hint": "一致するリクエストに対して返されるボディ。",
+  "mocks.modals.manage.form.body.hint": "一致するリクエストに対して返されるボディ。動的プレースホルダーに対応: {{timestamp}}、{{uuid}}、{{isoDate}}、{{request.method}}、{{request.path}}、{{request.body}}、{{request.host}}、{{request.header.Name}}、{{match.N}}（正規表現キャプチャグループ）。",
   "mocks.modals.manage.help.title": "パスパターンの例",
   "mocks.modals.manage.help.intro": "パスパターンは、クエリ文字列を除いたリクエストパスと照合される正規表現です。コピーアイコンをクリックすると、パターンをクリップボードにコピーできます。",
   "mocks.modals.manage.help.table.pattern": "パターン",

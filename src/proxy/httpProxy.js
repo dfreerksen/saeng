@@ -2,6 +2,7 @@ import http from 'http';
 import https from 'https';
 import net from 'net';
 import tls from 'tls';
+import { renderMockTemplate } from './mockTemplate.js';
 
 // Cap on how much of a request/response body is captured for the request
 // log, to bound memory use for large uploads/downloads.
@@ -82,41 +83,51 @@ class HttpProxy {
     this.mocks = byMapping;
   }
 
-  // Returns the first enabled mock rule for `mapping` whose method and path
-  // regex match the request, or null if mocking is off or nothing matches.
   _findMock(mapping, method, pathname) {
     if (!mapping.mocksEnabled) return null;
     const mocks = this.mocks.get(mapping.id);
     if (!mocks) return null;
     const upperMethod = method.toUpperCase();
-    return mocks.find(
-      (mock) => (mock.method === '*' || mock.method === upperMethod) && mock.regex.test(pathname)
-    ) ?? null;
+    for (const mock of mocks) {
+      if (mock.method !== '*' && mock.method !== upperMethod) continue;
+      const match = mock.regex.exec(pathname);
+      if (match) return { mock, match };
+    }
+    return null;
   }
 
-  // Writes a mocked response directly to the client without contacting the
-  // backend. Drains the request body so its stream doesn't hang, and (when
-  // request-log detail is enabled) records the response headers/body since
-  // there's no proxied stream to capture them from.
-  _serveMock(mock, req, res, record) {
-    req.resume();
+  _serveMock(mock, req, res, record, match) {
+    const chunks = [];
+    req.on('data', (chunk) => chunks.push(chunk));
+    req.on('end', () => {
+      const requestBody = Buffer.concat(chunks).toString('utf8');
+      const context = {
+        method: req.method,
+        path: (req.url || '/').split('?')[0],
+        url: req.url || '/',
+        body: requestBody,
+        host: (req.headers.host || '').split(':')[0],
+        headers: req.headers,
+        match: match || [],
+      };
 
-    const headers = this._applyHeaderOverrides({}, mock.headers);
-    if (!('content-type' in headers)) headers['content-type'] = 'text/plain; charset=utf-8';
-    headers['x-saeng-mock'] = 'true';
-    const body = mock.body || '';
+      const headers = this._applyHeaderOverrides({}, mock.headers);
+      if (!('content-type' in headers)) headers['content-type'] = 'text/plain; charset=utf-8';
+      headers['x-saeng-mock'] = 'true';
+      const body = renderMockTemplate(mock.body || '', context);
 
-    if (record) {
-      record.mocked = true;
-      if (this.requestLog?.logHeaders) record.responseHeaders = { ...headers };
-      if (this.requestLog?.logBody) {
-        record.responseBody = body;
-        record.responseBodyTruncated = false;
+      if (record) {
+        record.mocked = true;
+        if (this.requestLog?.logHeaders) record.responseHeaders = { ...headers };
+        if (this.requestLog?.logBody) {
+          record.responseBody = body;
+          record.responseBodyTruncated = false;
+        }
       }
-    }
 
-    res.writeHead(mock.statusCode, headers);
-    res.end(body);
+      res.writeHead(mock.statusCode, headers);
+      res.end(body);
+    });
   }
 
   async start(mappings, settings) {
@@ -289,9 +300,9 @@ class HttpProxy {
       }
     }
 
-    const mock = this._findMock(mapping, req.method, (reqPath || '/').split('?')[0]);
-    if (mock) {
-      this._serveMock(mock, req, res, record);
+    const found = this._findMock(mapping, req.method, (reqPath || '/').split('?')[0]);
+    if (found) {
+      this._serveMock(found.mock, req, res, record, found.match);
       return;
     }
 
@@ -339,9 +350,9 @@ class HttpProxy {
       return;
     }
 
-    const mock = this._findMock(mapping, req.method, (req.url || '/').split('?')[0]);
-    if (mock) {
-      this._serveMock(mock, req, res, record);
+    const found = this._findMock(mapping, req.method, (req.url || '/').split('?')[0]);
+    if (found) {
+      this._serveMock(found.mock, req, res, record, found.match);
       return;
     }
 

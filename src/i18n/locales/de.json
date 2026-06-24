@@ -110,7 +110,7 @@
   "mocks.modals.manage.form.headers.label": "Response-Header",
   "mocks.modals.manage.form.headers.hint": "Header, die der simulierten Antwort hinzugefügt werden (z. B. Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "Response-Body",
-  "mocks.modals.manage.form.body.hint": "Body, der für passende Anfragen zurückgegeben wird.",
+  "mocks.modals.manage.form.body.hint": "Body, der für passende Anfragen zurückgegeben wird. Unterstützt dynamische Platzhalter: {{timestamp}}, {{uuid}}, {{isoDate}}, {{request.method}}, {{request.path}}, {{request.body}}, {{request.host}}, {{request.header.Name}}, {{match.N}} (Regex-Erfassungsgruppen).",
   "mocks.modals.manage.help.title": "Beispiele für Pfadmuster",
   "mocks.modals.manage.help.intro": "Pfadmuster sind reguläre Ausdrücke, die mit dem Anfragepfad ohne Query-String abgeglichen werden. Klicke auf das Kopiersymbol, um ein Muster in die Zwischenablage zu kopieren.",
   "mocks.modals.manage.help.table.pattern": "Muster",

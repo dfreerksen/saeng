@@ -110,7 +110,7 @@
   "mocks.modals.manage.form.headers.label": "ส่วนหัวการตอบกลับ",
   "mocks.modals.manage.form.headers.hint": "ส่วนหัวที่เพิ่มเข้าไปในการตอบกลับที่จำลองไว้ (เช่น Content-Type, Access-Control-Allow-Origin)",
   "mocks.modals.manage.form.body.label": "เนื้อหาการตอบกลับ",
-  "mocks.modals.manage.form.body.hint": "เนื้อหาที่ส่งคืนสำหรับคำขอที่ตรงกัน",
+  "mocks.modals.manage.form.body.hint": "เนื้อหาที่ส่งคืนสำหรับคำขอที่ตรงกัน รองรับตัวแทนที่แบบไดนามิก: {{timestamp}}, {{uuid}}, {{isoDate}}, {{request.method}}, {{request.path}}, {{request.body}}, {{request.host}}, {{request.header.Name}}, {{match.N}} (กลุ่มจับคู่ของนิพจน์ปกติ)",
   "mocks.modals.manage.help.title": "ตัวอย่างรูปแบบพาธ",
   "mocks.modals.manage.help.intro": "รูปแบบพาธคือ regular expression ที่จับคู่กับพาธของคำขอ โดยไม่รวม query string คลิกไอคอนคัดลอกเพื่อคัดลอกรูปแบบไปยังคลิปบอร์ด",
   "mocks.modals.manage.help.table.pattern": "รูปแบบ",

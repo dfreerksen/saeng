@@ -110,7 +110,7 @@
   "mocks.modals.manage.form.headers.label": "رؤوس الاستجابة",
   "mocks.modals.manage.form.headers.hint": "رؤوس تُضاف إلى الاستجابة المحاكاة (مثل Content-Type وAccess-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "نص الاستجابة",
-  "mocks.modals.manage.form.body.hint": "النص الذي يُرجع للطلبات المطابقة.",
+  "mocks.modals.manage.form.body.hint": "النص الذي يُرجع للطلبات المطابقة. يدعم العناصر النائبة الديناميكية: {{timestamp}}، {{uuid}}، {{isoDate}}، {{request.method}}، {{request.path}}، {{request.body}}، {{request.host}}، {{request.header.Name}}، {{match.N}} (مجموعات التقاط التعبير النمطي).",
   "mocks.modals.manage.help.title": "أمثلة على أنماط المسار",
   "mocks.modals.manage.help.intro": "أنماط المسار هي تعبيرات عادية تُطابق مسار الطلب، بدون سلسلة الاستعلام. انقر على أيقونة النسخ لنسخ النمط إلى الحافظة.",
   "mocks.modals.manage.help.table.pattern": "النمط",

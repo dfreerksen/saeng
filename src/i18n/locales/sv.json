@@ -110,7 +110,7 @@
   "mocks.modals.manage.form.headers.label": "Svarshuvuden",
   "mocks.modals.manage.form.headers.hint": "Huvuden som läggs till i det mockade svaret (t.ex. Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "Svarsinnehåll",
-  "mocks.modals.manage.form.body.hint": "Innehåll som returneras för matchande förfrågningar.",
+  "mocks.modals.manage.form.body.hint": "Innehåll som returneras för matchande förfrågningar. Stöder dynamiska platshållare: {{timestamp}}, {{uuid}}, {{isoDate}}, {{request.method}}, {{request.path}}, {{request.body}}, {{request.host}}, {{request.header.Name}}, {{match.N}} (regex-fångstgrupper).",
   "mocks.modals.manage.help.title": "Sökvägsmönsterexempel",
   "mocks.modals.manage.help.intro": "Sökvägsmönster är reguljära uttryck som matchas mot förfrågningens sökväg, utan frågesträngen. Klicka på kopieringsikonen för att kopiera ett mönster till urklipp.",
   "mocks.modals.manage.help.table.pattern": "Mönster",

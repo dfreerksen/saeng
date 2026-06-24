@@ -121,7 +121,7 @@
   "mocks.modals.manage.form.headers.label": "Response Headers",
   "mocks.modals.manage.form.headers.hint": "Headers added to the mocked response (e.g. Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "Response Body",
-  "mocks.modals.manage.form.body.hint": "Body returned for matching requests.",
+  "mocks.modals.manage.form.body.hint": "Body returned for matching requests. Supports dynamic placeholders: {{timestamp}}, {{uuid}}, {{isoDate}}, {{request.method}}, {{request.path}}, {{request.body}}, {{request.host}}, {{request.header.Name}}, {{match.N}} (regex capture groups).",
 
   "mocks.modals.manage.help.title": "Path Pattern Examples",
   "mocks.modals.manage.help.intro": "Path patterns are regular expressions matched against the request path, without the query string. Click the copy icon to copy a pattern to the clipboard.",

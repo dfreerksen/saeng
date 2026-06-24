@@ -110,7 +110,7 @@
   "mocks.modals.manage.form.headers.label": "Yanıt Başlıkları",
   "mocks.modals.manage.form.headers.hint": "Mock yanıtına eklenen başlıklar (örn. Content-Type, Access-Control-Allow-Origin).",
   "mocks.modals.manage.form.body.label": "Yanıt Gövdesi",
-  "mocks.modals.manage.form.body.hint": "Eşleşen istekler için döndürülen gövde.",
+  "mocks.modals.manage.form.body.hint": "Eşleşen istekler için döndürülen gövde. Dinamik yer tutucuları destekler: {{timestamp}}, {{uuid}}, {{isoDate}}, {{request.method}}, {{request.path}}, {{request.body}}, {{request.host}}, {{request.header.Name}}, {{match.N}} (regex yakalama grupları).",
   "mocks.modals.manage.help.title": "Yol Deseni Örnekleri",
   "mocks.modals.manage.help.intro": "Yol desenleri, istek yoluyla eşleştirilen düzenli ifadelerdir, sorgu dizesi olmadan. Bir deseni panoya kopyalamak için kopyalama simgesine tıklayın.",
   "mocks.modals.manage.help.table.pattern": "Desen",
