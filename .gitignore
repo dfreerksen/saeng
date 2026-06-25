@@ -44,3 +44,7 @@ Thumbs.db
 
 # act local secrets
 .secrets
+
+# Heap
+*.cpuprofile
+*.heapprofile

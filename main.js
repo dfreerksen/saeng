@@ -27,10 +27,14 @@ let updateChecker = null;
 let isQuitting = false;
 
 app.setAboutPanelOptions({
-  applicationName: 'Saeng',
+  applicationName: pkg.productName,
   applicationVersion: pkg.version,
   copyright: `© ${new Date().getFullYear()} ${pkg.author.name}`,
+  // macOS
   credits: pkg.description,
+  // Linux
+  website: pkg.homepage,
+  // Windows and Linux
   iconPath: path.join(__dirname, 'assets/icons/about/icon.png')
 });
 
