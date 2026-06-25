@@ -22,7 +22,6 @@ const SAMPLE_MOCKS = [
 
 function renderMocksView(props = {}) {
   const defaults = {
-    active: true,
     mocks: [],
     mappings: SAMPLE_MAPPINGS,
     mockableMappings: SAMPLE_MAPPINGS,
@@ -280,13 +279,8 @@ describe('MocksView — export button', () => {
 });
 
 describe('MocksView — active state', () => {
-  it('applies the active class when active is true', () => {
-    const { container } = renderMocksView({ active: true });
+  it('always has the active class (visibility controlled by parent)', () => {
+    const { container } = renderMocksView();
     expect(container.querySelector('#view-mocks')).toHaveClass('active');
-  });
-
-  it('does not apply the active class when active is false', () => {
-    const { container } = renderMocksView({ active: false });
-    expect(container.querySelector('#view-mocks')).not.toHaveClass('active');
   });
 });

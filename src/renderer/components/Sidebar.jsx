@@ -1,4 +1,6 @@
-export default function Sidebar({ currentView, setCurrentView, loggingEnabled, onAbout, t }) {
+import { memo } from 'react';
+
+export default memo(function Sidebar({ currentView, setCurrentView, loggingEnabled, onAbout, t }) {
   return (
     <nav className="sidebar">
       <button
@@ -37,4 +39,4 @@ export default function Sidebar({ currentView, setCurrentView, loggingEnabled, o
       </button>
     </nav>
   );
-}
+});

@@ -30,7 +30,6 @@ const SAMPLE_SETTINGS = {
 
 function renderSettingsView(props = {}) {
   const defaults = {
-    active: true,
     settings: SAMPLE_SETTINGS,
     locales: SAMPLE_LOCALES,
     caPath: '/path/to/ca.crt',
@@ -64,14 +63,9 @@ describe('SettingsView — rendering', () => {
     expect(screen.getByText('settings.title')).toBeInTheDocument();
   });
 
-  it('adds active class when active=true', () => {
-    const { container } = renderSettingsView({ active: true });
+  it('always has the active class (visibility controlled by parent)', () => {
+    const { container } = renderSettingsView();
     expect(container.querySelector('#view-settings')).toHaveClass('active');
-  });
-
-  it('does not add active class when active=false', () => {
-    const { container } = renderSettingsView({ active: false });
-    expect(container.querySelector('#view-settings')).not.toHaveClass('active');
   });
 
   it('displays the CA path', () => {

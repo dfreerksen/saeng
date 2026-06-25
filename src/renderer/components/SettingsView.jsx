@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { getExpiryInfo } from '../js/utils.js';
 import { getOS } from '../js/os.js';
 import Tooltip from './Tooltip.jsx';
@@ -37,8 +37,7 @@ function clampHealthCheckTimeoutMs(value) {
   return Math.min(HEALTH_CHECK_TIMEOUT_MAX_MS, Math.max(HEALTH_CHECK_TIMEOUT_MIN_MS, parsed));
 }
 
-export default function SettingsView({
-  active,
+export default memo(function SettingsView({
   settings,
   locales,
   caPath,
@@ -109,7 +108,7 @@ export default function SettingsView({
   const os = getOS();
 
   return (
-    <div className={`view${active ? ' active' : ''}`} id="view-settings">
+    <div className="view active" id="view-settings">
       <header className="container-fluid p-0 mb-3">
         <div className="d-flex justify-content-between align-items-center">
           <div>
@@ -464,4 +463,4 @@ export default function SettingsView({
       </div>
     </div>
   );
-}
+});

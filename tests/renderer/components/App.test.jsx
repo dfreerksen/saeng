@@ -154,29 +154,29 @@ describe('App — initial render', () => {
 describe('App — navigation', () => {
   it('shows the mappings view by default', async () => {
     await renderApp();
-    expect(document.querySelector('#view-mappings')).toHaveClass('active');
-    expect(document.querySelector('#view-settings')).not.toHaveClass('active');
+    expect(document.querySelector('#view-mappings')).toBeInTheDocument();
+    expect(document.querySelector('#view-settings')).not.toBeInTheDocument();
   });
 
   it('switches to settings view when settings nav item is clicked', async () => {
     await renderApp();
     fireEvent.click(screen.getByText('nav.settings').closest('button'));
-    expect(document.querySelector('#view-settings')).toHaveClass('active');
-    expect(document.querySelector('#view-mappings')).not.toHaveClass('active');
+    expect(document.querySelector('#view-settings')).toBeInTheDocument();
+    expect(document.querySelector('#view-mappings')).not.toBeInTheDocument();
   });
 
   it('switches back to mappings view when mappings nav item is clicked', async () => {
     await renderApp();
     fireEvent.click(screen.getByText('nav.settings').closest('button'));
     fireEvent.click(screen.getByText('nav.mappings').closest('button'));
-    expect(document.querySelector('#view-mappings')).toHaveClass('active');
+    expect(document.querySelector('#view-mappings')).toBeInTheDocument();
   });
 
   it('switches to the log view when the log nav item is clicked', async () => {
     await renderApp();
     fireEvent.click(screen.getByText('nav.log').closest('button'));
-    expect(document.querySelector('#view-log')).toHaveClass('active');
-    expect(document.querySelector('#view-mappings')).not.toHaveClass('active');
+    expect(document.querySelector('#view-log')).toBeInTheDocument();
+    expect(document.querySelector('#view-mappings')).not.toBeInTheDocument();
   });
 });
 
@@ -514,6 +514,7 @@ describe('App — import mocks', () => {
   it('does nothing when the import dialog is canceled', async () => {
     const importFn = vi.fn().mockResolvedValue({ canceled: true });
     await renderApp({ mocks: { import: importFn } });
+    fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(screen.getByText('mocks.actions.import').closest('button'));
     await waitFor(() => expect(importFn).toHaveBeenCalledOnce());
     expect(screen.queryByText('flash.mocksImport.success')).not.toBeInTheDocument();
@@ -524,6 +525,7 @@ describe('App — import mocks', () => {
     const newMocks = [{ id: 'mock1', mappingId: 'm1', method: 'GET', pathPattern: '^/api$', statusCode: 200, enabled: true }];
     const importFn = vi.fn().mockResolvedValue({ canceled: false, success: true, added: 1, skipped: 0, mocks: newMocks });
     await renderApp({ mocks: { import: importFn } });
+    fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(screen.getByText('mocks.actions.import').closest('button'));
     await waitFor(() => {
       expect(screen.getByText('flash.mocksImport.success')).toBeInTheDocument();
@@ -534,6 +536,7 @@ describe('App — import mocks', () => {
   it('shows an error toast when import fails', async () => {
     const importFn = vi.fn().mockResolvedValue({ canceled: false, success: false, error: 'boom' });
     await renderApp({ mocks: { import: importFn } });
+    fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(screen.getByText('mocks.actions.import').closest('button'));
     await waitFor(() => {
       expect(screen.getByText('flash.mocksImport.error')).toBeInTheDocument();
@@ -548,6 +551,7 @@ describe('App — export mocks', () => {
 
   it('opens the export modal when the export button is clicked', async () => {
     await renderApp({ mocks: { list: vi.fn().mockResolvedValue(sampleMocks) } });
+    fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(screen.getByText('mocks.actions.export').closest('button'));
     expect(screen.getByText('mocks.modals.export.title')).toBeInTheDocument();
   });
@@ -555,6 +559,7 @@ describe('App — export mocks', () => {
   it('keeps the modal open without toasting when export is canceled', async () => {
     const exportFn = vi.fn().mockResolvedValue({ canceled: true });
     await renderApp({ mocks: { list: vi.fn().mockResolvedValue(sampleMocks), export: exportFn } });
+    fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(screen.getByText('mocks.actions.export').closest('button'));
     fireEvent.click(screen.getByText('mocks.modals.export.buttons.submit'));
     await waitFor(() => expect(exportFn).toHaveBeenCalledWith(['mock1']));
@@ -565,6 +570,7 @@ describe('App — export mocks', () => {
   it('closes the modal and shows a success toast on successful export', async () => {
     const exportFn = vi.fn().mockResolvedValue({ canceled: false, success: true, count: 1, path: '/tmp/export.json' });
     await renderApp({ mocks: { list: vi.fn().mockResolvedValue(sampleMocks), export: exportFn } });
+    fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(screen.getByText('mocks.actions.export').closest('button'));
     fireEvent.click(screen.getByText('mocks.modals.export.buttons.submit'));
     await waitFor(() => {
@@ -576,6 +582,7 @@ describe('App — export mocks', () => {
   it('keeps the modal open and shows an error toast when export fails', async () => {
     const exportFn = vi.fn().mockResolvedValue({ canceled: false, success: false, error: 'boom' });
     await renderApp({ mocks: { list: vi.fn().mockResolvedValue(sampleMocks), export: exportFn } });
+    fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(screen.getByText('mocks.actions.export').closest('button'));
     fireEvent.click(screen.getByText('mocks.modals.export.buttons.submit'));
     await waitFor(() => {
@@ -592,12 +599,14 @@ describe('App — add mock modal', () => {
 
   it('opens the add mock modal when the add button is clicked', async () => {
     await renderApp({ mappings: { list: vi.fn().mockResolvedValue(mockableMappings) } });
+    fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(screen.getByText('mocks.actions.add').closest('button'));
     expect(screen.getByText('mocks.modals.manage.addTitle')).toBeInTheDocument();
   });
 
   it('closes the add mock modal when cancel is clicked', async () => {
     await renderApp({ mappings: { list: vi.fn().mockResolvedValue(mockableMappings) } });
+    fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(screen.getByText('mocks.actions.add').closest('button'));
     fireEvent.click(screen.getByText('mappings.modals.manage.buttons.cancel'));
     await waitFor(() => {
@@ -609,6 +618,7 @@ describe('App — add mock modal', () => {
     const newMocks = [{ id: 'mock1', mappingId: 'm1', method: '*', pathPattern: '^/api$', statusCode: 200, enabled: true }];
     const addFn = vi.fn().mockResolvedValue({ success: true, mocks: newMocks });
     await renderApp({ mappings: { list: vi.fn().mockResolvedValue(mockableMappings) }, mocks: { add: addFn } });
+    fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(screen.getByText('mocks.actions.add').closest('button'));
     const pathInput = screen.getByPlaceholderText('mocks.modals.manage.form.path.placeholder');
     fireEvent.change(pathInput, { target: { value: '^/api$' } });
@@ -635,6 +645,7 @@ describe('App — edit mock modal', () => {
       mappings: { list: vi.fn().mockResolvedValue(sampleMappings) },
       mocks: { list: vi.fn().mockResolvedValue(sampleMocks) },
     });
+    fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(container.querySelector('#view-mocks .btn-edit'));
     expect(screen.getByText('mocks.modals.manage.editTitle')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('mocks.modals.manage.form.path.placeholder').value).toBe('^/api$');
@@ -650,6 +661,7 @@ describe('App — edit mock modal', () => {
       mappings: { list: vi.fn().mockResolvedValue(sampleMappings) },
       mocks: { list: vi.fn().mockResolvedValue(sampleMocks), update: updateFn },
     });
+    fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(container.querySelector('#view-mocks .btn-edit'));
     const pathInput = screen.getByPlaceholderText('mocks.modals.manage.form.path.placeholder');
     fireEvent.change(pathInput, { target: { value: '^/api/v2$' } });
@@ -671,6 +683,7 @@ describe('App — edit mock modal', () => {
       mappings: { list: vi.fn().mockResolvedValue(sampleMappings) },
       mocks: { list: vi.fn().mockResolvedValue(sampleMocks) },
     });
+    fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(container.querySelector('#view-mocks .btn-edit'));
     const mappingSelect = container.querySelector('.modal-body select');
     expect(mappingSelect.value).toBe('m1');

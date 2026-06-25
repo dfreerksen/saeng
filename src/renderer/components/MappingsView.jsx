@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { splitDomain } from '../js/utils.js';
 import Tooltip from './Tooltip.jsx';
 
@@ -35,7 +36,7 @@ function healthTooltip(health, t) {
   return t('mappings.table.health.down', { error: health.error });
 }
 
-export default function MappingsView({ active, mappings, setMappings, healthStatuses, proxyRunning, settings, onAdd, onEdit, onExport, onImport, showToast, t }) {
+export default memo(function MappingsView({ mappings, setMappings, healthStatuses, proxyRunning, settings, onAdd, onEdit, onExport, onImport, showToast, t }) {
   async function handleToggle(id) {
     const updated = await window.electronAPI.mappings.toggle(id);
     setMappings(updated);
@@ -67,10 +68,10 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
     navigator.clipboard.writeText(url);
   }
 
-  const groups = buildGroups(mappings);
+  const groups = useMemo(() => buildGroups(mappings), [mappings]);
 
   return (
-    <div className={`view${active ? ' active' : ''}`} id="view-mappings">
+    <div className="view active" id="view-mappings">
       <header className="container-fluid p-0 mb-3">
         <div className="d-flex justify-content-between align-items-center">
           <div>
@@ -209,4 +210,4 @@ export default function MappingsView({ active, mappings, setMappings, healthStat
       </div>
     </div>
   );
-}
+});

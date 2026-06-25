@@ -17,7 +17,6 @@ const SAMPLE_MAPPINGS = [
 
 function renderMappingsView(props = {}) {
   const defaults = {
-    active: true,
     mappings: [],
     setMappings: vi.fn(),
     proxyRunning: true,
@@ -245,14 +244,9 @@ describe('MappingsView — group toggle', () => {
 });
 
 describe('MappingsView — active state', () => {
-  it('adds active class to the view when active=true', () => {
-    const { container } = renderMappingsView({ active: true });
+  it('always has the active class (visibility controlled by parent)', () => {
+    const { container } = renderMappingsView();
     expect(container.querySelector('#view-mappings')).toHaveClass('active');
-  });
-
-  it('does not add active class when active=false', () => {
-    const { container } = renderMappingsView({ active: false });
-    expect(container.querySelector('#view-mappings')).not.toHaveClass('active');
   });
 });
 

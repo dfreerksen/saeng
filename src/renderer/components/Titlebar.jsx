@@ -1,4 +1,6 @@
-export default function Titlebar({ proxyRunning, updateInfo, onProxyToggle, t }) {
+import { memo } from 'react';
+
+export default memo(function Titlebar({ proxyRunning, updateInfo, onProxyToggle, t }) {
   return (
     <div className="titlebar">
       <span className="titlebar-title">{t('application.name')}</span>
@@ -25,4 +27,4 @@ export default function Titlebar({ proxyRunning, updateInfo, onProxyToggle, t })
       </button>
     </div>
   );
-}
+});

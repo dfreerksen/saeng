@@ -5,14 +5,10 @@
 }
 
 .view {
-  display: none;
-
-  &.active {
-    display: block;
-  }
+  display: block;
 }
 
-#view-log.active {
+#view-log {
   display: flex;
   flex-direction: column;
   height: 100%;

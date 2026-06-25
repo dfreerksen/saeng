@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState, useMemo } from 'react';
 import { FILTER_TABS, matchesFilter } from '../js/logFilter.js';
 import Tooltip from './Tooltip.jsx';
 
@@ -153,20 +153,22 @@ function DetailPanel({ entry, settings, detailTab, setDetailTab, onClose, t }) {
   );
 }
 
-export default function LogView({ active, entries, onClear, onExportHar, settings, t }) {
+export default memo(function LogView({ entries, onClear, onExportHar, settings, t }) {
   const [selectedId, setSelectedId] = useState(null);
   const [activeFilter, setActiveFilter] = useState('all');
   const [detailTab, setDetailTab] = useState('general');
 
-  const filteredEntries = activeFilter === 'all'
-    ? entries
-    : entries.filter((e) => matchesFilter(e, activeFilter));
+  const filteredEntries = useMemo(
+    () => activeFilter === 'all' ? entries : entries.filter((e) => matchesFilter(e, activeFilter)),
+    [entries, activeFilter]
+  );
 
-  const reversedEntries = [...filteredEntries].reverse();
+  const reversedEntries = useMemo(() => [...filteredEntries].reverse(), [filteredEntries]);
 
-  const selectedEntry = selectedId != null
-    ? entries.find((e) => e.id === selectedId) ?? null
-    : null;
+  const selectedEntry = useMemo(
+    () => selectedId != null ? entries.find((e) => e.id === selectedId) ?? null : null,
+    [entries, selectedId]
+  );
 
   function selectEntry(id) {
     if (selectedId === id) {
@@ -178,7 +180,7 @@ export default function LogView({ active, entries, onClear, onExportHar, setting
   }
 
   return (
-    <div className={`view${active ? ' active' : ''}`} id="view-log">
+    <div className="view active" id="view-log">
       <header className="container-fluid p-0 mb-3">
         <div className="d-flex justify-content-between align-items-center">
           <div>
@@ -281,4 +283,4 @@ export default function LogView({ active, entries, onClear, onExportHar, setting
       )}
     </div>
   );
-}
+});

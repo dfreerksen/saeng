@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import Tooltip from './Tooltip.jsx';
 
 function buildGroups(mocks, mapById) {
@@ -11,7 +12,7 @@ function buildGroups(mocks, mapById) {
   return groups;
 }
 
-export default function MocksView({ active, mocks, mappings, mockableMappings, setMocks, onAdd, onEdit, onExport, onImport, t }) {
+export default memo(function MocksView({ mocks, mappings, mockableMappings, setMocks, onAdd, onEdit, onExport, onImport, t }) {
 
   async function handleToggle(id) {
     const updated = await window.electronAPI.mocks.toggle(id);
@@ -26,11 +27,11 @@ export default function MocksView({ active, mocks, mappings, mockableMappings, s
     setMocks(updated);
   }
 
-  const mapById = new Map(mappings.map((m) => [m.id, m]));
-  const groups = buildGroups(mocks, mapById);
+  const mapById = useMemo(() => new Map(mappings.map((m) => [m.id, m])), [mappings]);
+  const groups = useMemo(() => buildGroups(mocks, mapById), [mocks, mapById]);
 
   return (
-    <div className={`view${active ? ' active' : ''}`} id="view-mocks">
+    <div className="view active" id="view-mocks">
       <header className="container-fluid p-0 mb-3">
         <div className="d-flex justify-content-between align-items-center">
           <div>
@@ -133,4 +134,4 @@ export default function MocksView({ active, mocks, mappings, mockableMappings, s
       </div>
     </div>
   );
-}
+});

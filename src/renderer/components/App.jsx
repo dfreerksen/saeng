@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, version as reactVersion } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, version as reactVersion } from 'react';
 import Titlebar from './Titlebar.jsx';
 import Sidebar from './Sidebar.jsx';
 import MappingsView from './MappingsView.jsx';
@@ -150,7 +150,7 @@ export default function App() {
     return () => document.removeEventListener('click', handleExternalLinks);
   }, []);
 
-  async function handleProxyToggle() {
+  const handleProxyToggle = useCallback(async () => {
     if (proxyRunning) {
       const result = await window.electronAPI.proxy.stop();
       if (result.success) {
@@ -168,9 +168,9 @@ export default function App() {
         showToast(t('flash.proxy.startFailed', { error: result.error }), 'error');
       }
     }
-  }
+  }, [proxyRunning, showToast, t]);
 
-  async function handleImportMappings() {
+  const handleImportMappings = useCallback(async () => {
     const result = await window.electronAPI.mappings.import();
     if (result.canceled) return;
     if (result.success) {
@@ -179,9 +179,9 @@ export default function App() {
     } else {
       showToast(t('flash.import.error', { error: result.error }), 'error');
     }
-  }
+  }, [showToast, t]);
 
-  async function handleImportMocks() {
+  const handleImportMocks = useCallback(async () => {
     const result = await window.electronAPI.mocks.import();
     if (result.canceled) return;
     if (result.success) {
@@ -190,14 +190,14 @@ export default function App() {
     } else {
       showToast(t('flash.mocksImport.error', { error: result.error }), 'error');
     }
-  }
+  }, [showToast, t]);
 
-  async function handleClearLog() {
+  const handleClearLog = useCallback(async () => {
     const cleared = await window.electronAPI.requestLog.clear();
     setRequestLog(cleared);
-  }
+  }, []);
 
-  async function handleExportHar() {
+  const handleExportHar = useCallback(async () => {
     const result = await window.electronAPI.requestLog.exportHar();
     if (result.canceled) return;
     if (result.success) {
@@ -205,14 +205,14 @@ export default function App() {
     } else {
       showToast(t('flash.harExport.error', { error: result.error }), 'error');
     }
-  }
+  }, [showToast, t]);
 
-  async function updateSettings(patch) {
+  const updateSettings = useCallback(async (patch) => {
     await window.electronAPI.settings.set(patch);
     setSettingsState((prev) => ({ ...prev, ...patch }));
-  }
+  }, []);
 
-  async function handleLocaleChange(locale) {
+  const handleLocaleChange = useCallback(async (locale) => {
     const localeInfo = locales.find((l) => l.code === locale);
     const strings = await window.electronAPI.i18n.setLocale(locale);
     setI18nStrings(strings);
@@ -220,15 +220,24 @@ export default function App() {
     document.documentElement.dir = localeInfo?.dir ?? 'ltr';
     await updateSettings({ locale });
     showToast(strings['flash.settings.updated'] ?? 'Settings have been updated.', 'info');
-  }
+  }, [locales, updateSettings, showToast]);
 
-  async function handleColorModeChange(mode) {
+  const handleColorModeChange = useCallback(async (mode) => {
     await updateSettings({ colorMode: mode });
     applyColorMode(mode);
     showToast(t('flash.settings.updated'), 'info');
-  }
+  }, [updateSettings, showToast, t]);
 
-  const mockableMappings = mappings.filter((m) => m.enabled && m.mocksEnabled);
+  const mockableMappings = useMemo(() => mappings.filter((m) => m.enabled && m.mocksEnabled), [mappings]);
+
+  const handleOpenAddModal = useCallback(() => setModal({ type: 'add' }), []);
+  const handleOpenEditModal = useCallback((mapping) => setModal({ type: 'edit', mapping }), []);
+  const handleOpenExportModal = useCallback(() => setModal({ type: 'export' }), []);
+  const handleOpenAddMockModal = useCallback(() => setModal({ type: 'addMock' }), []);
+  const handleOpenEditMockModal = useCallback((mock) => setModal({ type: 'editMock', mock }), []);
+  const handleOpenExportMocksModal = useCallback(() => setModal({ type: 'exportMocks' }), []);
+  const handleOpenAboutModal = useCallback(() => setModal({ type: 'about' }), []);
+  const handleCloseModal = useCallback(() => setModal(null), []);
 
   function mockModalMappings(mock) {
     if (!mock || mockableMappings.some((m) => m.id === mock.mappingId)) return mockableMappings;
@@ -244,64 +253,68 @@ export default function App() {
           currentView={currentView}
           setCurrentView={setCurrentView}
           loggingEnabled={settings.loggingEnabled !== false}
-          onAbout={() => setModal({ type: 'about' })}
+          onAbout={handleOpenAboutModal}
           t={t}
         />
         <main className="content">
-          <MappingsView
-            active={currentView === 'mappings'}
-            mappings={mappings}
-            setMappings={setMappings}
-            healthStatuses={healthStatuses}
-            proxyRunning={proxyRunning}
-            settings={settings}
-            onAdd={() => setModal({ type: 'add' })}
-            onEdit={(mapping) => setModal({ type: 'edit', mapping })}
-            onExport={() => setModal({ type: 'export' })}
-            onImport={handleImportMappings}
-            showToast={showToast}
-            t={t}
-          />
-          <MocksView
-            active={currentView === 'mocks'}
-            mocks={mocks}
-            mappings={mappings}
-            mockableMappings={mockableMappings}
-            setMocks={setMocks}
-            onAdd={() => setModal({ type: 'addMock' })}
-            onEdit={(mock) => setModal({ type: 'editMock', mock })}
-            onExport={() => setModal({ type: 'exportMocks' })}
-            onImport={handleImportMocks}
-            t={t}
-          />
-          <LogView
-            active={currentView === 'log'}
-            entries={requestLog}
-            onClear={handleClearLog}
-            onExportHar={handleExportHar}
-            settings={settings}
-            t={t}
-          />
-          <SettingsView
-            active={currentView === 'settings'}
-            settings={settings}
-            locales={locales}
-            caPath={caPath}
-            caExpiry={caExpiry}
-            setCaExpiry={setCaExpiry}
-            onSettingsChange={updateSettings}
-            onLocaleChange={handleLocaleChange}
-            onColorModeChange={handleColorModeChange}
-            showToast={showToast}
-            t={t}
-          />
+          {currentView === 'mappings' && (
+            <MappingsView
+              mappings={mappings}
+              setMappings={setMappings}
+              healthStatuses={healthStatuses}
+              proxyRunning={proxyRunning}
+              settings={settings}
+              onAdd={handleOpenAddModal}
+              onEdit={handleOpenEditModal}
+              onExport={handleOpenExportModal}
+              onImport={handleImportMappings}
+              showToast={showToast}
+              t={t}
+            />
+          )}
+          {currentView === 'mocks' && (
+            <MocksView
+              mocks={mocks}
+              mappings={mappings}
+              mockableMappings={mockableMappings}
+              setMocks={setMocks}
+              onAdd={handleOpenAddMockModal}
+              onEdit={handleOpenEditMockModal}
+              onExport={handleOpenExportMocksModal}
+              onImport={handleImportMocks}
+              t={t}
+            />
+          )}
+          {currentView === 'log' && (
+            <LogView
+              entries={requestLog}
+              onClear={handleClearLog}
+              onExportHar={handleExportHar}
+              settings={settings}
+              t={t}
+            />
+          )}
+          {currentView === 'settings' && (
+            <SettingsView
+              settings={settings}
+              locales={locales}
+              caPath={caPath}
+              caExpiry={caExpiry}
+              setCaExpiry={setCaExpiry}
+              onSettingsChange={updateSettings}
+              onLocaleChange={handleLocaleChange}
+              onColorModeChange={handleColorModeChange}
+              showToast={showToast}
+              t={t}
+            />
+          )}
         </main>
       </div>
 
       {modal?.type === 'add' && (
         <MappingModal
           mappings={mappings}
-          onClose={() => setModal(null)}
+          onClose={handleCloseModal}
           onSubmit={async (data) => {
             const updated = await window.electronAPI.mappings.add(data);
             setMappings(updated);
@@ -316,7 +329,7 @@ export default function App() {
         <MappingModal
           mapping={modal.mapping}
           mappings={mappings}
-          onClose={() => setModal(null)}
+          onClose={handleCloseModal}
           onSubmit={async (data) => {
             const updated = await window.electronAPI.mappings.update(modal.mapping.id, data);
             setMappings(updated);
@@ -330,7 +343,7 @@ export default function App() {
       {modal?.type === 'addMock' && (
         <MockModal
           mappings={mockableMappings}
-          onClose={() => setModal(null)}
+          onClose={handleCloseModal}
           onSubmit={async (data) => {
             const result = await window.electronAPI.mocks.add(data);
             if (result.success) {
@@ -349,7 +362,7 @@ export default function App() {
         <MockModal
           mock={modal.mock}
           mappings={mockModalMappings(modal.mock)}
-          onClose={() => setModal(null)}
+          onClose={handleCloseModal}
           onSubmit={async (data) => {
             const result = await window.electronAPI.mocks.update(modal.mock.id, data);
             if (result.success) {
@@ -368,7 +381,7 @@ export default function App() {
         <ExportModal
           items={mappings.map((m) => ({ id: m.id, label: m.domain }))}
           i18nPrefix="mappings.modals.export"
-          onClose={() => setModal(null)}
+          onClose={handleCloseModal}
           onSubmit={async (ids) => {
             const result = await window.electronAPI.mappings.export(ids);
             if (result.canceled) return;
@@ -390,7 +403,7 @@ export default function App() {
             label: `${m.method === '*' ? t('mocks.modals.manage.form.method.any') : m.method} ${m.pathPattern}`,
           }))}
           i18nPrefix="mocks.modals.export"
-          onClose={() => setModal(null)}
+          onClose={handleCloseModal}
           onSubmit={async (ids) => {
             const result = await window.electronAPI.mocks.export(ids);
             if (result.canceled) return;
@@ -412,7 +425,7 @@ export default function App() {
           nodeVersion={nodeVersion}
           reactVersion={reactVersion}
           bootstrapVersion={bootstrapVersion}
-          onClose={() => setModal(null)}
+          onClose={handleCloseModal}
           t={t}
         />
       )}

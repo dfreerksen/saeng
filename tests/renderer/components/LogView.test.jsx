@@ -41,7 +41,6 @@ const SAMPLE_ENTRIES = [
 
 function renderLogView(props = {}) {
   const defaults = {
-    active: true,
     entries: [],
     onClear: vi.fn(),
     onExportHar: vi.fn(),
@@ -367,13 +366,8 @@ describe('LogView — filter bar', () => {
 });
 
 describe('LogView — active state', () => {
-  it('applies the active class when active is true', () => {
-    const { container } = renderLogView({ active: true });
+  it('always has the active class (visibility controlled by parent)', () => {
+    const { container } = renderLogView();
     expect(container.querySelector('#view-log')).toHaveClass('active');
-  });
-
-  it('does not apply the active class when active is false', () => {
-    const { container } = renderLogView({ active: false });
-    expect(container.querySelector('#view-log')).not.toHaveClass('active');
   });
 });
