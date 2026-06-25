@@ -30,6 +30,10 @@ const MIN_MOCK_STATUS_CODE = 100;
 const MAX_MOCK_STATUS_CODE = 599;
 const DEFAULT_MOCK_STATUS_CODE = 200;
 
+const MIN_MOCK_DELAY_MS = 0;
+const MAX_MOCK_DELAY_MS = 30000;
+const DEFAULT_MOCK_DELAY_MS = 0;
+
 const schema = {
   mappings: {
     type: 'array',
@@ -64,6 +68,7 @@ const schema = {
         statusCode: { type: 'number' },
         headers: headerListSchema,
         body: { type: 'string' },
+        delayMs: { type: 'number', default: 0 },
         createdAt: { type: 'string' },
       },
     },
@@ -114,6 +119,12 @@ function sanitizeMockStatusCode(statusCode) {
   const parsed = parseInt(statusCode, 10);
   if (Number.isNaN(parsed)) return DEFAULT_MOCK_STATUS_CODE;
   return Math.min(MAX_MOCK_STATUS_CODE, Math.max(MIN_MOCK_STATUS_CODE, parsed));
+}
+
+function sanitizeMockDelayMs(delayMs) {
+  const parsed = parseInt(delayMs, 10);
+  if (Number.isNaN(parsed)) return DEFAULT_MOCK_DELAY_MS;
+  return Math.min(MAX_MOCK_DELAY_MS, Math.max(MIN_MOCK_DELAY_MS, parsed));
 }
 
 // Throws a descriptive error if `pattern` is not a valid regular expression.
@@ -245,6 +256,7 @@ class AppStore {
       statusCode: sanitizeMockStatusCode(data.statusCode),
       headers: sanitizeHeaders(data.headers),
       body: String(data?.body ?? ''),
+      delayMs: sanitizeMockDelayMs(data.delayMs),
       createdAt: new Date().toISOString(),
     };
     mocks.push(mock);
@@ -266,6 +278,7 @@ class AppStore {
         statusCode: sanitizeMockStatusCode(data.statusCode),
         headers: sanitizeHeaders(data.headers),
         body: String(data?.body ?? ''),
+        delayMs: sanitizeMockDelayMs(data.delayMs),
       };
     });
     this.store.set('mocks', mocks);
@@ -300,8 +313,8 @@ class AppStore {
       .map((m) => {
         const mapping = mappingById.get(m.mappingId);
         if (!mapping) return null;
-        const { enabled, method, pathPattern, statusCode, headers, body } = m;
-        return { domain: mapping.domain, enabled, method, pathPattern, statusCode, headers, body };
+        const { enabled, method, pathPattern, statusCode, headers, body, delayMs } = m;
+        return { domain: mapping.domain, enabled, method, pathPattern, statusCode, headers, body, delayMs };
       })
       .filter((entry) => entry !== null);
   }
@@ -326,6 +339,7 @@ class AppStore {
           statusCode: entry.statusCode,
           headers: entry.headers,
           body: entry.body,
+          delayMs: entry.delayMs,
         });
         added.push(mock);
       } catch {

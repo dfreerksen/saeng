@@ -130,6 +130,22 @@ describe('HttpProxy.updateMocks()', () => {
     expect(proxy.mocks.get('m2')).toHaveLength(1);
   });
 
+  it('carries delayMs through to compiled mocks', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMocks([
+      { mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/a$', statusCode: 200, headers: [], body: 'a', delayMs: 500 },
+    ]);
+    expect(proxy.mocks.get('m1')[0].delayMs).toBe(500);
+  });
+
+  it('defaults delayMs to 0 when not provided', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMocks([
+      { mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/a$', statusCode: 200, headers: [], body: 'a' },
+    ]);
+    expect(proxy.mocks.get('m1')[0].delayMs).toBe(0);
+  });
+
   it('skips mocks with an invalid pathPattern regex', () => {
     const proxy = new HttpProxy(null);
     expect(() => proxy.updateMocks([
@@ -836,6 +852,44 @@ describe('HttpProxy mocked responses — end to end', () => {
 
     const { body } = await makeRequest(proxy.getPort(), { host: 'mocked.local', path: '/api/users/42' });
     expect(JSON.parse(body)).toEqual({ id: 42 });
+  });
+
+  it('delays the mocked response by delayMs', async () => {
+    backend = await startCountingBackend();
+    proxy = new HttpProxy(null);
+    await proxy.start(
+      [{ id: 'm1', domain: 'mocked.local', host: '127.0.0.1', port: backend.address().port, enabled: true, mocksEnabled: true }],
+      { httpsEnabled: false }
+    );
+    proxy.updateMocks([
+      { mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/slow$', statusCode: 200, headers: [], body: 'delayed', delayMs: 200 },
+    ]);
+
+    const start = Date.now();
+    const { statusCode, body } = await makeRequest(proxy.getPort(), { host: 'mocked.local', path: '/slow' });
+    const elapsed = Date.now() - start;
+    expect(statusCode).toBe(200);
+    expect(body).toBe('delayed');
+    expect(elapsed).toBeGreaterThanOrEqual(150);
+  });
+
+  it('responds immediately when delayMs is 0', async () => {
+    backend = await startCountingBackend();
+    proxy = new HttpProxy(null);
+    await proxy.start(
+      [{ id: 'm1', domain: 'mocked.local', host: '127.0.0.1', port: backend.address().port, enabled: true, mocksEnabled: true }],
+      { httpsEnabled: false }
+    );
+    proxy.updateMocks([
+      { mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/fast$', statusCode: 200, headers: [], body: 'instant', delayMs: 0 },
+    ]);
+
+    const start = Date.now();
+    const { statusCode, body } = await makeRequest(proxy.getPort(), { host: 'mocked.local', path: '/fast' });
+    const elapsed = Date.now() - start;
+    expect(statusCode).toBe(200);
+    expect(body).toBe('instant');
+    expect(elapsed).toBeLessThan(150);
   });
 });
 

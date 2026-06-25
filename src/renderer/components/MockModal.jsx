@@ -43,11 +43,13 @@ export default function MockModal({ mock, mappings, onClose, onSubmit, showToast
   const [method, setMethod] = useState(mock?.method ?? '*');
   const [pathPattern, setPathPattern] = useState(mock?.pathPattern ?? '');
   const [statusCode, setStatusCode] = useState(mock?.statusCode ?? 200);
+  const [delayMs, setDelayMs] = useState(mock?.delayMs ?? 0);
   const [headers, setHeaders] = useState(mock?.headers ?? []);
   const [body, setBody] = useState(mock?.body ?? '');
   const [mappingError, setMappingError] = useState('');
   const [pathError, setPathError] = useState('');
   const [statusError, setStatusError] = useState('');
+  const [delayError, setDelayError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
@@ -62,9 +64,11 @@ export default function MockModal({ mock, mappings, onClose, onSubmit, showToast
     setMappingError('');
     setPathError('');
     setStatusError('');
+    setDelayError('');
 
     const trimPath = pathPattern.trim();
     const parsedStatus = parseInt(String(statusCode).trim(), 10);
+    const parsedDelay = parseInt(String(delayMs).trim(), 10);
 
     let valid = true;
 
@@ -90,6 +94,11 @@ export default function MockModal({ mock, mappings, onClose, onSubmit, showToast
       valid = false;
     }
 
+    if (isNaN(parsedDelay) || parsedDelay < 0 || parsedDelay > 30000) {
+      setDelayError(t('mocks.modals.manage.form.delay.error'));
+      valid = false;
+    }
+
     if (!valid) return;
 
     setSubmitting(true);
@@ -98,6 +107,7 @@ export default function MockModal({ mock, mappings, onClose, onSubmit, showToast
       method,
       pathPattern: trimPath,
       statusCode: parsedStatus,
+      delayMs: parsedDelay,
       headers,
       body,
     });
@@ -196,6 +206,24 @@ export default function MockModal({ mock, mappings, onClose, onSubmit, showToast
                   />
                   <div className="form-hint">{t('mocks.modals.manage.form.status.hint')}</div>
                   {statusError && <div className="form-error visible">{statusError}</div>}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    <span>{t('mocks.modals.manage.form.delay.label')}</span>
+                    <span className="form-label-hint">{t('mappings.modals.manage.form.optional')}</span>
+                  </label>
+                  <input
+                    className="form-input"
+                    type="number"
+                    min="0"
+                    max="30000"
+                    value={delayMs}
+                    onChange={(e) => setDelayMs(e.target.value)}
+                    autoComplete="off"
+                  />
+                  <div className="form-hint">{t('mocks.modals.manage.form.delay.hint')}</div>
+                  {delayError && <div className="form-error visible">{delayError}</div>}
                 </div>
 
                 <HeaderListEditor

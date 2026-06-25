@@ -77,6 +77,7 @@ class HttpProxy {
         statusCode: mock.statusCode,
         headers: mock.headers,
         body: mock.body,
+        delayMs: mock.delayMs || 0,
       });
       byMapping.set(mock.mappingId, list);
     }
@@ -125,8 +126,16 @@ class HttpProxy {
         }
       }
 
-      res.writeHead(mock.statusCode, headers);
-      res.end(body);
+      const sendResponse = () => {
+        res.writeHead(mock.statusCode, headers);
+        res.end(body);
+      };
+
+      if (mock.delayMs > 0) {
+        setTimeout(sendResponse, mock.delayMs);
+      } else {
+        sendResponse();
+      }
     });
   }
 

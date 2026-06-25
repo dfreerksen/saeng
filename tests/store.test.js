@@ -416,6 +416,23 @@ describe('AppStore.addMock()', () => {
     expect(result.headers).toEqual([{ name: 'X-Test', value: '1' }]);
   });
 
+  it('defaults delayMs to 0', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const result = store.addMock({ mappingId: mapping.id, pathPattern: '.*' });
+    expect(result.delayMs).toBe(0);
+  });
+
+  it('clamps delayMs to the valid range', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    expect(store.addMock({ mappingId: mapping.id, pathPattern: '.*', delayMs: -100 }).delayMs).toBe(0);
+    expect(store.addMock({ mappingId: mapping.id, pathPattern: '.*', delayMs: 50000 }).delayMs).toBe(30000);
+  });
+
+  it('defaults delayMs to 0 when not a number', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    expect(store.addMock({ mappingId: mapping.id, pathPattern: '.*', delayMs: 'banana' }).delayMs).toBe(0);
+  });
+
   it('throws a descriptive error for an invalid regex pathPattern', () => {
     const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
     expect(() => store.addMock({ mappingId: mapping.id, pathPattern: '(unterminated' })).toThrow(/Invalid path pattern/);
@@ -451,6 +468,13 @@ describe('AppStore.updateMock()', () => {
     const updated = store.updateMock(mock.id, { mappingId: mapping.id, pathPattern: '.*' });
     expect(updated.id).toBe(mock.id);
     expect(updated.createdAt).toBe(mock.createdAt);
+  });
+
+  it('updates delayMs', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const mock = store.addMock({ mappingId: mapping.id, pathPattern: '.*', delayMs: 0 });
+    const updated = store.updateMock(mock.id, { mappingId: mapping.id, pathPattern: '.*', delayMs: 500 });
+    expect(updated.delayMs).toBe(500);
   });
 
   it('throws a descriptive error for an invalid regex pathPattern and leaves the mock unchanged', () => {
@@ -512,7 +536,7 @@ describe('AppStore.exportMocks()', () => {
     store.addMock({ mappingId: mapping.id, method: 'GET', pathPattern: '^/api$', statusCode: 200, body: 'hi' });
     const [result] = store.exportMocks();
     expect(result).toEqual({
-      domain: 'a.local', enabled: true, method: 'GET', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'hi',
+      domain: 'a.local', enabled: true, method: 'GET', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'hi', delayMs: 0,
     });
     expect(result).not.toHaveProperty('id');
     expect(result).not.toHaveProperty('mappingId');
@@ -584,6 +608,16 @@ describe('AppStore.importMocks()', () => {
       headers: [{ name: 'X-Foo', value: 'bar' }],
     }]);
     expect(added[0].headers).toEqual([{ name: 'X-Foo', value: 'bar' }]);
+  });
+
+  it('imports delayMs', () => {
+    store.addMapping({ domain: 'a.local', port: 1 });
+    const { added } = store.importMocks([{
+      domain: 'a.local',
+      pathPattern: '.*',
+      delayMs: 1500,
+    }]);
+    expect(added[0].delayMs).toBe(1500);
   });
 });
 

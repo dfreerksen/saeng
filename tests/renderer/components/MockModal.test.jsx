@@ -29,6 +29,7 @@ const EXISTING_MOCK = {
   method: 'POST',
   pathPattern: '^/api/ping$',
   statusCode: 201,
+  delayMs: 500,
   headers: [{ name: 'X-Mock', value: 'yes' }],
   body: '{"ok":true}',
 };
@@ -95,8 +96,14 @@ describe('MockModal — add mode', () => {
 
   it('starts with status code defaulting to 200', () => {
     const { container } = renderAddModal();
-    const statusInput = container.querySelector('input[type="number"]');
-    expect(statusInput.value).toBe('200');
+    const numberInputs = container.querySelectorAll('input[type="number"]');
+    expect(numberInputs[0].value).toBe('200');
+  });
+
+  it('starts with delay defaulting to 0', () => {
+    const { container } = renderAddModal();
+    const numberInputs = container.querySelectorAll('input[type="number"]');
+    expect(numberInputs[1].value).toBe('0');
   });
 
   it('starts with an empty body field', () => {
@@ -142,8 +149,14 @@ describe('MockModal — edit mode', () => {
 
   it('pre-fills the status code field', () => {
     const { container } = renderEditModal();
-    const statusInput = container.querySelector('input[type="number"]');
-    expect(statusInput.value).toBe('201');
+    const numberInputs = container.querySelectorAll('input[type="number"]');
+    expect(numberInputs[0].value).toBe('201');
+  });
+
+  it('pre-fills the delay field', () => {
+    const { container } = renderEditModal();
+    const numberInputs = container.querySelectorAll('input[type="number"]');
+    expect(numberInputs[1].value).toBe('500');
   });
 
   it('pre-fills the body field', () => {
@@ -239,6 +252,20 @@ describe('MockModal — validation', () => {
     });
     expect(onSubmit).not.toHaveBeenCalled();
   });
+
+  it('shows a delay error when the delay is out of range', async () => {
+    const onSubmit = vi.fn();
+    const { container } = renderAddModal({ onSubmit });
+    const pathInput = container.querySelectorAll('.form-input')[2];
+    const numberInputs = container.querySelectorAll('input[type="number"]');
+    fireEvent.change(pathInput, { target: { value: '^/api$' } });
+    fireEvent.change(numberInputs[1], { target: { value: '50000' } });
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
+    await waitFor(() => {
+      expect(screen.getByText('mocks.modals.manage.form.delay.error')).toBeInTheDocument();
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
 });
 
 describe('MockModal — successful submit', () => {
@@ -254,6 +281,7 @@ describe('MockModal — successful submit', () => {
         method: '*',
         pathPattern: '^/api/ping$',
         statusCode: 200,
+        delayMs: 0,
         headers: [],
         body: '',
       });
