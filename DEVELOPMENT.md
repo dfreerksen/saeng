@@ -40,8 +40,8 @@ npm run js:build   # main.jsx -> src/renderer/scripts.js (esbuild)
 - `src/proxy/` — `ProxyManager`, `HttpProxy`, `pacServer`, `certManager`, `requestLog`, `healthChecker`, `har`.
 - `src/ssl/` — CA trust helpers (`security`/`certutil`).
 - `src/systemProxy.js` — sets/clears the OS auto-proxy (`networksetup` on macOS, registry on Windows).
-- `src/i18n/` — `i18n.js` plus `locales/*.json` (15 languages).
-- `src/renderer/` — React 19 app (`main.jsx` entry, `components/*.jsx`, `js/*.js` utilities, `scss/` source).
+- `src/i18n/` — `i18n.js` plus `locales/*.json` (21 languages).
+- `src/renderer/` — React 19 app (`main.jsx` entry, `components/*.jsx`, `js/*.js` utilities, `scss/` source). `DashboardView.jsx` uses `chart.js` / `react-chartjs-2` for time-series charts.
 
 See `.claude/CLAUDE.md` for a deeper architectural walkthrough (request flow, IPC channel table, mocks, health checks, etc.).
 
@@ -68,7 +68,7 @@ npm run lint:css # Stylelint (SCSS under src/renderer/scss/)
 
 ## i18n
 
-When adding, renaming, or removing a user-facing string key, update `en.json` and all 14 other locale files in the same position, with real translations (not copies). Then verify:
+When adding, renaming, or removing a user-facing string key, update `en.json` and all 20 other locale files in the same position, with real translations (not copies). Then verify:
 
 ```bash
 node .claude/skills/i18n-check/check-locales.mjs

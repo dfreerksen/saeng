@@ -10,10 +10,10 @@ Saeng means "light," "radiance," or "glow" in Thai.
 
 ![Saeng Mappings](./assets/screenshots/screenshot-dark-mappings.png "Saeng Mappings")
 
-|  | Mappings | Mocks | Logs | Settings |
-| :---: | :---: | :---: | :---: | :---: |
-| Dark | [![Saeng Mappings](./assets/screenshots/screenshot-dark-mappings.png "Saeng Mappings")](./assets/screenshots/screenshot-dark-mappings.png) | [![Saeng Mocks](./assets/screenshots/screenshot-dark-mocks.png "Saeng Mocks")](./assets/screenshots/screenshot-dark-mocks.png) | [![Saeng Log](./assets/screenshots/screenshot-dark-log.png "Saeng Log")](./assets/screenshots/screenshot-dark-log.png) | [![Saeng Settings](./assets/screenshots/screenshot-dark-settings.png "Saeng Settings")](./assets/screenshots/screenshot-dark-settings.png) |
-| Light | [![Saeng Mappings](./assets/screenshots/screenshot-light-mappings.png "Saeng Mappings")](./assets/screenshots/screenshot-light-mappings.png) | [![Saeng Mocks](./assets/screenshots/screenshot-light-mocks.png "Saeng Mocks")](./assets/screenshots/screenshot-light-mocks.png) | [![Saeng Log](./assets/screenshots/screenshot-light-log.png "Saeng Log")](./assets/screenshots/screenshot-light-log.png) | [![Saeng Settings](./assets/screenshots/screenshot-light-settings.png "Saeng Settings")](./assets/screenshots/screenshot-light-settings.png) |
+|  | Dashboard | Mappings | Mocks | Logs | Settings |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| Dark | [![Saeng Dashboard](./assets/screenshots/screenshot-dark-dashboard.png "Saeng Dashboard")](./assets/screenshots/screenshot-dark-dashboard.png) | [![Saeng Mappings](./assets/screenshots/screenshot-dark-mappings.png "Saeng Mappings")](./assets/screenshots/screenshot-dark-mappings.png) | [![Saeng Mocks](./assets/screenshots/screenshot-dark-mocks.png "Saeng Mocks")](./assets/screenshots/screenshot-dark-mocks.png) | [![Saeng Log](./assets/screenshots/screenshot-dark-log.png "Saeng Log")](./assets/screenshots/screenshot-dark-log.png) | [![Saeng Settings](./assets/screenshots/screenshot-dark-settings.png "Saeng Settings")](./assets/screenshots/screenshot-dark-settings.png) |
+| Light | [![Saeng Dashboard](./assets/screenshots/screenshot-light-dashboard.png "Saeng Dashboard")](./assets/screenshots/screenshot-light-dashboard.png) | [![Saeng Mappings](./assets/screenshots/screenshot-light-mappings.png "Saeng Mappings")](./assets/screenshots/screenshot-light-mappings.png) | [![Saeng Mocks](./assets/screenshots/screenshot-light-mocks.png "Saeng Mocks")](./assets/screenshots/screenshot-light-mocks.png) | [![Saeng Log](./assets/screenshots/screenshot-light-log.png "Saeng Log")](./assets/screenshots/screenshot-light-log.png) | [![Saeng Settings](./assets/screenshots/screenshot-light-settings.png "Saeng Settings")](./assets/screenshots/screenshot-light-settings.png) |
 
 ## How it works
 
@@ -40,6 +40,7 @@ xattr -cr /Applications/Saeng.app
 
 ## Features
 
+* Optional dashboard view with stat cards, time-series charts (requests/min, error rate, latency), and per-domain breakdowns of mappings and mocks
 * Map any local domain (with or without subdomain) to a local port
 * Mappings are grouped by base domain, with a toggle to enable/disable a whole group at once
 * Enable/disable individual mappings without removing them
@@ -54,6 +55,10 @@ xattr -cr /Applications/Saeng.app
 * Optional backend health checks with live status indicators per mapping
 * Notifies you in the titlebar when a newer version is available on GitHub
 * Remembers the window size between launches
+
+### Dashboard
+
+Enable **Show Dashboard** in Settings to add an overview screen as the first sidebar item and the default view on launch. The dashboard displays stat cards (total requests, error rate, average latency, domains up/down, active/disabled mappings and mocks), time-series charts for the last 30 minutes (requests per minute, error rate, average latency), and per-domain breakdowns of mappings and mocks. Request-related stats and charts require logging to be enabled; domain health stats require health checks to be enabled and the proxy to be running.
 
 ### HTTPS setup
 

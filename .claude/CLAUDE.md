@@ -58,7 +58,7 @@ All logic runs in the **main process**. The renderer has no Node.js access.
 
 ### Renderer
 
-The renderer is a **React 19** app bundled by **esbuild**. SCSS is compiled by **Sass** from `src/renderer/scss/` → `src/renderer/styles.css`. Bootstrap 5 + Bootstrap Icons are used for UI. Source files in `src/renderer/components/` are `.jsx`; utility modules in `src/renderer/js/` are plain `.js`.
+The renderer is a **React 19** app bundled by **esbuild**. SCSS is compiled by **Sass** from `src/renderer/scss/` → `src/renderer/styles.css`. Bootstrap 5 + Bootstrap Icons are used for UI. **chart.js** and **react-chartjs-2** provide the time-series charts on the Dashboard view. Source files in `src/renderer/components/` are `.jsx`; utility modules in `src/renderer/js/` are plain `.js`.
 
 `eslint.config.mjs` intentionally ignores `src/renderer/scripts.js` (the esbuild output). The ESLint config covers `.js` files and `.jsx` files — the `.jsx` block includes `eslint-plugin-react` (`jsx-uses-vars`, `no-unknown-property`) and `eslint-plugin-react-hooks` (`rules-of-hooks`, `exhaustive-deps`).
 
@@ -103,7 +103,7 @@ Mapping shape:
 
 `windowBounds` (`{ width, height }`, default `940x680`) is read via `store.getWindowBounds()` when creating the `BrowserWindow` and saved via `store.setWindowBounds()` on the window's `close` event, so the app reopens at its last size.
 
-Settings defaults: `{ httpsEnabled: true, startOnLaunch: true, colorMode: 'auto', locale: 'en', iconMode: 'both', logMaxEntries: DEFAULT_LOG_MAX_ENTRIES, loggingEnabled: true, logHeadersEnabled: false, logBodyEnabled: false, healthCheckEnabled: false, healthCheckIntervalMs: DEFAULT_INTERVAL_MS, healthCheckTimeoutMs: DEFAULT_TIMEOUT_MS }`. `healthCheckIntervalMs` (1 min default, clamped 5s-300s) and `healthCheckTimeoutMs` (2s default, clamped 500ms-30s) come from `src/proxy/healthChecker.js`'s exported defaults and are clamped in `setSettings()`. `iconMode` is validated to one of `both`, `tray`, `dock` (default `both`).
+Settings defaults: `{ httpsEnabled: true, startOnLaunch: true, colorMode: 'auto', locale: 'en', iconMode: 'both', dashboardEnabled: false, logMaxEntries: DEFAULT_LOG_MAX_ENTRIES, loggingEnabled: true, logHeadersEnabled: false, logBodyEnabled: false, healthCheckEnabled: false, healthCheckIntervalMs: DEFAULT_INTERVAL_MS, healthCheckTimeoutMs: DEFAULT_TIMEOUT_MS }`. `healthCheckIntervalMs` (1 min default, clamped 5s-300s) and `healthCheckTimeoutMs` (2s default, clamped 500ms-30s) come from `src/proxy/healthChecker.js`'s exported defaults and are clamped in `setSettings()`. `iconMode` is validated to one of `both`, `tray`, `dock` (default `both`).
 
 `store.exportMappings(ids)` / `store.importMappings(list)` back the `mappings:export`/`mappings:import` IPC handlers — export writes `{ mappings: [...] }` JSON via a save dialog, import reads a file (accepting either a bare array or `{ mappings: [...] }`), skipping mappings that already exist.
 
@@ -162,6 +162,16 @@ On `app.before-quit`: stops the health checker and tears down the proxy (which c
 `settings.iconMode` controls where the app icon appears: `both` (default, tray + dock/taskbar), `tray` (tray only, dock hidden on macOS), or `dock` (dock/taskbar only, no tray). Changing the setting at runtime dynamically creates/destroys the tray and shows/hides the dock. When `iconMode` is `dock`, closing the window quits the app on all platforms since there is no tray to keep it alive.
 
 Tray icons live in `assets/icons/tray/` with platform-specific variants: macOS uses template images (`tray.png` + `tray@2x.png` with `setTemplateImage(true)`), Windows uses `tray.ico`, Linux uses `tray.png`. Dock/app icons are in `assets/icons/dock/` (per-platform subdirectories referenced by `electron-builder` config in `package.json`). The about panel icon is `assets/icons/about/icon.png`.
+
+### Dashboard
+
+`DashboardView.jsx` is an optional overview screen (controlled by `settings.dashboardEnabled`, default `false`). When enabled, it becomes the initial view on app load and appears as the first item in the sidebar. It shows:
+
+- **Stat cards** — total requests, error rate, average latency (when logging is enabled), domains up/down (when health checks are enabled and the proxy is running), active/disabled mappings, and active/disabled mocks.
+- **Time-series charts** — requests per minute, error rate (%), and average latency (ms) over the last 30 minutes, rendered with chart.js / react-chartjs-2.
+- **Group breakdowns** — mappings and mocks counted per base domain.
+
+All data is derived from the existing in-memory request log, mappings, mocks, and health-check state — no additional IPC channels or persistence are required. If the dashboard is disabled while the user is viewing it, the app redirects to the mappings view.
 
 ### Internationalisation
 
