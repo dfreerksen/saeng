@@ -12,6 +12,16 @@ function statusBadgeClass(status) {
   return 'badge-status-ok';
 }
 
+function matchHeaders(headers, q) {
+  if (!headers) return false;
+  for (const [name, value] of Object.entries(headers)) {
+    if (name.toLowerCase().includes(q)) return true;
+    const v = Array.isArray(value) ? value.join(', ') : String(value);
+    if (v.toLowerCase().includes(q)) return true;
+  }
+  return false;
+}
+
 function formatTime(timestamp) {
   return new Date(timestamp).toLocaleTimeString();
 }
@@ -156,12 +166,25 @@ function DetailPanel({ entry, settings, detailTab, setDetailTab, onClose, t }) {
 export default memo(function LogView({ entries, onClear, onExportHar, settings, t }) {
   const [selectedId, setSelectedId] = useState(null);
   const [activeFilter, setActiveFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [detailTab, setDetailTab] = useState('general');
 
-  const filteredEntries = useMemo(
-    () => activeFilter === 'all' ? entries : entries.filter((e) => matchesFilter(e, activeFilter)),
-    [entries, activeFilter]
-  );
+  const filteredEntries = useMemo(() => {
+    let result = activeFilter === 'all' ? entries : entries.filter((e) => matchesFilter(e, activeFilter));
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter((e) =>
+        (e.hostname && e.hostname.toLowerCase().includes(q)) ||
+        (e.path && e.path.toLowerCase().includes(q)) ||
+        (e.method && e.method.toLowerCase().includes(q)) ||
+        (e.status != null && String(e.status).includes(q)) ||
+        matchHeaders(e.requestHeaders, q) ||
+        matchHeaders(e.responseHeaders, q) ||
+        (e.responseBody && e.responseBody.toLowerCase().includes(q))
+      );
+    }
+    return result;
+  }, [entries, activeFilter, searchQuery]);
 
   const reversedEntries = useMemo(() => [...filteredEntries].reverse(), [filteredEntries]);
 
@@ -204,6 +227,22 @@ export default memo(function LogView({ entries, onClear, onExportHar, settings, 
         </div>
       </header>
 
+      <div className="log-search-bar">
+        <i className="bi bi-search log-search-icon" />
+        <input
+          type="text"
+          className="log-search-input"
+          placeholder={t('log.search.placeholder')}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        {searchQuery && (
+          <button className="log-search-clear" onClick={() => setSearchQuery('')} aria-label={t('log.search.clear')}>
+            <i className="bi bi-x-lg" />
+          </button>
+        )}
+      </div>
+
       <div className="log-filter-bar">
         {FILTER_TABS.map((f) => (
           <button
@@ -224,8 +263,8 @@ export default memo(function LogView({ entries, onClear, onExportHar, settings, 
         </div>
       ) : filteredEntries.length === 0 ? (
         <div className="empty-state">
-          <i className="bi bi-funnel fs-1" />
-          <div className="empty-state-text">{t('log.filterEmpty')}</div>
+          <i className={`bi ${searchQuery ? 'bi-search' : 'bi-funnel'} fs-1`} />
+          <div className="empty-state-text">{t(searchQuery ? 'log.searchEmpty' : 'log.filterEmpty')}</div>
         </div>
       ) : (
         <div className="log-devtools">

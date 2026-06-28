@@ -365,6 +365,188 @@ describe('LogView — filter bar', () => {
   });
 });
 
+describe('LogView — search bar', () => {
+  const SEARCH_ENTRIES = [
+    {
+      id: 's1',
+      timestamp: 1700000000000,
+      method: 'GET',
+      hostname: 'webapp.local',
+      path: '/api/users',
+      status: 200,
+      latencyMs: 10,
+      https: false,
+      responseHeaders: {},
+    },
+    {
+      id: 's2',
+      timestamp: 1700000001000,
+      method: 'POST',
+      hostname: 'dashboard.local',
+      path: '/login',
+      status: 401,
+      latencyMs: 50,
+      https: true,
+      responseHeaders: {},
+    },
+    {
+      id: 's3',
+      timestamp: 1700000002000,
+      method: 'PUT',
+      hostname: 'api.webapp.local',
+      path: '/settings',
+      status: 500,
+      latencyMs: 200,
+      https: true,
+      responseHeaders: { 'content-type': 'application/json' },
+    },
+  ];
+
+  it('renders the search input with a placeholder', () => {
+    renderLogView({ entries: SEARCH_ENTRIES });
+    expect(screen.getByPlaceholderText('log.search.placeholder')).toBeInTheDocument();
+  });
+
+  it('does not show the clear button when the search input is empty', () => {
+    const { container } = renderLogView({ entries: SEARCH_ENTRIES });
+    expect(container.querySelector('.log-search-clear')).not.toBeInTheDocument();
+  });
+
+  it('shows the clear button when the search input has text', () => {
+    const { container } = renderLogView({ entries: SEARCH_ENTRIES });
+    fireEvent.change(screen.getByPlaceholderText('log.search.placeholder'), { target: { value: 'web' } });
+    expect(container.querySelector('.log-search-clear')).toBeInTheDocument();
+  });
+
+  it('clears the search input when the clear button is clicked', () => {
+    const { container } = renderLogView({ entries: SEARCH_ENTRIES });
+    const input = screen.getByPlaceholderText('log.search.placeholder');
+    fireEvent.change(input, { target: { value: 'web' } });
+    fireEvent.click(container.querySelector('.log-search-clear'));
+    expect(input).toHaveValue('');
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(3);
+  });
+
+  it('filters entries by hostname', () => {
+    const { container } = renderLogView({ entries: SEARCH_ENTRIES });
+    fireEvent.change(screen.getByPlaceholderText('log.search.placeholder'), { target: { value: 'dashboard' } });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(screen.getByText('dashboard.local')).toBeInTheDocument();
+  });
+
+  it('filters entries by path', () => {
+    const { container } = renderLogView({ entries: SEARCH_ENTRIES });
+    fireEvent.change(screen.getByPlaceholderText('log.search.placeholder'), { target: { value: '/login' } });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(screen.getByText('/login')).toBeInTheDocument();
+  });
+
+  it('filters entries by method', () => {
+    const { container } = renderLogView({ entries: SEARCH_ENTRIES });
+    fireEvent.change(screen.getByPlaceholderText('log.search.placeholder'), { target: { value: 'put' } });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(screen.getByText('/settings')).toBeInTheDocument();
+  });
+
+  it('filters entries by status code', () => {
+    const { container } = renderLogView({ entries: SEARCH_ENTRIES });
+    fireEvent.change(screen.getByPlaceholderText('log.search.placeholder'), { target: { value: '500' } });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(screen.getByText('api.webapp.local')).toBeInTheDocument();
+  });
+
+  it('is case-insensitive', () => {
+    const { container } = renderLogView({ entries: SEARCH_ENTRIES });
+    fireEvent.change(screen.getByPlaceholderText('log.search.placeholder'), { target: { value: 'DASHBOARD' } });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(screen.getByText('dashboard.local')).toBeInTheDocument();
+  });
+
+  it('shows the search empty state when no entries match', () => {
+    renderLogView({ entries: SEARCH_ENTRIES });
+    fireEvent.change(screen.getByPlaceholderText('log.search.placeholder'), { target: { value: 'nonexistent' } });
+    expect(screen.getByText('log.searchEmpty')).toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+  });
+
+  it('shows the filter empty state (not search) when only the filter has no matches', () => {
+    renderLogView({ entries: SEARCH_ENTRIES });
+    fireEvent.click(screen.getByText('log.filter.ws'));
+    expect(screen.getByText('log.filterEmpty')).toBeInTheDocument();
+    expect(screen.queryByText('log.searchEmpty')).not.toBeInTheDocument();
+  });
+
+  it('combines search with the active filter tab', () => {
+    const { container } = renderLogView({ entries: SEARCH_ENTRIES });
+    fireEvent.click(screen.getByText('log.filter.json'));
+    fireEvent.change(screen.getByPlaceholderText('log.search.placeholder'), { target: { value: 'api' } });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(screen.getByText('api.webapp.local')).toBeInTheDocument();
+  });
+
+  it('restores all entries when the search input is cleared by typing', () => {
+    const { container } = renderLogView({ entries: SEARCH_ENTRIES });
+    const input = screen.getByPlaceholderText('log.search.placeholder');
+    fireEvent.change(input, { target: { value: 'dashboard' } });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    fireEvent.change(input, { target: { value: '' } });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(3);
+  });
+
+  it('filters entries by request header name', () => {
+    const entries = [
+      { ...SEARCH_ENTRIES[0], requestHeaders: { authorization: 'Bearer token' } },
+      SEARCH_ENTRIES[1],
+    ];
+    const { container } = renderLogView({ entries });
+    fireEvent.change(screen.getByPlaceholderText('log.search.placeholder'), { target: { value: 'authorization' } });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(screen.getByText('/api/users')).toBeInTheDocument();
+  });
+
+  it('filters entries by request header value', () => {
+    const entries = [
+      { ...SEARCH_ENTRIES[0], requestHeaders: { authorization: 'Bearer token' } },
+      SEARCH_ENTRIES[1],
+    ];
+    const { container } = renderLogView({ entries });
+    fireEvent.change(screen.getByPlaceholderText('log.search.placeholder'), { target: { value: 'bearer' } });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(screen.getByText('/api/users')).toBeInTheDocument();
+  });
+
+  it('filters entries by response header value', () => {
+    const { container } = renderLogView({ entries: SEARCH_ENTRIES });
+    fireEvent.change(screen.getByPlaceholderText('log.search.placeholder'), { target: { value: 'application/json' } });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(screen.getByText('api.webapp.local')).toBeInTheDocument();
+  });
+
+  it('filters entries by response body content', () => {
+    const entries = [
+      { ...SEARCH_ENTRIES[0], responseBody: '{"users":[{"name":"alice"}]}' },
+      { ...SEARCH_ENTRIES[1], responseBody: '{"error":"unauthorized"}' },
+    ];
+    const { container } = renderLogView({ entries });
+    fireEvent.change(screen.getByPlaceholderText('log.search.placeholder'), { target: { value: 'alice' } });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(screen.getByText('/api/users')).toBeInTheDocument();
+  });
+
+  it('does not match entries without headers or body when searching for header/body content', () => {
+    const { container } = renderLogView({ entries: [SEARCH_ENTRIES[1]] });
+    fireEvent.change(screen.getByPlaceholderText('log.search.placeholder'), { target: { value: 'bearer' } });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(0);
+    expect(screen.getByText('log.searchEmpty')).toBeInTheDocument();
+  });
+
+  it('matches partial hostname strings', () => {
+    const { container } = renderLogView({ entries: SEARCH_ENTRIES });
+    fireEvent.change(screen.getByPlaceholderText('log.search.placeholder'), { target: { value: 'webapp' } });
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(2);
+  });
+});
+
 describe('LogView — active state', () => {
   it('always has the active class (visibility controlled by parent)', () => {
     const { container } = renderLogView();
