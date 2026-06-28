@@ -1,8 +1,17 @@
 import { memo } from 'react';
 
-export default memo(function Sidebar({ currentView, setCurrentView, loggingEnabled, onAbout, t }) {
+export default memo(function Sidebar({ currentView, setCurrentView, dashboardEnabled, loggingEnabled, onAbout, t }) {
   return (
     <nav className="sidebar">
+      {dashboardEnabled && (
+        <button
+          className={`nav-item${currentView === 'dashboard' ? ' active' : ''}`}
+          onClick={() => setCurrentView('dashboard')}
+        >
+          <i className="bi bi-speedometer2" />
+          <span>{t('nav.dashboard')}</span>
+        </button>
+      )}
       <button
         className={`nav-item${currentView === 'mappings' ? ' active' : ''}`}
         onClick={() => setCurrentView('mappings')}

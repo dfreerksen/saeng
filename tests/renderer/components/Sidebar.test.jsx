@@ -17,6 +17,16 @@ function renderSidebar(props = {}) {
 }
 
 describe('Sidebar', () => {
+  it('renders the dashboard nav item when dashboardEnabled is true', () => {
+    renderSidebar({ dashboardEnabled: true });
+    expect(screen.getByText('nav.dashboard')).toBeInTheDocument();
+  });
+
+  it('hides the dashboard nav item when dashboardEnabled is false', () => {
+    renderSidebar({ dashboardEnabled: false });
+    expect(screen.queryByText('nav.dashboard')).not.toBeInTheDocument();
+  });
+
   it('renders the mappings nav item', () => {
     renderSidebar();
     expect(screen.getByText('nav.mappings')).toBeInTheDocument();
@@ -45,6 +55,13 @@ describe('Sidebar', () => {
   it('renders the about nav item', () => {
     renderSidebar();
     expect(screen.getByText('nav.about')).toBeInTheDocument();
+  });
+
+  it('applies active class to dashboard button when currentView is dashboard', () => {
+    const { container } = renderSidebar({ dashboardEnabled: true, currentView: 'dashboard' });
+    const navItems = container.querySelectorAll('.nav-item');
+    expect(navItems[0]).toHaveClass('active');
+    expect(navItems[1]).not.toHaveClass('active');
   });
 
   it('applies active class to mappings button when currentView is mappings', () => {
@@ -78,6 +95,13 @@ describe('Sidebar', () => {
     expect(navItems[1]).not.toHaveClass('active');
     expect(navItems[2]).not.toHaveClass('active');
     expect(navItems[3]).toHaveClass('active');
+  });
+
+  it('calls setCurrentView("dashboard") when dashboard button is clicked', () => {
+    const setCurrentView = vi.fn();
+    renderSidebar({ dashboardEnabled: true, setCurrentView });
+    fireEvent.click(screen.getByText('nav.dashboard').closest('button'));
+    expect(setCurrentView).toHaveBeenCalledWith('dashboard');
   });
 
   it('calls setCurrentView("mappings") when mappings button is clicked', () => {

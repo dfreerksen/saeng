@@ -23,7 +23,11 @@ function matchHeaders(headers, q) {
 }
 
 function formatTime(timestamp) {
-  return new Date(timestamp).toLocaleTimeString();
+  return new Date(timestamp).toLocaleString(undefined, {
+    year: 'numeric', month: 'short', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    timeZoneName: 'short'
+  });
 }
 
 function HeadersTable({ headers, t }) {

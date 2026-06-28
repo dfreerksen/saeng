@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef, version as reactVersion } from 'react';
 import Titlebar from './Titlebar.jsx';
 import Sidebar from './Sidebar.jsx';
+import DashboardView from './DashboardView.jsx';
 import MappingsView from './MappingsView.jsx';
 import MocksView from './MocksView.jsx';
 import LogView from './LogView.jsx';
@@ -49,6 +50,12 @@ export default function App() {
     logMaxEntriesRef.current = max;
     setRequestLog((prev) => (prev.length > max ? prev.slice(prev.length - max) : prev));
   }, [settings.logMaxEntries]);
+
+  useEffect(() => {
+    if (currentView === 'dashboard' && settings.dashboardEnabled === false) {
+      setCurrentView('mappings');
+    }
+  }, [currentView, settings.dashboardEnabled]);
 
   useEffect(() => {
     if (currentView === 'log' && settings.loggingEnabled === false) {
@@ -106,6 +113,10 @@ export default function App() {
       setSettingsState(settingsData);
       setLocales(localeList);
       setUpdateInfo(updateStatus);
+
+      if (settingsData.dashboardEnabled !== false) {
+        setCurrentView('dashboard');
+      }
 
       applyColorMode(settingsData.colorMode || 'auto');
 
@@ -252,11 +263,23 @@ export default function App() {
         <Sidebar
           currentView={currentView}
           setCurrentView={setCurrentView}
+          dashboardEnabled={settings.dashboardEnabled !== false}
           loggingEnabled={settings.loggingEnabled !== false}
           onAbout={handleOpenAboutModal}
           t={t}
         />
         <main className="content">
+          {currentView === 'dashboard' && (
+            <DashboardView
+              entries={requestLog}
+              mappings={mappings}
+              mocks={mocks}
+              healthStatuses={healthStatuses}
+              settings={settings}
+              proxyRunning={proxyRunning}
+              t={t}
+            />
+          )}
           {currentView === 'mappings' && (
             <MappingsView
               mappings={mappings}

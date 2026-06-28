@@ -158,6 +158,25 @@ export default memo(function SettingsView({
 
         <div className="setting-row">
           <div className="setting-info">
+            <div className="setting-name">{t('settings.preferences.dashboard.label')}</div>
+            <div className="setting-desc">{t('settings.preferences.dashboard.description')}</div>
+          </div>
+          <label className="toggle">
+            <input
+              type="checkbox"
+              checked={settings.dashboardEnabled !== false}
+              onChange={async (e) => {
+                const checked = e.target.checked;
+                await onSettingsChange({ dashboardEnabled: checked });
+                showToast(checked ? t('flash.dashboard.enabled') : t('flash.dashboard.disabled'), 'info');
+              }}
+            />
+            <span className="toggle-track" />
+          </label>
+        </div>
+
+        <div className="setting-row">
+          <div className="setting-info">
             <div className="setting-name">{t('settings.preferences.iconMode.label')}</div>
             <div className="setting-desc">{t('settings.preferences.iconMode.description')}</div>
           </div>

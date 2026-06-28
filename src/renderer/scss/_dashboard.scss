@@ -1,0 +1,106 @@
+.dashboard-stats {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  margin-bottom: 20px;
+}
+
+.dashboard-stat-card {
+  background: var(--saeng-primary-color);
+  border: 1px solid var(--saeng-border);
+  border-radius: var(--saeng-radius-md);
+  padding: 16px;
+  text-align: center;
+}
+
+.dashboard-stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+
+  &--success {
+    color: var(--bs-success);
+  }
+
+  &--danger {
+    color: var(--bs-danger);
+  }
+}
+
+.dashboard-stat-unit {
+  font-size: 0.875rem;
+  font-weight: 400;
+  margin-left: 2px;
+}
+
+.dashboard-stat-label {
+  color: var(--saeng-text-muted);
+  font-size: var(--saeng-font-size-small);
+  margin-top: 4px;
+}
+
+.dashboard-charts {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+  margin-bottom: 20px;
+}
+
+.dashboard-chart-card {
+  background: var(--saeng-primary-color);
+  border: 1px solid var(--saeng-border);
+  border-radius: var(--saeng-radius-md);
+  min-width: 0;
+  padding: 16px;
+}
+
+.dashboard-chart-title {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.dashboard-chart-body {
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.dashboard-groups {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.dashboard-group-card {
+  background: var(--saeng-primary-color);
+  border: 1px solid var(--saeng-border);
+  border-radius: var(--saeng-radius-md);
+  padding: 16px;
+}
+
+.dashboard-group-title {
+  border-bottom: 1px solid var(--saeng-border);
+  font-weight: 600;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+}
+
+.dashboard-group-row {
+  border-bottom: 1px solid var(--saeng-border);
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.dashboard-group-count {
+  font-weight: 600;
+}
+
+.dashboard-group-empty {
+  color: var(--saeng-text-muted);
+  font-size: var(--saeng-font-size-small);
+}

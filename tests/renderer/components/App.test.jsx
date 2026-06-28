@@ -56,7 +56,7 @@ function makeElectronAPI(overrides = {}) {
       ...overrides.health,
     },
     settings: {
-      get: vi.fn().mockResolvedValue({ httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en', healthCheckEnabled: true }),
+      get: vi.fn().mockResolvedValue({ httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en', healthCheckEnabled: true, dashboardEnabled: false }),
       set: vi.fn().mockResolvedValue(undefined),
       ...overrides.settings,
     },
@@ -152,10 +152,45 @@ describe('App — initial render', () => {
 });
 
 describe('App — navigation', () => {
-  it('shows the mappings view by default', async () => {
+  it('shows the mappings view by default when dashboard is disabled', async () => {
     await renderApp();
     expect(document.querySelector('#view-mappings')).toBeInTheDocument();
     expect(document.querySelector('#view-settings')).not.toBeInTheDocument();
+  });
+
+  it('shows the dashboard view on init when dashboardEnabled is true', async () => {
+    await renderApp({
+      settings: {
+        get: vi.fn().mockResolvedValue({ httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en', healthCheckEnabled: true, dashboardEnabled: true }),
+      },
+    });
+    expect(document.querySelector('#view-dashboard')).toBeInTheDocument();
+    expect(document.querySelector('#view-mappings')).not.toBeInTheDocument();
+  });
+
+  it('redirects from dashboard to mappings when dashboardEnabled becomes false', async () => {
+    let settingsData = { httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en', healthCheckEnabled: true, dashboardEnabled: true };
+    const setFn = vi.fn().mockImplementation((patch) => {
+      settingsData = { ...settingsData, ...patch };
+      return Promise.resolve(settingsData);
+    });
+    await renderApp({
+      settings: {
+        get: vi.fn().mockResolvedValue(settingsData),
+        set: setFn,
+      },
+    });
+    expect(document.querySelector('#view-dashboard')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('nav.settings').closest('button'));
+    const toggles = document.querySelectorAll('.toggle input[type="checkbox"]');
+    await act(async () => {
+      fireEvent.click(toggles[0]);
+    });
+
+    await waitFor(() => {
+      expect(document.querySelector('#view-dashboard')).not.toBeInTheDocument();
+    });
   });
 
   it('switches to settings view when settings nav item is clicked', async () => {

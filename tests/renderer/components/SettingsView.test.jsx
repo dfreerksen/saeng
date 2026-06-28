@@ -169,23 +169,64 @@ describe('SettingsView — icon mode', () => {
   });
 });
 
+describe('SettingsView — dashboard toggle', () => {
+  it('renders the dashboard toggle as checked when dashboardEnabled is not set', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    expect(toggles[0]).toBeChecked();
+  });
+
+  it('renders the dashboard toggle as checked when dashboardEnabled is true', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, dashboardEnabled: true } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    expect(toggles[0]).toBeChecked();
+  });
+
+  it('renders the dashboard toggle as unchecked when dashboardEnabled is false', () => {
+    const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, dashboardEnabled: false } });
+    const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
+    expect(toggles[0]).not.toBeChecked();
+  });
+
+  it('calls onSettingsChange with dashboardEnabled when toggled off', async () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderSettingsView({ onSettingsChange });
+    const toggle = container.querySelectorAll('.toggle input[type="checkbox"]')[0];
+    fireEvent.click(toggle);
+    await waitFor(() => {
+      expect(onSettingsChange).toHaveBeenCalledWith({ dashboardEnabled: false });
+    });
+  });
+
+  it('shows a toast after toggling dashboard', async () => {
+    const onSettingsChange = vi.fn().mockResolvedValue(undefined);
+    const showToast = vi.fn();
+    const { container } = renderSettingsView({ onSettingsChange, showToast });
+    const toggle = container.querySelectorAll('.toggle input[type="checkbox"]')[0];
+    fireEvent.click(toggle);
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith('flash.dashboard.disabled', 'info');
+    });
+  });
+});
+
 describe('SettingsView — proxy toggles', () => {
   it('renders httpsEnabled checkbox as checked when setting is true', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, httpsEnabled: true } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    expect(toggles[0]).toBeChecked();
+    expect(toggles[1]).toBeChecked();
   });
 
   it('renders httpsEnabled checkbox as unchecked when setting is false', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, httpsEnabled: false } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    expect(toggles[0]).not.toBeChecked();
+    expect(toggles[1]).not.toBeChecked();
   });
 
   it('calls onSettingsChange with httpsEnabled when toggled', async () => {
     const onSettingsChange = vi.fn().mockResolvedValue(undefined);
     const { container } = renderSettingsView({ onSettingsChange });
-    const httpsToggle = container.querySelectorAll('.toggle input[type="checkbox"]')[0];
+    const httpsToggle = container.querySelectorAll('.toggle input[type="checkbox"]')[1];
     fireEvent.click(httpsToggle);
     await waitFor(() => {
       expect(onSettingsChange).toHaveBeenCalledWith({ httpsEnabled: false });
@@ -196,7 +237,7 @@ describe('SettingsView — proxy toggles', () => {
     const onSettingsChange = vi.fn().mockResolvedValue(undefined);
     const showToast = vi.fn();
     const { container } = renderSettingsView({ onSettingsChange, showToast });
-    const httpsToggle = container.querySelectorAll('.toggle input[type="checkbox"]')[0];
+    const httpsToggle = container.querySelectorAll('.toggle input[type="checkbox"]')[1];
     fireEvent.click(httpsToggle);
     await waitFor(() => {
       expect(showToast).toHaveBeenCalled();
@@ -206,13 +247,13 @@ describe('SettingsView — proxy toggles', () => {
   it('renders startOnLaunch checkbox reflecting the setting', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, startOnLaunch: true } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    expect(toggles[1]).toBeChecked();
+    expect(toggles[2]).toBeChecked();
   });
 
   it('calls onSettingsChange with startOnLaunch when toggled', () => {
     const onSettingsChange = vi.fn().mockResolvedValue(undefined);
     const { container } = renderSettingsView({ onSettingsChange });
-    const startToggle = container.querySelectorAll('.toggle input[type="checkbox"]')[1];
+    const startToggle = container.querySelectorAll('.toggle input[type="checkbox"]')[2];
     fireEvent.click(startToggle);
     expect(onSettingsChange).toHaveBeenCalledWith({ startOnLaunch: true });
   });
@@ -221,7 +262,7 @@ describe('SettingsView — proxy toggles', () => {
     const onSettingsChange = vi.fn().mockResolvedValue(undefined);
     const showToast = vi.fn();
     const { container } = renderSettingsView({ onSettingsChange, showToast });
-    const startToggle = container.querySelectorAll('.toggle input[type="checkbox"]')[1];
+    const startToggle = container.querySelectorAll('.toggle input[type="checkbox"]')[2];
     fireEvent.click(startToggle);
     await waitFor(() => {
       expect(showToast).toHaveBeenCalledWith('flash.settings.updated', 'info');
@@ -233,20 +274,20 @@ describe('SettingsView — logging enabled', () => {
   it('checks the toggle when loggingEnabled is true', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, loggingEnabled: true } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    expect(toggles[2]).toBeChecked();
+    expect(toggles[3]).toBeChecked();
   });
 
   it('unchecks the toggle when loggingEnabled is false', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, loggingEnabled: false } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    expect(toggles[2]).not.toBeChecked();
+    expect(toggles[3]).not.toBeChecked();
   });
 
   it('calls onSettingsChange when the toggle is changed', () => {
     const onSettingsChange = vi.fn().mockResolvedValue(undefined);
     const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, loggingEnabled: true } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    fireEvent.click(toggles[2]);
+    fireEvent.click(toggles[3]);
     expect(onSettingsChange).toHaveBeenCalledWith({ loggingEnabled: false });
   });
 
@@ -350,40 +391,40 @@ describe('SettingsView — log headers / body', () => {
   it('defaults the log headers toggle to unchecked', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, logHeadersEnabled: undefined } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    expect(toggles[3]).not.toBeChecked();
+    expect(toggles[4]).not.toBeChecked();
   });
 
   it('checks the log headers toggle when logHeadersEnabled is true', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, logHeadersEnabled: true } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    expect(toggles[3]).toBeChecked();
+    expect(toggles[4]).toBeChecked();
   });
 
   it('calls onSettingsChange with logHeadersEnabled when the headers toggle is changed', () => {
     const onSettingsChange = vi.fn().mockResolvedValue(undefined);
     const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, logHeadersEnabled: false } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    fireEvent.click(toggles[3]);
+    fireEvent.click(toggles[4]);
     expect(onSettingsChange).toHaveBeenCalledWith({ logHeadersEnabled: true });
   });
 
   it('defaults the log body toggle to unchecked', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, logBodyEnabled: undefined } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    expect(toggles[4]).not.toBeChecked();
+    expect(toggles[5]).not.toBeChecked();
   });
 
   it('checks the log body toggle when logBodyEnabled is true', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, logBodyEnabled: true } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    expect(toggles[4]).toBeChecked();
+    expect(toggles[5]).toBeChecked();
   });
 
   it('calls onSettingsChange with logBodyEnabled when the body toggle is changed', () => {
     const onSettingsChange = vi.fn().mockResolvedValue(undefined);
     const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, logBodyEnabled: false } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    fireEvent.click(toggles[4]);
+    fireEvent.click(toggles[5]);
     expect(onSettingsChange).toHaveBeenCalledWith({ logBodyEnabled: true });
   });
 });
@@ -392,20 +433,20 @@ describe('SettingsView — health check enabled', () => {
   it('unchecks the toggle when healthCheckEnabled is not set', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    expect(toggles[5]).not.toBeChecked();
+    expect(toggles[6]).not.toBeChecked();
   });
 
   it('checks the toggle when healthCheckEnabled is true', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: true } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    expect(toggles[5]).toBeChecked();
+    expect(toggles[6]).toBeChecked();
   });
 
   it('calls onSettingsChange when the toggle is changed', () => {
     const onSettingsChange = vi.fn().mockResolvedValue(undefined);
     const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, healthCheckEnabled: false } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    fireEvent.click(toggles[5]);
+    fireEvent.click(toggles[6]);
     expect(onSettingsChange).toHaveBeenCalledWith({ healthCheckEnabled: true });
   });
 

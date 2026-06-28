@@ -766,6 +766,15 @@ describe('AppStore.getSettings() / setSettings()', () => {
     expect(store.setSettings({ iconMode: 'invalid' }).iconMode).toBe('both');
     expect(store.setSettings({ iconMode: '' }).iconMode).toBe('both');
   });
+
+  it('getSettings() defaults dashboardEnabled to false', () => {
+    expect(store.getSettings().dashboardEnabled).toBe(false);
+  });
+
+  it('setSettings() stores a dashboardEnabled value', () => {
+    expect(store.setSettings({ dashboardEnabled: true }).dashboardEnabled).toBe(true);
+    expect(store.getSettings().dashboardEnabled).toBe(true);
+  });
 });
 
 describe('AppStore.getCertDir()', () => {
