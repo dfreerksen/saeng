@@ -75,7 +75,10 @@ export default memo(function MappingsView({ mappings, setMappings, healthStatuse
       <header className="container-fluid p-0 mb-3">
         <div className="d-flex justify-content-between align-items-center">
           <div>
-            <h4 className="m-0">{t('mappings.title')}</h4>
+            <h4 className="m-0">
+              <i className="bi bi-arrow-left-right me-2" />
+              {t('mappings.title')}
+            </h4>
             <h6 className="subtitle">{t('mappings.subtitle')}</h6>
           </div>
           <div className="btn-group" role="group" aria-label="Actions">
