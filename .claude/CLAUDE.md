@@ -60,7 +60,7 @@ All logic runs in the **main process**. The renderer has no Node.js access.
 
 The renderer is a **React 19** app bundled by **esbuild**. SCSS is compiled by **Sass** from `src/renderer/scss/` → `src/renderer/styles.css`. Bootstrap 5 + Bootstrap Icons are used for UI. Source files in `src/renderer/components/` are `.jsx`; utility modules in `src/renderer/js/` are plain `.js`.
 
-`eslint.config.mjs` intentionally ignores `src/renderer/scripts.js` (the esbuild output). The ESLint config covers only `.js` files — not `.jsx`.
+`eslint.config.mjs` intentionally ignores `src/renderer/scripts.js` (the esbuild output). The ESLint config covers `.js` files and `.jsx` files — the `.jsx` block includes `eslint-plugin-react` (`jsx-uses-vars`, `no-unknown-property`) and `eslint-plugin-react-hooks` (`rules-of-hooks`, `exhaustive-deps`).
 
 ### IPC channels (renderer → main)
 
@@ -131,7 +131,7 @@ A mock only takes effect if its mapping has `mocksEnabled: true`. `HttpProxy.upd
 
 `store.removeMocksForMapping(mappingId)` is called from the `mappings:remove` handler to delete orphaned mocks when their mapping is removed. `store.exportMocks(ids)`/`importMocks(list)` mirror the mapping export/import functions but key on the mapping's `domain` rather than `mappingId` (so exports are portable across stores) — import skips entries whose `domain` doesn't match an existing mapping.
 
-In the renderer, `MocksView.jsx` groups mocks by mapping domain (mirroring `MappingsView.jsx`), `MockModal.jsx` is the add/edit form, and `MockRegexHelpModal.jsx` shows example `pathPattern` regexes with copy-to-clipboard. `MockModal.jsx` and `MappingModal.jsx` share the extracted `HeaderListEditor.jsx` component for editing header lists. `ExportModal.jsx` was generalized to take `items`/`i18nPrefix` props so it can be reused for both mapping and mock exports.
+In the renderer, `MocksView.jsx` groups mocks by mapping domain (mirroring `MappingsView.jsx`), `MockModal.jsx` is the add/edit form with an inline regex-help pane (toggled by a help button) showing example `pathPattern` regexes with copy-to-clipboard. `MockModal.jsx` and `MappingModal.jsx` share the extracted `HeaderListEditor.jsx` component for editing header lists. `ExportModal.jsx` was generalized to take `items`/`i18nPrefix` props so it can be reused for both mapping and mock exports.
 
 ### Mapping groups
 

@@ -28,8 +28,8 @@ npm start
 This compiles the SCSS and bundles the renderer JS before launching Electron. The renderer loads `src/renderer/styles.css` and `src/renderer/scripts.js`, which are build artifacts (gitignored) — if you edit `.scss` or `.jsx`/`.js` files under `src/renderer/` and the app is already running, re-run `npm start` (or the individual build commands below) and restart Electron to see changes.
 
 ```bash
-npm run sass:build  # SCSS -> src/renderer/styles.css
-npm run js:build    # main.jsx -> src/renderer/scripts.js (esbuild)
+npm run sass:build # SCSS -> src/renderer/styles.css
+npm run js:build   # main.jsx -> src/renderer/scripts.js (esbuild)
 ```
 
 ## Project structure
@@ -83,8 +83,8 @@ If you add, rename, or remove an IPC channel, keep `preload.cjs`, `main.js`, and
 ## Packaging
 
 ```bash
-npm run pack   # electron-builder --dir, unpacked output in dist/
-npm run build  # full installers via electron-builder
+npm run pack  # electron-builder --dir, unpacked output in dist/
+npm run build # full installers via electron-builder
 ```
 
 Build targets (see `package.json` `build` section): macOS (`dmg`, arm64 + x64), Windows (`nsis`), Linux (`AppImage`, `deb`).

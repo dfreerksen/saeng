@@ -94,7 +94,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                 <div className="domain-row">
                   <input
                     className="form-input flex-1"
-                    placeholder={t('mappings.modals.manage.form.subdomain.placeholder')}
+                    placeholder="api"
                     value={subdomain}
                     onChange={(e) => setSubdomain(e.target.value.toLowerCase())}
                     autoComplete="off"
@@ -104,7 +104,7 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                   <input
                     ref={domainInputRef}
                     className="form-input flex-1-5"
-                    placeholder={t('mappings.modals.manage.form.domain.placeholder')}
+                    placeholder="myapp"
                     value={domain}
                     onChange={(e) => setDomain(e.target.value.toLowerCase())}
                     autoComplete="off"

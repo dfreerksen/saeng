@@ -620,7 +620,7 @@ describe('App — add mock modal', () => {
     await renderApp({ mappings: { list: vi.fn().mockResolvedValue(mockableMappings) }, mocks: { add: addFn } });
     fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(screen.getByText('mocks.actions.add').closest('button'));
-    const pathInput = screen.getByPlaceholderText('mocks.modals.manage.form.path.placeholder');
+    const pathInput = screen.getByPlaceholderText('^/api/users/\\d+$');
     fireEvent.change(pathInput, { target: { value: '^/api$' } });
     fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
@@ -648,7 +648,7 @@ describe('App — edit mock modal', () => {
     fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(container.querySelector('#view-mocks .btn-edit'));
     expect(screen.getByText('mocks.modals.manage.editTitle')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('mocks.modals.manage.form.path.placeholder').value).toBe('^/api$');
+    expect(screen.getByPlaceholderText('^/api/users/\\d+$').value).toBe('^/api$');
   });
 
   it('updates a mock, refreshes the list, closes the modal, and shows a success toast', async () => {
@@ -663,7 +663,7 @@ describe('App — edit mock modal', () => {
     });
     fireEvent.click(screen.getByText('nav.mocks').closest('button'));
     fireEvent.click(container.querySelector('#view-mocks .btn-edit'));
-    const pathInput = screen.getByPlaceholderText('mocks.modals.manage.form.path.placeholder');
+    const pathInput = screen.getByPlaceholderText('^/api/users/\\d+$');
     fireEvent.change(pathInput, { target: { value: '^/api/v2$' } });
     fireEvent.click(screen.getByText('mappings.modals.manage.buttons.update'));
     await waitFor(() => {

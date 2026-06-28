@@ -180,7 +180,7 @@ export default function MockModal({ mock, mappings, onClose, onSubmit, showToast
                   <input
                     ref={pathInputRef}
                     className="form-input"
-                    placeholder={t('mocks.modals.manage.form.path.placeholder')}
+                    placeholder='^/api/users/\d+$'
                     value={pathPattern}
                     onChange={(e) => setPathPattern(e.target.value)}
                     autoComplete="off"
