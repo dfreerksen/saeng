@@ -13,6 +13,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '../../..');
 
 const NAV_ICONS = {
+  dashboard: 'bi-speedometer2',
   mappings: 'bi-arrow-left-right',
   mocks: 'bi-magic',
   log: 'bi-list-columns-reverse',
@@ -27,7 +28,7 @@ function flag(name, fallback) {
   return found ? found.slice(prefix.length) : fallback;
 }
 
-const views = flag('views', 'mappings,mocks,log,settings').split(',').map((v) => v.trim());
+const views = flag('views', 'dashboard,mappings,mocks,log,settings').split(',').map((v) => v.trim());
 const width = Number(flag('width', '1356'));
 const height = Number(flag('height', '796'));
 const scale = Number(flag('scale', '2'));
@@ -150,6 +151,138 @@ async function injectFakeLogEntries(ws) {
   return result?.value;
 }
 
+async function injectFakeDashboardData(ws) {
+  const { result } = await cdpSend(ws, 'Runtime.evaluate', {
+    expression: `(() => {
+      const now = Date.now();
+
+      // Seeded PRNG for deterministic screenshots
+      let seed = 42;
+      function rand() {
+        seed = (seed * 1664525 + 1013904223) & 0x7fffffff;
+        return seed / 0x7fffffff;
+      }
+
+      const hosts = ['webapp.local', 'api.webapp.local', 'dashboard.local', 'admin.dashboard.local'];
+      const hostPaths = {
+        'webapp.local': ['/', '/about', '/contact', '/login', '/assets/app.js', '/assets/styles.css', '/favicon.ico'],
+        'api.webapp.local': ['/v2/users', '/v2/users?page=1&limit=25', '/v2/posts', '/v2/comments', '/v2/auth/token', '/v2/health'],
+        'dashboard.local': ['/events', '/metrics', '/', '/assets/dashboard.js', '/assets/styles.css'],
+        'admin.dashboard.local': ['/users', '/settings', '/audit-log'],
+      };
+      const methods = ['GET', 'GET', 'GET', 'GET', 'GET', 'POST', 'PUT', 'DELETE'];
+
+      // Traffic pattern per minute bucket (index 0 = oldest, 29 = most recent)
+      const traffic = [
+        2,2,3,2,3, 3,4,3,4,3, 4,4,5,6,7,
+        6,7,5,5,4, 4,3,4,3,3, 3,2,3,2,3
+      ];
+
+      const entries = [];
+      let id = 1;
+      for (let min = 0; min < 30; min++) {
+        const count = traffic[min];
+        for (let j = 0; j < count; j++) {
+          const host = hosts[Math.floor(rand() * hosts.length)];
+          const ps = hostPaths[host];
+          const p = ps[Math.floor(rand() * ps.length)];
+          const method = methods[Math.floor(rand() * methods.length)];
+          const timestamp = now - (30 - min) * 60000 + Math.floor(rand() * 55000) + 2000;
+
+          let status = 200;
+          const r = rand();
+          if (min >= 14 && min <= 17 && r > 0.82) status = 500;
+          else if (r > 0.94) status = 500;
+          else if (r > 0.90) status = 404;
+          else if (r > 0.84) status = 304;
+          else if (r > 0.80 && method === 'POST') status = 201;
+
+          const latencyMs = Math.round(12 + rand() * 160 + (status >= 500 ? 80 + rand() * 120 : 0));
+          const error = status === 500 && rand() > 0.4 ? 'ECONNREFUSED' : null;
+
+          entries.push({
+            id: id++, method, hostname: host, path: p, status,
+            https: host.includes('api.'), websocket: false,
+            timestamp, latencyMs, mocked: rand() > 0.88, error,
+          });
+        }
+      }
+
+      const mappings = [
+        { id: 'm1', domain: 'webapp.local', host: '127.0.0.1', port: 3000, https: false, enabled: true, createdAt: now - 86400000, requestHeaders: [], responseHeaders: [], mocksEnabled: true },
+        { id: 'm2', domain: 'api.webapp.local', host: '127.0.0.1', port: 3001, https: true, enabled: true, createdAt: now - 86400000, requestHeaders: [], responseHeaders: [], mocksEnabled: true },
+        { id: 'm3', domain: 'dashboard.local', host: '127.0.0.1', port: 8080, https: false, enabled: true, createdAt: now - 86400000, requestHeaders: [], responseHeaders: [], mocksEnabled: false },
+        { id: 'm4', domain: 'admin.dashboard.local', host: '127.0.0.1', port: 8081, https: false, enabled: false, createdAt: now - 86400000, requestHeaders: [], responseHeaders: [], mocksEnabled: false },
+      ];
+
+      const mocks = [
+        { id: 'mk1', mappingId: 'm1', enabled: true, method: 'GET', pathPattern: '^/api/health$', statusCode: 200, headers: [], body: '{"status":"ok"}', delayMs: 0, createdAt: now - 86400000 },
+        { id: 'mk2', mappingId: 'm2', enabled: true, method: '*', pathPattern: '^/v2/auth/token$', statusCode: 200, headers: [], body: '{"token":"fake"}', delayMs: 100, createdAt: now - 86400000 },
+        { id: 'mk3', mappingId: 'm2', enabled: false, method: 'GET', pathPattern: '^/v2/users$', statusCode: 200, headers: [], body: '[]', delayMs: 0, createdAt: now - 86400000 },
+      ];
+
+      const healthStatuses = {
+        m1: { id: 'm1', status: 'up', latencyMs: 12, checkedAt: now },
+        m2: { id: 'm2', status: 'up', latencyMs: 45, checkedAt: now },
+        m3: { id: 'm3', status: 'down', latencyMs: null, checkedAt: now, error: 'ECONNREFUSED' },
+      };
+
+      const root = document.getElementById('root');
+      const containerKey = Object.keys(root).find(k => k.startsWith('__reactContainer'));
+      if (!containerKey) return 'no-container';
+
+      function findAppFiber(f) {
+        if (!f) return null;
+        if (typeof f.type === 'function' && f.type.name === 'App') return f;
+        return findAppFiber(f.child) || findAppFiber(f.sibling);
+      }
+
+      const appFiber = findAppFiber(root[containerKey]);
+      if (!appFiber) return 'no-app';
+
+      function getHook(index) {
+        let hook = appFiber.memoizedState;
+        for (let i = 0; i < index; i++) {
+          if (!hook) return null;
+          hook = hook.next;
+        }
+        return hook;
+      }
+
+      // Hook 0: proxyRunning — true so health stats show
+      const proxyHook = getHook(0);
+      if (proxyHook?.queue?.dispatch) proxyHook.queue.dispatch(true);
+
+      // Hook 1: mappings
+      const mappingsHook = getHook(1);
+      if (mappingsHook?.queue?.dispatch) mappingsHook.queue.dispatch(mappings);
+
+      // Hook 2: mocks
+      const mocksHook = getHook(2);
+      if (mocksHook?.queue?.dispatch) mocksHook.queue.dispatch(mocks);
+
+      // Hook 3: requestLog
+      const logHook = getHook(3);
+      if (logHook?.queue?.dispatch) logHook.queue.dispatch(entries);
+
+      // Hook 4: healthStatuses
+      const healthHook = getHook(4);
+      if (healthHook?.queue?.dispatch) healthHook.queue.dispatch(healthStatuses);
+
+      // Hook 5: settings — enable dashboard and health checks
+      const settingsHook = getHook(5);
+      if (settingsHook?.queue?.dispatch) {
+        const current = settingsHook.memoizedState || {};
+        settingsHook.queue.dispatch({ ...current, dashboardEnabled: true, healthCheckEnabled: true });
+      }
+
+      return 'ok';
+    })()`,
+    returnByValue: true,
+  });
+  return result?.value;
+}
+
 async function main() {
   console.log('Building renderer assets...');
   execSync('npm run sass:build && npm run js:build', { cwd: root, stdio: 'inherit' });
@@ -202,6 +335,14 @@ async function main() {
       }
 
       for (const view of views) {
+        if (view === 'dashboard') {
+          const injected = await injectFakeDashboardData(ws);
+          if (injected !== 'ok') {
+            console.warn(`  Dashboard data injection returned: ${injected}`);
+          }
+          await sleep(600);
+        }
+
         const icon = NAV_ICONS[view];
         const { result } = await cdpSend(ws, 'Runtime.evaluate', {
           expression: `(() => {

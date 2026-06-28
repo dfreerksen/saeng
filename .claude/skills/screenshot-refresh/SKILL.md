@@ -1,6 +1,6 @@
 ---
 name: screenshot-refresh
-description: Launches the real Electron app with remote debugging, drives the renderer via the Chrome DevTools Protocol, and captures a PNG per sidebar view (mappings, mocks, log, settings, about) in both light and dark themes to use in the README. Use when asked to update/refresh screenshots or take new screenshots of the app.
+description: Launches the real Electron app with remote debugging, drives the renderer via the Chrome DevTools Protocol, and captures a PNG per sidebar view (dashboard, mappings, mocks, log, settings, about) in both light and dark themes to use in the README. Use when asked to update/refresh screenshots or take new screenshots of the app.
 ---
 
 Run the bundled script to (re)build the renderer and capture fresh screenshots:
@@ -9,7 +9,7 @@ Run the bundled script to (re)build the renderer and capture fresh screenshots:
 node .claude/skills/screenshot-refresh/capture-screenshots.mjs
 ```
 
-By default this captures `mappings`, `mocks`, `log`, and `settings`, in both `light` and `dark` themes, to `assets/screenshots/` as `screenshot-<theme>-<view>.png` (e.g. `screenshot-light-mappings.png`, `screenshot-dark-mappings.png`), at 1356x796 with a 2x device scale factor (2712x1592 — matches the existing README screenshots exactly).
+By default this captures `dashboard`, `mappings`, `mocks`, `log`, and `settings`, in both `light` and `dark` themes, to `assets/screenshots/` as `screenshot-<theme>-<view>.png` (e.g. `screenshot-light-mappings.png`, `screenshot-dark-mappings.png`), at 1356x796 with a 2x device scale factor (2712x1592 — matches the existing README screenshots exactly).
 
 ## How it works
 
@@ -24,14 +24,14 @@ By default this captures `mappings`, `mocks`, `log`, and `settings`, in both `li
 
 ```bash
 node .claude/skills/screenshot-refresh/capture-screenshots.mjs \
-  --views=mappings,mocks,log,settings,about \
+  --views=dashboard,mappings,mocks,log,settings,about \
   --width=1356 --height=796 --scale=2 \
   --theme=light,dark \
   --out-dir=assets/screenshots \
   --port=9333
 ```
 
-- `--views` — comma-separated subset of `mappings`, `mocks`, `log`, `settings`, `about`. `log` is skipped (with a warning) if `settings.loggingEnabled` is off, since the nav item won't exist.
+- `--views` — comma-separated subset of `dashboard`, `mappings`, `mocks`, `log`, `settings`, `about`. `dashboard` injects fake data (mappings, mocks, health statuses, and ~100 log entries spread over 30 minutes) via React fiber manipulation so the charts and stats are populated regardless of real app state. `log` is skipped (with a warning) if `settings.loggingEnabled` is off, since the nav item won't exist.
 - `--theme` — comma-separated subset of `light`, `dark` (default `light,dark`); sets `data-bs-theme` on `<html>` before capturing each. Pass `--theme=` (empty) to do a single pass without overriding the theme (uses whatever the app's current `colorMode` resolves to) and writes legacy `screenshot-<view>.png` names.
 - `--out-dir` — defaults to `assets/screenshots`, matching where the existing `screenshot-*.png` files already live.
 
