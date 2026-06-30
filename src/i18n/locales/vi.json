@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(tùy chọn)",
   "mappings.modals.manage.form.subdomain.error": "Tên miền phụ chỉ được chứa chữ cái, số và dấu gạch ngang.",
   "mappings.modals.manage.form.domain.hint": "Tên miền phụ là tùy chọn. Nhập * để khớp với tất cả tên miền phụ (ví dụ: *.myapp.local khớp với api.myapp.local).",
+  "mappings.modals.manage.form.domain.accessedUsing": "Truy cập bằng: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "Ví dụ: {url}",
   "mappings.modals.manage.form.domain.error.general": "Vui lòng nhập một tên miền hợp lệ.",
   "mappings.modals.manage.form.domain.error.invalid": "Nhập tên miền hợp lệ (chữ cái, số, dấu gạch ngang).",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} đã được ánh xạ.",

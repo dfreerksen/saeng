@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(ไม่จำเป็น)",
   "mappings.modals.manage.form.subdomain.error": "โดเมนย่อยต้องมีเฉพาะตัวอักษร ตัวเลข และขีดกลางเท่านั้น",
   "mappings.modals.manage.form.domain.hint": "โดเมนย่อยเป็นทางเลือก ป้อน * เพื่อจับคู่โดเมนย่อยทั้งหมด (เช่น *.myapp.local จะจับคู่กับ api.myapp.local)",
+  "mappings.modals.manage.form.domain.accessedUsing": "เข้าถึงโดยใช้: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "ตัวอย่างเช่น: {url}",
   "mappings.modals.manage.form.domain.error.general": "กรุณากรอกชื่อโดเมนที่ถูกต้อง",
   "mappings.modals.manage.form.domain.error.invalid": "ป้อนชื่อโดเมนที่ถูกต้อง (ตัวอักษร ตัวเลข ขีดกลาง)",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} ได้รับการแมปแล้ว",

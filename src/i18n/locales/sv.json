@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(valfri)",
   "mappings.modals.manage.form.subdomain.error": "Underdomänen får bara innehålla bokstäver, siffror och bindestreck.",
   "mappings.modals.manage.form.domain.hint": "Underdomän är valfri. Ange * för att matcha alla underdomäner (t.ex. *.myapp.local matchar api.myapp.local).",
+  "mappings.modals.manage.form.domain.accessedUsing": "Nås via: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "Till exempel: {url}",
   "mappings.modals.manage.form.domain.error.general": "Ange ett giltigt domännamn.",
   "mappings.modals.manage.form.domain.error.invalid": "Ange ett giltigt domännamn (bokstäver, siffror, bindestreck).",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} är redan mappad.",

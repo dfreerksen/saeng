@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(optioneel)",
   "mappings.modals.manage.form.subdomain.error": "Het subdomein mag alleen letters, cijfers en koppeltekens bevatten.",
   "mappings.modals.manage.form.domain.hint": "Het subdomein is optioneel. Voer * in om alle subdomeinen te matchen (bijv. *.myapp.local komt overeen met api.myapp.local).",
+  "mappings.modals.manage.form.domain.accessedUsing": "Toegankelijk via: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "Bijvoorbeeld: {url}",
   "mappings.modals.manage.form.domain.error.general": "Voer een geldige domeinnaam in.",
   "mappings.modals.manage.form.domain.error.invalid": "Voer een geldige domeinnaam in (letters, cijfers, koppeltekens).",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} is al gekoppeld.",

@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(선택 사항)",
   "mappings.modals.manage.form.subdomain.error": "서브도메인에는 문자, 숫자, 하이픈만 포함될 수 있습니다.",
   "mappings.modals.manage.form.domain.hint": "서브도메인은 선택 사항입니다. *를 입력하면 모든 서브도메인과 일치합니다 (예: *.myapp.local은 api.myapp.local과 일치).",
+  "mappings.modals.manage.form.domain.accessedUsing": "접속 주소: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "예: {url}",
   "mappings.modals.manage.form.domain.error.general": "유효한 도메인 이름을 입력해 주세요.",
   "mappings.modals.manage.form.domain.error.invalid": "유효한 도메인 이름(문자, 숫자, 하이픈)을 입력하세요.",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain}은 이미 매핑되어 있습니다.",

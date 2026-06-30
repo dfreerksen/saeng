@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(необов'язково)",
   "mappings.modals.manage.form.subdomain.error": "Піддомен повинен містити лише літери, цифри та дефіси.",
   "mappings.modals.manage.form.domain.hint": "Піддомен необов'язковий. Введіть * для відповідності всім піддоменам (напр., *.myapp.local відповідає api.myapp.local).",
+  "mappings.modals.manage.form.domain.accessedUsing": "Доступ через: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "Наприклад: {url}",
   "mappings.modals.manage.form.domain.error.general": "Будь ласка, введіть дійсне доменне ім'я.",
   "mappings.modals.manage.form.domain.error.invalid": "Введіть дійсне доменне ім'я (літери, цифри, дефіси).",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} вже зіставлено.",

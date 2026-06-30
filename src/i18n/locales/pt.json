@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(opcional)",
   "mappings.modals.manage.form.subdomain.error": "O subdomínio deve conter apenas letras, números e hifens.",
   "mappings.modals.manage.form.domain.hint": "O subdomínio é opcional. Digite * para corresponder a todos os subdomínios (ex.: *.myapp.local corresponde a api.myapp.local).",
+  "mappings.modals.manage.form.domain.accessedUsing": "Acessado usando: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "Por exemplo: {url}",
   "mappings.modals.manage.form.domain.error.general": "Por favor, insira um nome de domínio válido.",
   "mappings.modals.manage.form.domain.error.invalid": "Insira um nome de domínio válido (letras, números, hifens).",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} já está mapeado.",

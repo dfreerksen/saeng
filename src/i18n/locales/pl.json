@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(opcjonalne)",
   "mappings.modals.manage.form.subdomain.error": "Subdomena może zawierać tylko litery, cyfry i łączniki.",
   "mappings.modals.manage.form.domain.hint": "Subdomena jest opcjonalna. Wpisz * aby dopasować wszystkie subdomeny (np. *.myapp.local pasuje do api.myapp.local).",
+  "mappings.modals.manage.form.domain.accessedUsing": "Dostęp pod adresem: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "Na przykład: {url}",
   "mappings.modals.manage.form.domain.error.general": "Podaj prawidłową nazwę domeny.",
   "mappings.modals.manage.form.domain.error.invalid": "Podaj prawidłową nazwę domeny (litery, cyfry, łączniki).",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} jest już zmapowany.",

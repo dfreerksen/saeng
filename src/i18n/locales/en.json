@@ -74,6 +74,8 @@
   "mappings.modals.manage.form.optional": "(optional)",
   "mappings.modals.manage.form.subdomain.error": "Subdomain must contain only letters, numbers, and hyphens.",
   "mappings.modals.manage.form.domain.hint": "Subdomain is optional. Enter * to match all subdomains (e.g. *.myapp.local matches api.myapp.local).",
+  "mappings.modals.manage.form.domain.accessedUsing": "Accessed using: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "For example: {url}",
   "mappings.modals.manage.form.domain.error.general": "Please enter a valid domain name.",
   "mappings.modals.manage.form.domain.error.invalid": "Enter a valid domain name (letters, numbers, hyphens).",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} is already mapped.",

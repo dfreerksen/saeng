@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(opsional)",
   "mappings.modals.manage.form.subdomain.error": "Subdomain hanya boleh mengandung huruf, angka, dan tanda hubung.",
   "mappings.modals.manage.form.domain.hint": "Subdomain bersifat opsional. Masukkan * untuk mencocokkan semua subdomain (mis. *.myapp.local cocok dengan api.myapp.local).",
+  "mappings.modals.manage.form.domain.accessedUsing": "Diakses menggunakan: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "Contohnya: {url}",
   "mappings.modals.manage.form.domain.error.general": "Masukkan nama domain yang valid.",
   "mappings.modals.manage.form.domain.error.invalid": "Masukkan nama domain yang valid (huruf, angka, tanda hubung).",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} sudah dipetakan.",

@@ -8,7 +8,20 @@ vi.mock('../../../src/renderer/components/Modal.jsx', () => ({
 
 import MappingModal from '../../../src/renderer/components/MappingModal.jsx';
 
-const t = (key) => key;
+const STRINGS = {
+  'mappings.modals.manage.form.domain.accessedUsing': 'Accessed using: {url}',
+  'mappings.modals.manage.form.domain.wildcardExample': 'For example: {url}',
+};
+
+function t(key, vars) {
+  let str = STRINGS[key] ?? key;
+  if (vars) {
+    for (const [k, v] of Object.entries(vars)) {
+      str = str.replaceAll(`{${k}}`, String(v));
+    }
+  }
+  return str;
+}
 
 const EXISTING_MAPPING = {
   id: 'abc',
@@ -433,5 +446,76 @@ describe('MappingModal — header overrides', () => {
     expect(headerRows[0].querySelectorAll('.form-input')[1].value).toBe('req-val');
     expect(headerRows[1].querySelectorAll('.form-input')[0].value).toBe('X-Res');
     expect(headerRows[1].querySelectorAll('.form-input')[1].value).toBe('res-val');
+  });
+});
+
+describe('MappingModal — accessed using hint', () => {
+  it('does not show the hint when no domain is entered', () => {
+    renderAddModal();
+    expect(screen.queryByText(/Accessed using/)).not.toBeInTheDocument();
+  });
+
+  it('shows http scheme by default when httpsEnabled is not passed', () => {
+    const { container } = renderAddModal();
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    expect(screen.getByText('Accessed using: http://myapp.local')).toBeInTheDocument();
+  });
+
+  it('shows https scheme when httpsEnabled is true', () => {
+    const { container } = renderAddModal({ httpsEnabled: true });
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    expect(screen.getByText('Accessed using: https://myapp.local')).toBeInTheDocument();
+  });
+
+  it('includes the subdomain when one is provided', () => {
+    const { container } = renderAddModal({ httpsEnabled: true });
+    const subdomainInput = container.querySelectorAll('.form-input')[0];
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(subdomainInput, { target: { value: 'api' } });
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    expect(screen.getByText('Accessed using: https://api.myapp.local')).toBeInTheDocument();
+  });
+
+  it('shows the [SUBDOMAIN] placeholder when subdomain is *', () => {
+    const { container } = renderAddModal({ httpsEnabled: true });
+    const subdomainInput = container.querySelectorAll('.form-input')[0];
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(subdomainInput, { target: { value: '*' } });
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    expect(screen.getByText('Accessed using: https://[SUBDOMAIN].myapp.local')).toBeInTheDocument();
+  });
+
+  it('shows a separate example hint with a sample subdomain when subdomain is *', () => {
+    const { container } = renderAddModal({ httpsEnabled: true });
+    const subdomainInput = container.querySelectorAll('.form-input')[0];
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(subdomainInput, { target: { value: '*' } });
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    expect(screen.getByText('For example: https://admin.myapp.local')).toBeInTheDocument();
+  });
+
+  it('does not show the example hint for a named subdomain', () => {
+    const { container } = renderAddModal({ httpsEnabled: true });
+    const subdomainInput = container.querySelectorAll('.form-input')[0];
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(subdomainInput, { target: { value: 'api' } });
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    expect(screen.queryByText(/For example/)).not.toBeInTheDocument();
+  });
+
+  it('reflects the selected suffix', () => {
+    const { container } = renderAddModal({ httpsEnabled: true });
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    const suffixSelect = container.querySelector('.domain-suffix-select');
+    fireEvent.change(suffixSelect, { target: { value: '.test' } });
+    expect(screen.getByText('Accessed using: https://myapp.test')).toBeInTheDocument();
+  });
+
+  it('pre-fills the hint in edit mode based on the existing mapping', () => {
+    renderEditModal({ httpsEnabled: true });
+    expect(screen.getByText('Accessed using: https://api.myapp.local')).toBeInTheDocument();
   });
 });

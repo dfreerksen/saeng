@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(fakultativ)",
   "mappings.modals.manage.form.subdomain.error": "Die Subdomain darf nur Buchstaben, Zahlen und Bindestriche enthalten.",
   "mappings.modals.manage.form.domain.hint": "Die Subdomain ist optional. Geben Sie * ein, um alle Subdomains zu erfassen (z. B. entspricht *.myapp.local der Adresse api.myapp.local).",
+  "mappings.modals.manage.form.domain.accessedUsing": "Zugriff über: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "Zum Beispiel: {url}",
   "mappings.modals.manage.form.domain.error.general": "Bitte geben Sie einen gültigen Domainnamen ein.",
   "mappings.modals.manage.form.domain.error.invalid": "Bitte geben Sie einen gültigen Domainnamen ein (Buchstaben, Zahlen, Bindestriche).",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} ist bereits zugeordnet.",

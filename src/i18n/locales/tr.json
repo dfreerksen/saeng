@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(isteğe bağlı)",
   "mappings.modals.manage.form.subdomain.error": "Alt alan adı yalnızca harf, rakam ve kısa çizgi içerebilir.",
   "mappings.modals.manage.form.domain.hint": "Alt alan adı isteğe bağlıdır. Tüm alt alan adlarını eşleştirmek için * girin (örn. *.myapp.local, api.myapp.local ile eşleşir).",
+  "mappings.modals.manage.form.domain.accessedUsing": "Şu adresle erişilir: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "Örneğin: {url}",
   "mappings.modals.manage.form.domain.error.general": "Lütfen geçerli bir alan adı girin.",
   "mappings.modals.manage.form.domain.error.invalid": "Geçerli bir alan adı girin (harf, rakam, kısa çizgi).",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} zaten eşlenmiş.",

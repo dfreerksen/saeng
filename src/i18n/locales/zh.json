@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "（选填）",
   "mappings.modals.manage.form.subdomain.error": "子域名只能包含字母、数字和连字符。",
   "mappings.modals.manage.form.domain.hint": "子域名为选填项。输入 * 可匹配所有子域名（例如 *.myapp.local 匹配 api.myapp.local）。",
+  "mappings.modals.manage.form.domain.accessedUsing": "访问地址：{url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "例如：{url}",
   "mappings.modals.manage.form.domain.error.general": "请输入有效的域名。",
   "mappings.modals.manage.form.domain.error.invalid": "请输入有效的域名（仅限字母、数字和连字符）。",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} 已被映射。",

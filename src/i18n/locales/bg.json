@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(по избор)",
   "mappings.modals.manage.form.subdomain.error": "Поддомейнът трябва да съдържа само букви, числа и тирета.",
   "mappings.modals.manage.form.domain.hint": "Поддомейнът е по избор. Въведете * за съвпадение с всички поддомейни (напр. *.myapp.local съответства на api.myapp.local).",
+  "mappings.modals.manage.form.domain.accessedUsing": "Достъп чрез: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "Например: {url}",
   "mappings.modals.manage.form.domain.error.general": "Моля, въведете валидно име на домейн.",
   "mappings.modals.manage.form.domain.error.invalid": "Въведете валидно име на домейн (букви, цифри, тирета).",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} вече е картографиран.",

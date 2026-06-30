@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(неабавязковы)",
   "mappings.modals.manage.form.subdomain.error": "Субдамен павінен змяшчаць толькі літары, лічбы і падкрэсліванні.",
   "mappings.modals.manage.form.domain.hint": "Субдамен неабавязковы. Увядзіце * для супастаўлення ўсіх субдаменаў (напр., *.myapp.local адпавядае api.myapp.local).",
+  "mappings.modals.manage.form.domain.accessedUsing": "Доступ праз: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "Напрыклад: {url}",
   "mappings.modals.manage.form.domain.error.general": "Увядзіце сапраўднае даменнае імя.",
   "mappings.modals.manage.form.domain.error.invalid": "Увядзіце сапраўднае даменнае імя (літары, лічбы, падкрэсліванні).",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} ужо адлюстраваны.",

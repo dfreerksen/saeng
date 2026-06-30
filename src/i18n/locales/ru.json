@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(необязательный)",
   "mappings.modals.manage.form.subdomain.error": "Субдомен должен содержать только буквы, числа и дефисы.",
   "mappings.modals.manage.form.domain.hint": "Субдомен не является обязательным. Введите * для соответствия всем поддоменам (напр., *.myapp.local соответствует api.myapp.local).",
+  "mappings.modals.manage.form.domain.accessedUsing": "Доступ через: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "Например: {url}",
   "mappings.modals.manage.form.domain.error.general": "Пожалуйста, введите действительное доменное имя.",
   "mappings.modals.manage.form.domain.error.invalid": "Введите действительное доменное имя (буквы, числа, дефисы).",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} уже сопоставлен.",

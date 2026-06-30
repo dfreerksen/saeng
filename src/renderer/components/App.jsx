@@ -337,6 +337,7 @@ export default function App() {
       {modal?.type === 'add' && (
         <MappingModal
           mappings={mappings}
+          httpsEnabled={!!settings.httpsEnabled}
           onClose={handleCloseModal}
           onSubmit={async (data) => {
             const updated = await window.electronAPI.mappings.add(data);
@@ -352,6 +353,7 @@ export default function App() {
         <MappingModal
           mapping={modal.mapping}
           mappings={mappings}
+          httpsEnabled={!!settings.httpsEnabled}
           onClose={handleCloseModal}
           onSubmit={async (data) => {
             const updated = await window.electronAPI.mappings.update(modal.mapping.id, data);

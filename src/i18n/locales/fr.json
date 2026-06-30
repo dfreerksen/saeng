@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(facultatif)",
   "mappings.modals.manage.form.subdomain.error": "Le sous-domaine ne doit contenir que des lettres, des chiffres et des tirets.",
   "mappings.modals.manage.form.domain.hint": "Le sous-domaine est facultatif. Saisissez * pour correspondre à tous les sous-domaines (p. ex. *.myapp.local correspond à api.myapp.local).",
+  "mappings.modals.manage.form.domain.accessedUsing": "Accessible via : {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "Par exemple : {url}",
   "mappings.modals.manage.form.domain.error.general": "Veuillez saisir un nom de domaine valide.",
   "mappings.modals.manage.form.domain.error.invalid": "Saisissez un nom de domaine valide (lettres, chiffres, tirets).",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} est déjà mappé.",

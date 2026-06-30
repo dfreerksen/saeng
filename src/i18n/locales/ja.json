@@ -67,6 +67,8 @@
   "mappings.modals.manage.form.optional": "(任意)",
   "mappings.modals.manage.form.subdomain.error": "サブドメインには英数字とハイフンのみ使用できます。",
   "mappings.modals.manage.form.domain.hint": "サブドメインは任意です。* を入力するとすべてのサブドメインに一致します（例: *.myapp.local は api.myapp.local に一致します）。",
+  "mappings.modals.manage.form.domain.accessedUsing": "アクセス方法: {url}",
+  "mappings.modals.manage.form.domain.wildcardExample": "例: {url}",
   "mappings.modals.manage.form.domain.error.general": "有効なドメイン名を入力してください。",
   "mappings.modals.manage.form.domain.error.invalid": "有効なドメイン名（英数字、ハイフン）を入力してください。",
   "mappings.modals.manage.form.domain.error.duplicate": "{domain} はすでにマッピングされています。",

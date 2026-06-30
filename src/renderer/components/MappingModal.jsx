@@ -3,7 +3,7 @@ import Modal from './Modal.jsx';
 import HeaderListEditor from './HeaderListEditor.jsx';
 import { validateDomainPart, splitDomain, DOMAIN_SUFFIXES, DEFAULT_SUFFIX } from '../js/utils.js';
 
-export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }) {
+export default function MappingModal({ mapping, mappings, httpsEnabled, onClose, onSubmit, t }) {
   const isEditing = !!mapping;
   const parsed = mapping ? splitDomain(mapping.domain) : { subdomain: '', domain: '', suffix: DEFAULT_SUFFIX };
 
@@ -21,6 +21,21 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
   const [submitting, setSubmitting] = useState(false);
 
   const domainInputRef = useRef(null);
+
+  const scheme = httpsEnabled ? 'https' : 'http';
+  const trimmedDomain = domain.trim();
+  const trimmedSubdomain = subdomain.trim();
+  let accessedUsing = null;
+  let wildcardExample = null;
+  if (trimmedDomain) {
+    const base = `${trimmedDomain}${suffix}`;
+    const isWildcard = trimmedSubdomain === '*';
+    const host = !trimmedSubdomain ? base : isWildcard ? `[SUBDOMAIN].${base}` : `${trimmedSubdomain}.${base}`;
+    accessedUsing = t('mappings.modals.manage.form.domain.accessedUsing', { url: `${scheme}://${host}` });
+    if (isWildcard) {
+      wildcardExample = t('mappings.modals.manage.form.domain.wildcardExample', { url: `${scheme}://admin.${base}` });
+    }
+  }
 
   useEffect(() => {
     domainInputRef.current?.focus();
@@ -123,6 +138,8 @@ export default function MappingModal({ mapping, mappings, onClose, onSubmit, t }
                   </select>
                 </div>
                 <div className="form-hint">{t('mappings.modals.manage.form.domain.hint')}</div>
+                {accessedUsing && <div className="form-hint form-hint-emphasis">{accessedUsing}</div>}
+                {wildcardExample && <div className="form-hint form-hint-emphasis">{wildcardExample}</div>}
                 {domainError && <div className="form-error visible">{domainError}</div>}
               </div>
 
