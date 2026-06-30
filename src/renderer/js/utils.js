@@ -1,4 +1,4 @@
-export const DOMAIN_SUFFIXES = ['.local', '.test', '.localhost', '.co.local', '.co.test'];
+export const DOMAIN_SUFFIXES = ['.local', '.test', '.localhost', '.self', '.co.local', '.co.test'];
 export const DEFAULT_SUFFIX = '.local';
 
 export function validateDomainPart(value) {

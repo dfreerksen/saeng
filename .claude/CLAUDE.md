@@ -45,7 +45,7 @@ The project uses **ESM throughout** (`"type": "module"` in `package.json`). The 
 
 ### Domain suffixes
 
-`src/renderer/js/utils.js` defines the valid domain suffixes: `.local`, `.test`, `.localhost`, `.co.local`, `.co.test`. The default is `.local`. The PAC `FindProxyForURL` uses **exact hostname equality** — each domain/subdomain combination must be a separate mapping entry; there is no implicit subdomain matching.
+`src/renderer/js/utils.js` defines the valid domain suffixes: `.local`, `.test`, `.localhost`, `.self`, `.co.local`, `.co.test`. The default is `.local`. The PAC `FindProxyForURL` uses **exact hostname equality** — each domain/subdomain combination must be a separate mapping entry; there is no implicit subdomain matching.
 
 ### Electron process boundary
 

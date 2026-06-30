@@ -74,6 +74,7 @@ describe('splitDomain()', () => {
     const cases = [
       ['myapp.test', '.test'],
       ['myapp.localhost', '.localhost'],
+      ['myapp.self', '.self'],
       ['myapp.co.local', '.co.local'],
       ['myapp.co.test', '.co.test'],
     ];
@@ -90,6 +91,7 @@ describe('splitDomain()', () => {
     expect(DOMAIN_SUFFIXES).toContain('.local');
     expect(DOMAIN_SUFFIXES).toContain('.test');
     expect(DOMAIN_SUFFIXES).toContain('.localhost');
+    expect(DOMAIN_SUFFIXES).toContain('.self');
   });
 
   it('picks the longest matching suffix (co.local before .local)', () => {
