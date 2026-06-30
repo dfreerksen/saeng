@@ -339,13 +339,19 @@
 
 /* Headers/Response tab collapsible sections */
 .log-detail-sections {
+  @media (width <= 700px) {
+    flex-direction: column;
+  }
+
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 12px;
 
   details {
     border: 1px solid var(--saeng-border);
     border-radius: var(--saeng-radius-sm);
+    flex: 1 1 50%;
+    min-width: 0;
     overflow: hidden;
   }
 

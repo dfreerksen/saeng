@@ -138,8 +138,31 @@ function ResponseTab({ entry, settings, t }) {
   );
 }
 
+function QueryParamsTab({ entry, t }) {
+  const params = useMemo(() => {
+    const queryString = entry.path?.split('?')[1];
+    return queryString ? [...new URLSearchParams(queryString).entries()] : [];
+  }, [entry.path]);
+
+  if (params.length === 0) {
+    return <div className="log-details-empty">{t('log.details.noQueryParams')}</div>;
+  }
+  return (
+    <table className="log-details-headers">
+      <tbody>
+        {params.map(([key, value], i) => (
+          <tr key={`${key}-${i}`}>
+            <th scope="row">{key}</th>
+            <td>{value}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
 function DetailPanel({ entry, settings, detailTab, setDetailTab, onClose, t }) {
-  const tabs = ['general', 'headers', 'response'];
+  const tabs = ['general', 'queryParams', 'headers', 'response'];
   return (
     <div className="log-detail-panel">
       <div className="log-detail-bar">
@@ -160,6 +183,7 @@ function DetailPanel({ entry, settings, detailTab, setDetailTab, onClose, t }) {
       </div>
       <div className="log-detail-content">
         {detailTab === 'general' && <GeneralTab entry={entry} t={t} />}
+        {detailTab === 'queryParams' && <QueryParamsTab entry={entry} t={t} />}
         {detailTab === 'headers' && <HeadersTab entry={entry} settings={settings} t={t} />}
         {detailTab === 'response' && <ResponseTab entry={entry} settings={settings} t={t} />}
       </div>
