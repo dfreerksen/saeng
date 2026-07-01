@@ -162,6 +162,8 @@
   "log.subtitle": "Live view of requests proxied through Saeng",
   "log.actions.clear": "Clear",
   "log.actions.exportHar": "Export HAR",
+  "log.actions.convertToMock": "Convert to mock",
+  "log.actions.convertToMock.noMapping": "No mapping found for this domain.",
   "log.exportHar.dialog.title": "Export HAR",
   "log.empty": "No requests yet",
   "log.emptyHint": "Requests proxied through Saeng will appear here while the proxy is running.",

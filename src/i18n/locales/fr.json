@@ -149,6 +149,8 @@
   "log.subtitle": "Vue en temps réel des requêtes transmises via Saeng",
   "log.actions.clear": "Effacer",
   "log.actions.exportHar": "Exporter le HAR",
+  "log.actions.convertToMock": "Convertir en mock",
+  "log.actions.convertToMock.noMapping": "Aucun mapping trouvé pour ce domaine.",
   "log.exportHar.dialog.title": "Exporter le HAR",
   "log.empty": "Aucune requête pour le moment",
   "log.emptyHint": "Les requêtes transmises via Saeng apparaîtront ici tant que le proxy est en cours d'exécution.",

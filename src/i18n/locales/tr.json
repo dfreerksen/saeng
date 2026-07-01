@@ -149,6 +149,8 @@
   "log.subtitle": "Saeng üzerinden proxy'lenen isteklerin canlı görünümü",
   "log.actions.clear": "Temizle",
   "log.actions.exportHar": "HAR Dışa Aktar",
+  "log.actions.convertToMock": "Mock'a dönüştür",
+  "log.actions.convertToMock.noMapping": "Bu alan adı için eşleme bulunamadı.",
   "log.exportHar.dialog.title": "HAR Dışa Aktar",
   "log.empty": "Henüz istek yok",
   "log.emptyHint": "Proxy çalışırken Saeng üzerinden proxy'lenen istekler burada görünecek.",

@@ -149,6 +149,8 @@
   "log.subtitle": "Изглед на живо на заявки, проксирани чрез Saeng",
   "log.actions.clear": "Изчистване",
   "log.actions.exportHar": "Експортиране на HAR",
+  "log.actions.convertToMock": "Конвертиране в мок",
+  "log.actions.convertToMock.noMapping": "Не е намерено съответствие за този домейн.",
   "log.exportHar.dialog.title": "Експортиране на HAR",
   "log.empty": "Все още няма заявки",
   "log.emptyHint": "Заявките, проксирани чрез Saeng, ще се показват тук, докато проксито работи.",

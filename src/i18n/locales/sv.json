@@ -149,6 +149,8 @@
   "log.subtitle": "Livevy över förfrågningar som proxyas genom Saeng",
   "log.actions.clear": "Rensa",
   "log.actions.exportHar": "Exportera HAR",
+  "log.actions.convertToMock": "Konvertera till mock",
+  "log.actions.convertToMock.noMapping": "Ingen mappning hittades för den här domänen.",
   "log.exportHar.dialog.title": "Exportera HAR",
   "log.empty": "Inga förfrågningar ännu",
   "log.emptyHint": "Förfrågningar som proxyas genom Saeng visas här medan proxyn körs.",

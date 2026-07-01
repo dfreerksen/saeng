@@ -149,6 +149,8 @@
   "log.subtitle": "แสดงคำขอที่ผ่านพร็อกซี Saeng แบบเรียลไทม์",
   "log.actions.clear": "ล้างข้อมูล",
   "log.actions.exportHar": "ส่งออก HAR",
+  "log.actions.convertToMock": "แปลงเป็น mock",
+  "log.actions.convertToMock.noMapping": "ไม่พบการแมปสำหรับโดเมนนี้",
   "log.exportHar.dialog.title": "ส่งออก HAR",
   "log.empty": "ยังไม่มีคำขอ",
   "log.emptyHint": "คำขอที่ผ่านพร็อกซี Saeng จะปรากฏที่นี่ในขณะที่พร็อกซีทำงานอยู่",

@@ -44,6 +44,7 @@ function renderLogView(props = {}) {
     entries: [],
     onClear: vi.fn(),
     onExportHar: vi.fn(),
+    onConvertToMock: vi.fn(),
     t,
   };
   return render(<LogView {...defaults} {...props} />);
@@ -263,6 +264,59 @@ describe('LogView — detail panel', () => {
     fireEvent.click(container.querySelector('.log-row'));
     fireEvent.click(screen.getByText('log.detail.response'));
     expect(screen.getByText('log.detail.enableBody')).toBeInTheDocument();
+  });
+});
+
+describe('LogView — convert to mock button', () => {
+  const NORMAL_ENTRY = {
+    id: 'c1',
+    timestamp: 1700000000000,
+    method: 'GET',
+    hostname: 'myapp.local',
+    path: '/api/users',
+    status: 200,
+    latencyMs: 15,
+    https: false,
+  };
+
+  const NO_STATUS_ENTRY = { ...NORMAL_ENTRY, id: 'c2', status: null, latencyMs: null };
+  const WEBSOCKET_ENTRY = { ...NORMAL_ENTRY, id: 'c3', websocket: true };
+
+  function openPanel(container) {
+    fireEvent.click(container.querySelector('.log-row'));
+  }
+
+  it('renders the convert button in the detail panel', () => {
+    const { container } = renderLogView({ entries: [NORMAL_ENTRY] });
+    openPanel(container);
+    expect(container.querySelector('.log-detail-convert')).toBeInTheDocument();
+  });
+
+  it('calls onConvertToMock with the entry when clicked', () => {
+    const onConvertToMock = vi.fn();
+    const { container } = renderLogView({ entries: [NORMAL_ENTRY], onConvertToMock });
+    openPanel(container);
+    fireEvent.click(container.querySelector('.log-detail-convert'));
+    expect(onConvertToMock).toHaveBeenCalledOnce();
+    expect(onConvertToMock).toHaveBeenCalledWith(NORMAL_ENTRY);
+  });
+
+  it('is enabled for a normal entry with a status code', () => {
+    const { container } = renderLogView({ entries: [NORMAL_ENTRY] });
+    openPanel(container);
+    expect(container.querySelector('.log-detail-convert')).not.toBeDisabled();
+  });
+
+  it('is disabled for an entry with no status code', () => {
+    const { container } = renderLogView({ entries: [NO_STATUS_ENTRY] });
+    openPanel(container);
+    expect(container.querySelector('.log-detail-convert')).toBeDisabled();
+  });
+
+  it('is disabled for a WebSocket entry', () => {
+    const { container } = renderLogView({ entries: [WEBSOCKET_ENTRY] });
+    openPanel(container);
+    expect(container.querySelector('.log-detail-convert')).toBeDisabled();
   });
 });
 

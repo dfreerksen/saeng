@@ -5,9 +5,9 @@ import globals from "globals";
 import { defineConfig } from "eslint/config";
 
 export default defineConfig([
+  { ignores: ["src/renderer/scripts.js"] },
   {
     files: ["**/*.js"],
-    ignores: ["src/renderer/scripts.js"],
     plugins: { js },
     extends: ["js/recommended"],
     languageOptions: {

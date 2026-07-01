@@ -275,6 +275,32 @@
   }
 }
 
+.log-detail-bar-actions {
+  align-items: center;
+  display: flex;
+  gap: 2px;
+}
+
+.log-detail-convert {
+  background: none;
+  border: none;
+  border-radius: var(--saeng-radius-sm);
+  color: var(--saeng-text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+
+  &:hover:not(:disabled) {
+    background: var(--saeng-bg-hover);
+    color: var(--saeng-text);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+}
+
 .log-detail-close {
   background: none;
   border: none;

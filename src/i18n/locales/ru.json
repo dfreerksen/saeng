@@ -149,6 +149,8 @@
   "log.subtitle": "Просмотр запросов, проходящих через прокси Saeng, в реальном времени",
   "log.actions.clear": "Очистить",
   "log.actions.exportHar": "Экспорт HAR",
+  "log.actions.convertToMock": "Преобразовать в мок",
+  "log.actions.convertToMock.noMapping": "Маппинг для этого домена не найден.",
   "log.exportHar.dialog.title": "Экспорт HAR",
   "log.empty": "Запросов пока нет",
   "log.emptyHint": "Здесь будут отображаться запросы, проходящие через прокси Saeng, пока он запущен.",

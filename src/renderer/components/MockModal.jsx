@@ -35,17 +35,18 @@ function compareMappings(a, b) {
   return splitA.subdomain.localeCompare(splitB.subdomain, undefined, { numeric: true });
 }
 
-export default function MockModal({ mock, mappings, onClose, onSubmit, showToast, t }) {
+export default function MockModal({ mock, initialValues, mappings, onClose, onSubmit, showToast, t }) {
   const isEditing = !!mock;
+  const init = mock ?? initialValues ?? {};
 
   const sortedMappings = useMemo(() => [...mappings].sort(compareMappings), [mappings]);
-  const [mappingId, setMappingId] = useState(mock?.mappingId ?? sortedMappings[0]?.id ?? '');
-  const [method, setMethod] = useState(mock?.method ?? '*');
-  const [pathPattern, setPathPattern] = useState(mock?.pathPattern ?? '');
-  const [statusCode, setStatusCode] = useState(mock?.statusCode ?? 200);
-  const [delayMs, setDelayMs] = useState(mock?.delayMs ?? 0);
-  const [headers, setHeaders] = useState(mock?.headers ?? []);
-  const [body, setBody] = useState(mock?.body ?? '');
+  const [mappingId, setMappingId] = useState(init.mappingId ?? sortedMappings[0]?.id ?? '');
+  const [method, setMethod] = useState(init.method ?? '*');
+  const [pathPattern, setPathPattern] = useState(init.pathPattern ?? '');
+  const [statusCode, setStatusCode] = useState(init.statusCode ?? 200);
+  const [delayMs, setDelayMs] = useState(init.delayMs ?? 0);
+  const [headers, setHeaders] = useState(init.headers ?? []);
+  const [body, setBody] = useState(init.body ?? '');
   const [mappingError, setMappingError] = useState('');
   const [pathError, setPathError] = useState('');
   const [statusError, setStatusError] = useState('');

@@ -149,6 +149,8 @@
   "log.subtitle": "Live weergave van verzoeken die via Saeng worden gerouteerd",
   "log.actions.clear": "Wissen",
   "log.actions.exportHar": "HAR exporteren",
+  "log.actions.convertToMock": "Omzetten naar mock",
+  "log.actions.convertToMock.noMapping": "Geen mapping gevonden voor dit domein.",
   "log.exportHar.dialog.title": "HAR exporteren",
   "log.empty": "Nog geen verzoeken",
   "log.emptyHint": "Verzoeken die via Saeng worden gerouteerd verschijnen hier terwijl de proxy actief is.",

@@ -161,8 +161,9 @@ function QueryParamsTab({ entry, t }) {
   );
 }
 
-function DetailPanel({ entry, settings, detailTab, setDetailTab, onClose, t }) {
+function DetailPanel({ entry, settings, detailTab, setDetailTab, onClose, onConvertToMock, t }) {
   const tabs = ['general', 'queryParams', 'headers', 'response'];
+  const canConvert = !entry.websocket && entry.status != null;
   return (
     <div className="log-detail-panel">
       <div className="log-detail-bar">
@@ -177,9 +178,21 @@ function DetailPanel({ entry, settings, detailTab, setDetailTab, onClose, t }) {
             </button>
           ))}
         </div>
-        <button className="log-detail-close" onClick={onClose} aria-label={t('log.detail.close')}>
-          <i className="bi bi-x-lg" />
-        </button>
+        <div className="log-detail-bar-actions">
+          <Tooltip title={t('log.actions.convertToMock')}>
+            <button
+              className="log-detail-convert"
+              onClick={() => onConvertToMock(entry)}
+              disabled={!canConvert}
+              aria-label={t('log.actions.convertToMock')}
+            >
+              <i className="bi bi-magic" />
+            </button>
+          </Tooltip>
+          <button className="log-detail-close" onClick={onClose} aria-label={t('log.detail.close')}>
+            <i className="bi bi-x-lg" />
+          </button>
+        </div>
       </div>
       <div className="log-detail-content">
         {detailTab === 'general' && <GeneralTab entry={entry} t={t} />}
@@ -191,7 +204,7 @@ function DetailPanel({ entry, settings, detailTab, setDetailTab, onClose, t }) {
   );
 }
 
-export default memo(function LogView({ entries, onClear, onExportHar, settings, t }) {
+export default memo(function LogView({ entries, onClear, onExportHar, onConvertToMock, settings, t }) {
   const [selectedId, setSelectedId] = useState(null);
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -346,6 +359,7 @@ export default memo(function LogView({ entries, onClear, onExportHar, settings, 
               detailTab={detailTab}
               setDetailTab={setDetailTab}
               onClose={() => setSelectedId(null)}
+              onConvertToMock={onConvertToMock}
               t={t}
             />
           )}

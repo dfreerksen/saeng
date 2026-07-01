@@ -149,6 +149,8 @@
   "log.subtitle": "Xem trực tiếp các yêu cầu được chuyển tiếp qua Saeng",
   "log.actions.clear": "Xóa",
   "log.actions.exportHar": "Xuất HAR",
+  "log.actions.convertToMock": "Chuyển thành mock",
+  "log.actions.convertToMock.noMapping": "Không tìm thấy ánh xạ cho tên miền này.",
   "log.exportHar.dialog.title": "Xuất HAR",
   "log.empty": "Chưa có yêu cầu nào",
   "log.emptyHint": "Các yêu cầu được chuyển tiếp qua Saeng sẽ hiển thị tại đây khi proxy đang hoạt động.",

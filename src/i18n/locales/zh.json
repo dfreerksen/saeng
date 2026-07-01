@@ -149,6 +149,8 @@
   "log.subtitle": "经由 Saeng 代理的请求实时视图",
   "log.actions.clear": "清除",
   "log.actions.exportHar": "导出 HAR",
+  "log.actions.convertToMock": "转换为模拟",
+  "log.actions.convertToMock.noMapping": "未找到该域名的映射。",
   "log.exportHar.dialog.title": "导出 HAR",
   "log.empty": "暂无请求",
   "log.emptyHint": "代理运行时，经由 Saeng 代理的请求将显示在此处。",

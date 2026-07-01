@@ -149,6 +149,8 @@
   "log.subtitle": "Saeng을 통해 프록시된 요청 실시간 보기",
   "log.actions.clear": "지우기",
   "log.actions.exportHar": "HAR 내보내기",
+  "log.actions.convertToMock": "모의로 변환",
+  "log.actions.convertToMock.noMapping": "이 도메인에 대한 매핑을 찾을 수 없습니다.",
   "log.exportHar.dialog.title": "HAR 내보내기",
   "log.empty": "요청 없음",
   "log.emptyHint": "프록시가 실행되는 동안 Saeng을 통해 프록시된 요청이 여기에 표시됩니다.",

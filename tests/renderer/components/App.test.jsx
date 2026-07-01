@@ -728,6 +728,93 @@ describe('App — edit mock modal', () => {
   });
 });
 
+describe('App — convert to mock', () => {
+  const matchingMapping = {
+    id: 'm1', domain: 'myapp.local', host: '127.0.0.1', port: 3000,
+    https: false, enabled: true, mocksEnabled: true,
+  };
+  const logEntry = {
+    id: 'e1', timestamp: 1700000000000, method: 'GET',
+    hostname: 'myapp.local', path: '/api/users', status: 200, latencyMs: 10, https: false,
+  };
+  const unmatchedEntry = { ...logEntry, id: 'e2', hostname: 'unknown.local' };
+
+  it('shows an error toast when no mapping matches the log entry hostname', async () => {
+    const { container } = await renderApp({
+      requestLog: { list: vi.fn().mockResolvedValue([unmatchedEntry]) },
+    });
+    fireEvent.click(screen.getByText('nav.log').closest('button'));
+    fireEvent.click(container.querySelector('.log-row'));
+    fireEvent.click(container.querySelector('.log-detail-convert'));
+    await waitFor(() => {
+      expect(screen.getByText('log.actions.convertToMock.noMapping')).toBeInTheDocument();
+    });
+  });
+
+  it('opens the MockModal in add mode when a matching mapping is found', async () => {
+    const { container } = await renderApp({
+      mappings: { list: vi.fn().mockResolvedValue([matchingMapping]) },
+      requestLog: { list: vi.fn().mockResolvedValue([logEntry]) },
+    });
+    fireEvent.click(screen.getByText('nav.log').closest('button'));
+    fireEvent.click(container.querySelector('.log-row'));
+    fireEvent.click(container.querySelector('.log-detail-convert'));
+    await waitFor(() => {
+      expect(screen.getByText('mocks.modals.manage.addTitle')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('mocks.modals.manage.editTitle')).not.toBeInTheDocument();
+  });
+
+  it('pre-fills the path pattern with an escaped regex from the log entry path', async () => {
+    const { container } = await renderApp({
+      mappings: { list: vi.fn().mockResolvedValue([matchingMapping]) },
+      requestLog: { list: vi.fn().mockResolvedValue([logEntry]) },
+    });
+    fireEvent.click(screen.getByText('nav.log').closest('button'));
+    fireEvent.click(container.querySelector('.log-row'));
+    fireEvent.click(container.querySelector('.log-detail-convert'));
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('^/api/users/\\d+$').value).toBe('^/api/users$');
+    });
+  });
+
+  it('pre-fills the status code from the log entry', async () => {
+    const { container } = await renderApp({
+      mappings: { list: vi.fn().mockResolvedValue([matchingMapping]) },
+      requestLog: { list: vi.fn().mockResolvedValue([logEntry]) },
+    });
+    fireEvent.click(screen.getByText('nav.log').closest('button'));
+    fireEvent.click(container.querySelector('.log-row'));
+    fireEvent.click(container.querySelector('.log-detail-convert'));
+    await waitFor(() => {
+      expect(screen.getByText('mocks.modals.manage.addTitle')).toBeInTheDocument();
+    });
+    const statusInput = document.querySelector('input[type="number"]');
+    expect(statusInput.value).toBe('200');
+  });
+
+  it('submits via mocks.add, closes the modal, and shows a success toast', async () => {
+    const addFn = vi.fn().mockResolvedValue({ success: true, mocks: [] });
+    const { container } = await renderApp({
+      mappings: { list: vi.fn().mockResolvedValue([matchingMapping]) },
+      requestLog: { list: vi.fn().mockResolvedValue([logEntry]) },
+      mocks: { add: addFn },
+    });
+    fireEvent.click(screen.getByText('nav.log').closest('button'));
+    fireEvent.click(container.querySelector('.log-row'));
+    fireEvent.click(container.querySelector('.log-detail-convert'));
+    await waitFor(() => {
+      expect(screen.getByText('mocks.modals.manage.addTitle')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
+    await waitFor(() => {
+      expect(addFn).toHaveBeenCalledWith(expect.objectContaining({ mappingId: 'm1', pathPattern: '^/api/users$' }));
+      expect(screen.getByText('flash.mock.added')).toBeInTheDocument();
+      expect(screen.queryByText('mocks.modals.manage.addTitle')).not.toBeInTheDocument();
+    });
+  });
+});
+
 describe('App — external link handling', () => {
   it('intercepts http link clicks and opens them externally', async () => {
     await renderApp();

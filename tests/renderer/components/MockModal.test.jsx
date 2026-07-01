@@ -379,6 +379,86 @@ describe('MockModal — successful submit', () => {
   });
 });
 
+describe('MockModal — convert mode (initialValues)', () => {
+  const INITIAL_VALUES = {
+    mappingId: 'm2',
+    method: 'GET',
+    pathPattern: '^/api/users$',
+    statusCode: 404,
+    delayMs: 100,
+    headers: [{ name: 'content-type', value: 'application/json' }],
+    body: '{"error":"not found"}',
+  };
+
+  function renderConvertModal(props = {}) {
+    return renderAddModal({ initialValues: INITIAL_VALUES, ...props });
+  }
+
+  it('shows the add title, not the edit title', () => {
+    renderConvertModal();
+    expect(screen.getByText('mocks.modals.manage.addTitle')).toBeInTheDocument();
+    expect(screen.queryByText('mocks.modals.manage.editTitle')).not.toBeInTheDocument();
+  });
+
+  it('shows the add submit button, not update', () => {
+    renderConvertModal();
+    expect(screen.getByText('mappings.modals.manage.buttons.add')).toBeInTheDocument();
+    expect(screen.queryByText('mappings.modals.manage.buttons.update')).not.toBeInTheDocument();
+  });
+
+  it('pre-fills the mapping select from initialValues', () => {
+    const { container } = renderConvertModal();
+    expect(container.querySelectorAll('.form-input')[0].value).toBe('m2');
+  });
+
+  it('pre-fills the method select from initialValues', () => {
+    const { container } = renderConvertModal();
+    expect(container.querySelectorAll('.form-input')[1].value).toBe('GET');
+  });
+
+  it('pre-fills the path pattern field from initialValues', () => {
+    const { container } = renderConvertModal();
+    expect(container.querySelectorAll('.form-input')[2].value).toBe('^/api/users$');
+  });
+
+  it('pre-fills the status code from initialValues', () => {
+    const { container } = renderConvertModal();
+    expect(container.querySelectorAll('input[type="number"]')[0].value).toBe('404');
+  });
+
+  it('pre-fills the delay from initialValues', () => {
+    const { container } = renderConvertModal();
+    expect(container.querySelectorAll('input[type="number"]')[1].value).toBe('100');
+  });
+
+  it('pre-fills the body from initialValues', () => {
+    const { container } = renderConvertModal();
+    expect(container.querySelector('textarea').value).toBe('{"error":"not found"}');
+  });
+
+  it('pre-fills headers from initialValues', () => {
+    const { container } = renderConvertModal();
+    const headerRows = container.querySelectorAll('.header-row');
+    expect(headerRows).toHaveLength(1);
+    expect(headerRows[0].querySelectorAll('.form-input')[0].value).toBe('content-type');
+    expect(headerRows[0].querySelectorAll('.form-input')[1].value).toBe('application/json');
+  });
+
+  it('submits as a new mock (not an update)', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    renderConvertModal({ onSubmit });
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
+        mappingId: 'm2',
+        method: 'GET',
+        pathPattern: '^/api/users$',
+        statusCode: 404,
+      }));
+    });
+  });
+});
+
 describe('MockModal — mapping sort order', () => {
   const UNSORTED_MAPPINGS = [
     { id: 'm-wild', domain: '*.myapp.local', port: 3000, https: false, enabled: true },

@@ -149,6 +149,8 @@
   "log.subtitle": "عرض مباشر للطلبات الموجهة عبر Saeng",
   "log.actions.clear": "مسح",
   "log.actions.exportHar": "تصدير HAR",
+  "log.actions.convertToMock": "تحويل إلى محاكاة",
+  "log.actions.convertToMock.noMapping": "لم يتم العثور على تعيين لهذا النطاق.",
   "log.exportHar.dialog.title": "تصدير HAR",
   "log.empty": "لا توجد طلبات بعد",
   "log.emptyHint": "ستظهر هنا الطلبات الموجهة عبر Saeng أثناء تشغيل الوكيل (Proxy).",

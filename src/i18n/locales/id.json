@@ -149,6 +149,8 @@
   "log.subtitle": "Tampilan langsung permintaan yang diproksi melalui Saeng",
   "log.actions.clear": "Bersihkan",
   "log.actions.exportHar": "Ekspor HAR",
+  "log.actions.convertToMock": "Jadikan mock",
+  "log.actions.convertToMock.noMapping": "Tidak ada mapping untuk domain ini.",
   "log.exportHar.dialog.title": "Ekspor HAR",
   "log.empty": "Belum ada permintaan",
   "log.emptyHint": "Permintaan yang diproksi melalui Saeng akan muncul di sini selama proxy berjalan.",

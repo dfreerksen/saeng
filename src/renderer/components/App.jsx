@@ -16,6 +16,19 @@ import { Tooltip as BsTooltip } from 'bootstrap';
 
 const DEFAULT_LOG_MAX_ENTRIES = 300;
 
+const MOCK_DRAFT_HEADERS = new Set(['content-type', 'content-length']);
+
+function buildMockDraftFromEntry(entry, mappingId) {
+  const pathOnly = (entry.path || '').split('?')[0];
+  const pathPattern = '^' + pathOnly.replace(/[.+*?^${}()|[\]\\]/g, '\\$&') + '$';
+  const headers = entry.responseHeaders
+    ? Object.entries(entry.responseHeaders)
+        .filter(([name]) => MOCK_DRAFT_HEADERS.has(name.toLowerCase()))
+        .map(([name, value]) => ({ name, value: Array.isArray(value) ? value.join(', ') : String(value) }))
+    : [];
+  return { mappingId, method: entry.method || '*', pathPattern, statusCode: entry.status || 200, delayMs: 0, headers, body: entry.responseBody || '' };
+}
+
 function applyColorMode(mode) {
   const resolved = mode === 'auto'
     ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
@@ -250,6 +263,15 @@ export default function App() {
   const handleOpenAboutModal = useCallback(() => setModal({ type: 'about' }), []);
   const handleCloseModal = useCallback(() => setModal(null), []);
 
+  const handleConvertToMock = useCallback((entry) => {
+    const mapping = mappings.find((m) => m.domain === entry.hostname);
+    if (!mapping) {
+      showToast(t('log.actions.convertToMock.noMapping'), 'error');
+      return;
+    }
+    setModal({ type: 'convertToMock', entry, mappingId: mapping.id });
+  }, [mappings, showToast, t]);
+
   function mockModalMappings(mock) {
     if (!mock || mockableMappings.some((m) => m.id === mock.mappingId)) return mockableMappings;
     const current = mappings.find((m) => m.id === mock.mappingId);
@@ -313,6 +335,7 @@ export default function App() {
               entries={requestLog}
               onClear={handleClearLog}
               onExportHar={handleExportHar}
+              onConvertToMock={handleConvertToMock}
               settings={settings}
               t={t}
             />
@@ -394,6 +417,25 @@ export default function App() {
               setMocks(result.mocks);
               setModal(null);
               showToast(t('flash.mock.updated'), 'success');
+            }
+            return result;
+          }}
+          showToast={showToast}
+          t={t}
+        />
+      )}
+
+      {modal?.type === 'convertToMock' && (
+        <MockModal
+          initialValues={buildMockDraftFromEntry(modal.entry, modal.mappingId)}
+          mappings={mockModalMappings({ mappingId: modal.mappingId })}
+          onClose={handleCloseModal}
+          onSubmit={async (data) => {
+            const result = await window.electronAPI.mocks.add(data);
+            if (result.success) {
+              setMocks(result.mocks);
+              setModal(null);
+              showToast(t('flash.mock.added'), 'success');
             }
             return result;
           }}

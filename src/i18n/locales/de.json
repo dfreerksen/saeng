@@ -149,6 +149,8 @@
   "log.subtitle": "Live-Ansicht der über Saeng weitergeleiteten Anfragen",
   "log.actions.clear": "Leeren",
   "log.actions.exportHar": "HAR exportieren",
+  "log.actions.convertToMock": "In Mock umwandeln",
+  "log.actions.convertToMock.noMapping": "Kein Mapping für diese Domain gefunden.",
   "log.exportHar.dialog.title": "HAR exportieren",
   "log.empty": "Noch keine Anfragen",
   "log.emptyHint": "Über Saeng weitergeleitete Anfragen erscheinen hier, während der Proxy läuft.",

@@ -149,6 +149,8 @@
   "log.subtitle": "Podgląd na żywo żądań przesyłanych przez Saeng",
   "log.actions.clear": "Wyczyść",
   "log.actions.exportHar": "Eksportuj HAR",
+  "log.actions.convertToMock": "Konwertuj na mock",
+  "log.actions.convertToMock.noMapping": "Nie znaleziono mapowania dla tej domeny.",
   "log.exportHar.dialog.title": "Eksportuj HAR",
   "log.empty": "Brak żądań",
   "log.emptyHint": "Żądania przesyłane przez Saeng pojawią się tutaj, gdy proxy jest uruchomione.",

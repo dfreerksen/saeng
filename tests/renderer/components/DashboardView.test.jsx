@@ -13,7 +13,7 @@ vi.mock('chart.js', () => ({
 }));
 
 vi.mock('react-chartjs-2', () => ({
-  Line: (props) => <canvas data-testid="chart" />,
+  Line: () => <canvas data-testid="chart" />,
 }));
 
 import DashboardView from '../../../src/renderer/components/DashboardView.jsx';

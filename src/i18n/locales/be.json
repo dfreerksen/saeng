@@ -149,6 +149,8 @@
   "log.subtitle": "Прагляд у рэжыме рэальнага часу запытаў, адпраўленых праз Saeng",
   "log.actions.clear": "Ачысціць",
   "log.actions.exportHar": "Экспартаваць HAR",
+  "log.actions.convertToMock": "Канвертаваць у мок",
+  "log.actions.convertToMock.noMapping": "Адлюстраванне для гэтага дамена не знойдзена.",
   "log.exportHar.dialog.title": "Экспартаваць HAR",
   "log.empty": "Пакуль няма запытаў",
   "log.emptyHint": "Запыты, адпраўленыя праз Saeng, будуць адлюстроўвацца тут, пакуль праксі-сервер працуе.",
