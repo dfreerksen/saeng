@@ -160,6 +160,11 @@ export default memo(function MappingsView({ mappings, setMappings, healthStatuse
                               <i className="bi bi-magic mock-indicator" />
                             </Tooltip>
                           )}
+                          {m.pathRewriteFrom && (
+                            <Tooltip title={t('mappings.table.pathRewrite', { from: m.pathRewriteFrom, to: m.pathRewriteTo || '/' })}>
+                              <i className="bi bi-signpost-split rewrite-indicator" />
+                            </Tooltip>
+                          )}
                         </td>
                         <td>
                           <span className={`badge badge-${proto}`}>{proto.toUpperCase()}</span>

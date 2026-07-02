@@ -14,6 +14,8 @@ export default function MappingModal({ mapping, mappings, httpsEnabled, onClose,
   const [port, setPort] = useState(mapping?.port ?? 3000);
   const [https, setHttps] = useState(!!mapping?.https);
   const [mocksEnabled, setMocksEnabled] = useState(!!mapping?.mocksEnabled);
+  const [pathRewriteFrom, setPathRewriteFrom] = useState(mapping?.pathRewriteFrom ?? '');
+  const [pathRewriteTo, setPathRewriteTo] = useState(mapping?.pathRewriteTo ?? '');
   const [requestHeaders, setRequestHeaders] = useState(mapping?.requestHeaders ?? []);
   const [responseHeaders, setResponseHeaders] = useState(mapping?.responseHeaders ?? []);
   const [domainError, setDomainError] = useState('');
@@ -85,13 +87,15 @@ export default function MappingModal({ mapping, mappings, httpsEnabled, onClose,
       mocksEnabled,
       requestHeaders,
       responseHeaders,
+      pathRewriteFrom: pathRewriteFrom.trim(),
+      pathRewriteTo: pathRewriteTo.trim(),
     });
     setSubmitting(false);
   }
 
   return (
     <Modal onClose={onClose}>
-      <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content">
           <div className="modal-header">
             <h1 className="modal-title fs-5">
@@ -200,6 +204,33 @@ export default function MappingModal({ mapping, mappings, httpsEnabled, onClose,
                   <span>{t('mappings.modals.manage.form.mocksEnabled.label')}</span>
                 </label>
                 <div className="form-hint mt-1">{t('mappings.modals.manage.form.mocksEnabled.hint')}</div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">
+                  <span>{t('mappings.modals.manage.form.pathRewrite.label')}</span>
+                  <span className="form-label-hint">{t('mappings.modals.manage.form.optional')}</span>
+                </label>
+                <div className="domain-row">
+                  <input
+                    className="form-input flex-1"
+                    placeholder={t('mappings.modals.manage.form.pathRewrite.fromPlaceholder')}
+                    value={pathRewriteFrom}
+                    onChange={(e) => setPathRewriteFrom(e.target.value)}
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                  <span className="domain-sep">→</span>
+                  <input
+                    className="form-input flex-1"
+                    placeholder={t('mappings.modals.manage.form.pathRewrite.toPlaceholder')}
+                    value={pathRewriteTo}
+                    onChange={(e) => setPathRewriteTo(e.target.value)}
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                </div>
+                <div className="form-hint">{t('mappings.modals.manage.form.pathRewrite.hint')}</div>
               </div>
 
               <HeaderListEditor

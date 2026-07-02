@@ -104,6 +104,18 @@ describe('MappingsView — table with mappings', () => {
     const { container } = renderMappingsView({ mappings: [SAMPLE_MAPPINGS[0]] });
     expect(container.querySelector('td.domain-cell .mock-indicator')).not.toBeInTheDocument();
   });
+
+  it('shows a rewrite indicator next to the domain when pathRewriteFrom is set', () => {
+    const { container } = renderMappingsView({
+      mappings: [{ ...SAMPLE_MAPPINGS[0], pathRewriteFrom: '/api/v2', pathRewriteTo: '/v3' }],
+    });
+    expect(container.querySelector('td.domain-cell .rewrite-indicator')).toBeInTheDocument();
+  });
+
+  it('does not show a rewrite indicator when pathRewriteFrom is empty', () => {
+    const { container } = renderMappingsView({ mappings: [SAMPLE_MAPPINGS[0]] });
+    expect(container.querySelector('td.domain-cell .rewrite-indicator')).not.toBeInTheDocument();
+  });
 });
 
 describe('MappingsView — group headers', () => {

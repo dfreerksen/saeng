@@ -51,6 +51,8 @@ const schema = {
         requestHeaders: headerListSchema,
         responseHeaders: headerListSchema,
         mocksEnabled: { type: 'boolean', default: false },
+        pathRewriteFrom: { type: 'string', default: '' },
+        pathRewriteTo: { type: 'string', default: '' },
       },
     },
   },
@@ -128,6 +130,29 @@ function sanitizeMockDelayMs(delayMs) {
   return Math.min(MAX_MOCK_DELAY_MS, Math.max(MIN_MOCK_DELAY_MS, parsed));
 }
 
+// Normalizes a path-rewrite prefix: trims whitespace, ensures a leading
+// slash (unless empty — empty means "no rewrite"), and strips a single
+// trailing slash (unless the value is just '/').
+function sanitizePathRewriteFrom(value) {
+  let v = String(value ?? '').trim();
+  if (!v) return '';
+  if (!v.startsWith('/')) v = `/${v}`;
+  if (v.length > 1 && v.endsWith('/')) v = v.slice(0, -1);
+  return v;
+}
+
+// Normalizes a path-rewrite replacement the same way as
+// sanitizePathRewriteFrom, except empty stays empty (a valid "strip the
+// prefix entirely" value, unlike pathRewriteFrom where empty disables
+// rewriting altogether).
+function sanitizePathRewriteTo(value) {
+  let v = String(value ?? '').trim();
+  if (!v) return '';
+  if (!v.startsWith('/')) v = `/${v}`;
+  if (v.length > 1 && v.endsWith('/')) v = v.slice(0, -1);
+  return v;
+}
+
 // Throws a descriptive error if `pattern` is not a valid regular expression.
 function validatePathPattern(pattern) {
   try {
@@ -159,6 +184,8 @@ class AppStore {
       requestHeaders: sanitizeHeaders(data.requestHeaders),
       responseHeaders: sanitizeHeaders(data.responseHeaders),
       mocksEnabled: !!data.mocksEnabled,
+      pathRewriteFrom: sanitizePathRewriteFrom(data.pathRewriteFrom),
+      pathRewriteTo: sanitizePathRewriteTo(data.pathRewriteTo),
     };
     mappings.push(mapping);
     this.store.set('mappings', mappings);
@@ -182,6 +209,8 @@ class AppStore {
         requestHeaders: sanitizeHeaders(data.requestHeaders),
         responseHeaders: sanitizeHeaders(data.responseHeaders),
         mocksEnabled: !!data.mocksEnabled,
+        pathRewriteFrom: sanitizePathRewriteFrom(data.pathRewriteFrom),
+        pathRewriteTo: sanitizePathRewriteTo(data.pathRewriteTo),
       };
     });
     this.store.set('mappings', mappings);
@@ -209,8 +238,8 @@ class AppStore {
     const selected = Array.isArray(ids) && ids.length > 0
       ? mappings.filter((m) => ids.includes(m.id))
       : mappings;
-    return selected.map(({ domain, host, port, https, enabled, requestHeaders, responseHeaders }) => ({
-      domain, host, port, https, enabled, requestHeaders, responseHeaders,
+    return selected.map(({ domain, host, port, https, enabled, requestHeaders, responseHeaders, pathRewriteFrom, pathRewriteTo }) => ({
+      domain, host, port, https, enabled, requestHeaders, responseHeaders, pathRewriteFrom, pathRewriteTo,
     }));
   }
 
@@ -232,6 +261,8 @@ class AppStore {
         https: entry.https,
         requestHeaders: entry.requestHeaders,
         responseHeaders: entry.responseHeaders,
+        pathRewriteFrom: entry.pathRewriteFrom,
+        pathRewriteTo: entry.pathRewriteTo,
       });
       if (entry.enabled === false) this.toggleMapping(mapping.id);
       existingDomains.add(domain);

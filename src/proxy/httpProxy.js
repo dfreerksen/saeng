@@ -44,6 +44,30 @@ class HttpProxy {
     return headers;
   }
 
+  // Rewrites the path portion of `pathWithQuery` by replacing a matched
+  // mapping.pathRewriteFrom prefix with mapping.pathRewriteTo, preserving
+  // the query string. Only rewrites on an exact match or a `from + '/'`
+  // prefix (so `/api` doesn't match `/apiextra`). No-op when
+  // pathRewriteFrom is empty/unset.
+  _rewritePath(mapping, pathWithQuery) {
+    const from = mapping.pathRewriteFrom;
+    if (!from) return pathWithQuery;
+
+    const input = pathWithQuery || '/';
+    const qIndex = input.indexOf('?');
+    const pathname = qIndex === -1 ? input : input.slice(0, qIndex);
+    const query = qIndex === -1 ? '' : input.slice(qIndex);
+
+    const matches = pathname === from || pathname.startsWith(`${from}/`);
+    if (!matches) return pathWithQuery;
+
+    const rest = pathname.slice(from.length);
+    const to = mapping.pathRewriteTo || '';
+    const rewrittenPathname = `${to}${rest}` || '/';
+
+    return rewrittenPathname + query;
+  }
+
   findMapping(hostname) {
     const lower = hostname.toLowerCase();
 
@@ -315,12 +339,14 @@ class HttpProxy {
       return;
     }
 
+    const backendPath = this._rewritePath(mapping, reqPath || '/');
+
     const backendProto = mapping.https ? https : http;
     const options = {
       hostname: mapping.host || '127.0.0.1',
       port: mapping.port,
       method: req.method,
-      path: reqPath || '/',
+      path: backendPath,
       headers: { ...req.headers },
       ...(mapping.https && { rejectUnauthorized: false }),
     };
@@ -365,12 +391,14 @@ class HttpProxy {
       return;
     }
 
+    const backendPath = this._rewritePath(mapping, req.url || '/');
+
     const backendProto = mapping.https ? https : http;
     const options = {
       hostname: mapping.host || '127.0.0.1',
       port: mapping.port,
       method: req.method,
-      path: req.url || '/',
+      path: backendPath,
       headers: { ...req.headers },
       ...(mapping.https && { rejectUnauthorized: false }),
     };
@@ -450,7 +478,8 @@ class HttpProxy {
     const serverSocket = net.connect(mapping.port, mapping.host || '127.0.0.1', () => {
       // Replay the upgrade request to the backend
       const headers = this._applyHeaderOverrides({ ...req.headers }, mapping.requestHeaders);
-      let requestLine = `${req.method} ${req.url} HTTP/${req.httpVersion}\r\n`;
+      const backendPath = this._rewritePath(mapping, req.url || '/');
+      let requestLine = `${req.method} ${backendPath} HTTP/${req.httpVersion}\r\n`;
       serverSocket.write(requestLine);
       Object.entries(headers).forEach(([k, v]) => {
         serverSocket.write(`${k}: ${v}\r\n`);

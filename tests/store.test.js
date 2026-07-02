@@ -243,7 +243,7 @@ describe('AppStore.exportMappings()', () => {
     const [result] = store.exportMappings();
     expect(result).toEqual({
       domain: 'a.local', host: '127.0.0.1', port: 1, https: false, enabled: true,
-      requestHeaders: [], responseHeaders: [],
+      requestHeaders: [], responseHeaders: [], pathRewriteFrom: '', pathRewriteTo: '',
     });
     expect(result).not.toHaveProperty('id');
     expect(result).not.toHaveProperty('createdAt');
@@ -259,6 +259,13 @@ describe('AppStore.exportMappings()', () => {
     const [result] = store.exportMappings();
     expect(result.requestHeaders).toEqual([{ name: 'X-Foo', value: 'bar' }]);
     expect(result.responseHeaders).toEqual([{ name: 'X-Bar', value: 'baz' }]);
+  });
+
+  it('includes pathRewriteFrom and pathRewriteTo', () => {
+    store.addMapping({ domain: 'a.local', port: 1, pathRewriteFrom: '/api/v2', pathRewriteTo: '/v3' });
+    const [result] = store.exportMappings();
+    expect(result.pathRewriteFrom).toBe('/api/v2');
+    expect(result.pathRewriteTo).toBe('/v3');
   });
 
   it('returns all mappings when ids is an empty array', () => {
@@ -337,6 +344,23 @@ describe('AppStore.importMappings()', () => {
     expect(added[0].requestHeaders).toEqual([{ name: 'X-Foo', value: 'bar' }]);
     expect(added[0].responseHeaders).toEqual([{ name: 'X-Bar', value: 'baz' }]);
   });
+
+  it('imports pathRewriteFrom and pathRewriteTo', () => {
+    const { added } = store.importMappings([{
+      domain: 'a.local',
+      port: 1,
+      pathRewriteFrom: '/api/v2',
+      pathRewriteTo: '/v3',
+    }]);
+    expect(added[0].pathRewriteFrom).toBe('/api/v2');
+    expect(added[0].pathRewriteTo).toBe('/v3');
+  });
+
+  it('defaults pathRewriteFrom/pathRewriteTo to empty string on legacy entries missing them', () => {
+    const { added } = store.importMappings([{ domain: 'a.local', port: 1 }]);
+    expect(added[0].pathRewriteFrom).toBe('');
+    expect(added[0].pathRewriteTo).toBe('');
+  });
 });
 
 describe('AppStore mocksEnabled on mappings', () => {
@@ -355,6 +379,46 @@ describe('AppStore mocksEnabled on mappings', () => {
     const m = store.addMapping({ domain: 'myapp.local', port: 3000 });
     const updated = store.updateMapping(m.id, { domain: 'myapp.local', port: 3000, mocksEnabled: true });
     expect(updated.mocksEnabled).toBe(true);
+  });
+});
+
+describe('AppStore pathRewrite on mappings', () => {
+  it('defaults pathRewriteFrom and pathRewriteTo to empty string on addMapping', () => {
+    const result = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    expect(result.pathRewriteFrom).toBe('');
+    expect(result.pathRewriteTo).toBe('');
+  });
+
+  it('adds a leading slash to pathRewriteFrom when missing', () => {
+    expect(store.addMapping({ domain: 'a.local', port: 1, pathRewriteFrom: 'api/v2' }).pathRewriteFrom).toBe('/api/v2');
+  });
+
+  it('strips a single trailing slash from pathRewriteFrom (except root)', () => {
+    expect(store.addMapping({ domain: 'a.local', port: 1, pathRewriteFrom: '/api/v2/' }).pathRewriteFrom).toBe('/api/v2');
+    expect(store.addMapping({ domain: 'b.local', port: 2, pathRewriteFrom: '/' }).pathRewriteFrom).toBe('/');
+  });
+
+  it('trims whitespace on pathRewriteFrom and pathRewriteTo', () => {
+    const result = store.addMapping({ domain: 'a.local', port: 1, pathRewriteFrom: '  /api  ', pathRewriteTo: '  /v3  ' });
+    expect(result.pathRewriteFrom).toBe('/api');
+    expect(result.pathRewriteTo).toBe('/v3');
+  });
+
+  it('normalizes pathRewriteTo the same way as pathRewriteFrom when non-empty', () => {
+    expect(store.addMapping({ domain: 'a.local', port: 1, pathRewriteTo: 'v3' }).pathRewriteTo).toBe('/v3');
+  });
+
+  it('keeps pathRewriteTo as empty string when explicitly empty (strip to root)', () => {
+    expect(store.addMapping({ domain: 'a.local', port: 1, pathRewriteFrom: '/api', pathRewriteTo: '' }).pathRewriteTo).toBe('');
+  });
+
+  it('updates pathRewriteFrom/pathRewriteTo via updateMapping', () => {
+    const m = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const updated = store.updateMapping(m.id, {
+      domain: 'myapp.local', port: 3000, pathRewriteFrom: '/api/v2', pathRewriteTo: '/v3',
+    });
+    expect(updated.pathRewriteFrom).toBe('/api/v2');
+    expect(updated.pathRewriteTo).toBe('/v3');
   });
 });
 

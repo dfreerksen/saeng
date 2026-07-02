@@ -91,6 +91,13 @@ describe('MappingModal — add mode', () => {
     const checkboxes = container.querySelectorAll('.checkbox-row input[type="checkbox"]');
     expect(checkboxes[1]).not.toBeChecked();
   });
+
+  it('starts with pathRewriteFrom and pathRewriteTo empty', () => {
+    const { container } = renderAddModal();
+    const formInputs = container.querySelectorAll('.form-input');
+    expect(formInputs[4].value).toBe('');
+    expect(formInputs[5].value).toBe('');
+  });
 });
 
 describe('MappingModal — edit mode', () => {
@@ -133,6 +140,15 @@ describe('MappingModal — edit mode', () => {
     const { container } = renderEditModal();
     const hostInput = container.querySelectorAll('.form-input')[2];
     expect(hostInput.value).toBe('192.168.1.10');
+  });
+
+  it('pre-fills pathRewriteFrom and pathRewriteTo when the mapping has a rewrite rule', () => {
+    const { container } = renderEditModal({
+      mapping: { ...EXISTING_MAPPING, pathRewriteFrom: '/api/v2', pathRewriteTo: '/v3' },
+    });
+    const formInputs = container.querySelectorAll('.form-input');
+    expect(formInputs[4].value).toBe('/api/v2');
+    expect(formInputs[5].value).toBe('/v3');
   });
 
   it('renders the edit submit button', () => {
@@ -366,6 +382,35 @@ describe('MappingModal — successful submit', () => {
     fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ mocksEnabled: true }));
+    });
+  });
+
+  it('includes trimmed pathRewriteFrom/pathRewriteTo in onSubmit', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderAddModal({ onSubmit });
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    const formInputs = container.querySelectorAll('.form-input');
+    fireEvent.change(formInputs[4], { target: { value: '  /api/v2  ' } });
+    fireEvent.change(formInputs[5], { target: { value: '  /v3  ' } });
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ pathRewriteFrom: '/api/v2', pathRewriteTo: '/v3' })
+      );
+    });
+  });
+
+  it('includes empty pathRewriteFrom/pathRewriteTo in onSubmit by default', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderAddModal({ onSubmit });
+    const domainInput = container.querySelectorAll('.form-input')[1];
+    fireEvent.change(domainInput, { target: { value: 'myapp' } });
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ pathRewriteFrom: '', pathRewriteTo: '' })
+      );
     });
   });
 

@@ -51,6 +51,7 @@
   "mappings.table.actions.delete": "Remove",
   "mappings.table.actions.confirm.remove": "Remove {domain}?",
   "mappings.table.mocksEnabled": "Mocking enabled for this domain",
+  "mappings.table.pathRewrite": "Path rewrite: {from} → {to}",
 
   "mappings.modals.export.title": "Export Mappings",
   "mappings.modals.export.description": "Choose which mappings to include in the exported file.",
@@ -88,6 +89,10 @@
   "mappings.modals.manage.form.https.hint": "Enable only if your backend service itself runs HTTPS. Leave off for plain HTTP backends (even if the domain is accessed via HTTPS).",
   "mappings.modals.manage.form.mocksEnabled.label": "Enable mocking for this domain",
   "mappings.modals.manage.form.mocksEnabled.hint": "When enabled, requests matching a mock rule for this domain return the mocked response instead of reaching the backend.",
+  "mappings.modals.manage.form.pathRewrite.label": "Path Rewrite",
+  "mappings.modals.manage.form.pathRewrite.hint": "Strip or replace a path prefix before forwarding to the backend, e.g. /api/v2 → (empty) turns /api/v2/users into /users. Leave both blank to forward paths unchanged.",
+  "mappings.modals.manage.form.pathRewrite.fromPlaceholder": "/api/v2",
+  "mappings.modals.manage.form.pathRewrite.toPlaceholder": "/v3 (optional)",
   "mappings.modals.manage.form.headers.request.label": "Request Headers",
   "mappings.modals.manage.form.headers.request.hint": "Extra headers sent to the backend with each request (e.g. Authorization, X-Api-Key).",
   "mappings.modals.manage.form.headers.response.label": "Response Headers",

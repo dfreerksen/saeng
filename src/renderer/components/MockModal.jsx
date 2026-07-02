@@ -126,7 +126,7 @@ export default function MockModal({ mock, initialValues, mappings, onClose, onSu
 
   return (
     <Modal onClose={onClose}>
-      <div className={`modal-dialog modal-dialog-centered modal-dialog-scrollable${showHelp ? ' mock-modal-expanded' : ''}`}>
+      <div className={`modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable${showHelp ? ' mock-modal-expanded' : ''}`}>
         <div className="modal-content">
           <div className="modal-header">
             <h1 className="modal-title fs-5">

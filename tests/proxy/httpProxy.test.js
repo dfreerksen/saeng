@@ -39,6 +39,15 @@ function stopBackend(server) {
   return new Promise((resolve) => server.close(resolve));
 }
 
+// Backend that responds with the request path (req.url) as its body, used
+// to verify path-rewriting is applied to what's forwarded to the backend.
+function startPathEchoBackend() {
+  return new Promise((resolve) => {
+    const server = http.createServer((req, res) => res.end(req.url));
+    server.listen(0, '127.0.0.1', () => resolve(server));
+  });
+}
+
 // Helper: make a plain HTTP request and return { statusCode, body }
 function makeRequest(port, { method = 'GET', path = '/', host, body } = {}) {
   return new Promise((resolve, reject) => {
@@ -397,6 +406,103 @@ describe('HttpProxy request handling', () => {
     expect(headers['x-original']).toBe('overridden');
     expect(headers['x-new']).toBe('added');
     await stopBackend(backend);
+  });
+
+  it('rewrites the request path before forwarding to the backend', async () => {
+    const backend = await startPathEchoBackend();
+    const backendPort = backend.address().port;
+    proxy = new HttpProxy(null);
+    await proxy.start(
+      [{
+        domain: 'rewrite.local', host: '127.0.0.1', port: backendPort, enabled: true,
+        pathRewriteFrom: '/api/v2', pathRewriteTo: '/v3',
+      }],
+      { httpsEnabled: false }
+    );
+    const { body } = await makeRequest(proxy.getPort(), { host: 'rewrite.local', path: '/api/v2/users?x=1' });
+    expect(body).toBe('/v3/users?x=1');
+    await stopBackend(backend);
+  });
+
+  it('does not rewrite the path when pathRewriteFrom is empty', async () => {
+    const backend = await startPathEchoBackend();
+    const backendPort = backend.address().port;
+    proxy = new HttpProxy(null);
+    await proxy.start(
+      [{ domain: 'norewrite.local', host: '127.0.0.1', port: backendPort, enabled: true }],
+      { httpsEnabled: false }
+    );
+    const { body } = await makeRequest(proxy.getPort(), { host: 'norewrite.local', path: '/api/v2/users' });
+    expect(body).toBe('/api/v2/users');
+    await stopBackend(backend);
+  });
+
+  it('matches a mock against the original pre-rewrite path even when a rewrite is configured', async () => {
+    const backend = await startPathEchoBackend();
+    const backendPort = backend.address().port;
+    proxy = new HttpProxy(null);
+    const mapping = {
+      id: 'm1', domain: 'mockrewrite.local', host: '127.0.0.1', port: backendPort, enabled: true,
+      mocksEnabled: true, pathRewriteFrom: '/api/v2', pathRewriteTo: '/v3',
+    };
+    proxy.updateMocks([{
+      id: 'mock1', mappingId: 'm1', enabled: true, method: '*',
+      pathPattern: '^/api/v2/users$', statusCode: 200, headers: [], body: 'mocked-response', delayMs: 0,
+    }]);
+    await proxy.start([mapping], { httpsEnabled: false });
+    const { body } = await makeRequest(proxy.getPort(), { host: 'mockrewrite.local', path: '/api/v2/users' });
+    expect(body).toBe('mocked-response');
+    await stopBackend(backend);
+  });
+});
+
+describe('HttpProxy._rewritePath()', () => {
+  it('returns the path unchanged when pathRewriteFrom is empty/not set', () => {
+    const proxy = new HttpProxy(null);
+    expect(proxy._rewritePath({}, '/api/v2/users')).toBe('/api/v2/users');
+    expect(proxy._rewritePath({ pathRewriteFrom: '' }, '/api/v2/users')).toBe('/api/v2/users');
+  });
+
+  it('rewrites an exact prefix match to pathRewriteTo', () => {
+    const proxy = new HttpProxy(null);
+    const mapping = { pathRewriteFrom: '/api/v2', pathRewriteTo: '/v3' };
+    expect(proxy._rewritePath(mapping, '/api/v2')).toBe('/v3');
+  });
+
+  it('rewrites a prefix match with a trailing segment, preserving the query string', () => {
+    const proxy = new HttpProxy(null);
+    const mapping = { pathRewriteFrom: '/api/v2', pathRewriteTo: '/v3' };
+    expect(proxy._rewritePath(mapping, '/api/v2/users/42?x=1')).toBe('/v3/users/42?x=1');
+  });
+
+  it('does not rewrite when the prefix is not a full path segment', () => {
+    const proxy = new HttpProxy(null);
+    const mapping = { pathRewriteFrom: '/api', pathRewriteTo: '/v3' };
+    expect(proxy._rewritePath(mapping, '/apiextra')).toBe('/apiextra');
+  });
+
+  it('falls back to "/" when pathRewriteTo is empty and the match is exact', () => {
+    const proxy = new HttpProxy(null);
+    const mapping = { pathRewriteFrom: '/api/v2', pathRewriteTo: '' };
+    expect(proxy._rewritePath(mapping, '/api/v2')).toBe('/');
+  });
+
+  it('strips the prefix down to the remaining segment when pathRewriteTo is empty', () => {
+    const proxy = new HttpProxy(null);
+    const mapping = { pathRewriteFrom: '/api/v2', pathRewriteTo: '' };
+    expect(proxy._rewritePath(mapping, '/api/v2/users')).toBe('/users');
+  });
+
+  it('preserves special characters in the query string exactly', () => {
+    const proxy = new HttpProxy(null);
+    const mapping = { pathRewriteFrom: '/api/v2', pathRewriteTo: '/v3' };
+    expect(proxy._rewritePath(mapping, '/api/v2/users?q=a%20b&x=1')).toBe('/v3/users?q=a%20b&x=1');
+  });
+
+  it('treats a missing pathWithQuery as "/"', () => {
+    const proxy = new HttpProxy(null);
+    const mapping = { pathRewriteFrom: '/', pathRewriteTo: '/v3' };
+    expect(proxy._rewritePath(mapping, '')).toBe('/v3');
   });
 });
 
@@ -1089,6 +1195,55 @@ describe('HttpProxy._handleWebSocketUpgrade()', () => {
     await new Promise((r) => process.nextTick(r));
 
     expect(writtenText(serverSocket)).toContain('x-forwarded-proto: wss');
+  });
+
+  it('rewrites req.url when replaying the WebSocket upgrade request line', async () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{
+      domain: 'ws.local', port: 9000, host: '127.0.0.1', enabled: true,
+      pathRewriteFrom: '/ws/v1', pathRewriteTo: '/socket',
+    }]);
+
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockImplementation((port, host, cb) => {
+      process.nextTick(cb);
+      return serverSocket;
+    });
+
+    proxy._handleWebSocketUpgrade(
+      { headers: { host: 'ws.local' }, method: 'GET', url: '/ws/v1/chat', httpVersion: '1.1' },
+      clientSocket,
+      Buffer.alloc(0)
+    );
+
+    await new Promise((r) => process.nextTick(r));
+
+    expect(writtenText(serverSocket)).toContain('GET /socket/chat HTTP/1.1');
+  });
+
+  it('does not rewrite the WebSocket upgrade path when pathRewriteFrom is empty', async () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{
+      domain: 'ws.local', port: 9000, host: '127.0.0.1', enabled: true,
+    }]);
+
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockImplementation((port, host, cb) => {
+      process.nextTick(cb);
+      return serverSocket;
+    });
+
+    proxy._handleWebSocketUpgrade(
+      { headers: { host: 'ws.local' }, method: 'GET', url: '/chat', httpVersion: '1.1' },
+      clientSocket,
+      Buffer.alloc(0)
+    );
+
+    await new Promise((r) => process.nextTick(r));
+
+    expect(writtenText(serverSocket)).toContain('GET /chat HTTP/1.1');
   });
 
   it('forwards head data to the server socket after connecting', async () => {

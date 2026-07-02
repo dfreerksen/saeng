@@ -95,9 +95,11 @@ The user must install the CA cert into the OS trust store once — `src/ssl/trus
 
 Mapping shape:
 ```js
-{ id, domain, host, port, https, enabled, createdAt, requestHeaders, responseHeaders, mocksEnabled }
+{ id, domain, host, port, https, enabled, createdAt, requestHeaders, responseHeaders, mocksEnabled, pathRewriteFrom, pathRewriteTo }
 ```
 `host` is the backend hostname to proxy to (defaults to `127.0.0.1`). It is used for all connection types: plain HTTP, HTTPS CONNECT tunnels, and WebSocket upgrades. `https` on a mapping means the **backend** expects HTTPS — it does not control whether the frontend domain is served over HTTPS (that is the global `settings.httpsEnabled` toggle). `mocksEnabled` (default `false`) gates whether any mock rules for this mapping are applied — see [Mocks](#mocks).
+
+`pathRewriteFrom`/`pathRewriteTo` (both default `''`, sanitized via `sanitizePathRewriteFrom()`/`sanitizePathRewriteTo()` — trimmed, given a leading `/` if non-empty, trailing `/` stripped unless the value is just `/`) let a mapping strip or replace a path prefix before forwarding to the backend. `HttpProxy._rewritePath(mapping, pathWithQuery)` rewrites the path only when `pathRewriteFrom` is non-empty and the request pathname is exactly `pathRewriteFrom` or starts with `pathRewriteFrom + '/'`, replacing the matched prefix with `pathRewriteTo` (falling back to `/` if the result is empty) while preserving the query string; it is called from `_handleRequest`, `_handleDecryptedRequest`, and `_handleWebSocketUpgrade` (applied to `req.url` when replaying the upgrade request line) right before the backend request/connection is built. Rewriting happens *after* `_findMock()` is checked, so mock rules always match the original, pre-rewrite request path — rewriting only affects what is sent to the real backend. Raw HTTPS CONNECT tunnels (`_tunnelRaw`, used when global HTTPS is disabled) are opaque TCP and are not affected by path rewriting.
 
 `requestHeaders`/`responseHeaders` are arrays of `{ name, value }` pairs (sanitized via `sanitizeHeaders()`, default `[]`), editable per-mapping in `MappingModal.jsx`. `HttpProxy._applyHeaderOverrides()` lowercases each `name` and sets it on the headers object, so overrides replace rather than duplicate existing headers — `requestHeaders` are applied to the outgoing backend request (including WebSocket upgrade replays) and `responseHeaders` to the response written back to the client.
 
