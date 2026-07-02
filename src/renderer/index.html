@@ -10,6 +10,13 @@
 
     <link rel="stylesheet" href="styles.css">
 
+    <!-- Warmed early so AboutModal images are already cached by the time it's opened -->
+    <link rel="preload" as="image" href="images/logo.svg" fetchpriority="low">
+    <link rel="preload" as="image" href="images/tech/electron.svg" fetchpriority="low">
+    <link rel="preload" as="image" href="images/tech/nodejs.svg" fetchpriority="low">
+    <link rel="preload" as="image" href="images/tech/react.svg" fetchpriority="low">
+    <link rel="preload" as="image" href="images/tech/bootstrap.svg" fetchpriority="low">
+
     <script src="color-mode.js" nonce="__NONCE__"></script>
   </head>
   <body>
