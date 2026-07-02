@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Modal from './Modal.jsx';
-import HeaderListEditor from './HeaderListEditor.jsx';
-import { validateDomainPart, splitDomain, DOMAIN_SUFFIXES, DEFAULT_SUFFIX } from '../js/utils.js';
+import HeaderListEditor from '../HeaderListEditor.jsx';
+import { validateDomainPart, splitDomain, DOMAIN_SUFFIXES, DEFAULT_SUFFIX } from '../../js/utils.js';
 
 export default function MappingModal({ mapping, mappings, httpsEnabled, onClose, onSubmit, t }) {
   const isEditing = !!mapping;

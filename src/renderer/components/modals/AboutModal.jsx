@@ -1,5 +1,5 @@
 import Modal from './Modal.jsx';
-import Tooltip from './Tooltip.jsx';
+import Tooltip from '../utilities/Tooltip.jsx';
 
 export default function AboutModal({ version, electronVersion, nodeVersion, reactVersion, bootstrapVersion, onClose, t }) {
   return (

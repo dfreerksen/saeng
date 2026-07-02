@@ -2,11 +2,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 
-vi.mock('../../../src/renderer/components/Modal.jsx', () => ({
+vi.mock('../../../../src/renderer/components/modals/Modal.jsx', () => ({
   default: ({ children }) => <div data-testid="modal-wrapper">{children}</div>,
 }));
 
-import ExportModal from '../../../src/renderer/components/ExportModal.jsx';
+import ExportModal from '../../../../src/renderer/components/modals/ExportModal.jsx';
 
 const t = (key) => key;
 

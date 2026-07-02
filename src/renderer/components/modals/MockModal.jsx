@@ -1,46 +1,17 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import Modal from './Modal.jsx';
-import HeaderListEditor from './HeaderListEditor.jsx';
-import ConditionListEditor from './ConditionListEditor.jsx';
-import Tooltip from './Tooltip.jsx';
-import { splitDomain } from '../js/utils.js';
+import HeaderListEditor from '../HeaderListEditor.jsx';
+import ConditionListEditor from '../ConditionListEditor.jsx';
+import MockRegexHelpPane from './MockRegexHelpPane.jsx';
+import { compareMappingsByDomain } from '../../js/utils.js';
 
 const HTTP_METHODS = ['*', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
-
-const REGEX_EXAMPLES = [
-  { pattern: '^/api/users$', descriptionKey: 'mocks.modals.manage.help.examples.exact' },
-  { pattern: '^/api/users/\\d+$', descriptionKey: 'mocks.modals.manage.help.examples.numericId' },
-  { pattern: '^/api/users/[^/]+$', descriptionKey: 'mocks.modals.manage.help.examples.anySegment' },
-  { pattern: '^/api/users(/.*)?$', descriptionKey: 'mocks.modals.manage.help.examples.prefix' },
-  { pattern: '^/api/users/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$', descriptionKey: 'mocks.modals.manage.help.examples.uuid' },
-  { pattern: '\\.json$', descriptionKey: 'mocks.modals.manage.help.examples.extension' },
-  { pattern: '^/(users|accounts)$', descriptionKey: 'mocks.modals.manage.help.examples.alternation' },
-  { pattern: '.*', descriptionKey: 'mocks.modals.manage.help.examples.any' },
-];
-
-function subdomainRank(subdomain) {
-  if (subdomain === '') return 0;
-  if (subdomain === '*') return 2;
-  return 1;
-}
-
-function compareMappings(a, b) {
-  const splitA = splitDomain(a.domain);
-  const splitB = splitDomain(b.domain);
-  const baseA = splitA.domain + splitA.suffix;
-  const baseB = splitB.domain + splitB.suffix;
-  const baseCmp = baseA.localeCompare(baseB, undefined, { numeric: true });
-  if (baseCmp !== 0) return baseCmp;
-  const rankDiff = subdomainRank(splitA.subdomain) - subdomainRank(splitB.subdomain);
-  if (rankDiff !== 0) return rankDiff;
-  return splitA.subdomain.localeCompare(splitB.subdomain, undefined, { numeric: true });
-}
 
 export default function MockModal({ mock, initialValues, mappings, onClose, onSubmit, showToast, t }) {
   const isEditing = !!mock;
   const init = mock ?? initialValues ?? {};
 
-  const sortedMappings = useMemo(() => [...mappings].sort(compareMappings), [mappings]);
+  const sortedMappings = useMemo(() => [...mappings].sort(compareMappingsByDomain), [mappings]);
   const [mappingId, setMappingId] = useState(init.mappingId ?? sortedMappings[0]?.id ?? '');
   const [method, setMethod] = useState(init.method ?? '*');
   const [pathPattern, setPathPattern] = useState(init.pathPattern ?? '');
@@ -133,11 +104,6 @@ export default function MockModal({ mock, initialValues, mappings, onClose, onSu
     if (result && result.success === false) {
       setPathError(result.error);
     }
-  }
-
-  function handleCopy(pattern) {
-    navigator.clipboard.writeText(pattern);
-    showToast(t('flash.copied', { url: pattern }), 'success');
   }
 
   return (
@@ -280,41 +246,7 @@ export default function MockModal({ mock, initialValues, mappings, onClose, onSu
               </form>
             </div>
 
-            {showHelp && (
-              <div className="mock-modal-help-pane">
-                <h6 className="mb-2">{t('mocks.modals.manage.help.title')}</h6>
-                <p className="form-hint">{t('mocks.modals.manage.help.intro')}</p>
-                <table className="table table-borderless table-striped">
-                  <thead>
-                    <tr>
-                      <th scope="col">{t('mocks.modals.manage.help.table.pattern')}</th>
-                      <th scope="col" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {REGEX_EXAMPLES.map((example) => (
-                      <tr key={example.pattern}>
-                        <td className="log-path-cell">
-                          <code>{example.pattern}</code>
-                          <div className="form-hint mb-0">{t(example.descriptionKey)}</div>
-                        </td>
-                        <td className="text-end">
-                          <Tooltip title={t('mocks.modals.manage.help.copy')}>
-                            <button
-                              type="button"
-                              className="btn btn-outline-secondary btn-copy"
-                              onClick={() => handleCopy(example.pattern)}
-                            >
-                              <i className="bi bi-clipboard" />
-                            </button>
-                          </Tooltip>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            {showHelp && <MockRegexHelpPane showToast={showToast} t={t} />}
           </div>
         </div>
       </div>

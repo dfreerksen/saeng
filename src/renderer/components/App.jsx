@@ -1,16 +1,13 @@
-import { useState, useEffect, useCallback, useMemo, useRef, version as reactVersion } from 'react';
-import Titlebar from './Titlebar.jsx';
-import Sidebar from './Sidebar.jsx';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import Titlebar from './layout/Titlebar.jsx';
+import Sidebar from './layout/Sidebar.jsx';
 import DashboardView from './DashboardView.jsx';
 import MappingsView from './MappingsView.jsx';
 import MocksView from './MocksView.jsx';
 import LogView from './LogView.jsx';
 import SettingsView from './SettingsView.jsx';
-import MappingModal from './MappingModal.jsx';
-import MockModal from './MockModal.jsx';
-import ExportModal from './ExportModal.jsx';
-import AboutModal from './AboutModal.jsx';
-import Toast from './Toast.jsx';
+import AppModals from './modals/AppModals.jsx';
+import Toast from './utilities/Toast.jsx';
 import { getOS } from '../js/os.js';
 import { Tooltip as BsTooltip } from 'bootstrap';
 
@@ -254,9 +251,9 @@ export default function App() {
 
   const mockableMappings = useMemo(() => mappings.filter((m) => m.enabled && m.mocksEnabled), [mappings]);
 
-  const handleOpenAddModal = useCallback(() => setModal({ type: 'add' }), []);
-  const handleOpenEditModal = useCallback((mapping) => setModal({ type: 'edit', mapping }), []);
-  const handleOpenExportModal = useCallback(() => setModal({ type: 'export' }), []);
+  const handleOpenAddModal = useCallback(() => setModal({ type: 'addMapping' }), []);
+  const handleOpenEditModal = useCallback((mapping) => setModal({ type: 'editMapping', mapping }), []);
+  const handleOpenExportModal = useCallback(() => setModal({ type: 'exportMappings' }), []);
   const handleOpenAddMockModal = useCallback(() => setModal({ type: 'addMock' }), []);
   const handleOpenEditMockModal = useCallback((mock) => setModal({ type: 'editMock', mock }), []);
   const handleOpenExportMocksModal = useCallback(() => setModal({ type: 'exportMocks' }), []);
@@ -269,7 +266,11 @@ export default function App() {
       showToast(t('log.actions.convertToMock.noMapping'), 'error');
       return;
     }
-    setModal({ type: 'convertToMock', entry, mappingId: mapping.id });
+    setModal({
+      type: 'convertToMock',
+      mappingId: mapping.id,
+      initialValues: buildMockDraftFromEntry(entry, mapping.id),
+    });
   }, [mappings, showToast, t]);
 
   function mockModalMappings(mock) {
@@ -357,145 +358,23 @@ export default function App() {
         </main>
       </div>
 
-      {modal?.type === 'add' && (
-        <MappingModal
-          mappings={mappings}
-          httpsEnabled={!!settings.httpsEnabled}
-          onClose={handleCloseModal}
-          onSubmit={async (data) => {
-            const updated = await window.electronAPI.mappings.add(data);
-            setMappings(updated);
-            setModal(null);
-            showToast(t('flash.mapping.added', { domain: data.domain, host: data.host, port: data.port }), 'success');
-          }}
-          t={t}
-        />
-      )}
-
-      {modal?.type === 'edit' && (
-        <MappingModal
-          mapping={modal.mapping}
-          mappings={mappings}
-          httpsEnabled={!!settings.httpsEnabled}
-          onClose={handleCloseModal}
-          onSubmit={async (data) => {
-            const updated = await window.electronAPI.mappings.update(modal.mapping.id, data);
-            setMappings(updated);
-            setModal(null);
-            showToast(t('flash.mapping.updated', { domain: data.domain, host: data.host, port: data.port }), 'success');
-          }}
-          t={t}
-        />
-      )}
-
-      {modal?.type === 'addMock' && (
-        <MockModal
-          mappings={mockableMappings}
-          onClose={handleCloseModal}
-          onSubmit={async (data) => {
-            const result = await window.electronAPI.mocks.add(data);
-            if (result.success) {
-              setMocks(result.mocks);
-              setModal(null);
-              showToast(t('flash.mock.added'), 'success');
-            }
-            return result;
-          }}
-          showToast={showToast}
-          t={t}
-        />
-      )}
-
-      {modal?.type === 'editMock' && (
-        <MockModal
-          mock={modal.mock}
-          mappings={mockModalMappings(modal.mock)}
-          onClose={handleCloseModal}
-          onSubmit={async (data) => {
-            const result = await window.electronAPI.mocks.update(modal.mock.id, data);
-            if (result.success) {
-              setMocks(result.mocks);
-              setModal(null);
-              showToast(t('flash.mock.updated'), 'success');
-            }
-            return result;
-          }}
-          showToast={showToast}
-          t={t}
-        />
-      )}
-
-      {modal?.type === 'convertToMock' && (
-        <MockModal
-          initialValues={buildMockDraftFromEntry(modal.entry, modal.mappingId)}
-          mappings={mockModalMappings({ mappingId: modal.mappingId })}
-          onClose={handleCloseModal}
-          onSubmit={async (data) => {
-            const result = await window.electronAPI.mocks.add(data);
-            if (result.success) {
-              setMocks(result.mocks);
-              setModal(null);
-              showToast(t('flash.mock.added'), 'success');
-            }
-            return result;
-          }}
-          showToast={showToast}
-          t={t}
-        />
-      )}
-
-      {modal?.type === 'export' && (
-        <ExportModal
-          items={mappings.map((m) => ({ id: m.id, label: m.domain }))}
-          i18nPrefix="mappings.modals.export"
-          onClose={handleCloseModal}
-          onSubmit={async (ids) => {
-            const result = await window.electronAPI.mappings.export(ids);
-            if (result.canceled) return;
-            if (result.success) {
-              setModal(null);
-              showToast(t('flash.export.success', { count: result.count, path: result.path }), 'success');
-            } else {
-              showToast(t('flash.export.error', { error: result.error }), 'error');
-            }
-          }}
-          t={t}
-        />
-      )}
-
-      {modal?.type === 'exportMocks' && (
-        <ExportModal
-          items={mocks.map((m) => ({
-            id: m.id,
-            label: `${m.method === '*' ? t('mocks.modals.manage.form.method.any') : m.method} ${m.pathPattern}`,
-          }))}
-          i18nPrefix="mocks.modals.export"
-          onClose={handleCloseModal}
-          onSubmit={async (ids) => {
-            const result = await window.electronAPI.mocks.export(ids);
-            if (result.canceled) return;
-            if (result.success) {
-              setModal(null);
-              showToast(t('flash.mocksExport.success', { count: result.count, path: result.path }), 'success');
-            } else {
-              showToast(t('flash.mocksExport.error', { error: result.error }), 'error');
-            }
-          }}
-          t={t}
-        />
-      )}
-
-      {modal?.type === 'about' && (
-        <AboutModal
-          version={appVersion}
-          electronVersion={electronVersion}
-          nodeVersion={nodeVersion}
-          reactVersion={reactVersion}
-          bootstrapVersion={bootstrapVersion}
-          onClose={handleCloseModal}
-          t={t}
-        />
-      )}
+      <AppModals
+        modal={modal}
+        mappings={mappings}
+        setMappings={setMappings}
+        mocks={mocks}
+        setMocks={setMocks}
+        mockModalMappings={mockModalMappings}
+        settings={settings}
+        appVersion={appVersion}
+        electronVersion={electronVersion}
+        nodeVersion={nodeVersion}
+        bootstrapVersion={bootstrapVersion}
+        onClose={handleCloseModal}
+        setModal={setModal}
+        showToast={showToast}
+        t={t}
+      />
 
       <Toast toasts={toasts} />
     </div>

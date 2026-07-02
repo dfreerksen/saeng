@@ -4,6 +4,8 @@ import {
   validateDomainPart,
   splitDomain,
   getExpiryInfo,
+  subdomainRank,
+  compareMappingsByDomain,
   DOMAIN_SUFFIXES,
   DEFAULT_SUFFIX,
 } from '../../../src/renderer/js/utils.js';
@@ -97,6 +99,47 @@ describe('splitDomain()', () => {
   it('picks the longest matching suffix (co.local before .local)', () => {
     expect(splitDomain('myapp.co.local').suffix).toBe('.co.local');
     expect(splitDomain('myapp.co.local').domain).toBe('myapp');
+  });
+});
+
+// ── subdomainRank / compareMappingsByDomain ───────────────────────
+
+describe('subdomainRank()', () => {
+  it('ranks the bare domain (no subdomain) first', () => {
+    expect(subdomainRank('')).toBe(0);
+  });
+
+  it('ranks named subdomains in the middle', () => {
+    expect(subdomainRank('api')).toBe(1);
+  });
+
+  it('ranks the wildcard subdomain last', () => {
+    expect(subdomainRank('*')).toBe(2);
+  });
+});
+
+describe('compareMappingsByDomain()', () => {
+  const mapping = (domain) => ({ domain });
+
+  it('sorts by base domain first', () => {
+    const result = [mapping('zeta.local'), mapping('alpha.local')].sort(compareMappingsByDomain);
+    expect(result.map((m) => m.domain)).toEqual(['alpha.local', 'zeta.local']);
+  });
+
+  it('orders the bare domain before named subdomains within the same base domain', () => {
+    const result = [mapping('api.myapp.local'), mapping('myapp.local')].sort(compareMappingsByDomain);
+    expect(result.map((m) => m.domain)).toEqual(['myapp.local', 'api.myapp.local']);
+  });
+
+  it('orders the wildcard subdomain last within the same base domain', () => {
+    const result = [mapping('*.myapp.local'), mapping('api.myapp.local'), mapping('myapp.local')]
+      .sort(compareMappingsByDomain);
+    expect(result.map((m) => m.domain)).toEqual(['myapp.local', 'api.myapp.local', '*.myapp.local']);
+  });
+
+  it('sorts named subdomains alphanumerically', () => {
+    const result = [mapping('zebra.myapp.local'), mapping('api.myapp.local')].sort(compareMappingsByDomain);
+    expect(result.map((m) => m.domain)).toEqual(['api.myapp.local', 'zebra.myapp.local']);
   });
 });
 

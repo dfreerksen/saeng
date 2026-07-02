@@ -1,20 +1,6 @@
 import { memo, useMemo } from 'react';
-import { splitDomain } from '../js/utils.js';
-import Tooltip from './Tooltip.jsx';
-
-function subdomainRank(subdomain) {
-  if (subdomain === '') return 0;
-  if (subdomain === '*') return 2;
-  return 1;
-}
-
-function compareMappings(a, b) {
-  const subA = splitDomain(a.domain).subdomain;
-  const subB = splitDomain(b.domain).subdomain;
-  const rankDiff = subdomainRank(subA) - subdomainRank(subB);
-  if (rankDiff !== 0) return rankDiff;
-  return subA.localeCompare(subB, undefined, { numeric: true });
-}
+import { splitDomain, compareMappingsByDomain } from '../js/utils.js';
+import Tooltip from './utilities/Tooltip.jsx';
 
 function buildGroups(mappings) {
   const groups = new Map();
@@ -25,7 +11,7 @@ function buildGroups(mappings) {
     groups.get(key).push(m);
   }
   for (const groupMappings of groups.values()) {
-    groupMappings.sort(compareMappings);
+    groupMappings.sort(compareMappingsByDomain);
   }
   return groups;
 }

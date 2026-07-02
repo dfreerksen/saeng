@@ -211,6 +211,25 @@ describe('LogView — detail panel', () => {
     expect(screen.getByText('{"ok":true}')).toBeInTheDocument();
   });
 
+  it('shows a placeholder when the entry has no query params', () => {
+    const { container } = renderLogView({ entries: [ENTRY_WITH_DETAILS] });
+    fireEvent.click(container.querySelector('.log-row'));
+    fireEvent.click(screen.getByText('log.detail.queryParams'));
+    expect(screen.getByText('log.details.noQueryParams')).toBeInTheDocument();
+  });
+
+  it('shows parsed query params when the entry has a query string', () => {
+    const { container } = renderLogView({
+      entries: [{ ...ENTRY_WITH_DETAILS, path: '/login?foo=bar&baz=qux' }],
+    });
+    fireEvent.click(container.querySelector('.log-row'));
+    fireEvent.click(screen.getByText('log.detail.queryParams'));
+    expect(screen.getByText('foo')).toBeInTheDocument();
+    expect(screen.getByText('bar')).toBeInTheDocument();
+    expect(screen.getByText('baz')).toBeInTheDocument();
+    expect(screen.getByText('qux')).toBeInTheDocument();
+  });
+
   it('hides the detail panel when the same row is clicked again', () => {
     const { container } = renderLogView({ entries: [ENTRY_WITH_DETAILS] });
     fireEvent.click(container.querySelector('.log-row'));

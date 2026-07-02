@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import Toast from '../../../src/renderer/components/Toast.jsx';
+import Toast from '../../../../src/renderer/components/utilities/Toast.jsx';
 
 describe('Toast', () => {
   it('renders nothing when toasts array is empty', () => {

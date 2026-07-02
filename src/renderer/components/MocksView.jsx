@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-import Tooltip from './Tooltip.jsx';
+import Tooltip from './utilities/Tooltip.jsx';
 
 function buildGroups(mocks, mapById) {
   const groups = new Map();

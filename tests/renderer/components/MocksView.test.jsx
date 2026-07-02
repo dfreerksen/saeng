@@ -2,7 +2,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../../../src/renderer/components/Tooltip.jsx', () => ({
+vi.mock('../../../src/renderer/components/utilities/Tooltip.jsx', () => ({
   default: ({ children }) => children,
 }));
 

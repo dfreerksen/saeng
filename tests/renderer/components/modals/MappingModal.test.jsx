@@ -2,11 +2,11 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 
-vi.mock('../../../src/renderer/components/Modal.jsx', () => ({
+vi.mock('../../../../src/renderer/components/modals/Modal.jsx', () => ({
   default: ({ children }) => <div data-testid="modal-wrapper">{children}</div>,
 }));
 
-import MappingModal from '../../../src/renderer/components/MappingModal.jsx';
+import MappingModal from '../../../../src/renderer/components/modals/MappingModal.jsx';
 
 const STRINGS = {
   'mappings.modals.manage.form.domain.accessedUsing': 'Accessed using: {url}',

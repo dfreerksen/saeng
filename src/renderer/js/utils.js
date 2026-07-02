@@ -21,6 +21,22 @@ export function splitDomain(fullDomain) {
   return { subdomain: base.slice(0, dot), domain: base.slice(dot + 1), suffix };
 }
 
+export function subdomainRank(subdomain) {
+  if (subdomain === '') return 0;
+  if (subdomain === '*') return 2;
+  return 1;
+}
+
+export function compareMappingsByDomain(a, b) {
+  const splitA = splitDomain(a.domain);
+  const splitB = splitDomain(b.domain);
+  const baseCmp = (splitA.domain + splitA.suffix).localeCompare(splitB.domain + splitB.suffix, undefined, { numeric: true });
+  if (baseCmp !== 0) return baseCmp;
+  const rankDiff = subdomainRank(splitA.subdomain) - subdomainRank(splitB.subdomain);
+  if (rankDiff !== 0) return rankDiff;
+  return splitA.subdomain.localeCompare(splitB.subdomain, undefined, { numeric: true });
+}
+
 export function getExpiryInfo(isoString) {
   if (!isoString) return null;
   const expiry = new Date(isoString);

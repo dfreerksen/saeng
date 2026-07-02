@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import Modal from '../../../src/renderer/components/Modal.jsx';
+import Modal from '../../../../src/renderer/components/modals/Modal.jsx';
 
 afterEach(() => {
   document.body.classList.remove('modal-open');

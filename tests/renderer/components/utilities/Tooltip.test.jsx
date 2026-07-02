@@ -10,7 +10,7 @@ vi.mock('bootstrap', () => ({
 }));
 
 import { Tooltip as BsTooltip } from 'bootstrap';
-import Tooltip from '../../../src/renderer/components/Tooltip.jsx';
+import Tooltip from '../../../../src/renderer/components/utilities/Tooltip.jsx';
 
 describe('Tooltip', () => {
   beforeEach(() => {

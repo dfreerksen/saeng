@@ -2,15 +2,15 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../../../src/renderer/components/Modal.jsx', () => ({
+vi.mock('../../../../src/renderer/components/modals/Modal.jsx', () => ({
   default: ({ children }) => <div data-testid="modal-wrapper">{children}</div>,
 }));
 
-vi.mock('../../../src/renderer/components/Tooltip.jsx', () => ({
+vi.mock('../../../../src/renderer/components/utilities/Tooltip.jsx', () => ({
   default: ({ children }) => children,
 }));
 
-import MockModal from '../../../src/renderer/components/MockModal.jsx';
+import MockModal from '../../../../src/renderer/components/modals/MockModal.jsx';
 
 const t = (key, vars) => (vars ? `${key}:${JSON.stringify(vars)}` : key);
 

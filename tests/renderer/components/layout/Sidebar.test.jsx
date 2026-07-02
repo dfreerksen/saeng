@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import Sidebar from '../../../src/renderer/components/Sidebar.jsx';
+import Sidebar from '../../../../src/renderer/components/layout/Sidebar.jsx';
 
 const t = (key) => key;
 

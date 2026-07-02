@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import Titlebar from '../../../src/renderer/components/Titlebar.jsx';
+import Titlebar from '../../../../src/renderer/components/layout/Titlebar.jsx';
 
 const t = (key) => key;
 
