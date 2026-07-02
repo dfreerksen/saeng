@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import Modal from './Modal.jsx';
 import HeaderListEditor from './HeaderListEditor.jsx';
+import ConditionListEditor from './ConditionListEditor.jsx';
 import Tooltip from './Tooltip.jsx';
 import { splitDomain } from '../js/utils.js';
 
@@ -47,10 +48,12 @@ export default function MockModal({ mock, initialValues, mappings, onClose, onSu
   const [delayMs, setDelayMs] = useState(init.delayMs ?? 0);
   const [headers, setHeaders] = useState(init.headers ?? []);
   const [body, setBody] = useState(init.body ?? '');
+  const [conditions, setConditions] = useState(init.conditions ?? []);
   const [mappingError, setMappingError] = useState('');
   const [pathError, setPathError] = useState('');
   const [statusError, setStatusError] = useState('');
   const [delayError, setDelayError] = useState('');
+  const [conditionsError, setConditionsError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
@@ -66,6 +69,7 @@ export default function MockModal({ mock, initialValues, mappings, onClose, onSu
     setPathError('');
     setStatusError('');
     setDelayError('');
+    setConditionsError('');
 
     const trimPath = pathPattern.trim();
     const parsedStatus = parseInt(String(statusCode).trim(), 10);
@@ -100,6 +104,17 @@ export default function MockModal({ mock, initialValues, mappings, onClose, onSu
       valid = false;
     }
 
+    for (const condition of conditions) {
+      if (condition.operator !== 'regex') continue;
+      try {
+        new RegExp(condition.value);
+      } catch {
+        setConditionsError(t('mocks.modals.manage.form.conditions.error.invalidRegex'));
+        valid = false;
+        break;
+      }
+    }
+
     if (!valid) return;
 
     setSubmitting(true);
@@ -111,6 +126,7 @@ export default function MockModal({ mock, initialValues, mappings, onClose, onSu
       delayMs: parsedDelay,
       headers,
       body,
+      conditions,
     });
     setSubmitting(false);
 
@@ -190,6 +206,9 @@ export default function MockModal({ mock, initialValues, mappings, onClose, onSu
                   <div className="form-hint">{t('mocks.modals.manage.form.path.hint')}</div>
                   {pathError && <div className="form-error visible">{pathError}</div>}
                 </div>
+
+                <ConditionListEditor conditions={conditions} onChange={setConditions} t={t} />
+                {conditionsError && <div className="form-error visible">{conditionsError}</div>}
 
                 <div className="form-group">
                   <label className="form-label">

@@ -34,6 +34,23 @@ const MIN_MOCK_DELAY_MS = 0;
 const MAX_MOCK_DELAY_MS = 30000;
 const DEFAULT_MOCK_DELAY_MS = 0;
 
+const CONDITION_TYPES = ['header', 'query', 'body'];
+const CONDITION_OPERATORS = ['equals', 'contains', 'regex', 'exists'];
+
+const conditionListSchema = {
+  type: 'array',
+  default: [],
+  items: {
+    type: 'object',
+    properties: {
+      type: { type: 'string' },
+      key: { type: 'string' },
+      operator: { type: 'string' },
+      value: { type: 'string' },
+    },
+  },
+};
+
 const schema = {
   mappings: {
     type: 'array',
@@ -71,6 +88,7 @@ const schema = {
         headers: headerListSchema,
         body: { type: 'string' },
         delayMs: { type: 'number', default: 0 },
+        conditions: conditionListSchema,
         createdAt: { type: 'string' },
       },
     },
@@ -159,6 +177,35 @@ function validatePathPattern(pattern) {
     new RegExp(pattern);
   } catch (err) {
     throw new Error(`Invalid path pattern: ${err.message}`, { cause: err });
+  }
+}
+
+// Normalizes a mock's condition list: invalid type/operator fall back to
+// 'header'/'equals', key/value are coerced to trimmed strings, and
+// header/query conditions without a key are dropped (body conditions don't
+// need one).
+function sanitizeConditions(list) {
+  if (!Array.isArray(list)) return [];
+  return list
+    .map((c) => ({
+      type: CONDITION_TYPES.includes(c?.type) ? c.type : 'header',
+      key: String(c?.key ?? '').trim(),
+      operator: CONDITION_OPERATORS.includes(c?.operator) ? c.operator : 'equals',
+      value: String(c?.value ?? ''),
+    }))
+    .filter((c) => c.type === 'body' || c.key);
+}
+
+// Throws a descriptive error if any condition using the 'regex' operator has
+// an unparsable value.
+function validateConditions(conditions) {
+  for (const c of conditions) {
+    if (c.operator !== 'regex') continue;
+    try {
+      new RegExp(c.value);
+    } catch (err) {
+      throw new Error(`Invalid condition regex: ${err.message}`, { cause: err });
+    }
   }
 }
 
@@ -278,6 +325,8 @@ class AppStore {
   addMock(data) {
     const pathPattern = String(data?.pathPattern ?? '');
     validatePathPattern(pathPattern);
+    const conditions = sanitizeConditions(data?.conditions);
+    validateConditions(conditions);
     const mocks = this.getMocks();
     const mock = {
       id: randomUUID(),
@@ -289,6 +338,7 @@ class AppStore {
       headers: sanitizeHeaders(data.headers),
       body: String(data?.body ?? ''),
       delayMs: sanitizeMockDelayMs(data.delayMs),
+      conditions,
       createdAt: new Date().toISOString(),
     };
     mocks.push(mock);
@@ -299,6 +349,8 @@ class AppStore {
   updateMock(id, data) {
     const pathPattern = String(data?.pathPattern ?? '');
     validatePathPattern(pathPattern);
+    const conditions = sanitizeConditions(data?.conditions);
+    validateConditions(conditions);
     const mocks = this.getMocks().map((m) => {
       if (m.id !== id) return m;
       return {
@@ -311,6 +363,7 @@ class AppStore {
         headers: sanitizeHeaders(data.headers),
         body: String(data?.body ?? ''),
         delayMs: sanitizeMockDelayMs(data.delayMs),
+        conditions,
       };
     });
     this.store.set('mocks', mocks);
@@ -345,8 +398,8 @@ class AppStore {
       .map((m) => {
         const mapping = mappingById.get(m.mappingId);
         if (!mapping) return null;
-        const { enabled, method, pathPattern, statusCode, headers, body, delayMs } = m;
-        return { domain: mapping.domain, enabled, method, pathPattern, statusCode, headers, body, delayMs };
+        const { enabled, method, pathPattern, statusCode, headers, body, delayMs, conditions } = m;
+        return { domain: mapping.domain, enabled, method, pathPattern, statusCode, headers, body, delayMs, conditions };
       })
       .filter((entry) => entry !== null);
   }
@@ -372,6 +425,7 @@ class AppStore {
           headers: entry.headers,
           body: entry.body,
           delayMs: entry.delayMs,
+          conditions: entry.conditions,
         });
         added.push(mock);
       } catch {

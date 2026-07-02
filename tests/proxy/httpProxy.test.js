@@ -170,6 +170,24 @@ describe('HttpProxy.updateMocks()', () => {
     expect(proxy.mocks.has('m1')).toBe(false);
     expect(proxy.mocks.has('m2')).toBe(true);
   });
+
+  it('tracks mappingIds with a body condition in mocksNeedBody', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMocks([
+      { mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/a$', statusCode: 200, headers: [], body: '', conditions: [{ type: 'body', key: '', operator: 'contains', value: 'x' }] },
+      { mappingId: 'm2', enabled: true, method: '*', pathPattern: '^/b$', statusCode: 200, headers: [], body: '', conditions: [{ type: 'header', key: 'x-foo', operator: 'exists' }] },
+    ]);
+    expect(proxy.mocksNeedBody.has('m1')).toBe(true);
+    expect(proxy.mocksNeedBody.has('m2')).toBe(false);
+  });
+
+  it('skips mocks with an invalid condition regex', () => {
+    const proxy = new HttpProxy(null);
+    expect(() => proxy.updateMocks([
+      { mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/a$', statusCode: 200, headers: [], body: '', conditions: [{ type: 'header', key: 'x-foo', operator: 'regex', value: '(unterminated' }] },
+    ])).not.toThrow();
+    expect(proxy.mocks.has('m1')).toBe(false);
+  });
 });
 
 describe('HttpProxy._findMock()', () => {
@@ -225,6 +243,65 @@ describe('HttpProxy._findMock()', () => {
     const result = proxy._findMock(mapping, 'GET', '/api/users/42');
     expect(result.match[0]).toBe('/api/users/42');
     expect(result.match[1]).toBe('42');
+  });
+});
+
+describe('HttpProxy._findMock() with conditions', () => {
+  const mapping = { id: 'm1', mocksEnabled: true };
+
+  it('matches when a header condition is satisfied (equals, case-insensitive key)', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMocks([{ mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'ok', conditions: [{ type: 'header', key: 'X-Token', operator: 'equals', value: 'secret' }] }]);
+    const extra = { query: new URLSearchParams(), headers: { 'x-token': 'secret' } };
+    expect(proxy._findMock(mapping, 'GET', '/api', extra)?.mock.body).toBe('ok');
+    expect(proxy._findMock(mapping, 'GET', '/api', { query: new URLSearchParams(), headers: { 'x-token': 'wrong' } })).toBeNull();
+  });
+
+  it('matches a header "exists" condition regardless of value', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMocks([{ mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'ok', conditions: [{ type: 'header', key: 'authorization', operator: 'exists' }] }]);
+    expect(proxy._findMock(mapping, 'GET', '/api', { query: new URLSearchParams(), headers: { authorization: 'Bearer x' } })).not.toBeNull();
+    expect(proxy._findMock(mapping, 'GET', '/api', { query: new URLSearchParams(), headers: {} })).toBeNull();
+  });
+
+  it('matches a query param condition (contains)', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMocks([{ mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'ok', conditions: [{ type: 'query', key: 'debug', operator: 'contains', value: 'tru' }] }]);
+    expect(proxy._findMock(mapping, 'GET', '/api', { query: new URLSearchParams('debug=true'), headers: {} })).not.toBeNull();
+    expect(proxy._findMock(mapping, 'GET', '/api', { query: new URLSearchParams(), headers: {} })).toBeNull();
+  });
+
+  it('matches a body condition (regex)', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMocks([{ mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'ok', conditions: [{ type: 'body', key: '', operator: 'regex', value: '"id":\\s*\\d+' }] }]);
+    expect(proxy._findMock(mapping, 'GET', '/api', { query: new URLSearchParams(), headers: {}, body: '{"id": 42}' })).not.toBeNull();
+    expect(proxy._findMock(mapping, 'GET', '/api', { query: new URLSearchParams(), headers: {}, body: '{}' })).toBeNull();
+  });
+
+  it('treats a body "exists" condition as non-empty', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMocks([{ mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'ok', conditions: [{ type: 'body', key: '', operator: 'exists' }] }]);
+    expect(proxy._findMock(mapping, 'GET', '/api', { query: new URLSearchParams(), headers: {}, body: '  ' })).toBeNull();
+    expect(proxy._findMock(mapping, 'GET', '/api', { query: new URLSearchParams(), headers: {}, body: 'x' })).not.toBeNull();
+  });
+
+  it('requires all conditions to match (AND)', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMocks([{
+      mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'ok',
+      conditions: [
+        { type: 'header', key: 'x-token', operator: 'exists' },
+        { type: 'query', key: 'debug', operator: 'equals', value: 'true' },
+      ],
+    }]);
+    expect(proxy._findMock(mapping, 'GET', '/api', { query: new URLSearchParams('debug=true'), headers: { 'x-token': 'a' } })).not.toBeNull();
+    expect(proxy._findMock(mapping, 'GET', '/api', { query: new URLSearchParams('debug=true'), headers: {} })).toBeNull();
+  });
+
+  it('is backward compatible when called without an extra context', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMocks([{ mappingId: 'm1', enabled: true, method: '*', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'ok' }]);
+    expect(proxy._findMock(mapping, 'GET', '/api')?.mock.body).toBe('ok');
   });
 });
 
@@ -890,6 +967,37 @@ describe('HttpProxy mocked responses — end to end', () => {
     const { body } = await makeRequest(proxy.getPort(), { host: 'mocked.local', path: '/other' });
     expect(body).toBe('from-backend');
     expect(backendHits).toBe(1);
+  });
+
+  it('serves the mock only when a body condition matches, otherwise forwards the full untruncated body to the backend', async () => {
+    let receivedBody = '';
+    backend = await new Promise((resolve) => {
+      const server = http.createServer((req, res) => {
+        const chunks = [];
+        req.on('data', (c) => chunks.push(c));
+        req.on('end', () => {
+          receivedBody = Buffer.concat(chunks).toString('utf8');
+          res.end('from-backend');
+        });
+      });
+      server.listen(0, '127.0.0.1', () => resolve(server));
+    });
+    proxy = new HttpProxy(null);
+    await proxy.start(
+      [{ id: 'm1', domain: 'bodycond.local', host: '127.0.0.1', port: backend.address().port, enabled: true, mocksEnabled: true }],
+      { httpsEnabled: false }
+    );
+    proxy.updateMocks([
+      { mappingId: 'm1', enabled: true, method: 'POST', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'mocked-response', conditions: [{ type: 'body', key: '', operator: 'contains', value: 'special' }] },
+    ]);
+
+    const matched = await makeRequest(proxy.getPort(), { method: 'POST', host: 'bodycond.local', path: '/api', body: 'this is a special payload' });
+    expect(matched.body).toBe('mocked-response');
+
+    const largeBody = 'x'.repeat(100000);
+    const unmatched = await makeRequest(proxy.getPort(), { method: 'POST', host: 'bodycond.local', path: '/api', body: largeBody });
+    expect(unmatched.body).toBe('from-backend');
+    expect(receivedBody).toBe(largeBody);
   });
 
   it('marks log entries with mocked: true for mocked responses and mocked: false for proxied responses', async () => {

@@ -513,6 +513,59 @@ describe('AppStore.addMock()', () => {
     store.addMock({ mappingId: mapping.id, pathPattern: '.*' });
     expect(store.getMocks()).toHaveLength(1);
   });
+
+  it('defaults conditions to an empty array when not provided', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    expect(store.addMock({ mappingId: mapping.id, pathPattern: '.*' }).conditions).toEqual([]);
+  });
+
+  it('sanitizes conditions: trims key, coerces value, defaults invalid type/operator', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const result = store.addMock({
+      mappingId: mapping.id,
+      pathPattern: '.*',
+      conditions: [
+        { type: 'query', key: '  debug  ', operator: 'contains', value: 'true' },
+        { type: 'bogus', key: 'x', operator: 'bogus', value: 1 },
+      ],
+    });
+    expect(result.conditions).toEqual([
+      { type: 'query', key: 'debug', operator: 'contains', value: 'true' },
+      { type: 'header', key: 'x', operator: 'equals', value: '1' },
+    ]);
+  });
+
+  it('drops header/query conditions with an empty key but keeps body conditions', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const result = store.addMock({
+      mappingId: mapping.id,
+      pathPattern: '.*',
+      conditions: [
+        { type: 'header', key: '  ', operator: 'exists' },
+        { type: 'body', key: '', operator: 'contains', value: 'x' },
+      ],
+    });
+    expect(result.conditions).toEqual([{ type: 'body', key: '', operator: 'contains', value: 'x' }]);
+  });
+
+  it('throws a descriptive error for an invalid condition regex', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    expect(() => store.addMock({
+      mappingId: mapping.id,
+      pathPattern: '.*',
+      conditions: [{ type: 'body', key: '', operator: 'regex', value: '(unterminated' }],
+    })).toThrow(/Invalid condition regex/);
+  });
+
+  it('does not persist a mock when a condition regex is invalid', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    expect(() => store.addMock({
+      mappingId: mapping.id,
+      pathPattern: '.*',
+      conditions: [{ type: 'body', key: '', operator: 'regex', value: '(unterminated' }],
+    })).toThrow();
+    expect(store.getMocks()).toHaveLength(0);
+  });
 });
 
 describe('AppStore.updateMock()', () => {
@@ -546,6 +599,28 @@ describe('AppStore.updateMock()', () => {
     const mock = store.addMock({ mappingId: mapping.id, pathPattern: '^/old$' });
     expect(() => store.updateMock(mock.id, { mappingId: mapping.id, pathPattern: '(unterminated' })).toThrow(/Invalid path pattern/);
     expect(store.getMocks().find((m) => m.id === mock.id).pathPattern).toBe('^/old$');
+  });
+
+  it('updates conditions', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const mock = store.addMock({ mappingId: mapping.id, pathPattern: '.*' });
+    const updated = store.updateMock(mock.id, {
+      mappingId: mapping.id,
+      pathPattern: '.*',
+      conditions: [{ type: 'header', key: 'x-token', operator: 'exists' }],
+    });
+    expect(updated.conditions).toEqual([{ type: 'header', key: 'x-token', operator: 'exists', value: '' }]);
+  });
+
+  it('throws a descriptive error for an invalid condition regex and leaves the mock unchanged', () => {
+    const mapping = store.addMapping({ domain: 'myapp.local', port: 3000 });
+    const mock = store.addMock({ mappingId: mapping.id, pathPattern: '.*' });
+    expect(() => store.updateMock(mock.id, {
+      mappingId: mapping.id,
+      pathPattern: '.*',
+      conditions: [{ type: 'body', key: '', operator: 'regex', value: '(unterminated' }],
+    })).toThrow(/Invalid condition regex/);
+    expect(store.getMocks().find((m) => m.id === mock.id).conditions).toEqual([]);
   });
 });
 
@@ -600,7 +675,7 @@ describe('AppStore.exportMocks()', () => {
     store.addMock({ mappingId: mapping.id, method: 'GET', pathPattern: '^/api$', statusCode: 200, body: 'hi' });
     const [result] = store.exportMocks();
     expect(result).toEqual({
-      domain: 'a.local', enabled: true, method: 'GET', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'hi', delayMs: 0,
+      domain: 'a.local', enabled: true, method: 'GET', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'hi', delayMs: 0, conditions: [],
     });
     expect(result).not.toHaveProperty('id');
     expect(result).not.toHaveProperty('mappingId');

@@ -139,6 +139,22 @@ describe('MocksView — table with mocks', () => {
     expect(toggles[0]).toBeChecked();
     expect(toggles[1]).not.toBeChecked();
   });
+
+  it('does not show a conditions badge when the mock has no conditions', () => {
+    renderMocksView({ mocks: [SAMPLE_MOCKS[0]] });
+    expect(screen.queryByText('mocks.table.conditionsBadge')).not.toBeInTheDocument();
+  });
+
+  it('shows a conditions badge when the mock has conditions', () => {
+    const mockWithConditions = {
+      ...SAMPLE_MOCKS[0],
+      conditions: [{ type: 'header', key: 'x-token', operator: 'exists' }],
+    };
+    const { container } = renderMocksView({ mocks: [mockWithConditions] });
+    const badge = screen.getByText('mocks.table.conditionsBadge');
+    expect(badge).toHaveClass('badge-conditions');
+    expect(container.querySelector('.log-path-cell').contains(badge)).toBe(true);
+  });
 });
 
 describe('MocksView — disabled mapping', () => {

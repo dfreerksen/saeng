@@ -110,6 +110,12 @@
   margin-left: 6px;
 }
 
+.badge-conditions {
+  background: color-mix(in srgb, var(--bs-secondary) 15%, transparent);
+  color: var(--bs-secondary);
+  margin-left: 6px;
+}
+
 .log-search-bar {
   align-items: center;
   display: flex;

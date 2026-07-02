@@ -32,6 +32,7 @@ const EXISTING_MOCK = {
   delayMs: 500,
   headers: [{ name: 'X-Mock', value: 'yes' }],
   body: '{"ok":true}',
+  conditions: [{ type: 'header', key: 'x-token', operator: 'exists', value: '' }],
 };
 
 function renderAddModal(props = {}) {
@@ -167,10 +168,21 @@ describe('MockModal — edit mode', () => {
 
   it('pre-fills header rows', () => {
     const { container } = renderEditModal();
+    // Both HeaderListEditor and ConditionListEditor render `.header-row` elements;
+    // the condition row (from EXISTING_MOCK.conditions) comes first in the form.
     const headerRows = container.querySelectorAll('.header-row');
-    expect(headerRows).toHaveLength(1);
-    expect(headerRows[0].querySelectorAll('.form-input')[0].value).toBe('X-Mock');
-    expect(headerRows[0].querySelectorAll('.form-input')[1].value).toBe('yes');
+    expect(headerRows).toHaveLength(2);
+    expect(headerRows[1].querySelectorAll('.form-input')[0].value).toBe('X-Mock');
+    expect(headerRows[1].querySelectorAll('.form-input')[1].value).toBe('yes');
+  });
+
+  it('pre-fills condition rows', () => {
+    const { container } = renderEditModal();
+    const conditionRow = container.querySelectorAll('.header-row')[0];
+    const inputs = conditionRow.querySelectorAll('.form-input');
+    expect(inputs[0].value).toBe('header');
+    expect(inputs[1].value).toBe('x-token');
+    expect(inputs[2].value).toBe('exists');
   });
 });
 
@@ -284,6 +296,7 @@ describe('MockModal — successful submit', () => {
         delayMs: 0,
         headers: [],
         body: '',
+        conditions: [],
       });
     });
   });
@@ -376,6 +389,54 @@ describe('MockModal — successful submit', () => {
     await waitFor(() => {
       expect(screen.getByText('Invalid path pattern: boom')).toBeInTheDocument();
     });
+  });
+});
+
+describe('MockModal — conditions', () => {
+  it('starts with no condition rows in add mode', () => {
+    const { container } = renderAddModal();
+    expect(container.querySelectorAll('.header-row')).toHaveLength(0);
+  });
+
+  it('includes a condition added via the condition list editor', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderAddModal({ onSubmit });
+    const pathInput = container.querySelectorAll('.form-input')[2];
+    fireEvent.change(pathInput, { target: { value: '^/api$' } });
+
+    fireEvent.click(screen.getByText('mocks.modals.manage.form.conditions.add'));
+    const conditionRow = container.querySelector('.header-row');
+    const [typeSelect, keyInput, operatorSelect, valueInput] = conditionRow.querySelectorAll('.form-input');
+    fireEvent.change(typeSelect, { target: { value: 'query' } });
+    fireEvent.change(keyInput, { target: { value: 'debug' } });
+    fireEvent.change(operatorSelect, { target: { value: 'contains' } });
+    fireEvent.change(valueInput, { target: { value: 'true' } });
+
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
+        conditions: [{ type: 'query', key: 'debug', operator: 'contains', value: 'true' }],
+      }));
+    });
+  });
+
+  it('shows a conditions error and blocks submit when a regex condition is invalid', async () => {
+    const onSubmit = vi.fn();
+    const { container } = renderAddModal({ onSubmit });
+    const pathInput = container.querySelectorAll('.form-input')[2];
+    fireEvent.change(pathInput, { target: { value: '^/api$' } });
+
+    fireEvent.click(screen.getByText('mocks.modals.manage.form.conditions.add'));
+    const conditionRow = container.querySelector('.header-row');
+    const [, , operatorSelect, valueInput] = conditionRow.querySelectorAll('.form-input');
+    fireEvent.change(operatorSelect, { target: { value: 'regex' } });
+    fireEvent.change(valueInput, { target: { value: '(unterminated' } });
+
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.add'));
+    await waitFor(() => {
+      expect(screen.getByText('mocks.modals.manage.form.conditions.error.invalidRegex')).toBeInTheDocument();
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });
 

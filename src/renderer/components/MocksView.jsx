@@ -100,7 +100,12 @@ export default memo(function MocksView({ mocks, mappings, mockableMappings, setM
                         {mock.method === '*' ? t('mocks.modals.manage.form.method.any') : mock.method}
                       </span>
                     </td>
-                    <td className="log-path-cell"><code>{mock.pathPattern}</code></td>
+                    <td className="log-path-cell">
+                      <code>{mock.pathPattern}</code>
+                      {mock.conditions?.length > 0 && (
+                        <span className="badge badge-conditions">{t('mocks.table.conditionsBadge', { count: mock.conditions.length })}</span>
+                      )}
+                    </td>
                     <td>{mock.statusCode}</td>
                     <td>
                       <label className="toggle">

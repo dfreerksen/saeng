@@ -15,6 +15,7 @@ class HttpProxy {
     this.mappings = new Map();
     this.wildcards = [];
     this.mocks = new Map();
+    this.mocksNeedBody = new Set();
     this.httpServer = null;
     this.internalHttpsServer = null;
     this.internalHttpsPort = null;
@@ -82,10 +83,14 @@ class HttpProxy {
 
   // Compiles the enabled mock rules into a Map<mappingId, CompiledMock[]>,
   // preserving array order so the first matching rule wins. Rules with an
-  // invalid pathPattern are skipped defensively (the store validates on
-  // save, but mappings between processes could in theory drift).
+  // invalid pathPattern or an invalid condition regex are skipped
+  // defensively (the store validates on save, but mappings between
+  // processes could in theory drift). Also tracks which mappings have at
+  // least one enabled mock with a body condition, so the request handlers
+  // know whether they need to buffer the full body before deciding.
   updateMocks(mocks) {
     const byMapping = new Map();
+    const needsBody = new Set();
     for (const mock of mocks) {
       if (!mock.enabled) continue;
       let regex;
@@ -94,6 +99,13 @@ class HttpProxy {
       } catch {
         continue;
       }
+      let conditions;
+      try {
+        conditions = this._compileConditions(mock.conditions);
+      } catch {
+        continue;
+      }
+      if (conditions.some((c) => c.type === 'body')) needsBody.add(mock.mappingId);
       const list = byMapping.get(mock.mappingId) ?? [];
       list.push({
         method: (mock.method || '*').toUpperCase(),
@@ -102,13 +114,30 @@ class HttpProxy {
         headers: mock.headers,
         body: mock.body,
         delayMs: mock.delayMs || 0,
+        conditions,
       });
       byMapping.set(mock.mappingId, list);
     }
     this.mocks = byMapping;
+    this.mocksNeedBody = needsBody;
   }
 
-  _findMock(mapping, method, pathname) {
+  // Pre-lowercases header condition keys (request headers are always
+  // lowercase-keyed in Node) and pre-compiles regex-operator conditions.
+  // Throws if a regex condition doesn't compile, so the caller can skip the
+  // whole mock the same way an invalid pathPattern is skipped.
+  _compileConditions(conditions) {
+    if (!Array.isArray(conditions)) return [];
+    return conditions.map((c) => ({
+      type: c.type,
+      key: c.type === 'header' ? (c.key || '').toLowerCase() : c.key,
+      operator: c.operator,
+      value: c.value,
+      regex: c.operator === 'regex' ? new RegExp(c.value) : null,
+    }));
+  }
+
+  _findMock(mapping, method, pathname, extra = {}) {
     if (!mapping.mocksEnabled) return null;
     const mocks = this.mocks.get(mapping.id);
     if (!mocks) return null;
@@ -116,16 +145,43 @@ class HttpProxy {
     for (const mock of mocks) {
       if (mock.method !== '*' && mock.method !== upperMethod) continue;
       const match = mock.regex.exec(pathname);
-      if (match) return { mock, match };
+      if (!match) continue;
+      if (!this._conditionsMatch(mock.conditions, extra)) continue;
+      return { mock, match };
     }
     return null;
   }
 
-  _serveMock(mock, req, res, record, match) {
-    const chunks = [];
-    req.on('data', (chunk) => chunks.push(chunk));
-    req.on('end', () => {
-      const requestBody = Buffer.concat(chunks).toString('utf8');
+  _conditionsMatch(conditions, extra) {
+    if (!conditions || conditions.length === 0) return true;
+    return conditions.every((c) => this._conditionMatches(c, extra));
+  }
+
+  _conditionMatches(condition, extra) {
+    let actual;
+    if (condition.type === 'header') actual = extra.headers?.[condition.key];
+    else if (condition.type === 'query') actual = extra.query?.get(condition.key) ?? undefined;
+    else actual = extra.body;
+
+    if (condition.operator === 'exists') {
+      if (condition.type === 'body') return typeof actual === 'string' && actual.trim().length > 0;
+      return actual !== undefined;
+    }
+
+    if (actual === undefined) return false;
+    switch (condition.operator) {
+      case 'equals': return actual === condition.value;
+      case 'contains': return actual.includes(condition.value);
+      case 'regex': return condition.regex ? condition.regex.test(actual) : false;
+      default: return false;
+    }
+  }
+
+  // `bufferedBody`, when provided, is the request body already drained by
+  // `_readFullBody` (for mappings with a body condition) — reused here
+  // instead of re-reading `req`, whose stream has already ended.
+  _serveMock(mock, req, res, record, match, bufferedBody = null) {
+    const respond = (requestBody) => {
       const context = {
         method: req.method,
         path: (req.url || '/').split('?')[0],
@@ -160,7 +216,16 @@ class HttpProxy {
       } else {
         sendResponse();
       }
-    });
+    };
+
+    if (bufferedBody !== null) {
+      respond(bufferedBody.toString('utf8'));
+      return;
+    }
+
+    const chunks = [];
+    req.on('data', (chunk) => chunks.push(chunk));
+    req.on('end', () => respond(Buffer.concat(chunks).toString('utf8')));
   }
 
   async start(mappings, settings) {
@@ -333,43 +398,7 @@ class HttpProxy {
       }
     }
 
-    const found = this._findMock(mapping, req.method, (reqPath || '/').split('?')[0]);
-    if (found) {
-      this._serveMock(found.mock, req, res, record, found.match);
-      return;
-    }
-
-    const backendPath = this._rewritePath(mapping, reqPath || '/');
-
-    const backendProto = mapping.https ? https : http;
-    const options = {
-      hostname: mapping.host || '127.0.0.1',
-      port: mapping.port,
-      method: req.method,
-      path: backendPath,
-      headers: { ...req.headers },
-      ...(mapping.https && { rejectUnauthorized: false }),
-    };
-    delete options.headers['proxy-connection'];
-    this._applyHeaderOverrides(options.headers, mapping.requestHeaders);
-
-    const proxyReq = backendProto.request(options, (proxyRes) => {
-      const headers = this._applyHeaderOverrides({ ...proxyRes.headers }, mapping.responseHeaders);
-      if (record && this.requestLog.logHeaders) record.responseHeaders = { ...headers };
-      if (record && this.requestLog.logBody) this._captureBody(proxyRes, record, 'responseBody');
-      res.writeHead(proxyRes.statusCode, headers);
-      proxyRes.pipe(res);
-    });
-
-    proxyReq.on('error', (err) => {
-      res.proxyError = err.message;
-      if (!res.headersSent) {
-        res.writeHead(502, { 'Content-Type': 'text/plain' });
-        res.end(`Saeng: backend error - ${err.message}`);
-      }
-    });
-
-    req.pipe(proxyReq);
+    this._dispatch(req, res, mapping, reqPath || '/', record, true);
   }
 
   // Handles decrypted HTTPS requests forwarded from the internal TLS server
@@ -385,13 +414,56 @@ class HttpProxy {
       return;
     }
 
-    const found = this._findMock(mapping, req.method, (req.url || '/').split('?')[0]);
+    this._dispatch(req, res, mapping, req.url || '/', record, false);
+  }
+
+  // Reads the full request body into a Buffer, resolving once the stream
+  // ends. Used only for mappings with a body-conditioned mock, since the
+  // buffer must be complete to replay to the real backend when no mock
+  // matches (streams can only be consumed once).
+  _readFullBody(req) {
+    return new Promise((resolve) => {
+      const chunks = [];
+      req.on('data', (chunk) => chunks.push(chunk));
+      req.on('end', () => resolve(Buffer.concat(chunks)));
+    });
+  }
+
+  // Buffers the request body first when the mapping has a mock with a body
+  // condition (needed for both matching and replaying to the backend);
+  // otherwise continues immediately, preserving today's streaming fast path.
+  _dispatch(req, res, mapping, pathWithQuery, record, stripProxyConnectionHeader) {
+    if (mapping.mocksEnabled && this.mocksNeedBody.has(mapping.id)) {
+      this._readFullBody(req).then((bufferedBody) => {
+        this._continueRequest(req, res, mapping, pathWithQuery, record, stripProxyConnectionHeader, bufferedBody);
+      });
+      return;
+    }
+    this._continueRequest(req, res, mapping, pathWithQuery, record, stripProxyConnectionHeader, null);
+  }
+
+  // Shared tail of _handleRequest/_handleDecryptedRequest: finds a matching
+  // mock (using headers/query/body available at this point) or forwards to
+  // the real backend, replaying `bufferedBody` instead of piping `req` when
+  // the body was already buffered upstream.
+  _continueRequest(req, res, mapping, pathWithQuery, record, stripProxyConnectionHeader, bufferedBody) {
+    const input = pathWithQuery || '/';
+    const qIndex = input.indexOf('?');
+    const pathname = qIndex === -1 ? input : input.slice(0, qIndex);
+    const query = new URLSearchParams(qIndex === -1 ? '' : input.slice(qIndex + 1));
+    const extra = {
+      query,
+      headers: req.headers,
+      body: bufferedBody !== null ? bufferedBody.toString('utf8') : undefined,
+    };
+
+    const found = this._findMock(mapping, req.method, pathname, extra);
     if (found) {
-      this._serveMock(found.mock, req, res, record, found.match);
+      this._serveMock(found.mock, req, res, record, found.match, bufferedBody);
       return;
     }
 
-    const backendPath = this._rewritePath(mapping, req.url || '/');
+    const backendPath = this._rewritePath(mapping, pathWithQuery || '/');
 
     const backendProto = mapping.https ? https : http;
     const options = {
@@ -402,6 +474,7 @@ class HttpProxy {
       headers: { ...req.headers },
       ...(mapping.https && { rejectUnauthorized: false }),
     };
+    if (stripProxyConnectionHeader) delete options.headers['proxy-connection'];
     this._applyHeaderOverrides(options.headers, mapping.requestHeaders);
 
     const proxyReq = backendProto.request(options, (proxyRes) => {
@@ -420,7 +493,11 @@ class HttpProxy {
       }
     });
 
-    req.pipe(proxyReq);
+    if (bufferedBody !== null) {
+      proxyReq.end(bufferedBody);
+    } else {
+      req.pipe(proxyReq);
+    }
   }
 
   _handleConnect(req, clientSocket, head) {
