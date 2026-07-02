@@ -81,6 +81,8 @@ Enable **Backend health checks** in Settings to have Saeng periodically ping eac
 
 Enable **mocking** on a mapping (in the mapping's edit form), then add mock rules in the **Mocks** view. Each mock matches requests for that domain by HTTP method and a path pattern (a regular expression matched against the request path, without the query string) and returns a canned status code, headers, and body instead of forwarding the request to the backend. The first matching rule wins. Mocking applies to HTTP and HTTPS requests, but not WebSocket upgrades or raw HTTPS tunnels. Every mocked response includes an `X-Saeng-Mock: true` header. Mocked requests are flagged with a "MOCK" badge in the request log. Mocks can be exported/imported as JSON, matched up by domain.
 
+A mock can also require extra **conditions** to match: a request header, query parameter, or the request body, checked against an operator (`equals`, `contains`, `regex`, or `exists`). All conditions on a mock must match for it to apply, letting you set up multiple rules for the same method/path that respond differently based on the request.
+
 Mock bodies support **template variables** that are rendered at request time using `{{name}}` syntax. Available variables: `{{timestamp}}` (epoch ms), `{{isodate}}` (ISO 8601), `{{uuid}}` (random UUID), `{{request.method}}`, `{{request.path}}`, `{{request.url}}`, `{{request.body}}`, `{{request.host}}`, `{{request.header.<name>}}`, and `{{match.<N>}}` (capture groups from the path pattern regex). Unrecognized variables are left as-is.
 
 Each mock can also specify a **response delay** (0–30 000 ms) to simulate network latency or slow backends.

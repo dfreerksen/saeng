@@ -41,7 +41,7 @@ npm run js:build   # main.jsx -> src/renderer/scripts.js (esbuild)
 - `src/ssl/` — CA trust helpers (`security`/`certutil`).
 - `src/systemProxy.js` — sets/clears the OS auto-proxy (`networksetup` on macOS, registry on Windows).
 - `src/i18n/` — `i18n.js` plus `locales/*.json` (21 languages).
-- `src/renderer/` — React 19 app (`main.jsx` entry, `components/*.jsx`, `js/*.js` utilities, `scss/` source). `DashboardView.jsx` uses `chart.js` / `react-chartjs-2` for time-series charts.
+- `src/renderer/` — React 19 app (`main.jsx` entry, `components/` — subdivided into `layout/`, `modals/`, `settings/`, `utilities/`, plus top-level view components — `js/*.js` utilities, `scss/` source). `DashboardView.jsx` uses `chart.js` / `react-chartjs-2` for time-series charts.
 
 See `.claude/CLAUDE.md` for a deeper architectural walkthrough (request flow, IPC channel table, mocks, health checks, etc.).
 
