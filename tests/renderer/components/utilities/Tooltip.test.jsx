@@ -41,18 +41,26 @@ describe('Tooltip', () => {
     expect(BsTooltip).not.toHaveBeenCalled();
   });
 
-  it('hides the tooltip when the child is clicked', () => {
+  it('blurs the child when clicked, instead of forcing the tooltip closed', () => {
     render(<Tooltip title="Hint"><button>Click</button></Tooltip>);
     const instance = vi.mocked(BsTooltip).mock.instances[0];
-    fireEvent.click(screen.getByText('Click'));
-    expect(instance.hide).toHaveBeenCalled();
+    const button = screen.getByText('Click');
+    button.focus();
+    expect(document.activeElement).toBe(button);
+    fireEvent.click(button);
+    expect(document.activeElement).not.toBe(button);
+    expect(instance.hide).not.toHaveBeenCalled();
   });
 
-  it('hides and disposes the tooltip on unmount', () => {
+  it('disposes the tooltip on unmount without calling hide() first', () => {
+    // dispose() alone tears down the tip element/listeners regardless of
+    // shown state. Calling hide() first would queue a post-transition
+    // callback that later runs against an already-disposed (nulled-out)
+    // instance and throws - see the About-modal rapid-toggle crash.
     const { unmount } = render(<Tooltip title="Hint"><button>Btn</button></Tooltip>);
     const instance = vi.mocked(BsTooltip).mock.instances[0];
     unmount();
-    expect(instance.hide).toHaveBeenCalled();
+    expect(instance.hide).not.toHaveBeenCalled();
     expect(instance.dispose).toHaveBeenCalled();
   });
 });
