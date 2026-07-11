@@ -96,6 +96,7 @@ export default memo(function MocksView({ mocks, mappings, mockableMappings, setM
                   <td colSpan={5}>
                     <div className="group-header">
                       <span className="group-name">{groupKey}</span>
+                      <span className="group-count">({groupMocks.length})</span>
                     </div>
                   </td>
                 </tr>

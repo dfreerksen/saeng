@@ -103,6 +103,12 @@ describe('MocksView — table with mocks', () => {
     expect(groupNames).toEqual(['myapp.local', 'api.myapp.local']);
   });
 
+  it('displays the number of mocks in each group as a count badge', () => {
+    const { container } = renderMocksView({ mocks: SAMPLE_MOCKS });
+    const groupCounts = [...container.querySelectorAll('.group-count')].map((el) => el.textContent);
+    expect(groupCounts).toEqual(['(1)', '(1)']);
+  });
+
   it('falls back to the mappingId as the group name when the mapping no longer exists', () => {
     const { container } = renderMocksView({
       mocks: [{ id: 'mock3', mappingId: 'missing', method: 'GET', pathPattern: '^/x$', statusCode: 200, enabled: true }],

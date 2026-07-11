@@ -5,7 +5,7 @@ const REGEX_EXAMPLES = [
   { pattern: '^/api/users/\\d+$', descriptionKey: 'mocks.modals.manage.help.examples.numericId' },
   { pattern: '^/api/users/[^/]+$', descriptionKey: 'mocks.modals.manage.help.examples.anySegment' },
   { pattern: '^/api/users(/.*)?$', descriptionKey: 'mocks.modals.manage.help.examples.prefix' },
-  { pattern: '^/api/users/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$', descriptionKey: 'mocks.modals.manage.help.examples.uuid' },
+  { pattern: '^/users/[a-fA-F\\d]{8}-([a-fA-F\\d]{4}-){3}[a-fA-F\\d]{12}$', descriptionKey: 'mocks.modals.manage.help.examples.uuid' },
   { pattern: '\\.json$', descriptionKey: 'mocks.modals.manage.help.examples.extension' },
   { pattern: '^/(users|accounts)$', descriptionKey: 'mocks.modals.manage.help.examples.alternation' },
   { pattern: '.*', descriptionKey: 'mocks.modals.manage.help.examples.any' },

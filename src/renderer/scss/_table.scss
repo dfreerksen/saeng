@@ -11,7 +11,7 @@
 .group-header {
   align-items: center;
   display: flex;
-  justify-content: space-between;
+  gap: 10px;
 }
 
 .group-name {
@@ -20,6 +20,12 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+.group-count {
+  color: var(--saeng-text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
 }
 
 .domain-cell {
@@ -203,7 +209,6 @@
 .log-path-cell {
   color: var(--saeng-primary-complement-color);
   font-family: var(--bs-font-monospace, monospace);
-  max-width: 360px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -212,6 +217,32 @@
 .log-latency-cell {
   color: var(--saeng-primary-complement-color);
   white-space: nowrap;
+}
+
+/* Fixed column widths so the Path column absorbs leftover width instead of
+   the row content bunching to the left on wide windows. */
+.log-table {
+  table-layout: fixed;
+}
+
+.log-table th:nth-child(1),
+.log-table td:nth-child(1) {
+  width: 9%;
+}
+
+.log-table th:nth-child(2),
+.log-table td:nth-child(2) {
+  width: 18%;
+}
+
+.log-table th:nth-child(4),
+.log-table td:nth-child(4) {
+  width: 11%;
+}
+
+.log-table th:nth-child(5),
+.log-table td:nth-child(5) {
+  width: 10%;
 }
 
 /* DevTools-style layout */

@@ -123,7 +123,7 @@ export default memo(function LogView({ entries, onClear, onExportHar, onConvertT
       ) : (
         <div className="log-devtools">
           <div className="log-request-list">
-            <table className="table table-borderless table-hover" id="logTable">
+            <table className="table table-borderless table-hover log-table" id="logTable">
               <thead>
                 <tr>
                   <th scope="col">{t('log.table.method')}</th>

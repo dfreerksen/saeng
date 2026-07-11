@@ -123,6 +123,7 @@ export default memo(function MappingsView({ mappings, setMappings, healthStatuse
                     <td colSpan={4}>
                       <div className="group-header">
                         <span className="group-name">{groupKey}</span>
+                        <span className="group-count">({groupMappings.length})</span>
                         <Tooltip title={t('mappings.table.groupToggleAll')}>
                           <label className="toggle">
                             <input

@@ -128,6 +128,11 @@ describe('MappingsView — group headers', () => {
     expect(container.querySelector('.group-name').textContent).toBe('myapp.local');
   });
 
+  it('displays the number of mappings in the group as a count badge', () => {
+    const { container } = renderMappingsView({ mappings: SAMPLE_MAPPINGS });
+    expect(container.querySelector('.group-count').textContent).toBe('(2)');
+  });
+
   it('renders a separate group header for each distinct base domain', () => {
     const mappings = [
       { id: '1', domain: 'myapp.local', port: 3000, https: false, enabled: true },
