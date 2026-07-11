@@ -2,7 +2,9 @@ import http from 'http';
 import https from 'https';
 import net from 'net';
 import tls from 'tls';
-import { renderMockTemplate } from './mockTemplate.js';
+import { applyHeaderOverrides, rewritePath } from './requestUtils.js';
+import { compileMockRules, findMock } from './mockMatcher.js';
+import { serveMock } from './mockResponder.js';
 
 // Cap on how much of a request/response body is captured for the request
 // log, to bound memory use for large uploads/downloads.
@@ -33,40 +35,12 @@ class HttpProxy {
       .sort((a, b) => b.base.length - a.base.length);
   }
 
-  // Applies a mapping's header overrides ({ name, value } pairs) onto a
-  // headers object, lowercasing names so they replace existing headers
-  // (which Node always reports with lowercase keys) rather than duplicating.
   _applyHeaderOverrides(headers, overrides) {
-    if (Array.isArray(overrides)) {
-      for (const { name, value } of overrides) {
-        if (name) headers[name.toLowerCase()] = value;
-      }
-    }
-    return headers;
+    return applyHeaderOverrides(headers, overrides);
   }
 
-  // Rewrites the path portion of `pathWithQuery` by replacing a matched
-  // mapping.pathRewriteFrom prefix with mapping.pathRewriteTo, preserving
-  // the query string. Only rewrites on an exact match or a `from + '/'`
-  // prefix (so `/api` doesn't match `/apiextra`). No-op when
-  // pathRewriteFrom is empty/unset.
   _rewritePath(mapping, pathWithQuery) {
-    const from = mapping.pathRewriteFrom;
-    if (!from) return pathWithQuery;
-
-    const input = pathWithQuery || '/';
-    const qIndex = input.indexOf('?');
-    const pathname = qIndex === -1 ? input : input.slice(0, qIndex);
-    const query = qIndex === -1 ? '' : input.slice(qIndex);
-
-    const matches = pathname === from || pathname.startsWith(`${from}/`);
-    if (!matches) return pathWithQuery;
-
-    const rest = pathname.slice(from.length);
-    const to = mapping.pathRewriteTo || '';
-    const rewrittenPathname = `${to}${rest}` || '/';
-
-    return rewrittenPathname + query;
+    return rewritePath(mapping, pathWithQuery);
   }
 
   findMapping(hostname) {
@@ -81,151 +55,24 @@ class HttpProxy {
     return wildcard?.mapping;
   }
 
-  // Compiles the enabled mock rules into a Map<mappingId, CompiledMock[]>,
-  // preserving array order so the first matching rule wins. Rules with an
-  // invalid pathPattern or an invalid condition regex are skipped
-  // defensively (the store validates on save, but mappings between
-  // processes could in theory drift). Also tracks which mappings have at
-  // least one enabled mock with a body condition, so the request handlers
-  // know whether they need to buffer the full body before deciding.
+  // Compiles the enabled mock rules and tracks which mappings need their
+  // request body buffered before a mock-match decision can be made. See
+  // mockMatcher.js for details.
   updateMocks(mocks) {
-    const byMapping = new Map();
-    const needsBody = new Set();
-    for (const mock of mocks) {
-      if (!mock.enabled) continue;
-      let regex;
-      try {
-        regex = new RegExp(mock.pathPattern);
-      } catch {
-        continue;
-      }
-      let conditions;
-      try {
-        conditions = this._compileConditions(mock.conditions);
-      } catch {
-        continue;
-      }
-      if (conditions.some((c) => c.type === 'body')) needsBody.add(mock.mappingId);
-      const list = byMapping.get(mock.mappingId) ?? [];
-      list.push({
-        method: (mock.method || '*').toUpperCase(),
-        regex,
-        statusCode: mock.statusCode,
-        headers: mock.headers,
-        body: mock.body,
-        delayMs: mock.delayMs || 0,
-        conditions,
-      });
-      byMapping.set(mock.mappingId, list);
-    }
+    const { byMapping, needsBody } = compileMockRules(mocks);
     this.mocks = byMapping;
     this.mocksNeedBody = needsBody;
   }
 
-  // Pre-lowercases header condition keys (request headers are always
-  // lowercase-keyed in Node) and pre-compiles regex-operator conditions.
-  // Throws if a regex condition doesn't compile, so the caller can skip the
-  // whole mock the same way an invalid pathPattern is skipped.
-  _compileConditions(conditions) {
-    if (!Array.isArray(conditions)) return [];
-    return conditions.map((c) => ({
-      type: c.type,
-      key: c.type === 'header' ? (c.key || '').toLowerCase() : c.key,
-      operator: c.operator,
-      value: c.value,
-      regex: c.operator === 'regex' ? new RegExp(c.value) : null,
-    }));
-  }
-
   _findMock(mapping, method, pathname, extra = {}) {
-    if (!mapping.mocksEnabled) return null;
-    const mocks = this.mocks.get(mapping.id);
-    if (!mocks) return null;
-    const upperMethod = method.toUpperCase();
-    for (const mock of mocks) {
-      if (mock.method !== '*' && mock.method !== upperMethod) continue;
-      const match = mock.regex.exec(pathname);
-      if (!match) continue;
-      if (!this._conditionsMatch(mock.conditions, extra)) continue;
-      return { mock, match };
-    }
-    return null;
-  }
-
-  _conditionsMatch(conditions, extra) {
-    if (!conditions || conditions.length === 0) return true;
-    return conditions.every((c) => this._conditionMatches(c, extra));
-  }
-
-  _conditionMatches(condition, extra) {
-    let actual;
-    if (condition.type === 'header') actual = extra.headers?.[condition.key];
-    else if (condition.type === 'query') actual = extra.query?.get(condition.key) ?? undefined;
-    else actual = extra.body;
-
-    if (condition.operator === 'exists') {
-      if (condition.type === 'body') return typeof actual === 'string' && actual.trim().length > 0;
-      return actual !== undefined;
-    }
-
-    if (actual === undefined) return false;
-    switch (condition.operator) {
-      case 'equals': return actual === condition.value;
-      case 'contains': return actual.includes(condition.value);
-      case 'regex': return condition.regex ? condition.regex.test(actual) : false;
-      default: return false;
-    }
+    return findMock(this.mocks, mapping, method, pathname, extra);
   }
 
   // `bufferedBody`, when provided, is the request body already drained by
   // `_readFullBody` (for mappings with a body condition) — reused here
   // instead of re-reading `req`, whose stream has already ended.
   _serveMock(mock, req, res, record, match, bufferedBody = null) {
-    const respond = (requestBody) => {
-      const context = {
-        method: req.method,
-        path: (req.url || '/').split('?')[0],
-        url: req.url || '/',
-        body: requestBody,
-        host: (req.headers.host || '').split(':')[0],
-        headers: req.headers,
-        match: match || [],
-      };
-
-      const headers = this._applyHeaderOverrides({}, mock.headers);
-      if (!('content-type' in headers)) headers['content-type'] = 'text/plain; charset=utf-8';
-      headers['x-saeng-mock'] = 'true';
-      const body = renderMockTemplate(mock.body || '', context);
-
-      if (record) {
-        record.mocked = true;
-        if (this.requestLog?.logHeaders) record.responseHeaders = { ...headers };
-        if (this.requestLog?.logBody) {
-          record.responseBody = body;
-          record.responseBodyTruncated = false;
-        }
-      }
-
-      const sendResponse = () => {
-        res.writeHead(mock.statusCode, headers);
-        res.end(body);
-      };
-
-      if (mock.delayMs > 0) {
-        setTimeout(sendResponse, mock.delayMs);
-      } else {
-        sendResponse();
-      }
-    };
-
-    if (bufferedBody !== null) {
-      respond(bufferedBody.toString('utf8'));
-      return;
-    }
-
-    const chunks = [];
-    req.on('data', (chunk) => chunks.push(chunk));
-    req.on('end', () => respond(Buffer.concat(chunks).toString('utf8')));
+    serveMock(mock, req, res, record, match, this.requestLog, bufferedBody);
   }
 
   async start(mappings, settings) {
