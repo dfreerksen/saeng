@@ -42,7 +42,6 @@ beforeEach(() => {
       remove: vi.fn().mockResolvedValue([]),
     },
   };
-  vi.spyOn(window, 'confirm').mockReturnValue(true);
 });
 
 describe('MocksView — empty state', () => {
@@ -217,26 +216,28 @@ describe('MocksView — edit', () => {
 });
 
 describe('MocksView — delete', () => {
-  it('calls confirm before deleting', () => {
+  it('shows a confirm modal before deleting', () => {
     renderMocksView({ mocks: SAMPLE_MOCKS });
     fireEvent.click(screen.getAllByRole('button').find((b) => b.classList.contains('btn-delete')));
-    expect(window.confirm).toHaveBeenCalled();
+    expect(screen.getByText('common.confirm.title')).toBeInTheDocument();
+    expect(window.electronAPI.mocks.remove).not.toHaveBeenCalled();
   });
 
-  it('calls electronAPI.mocks.remove when confirmed', async () => {
-    window.confirm.mockReturnValue(true);
+  it('calls electronAPI.mocks.remove when the confirm button is clicked', async () => {
     renderMocksView({ mocks: SAMPLE_MOCKS });
     fireEvent.click(screen.getAllByRole('button').find((b) => b.classList.contains('btn-delete')));
+    fireEvent.click(screen.getByText('mappings.table.actions.delete'));
     await waitFor(() => {
       expect(window.electronAPI.mocks.remove).toHaveBeenCalledWith('mock1');
     });
   });
 
-  it('does not call remove when confirmation is denied', () => {
-    window.confirm.mockReturnValue(false);
+  it('does not call remove and closes the modal when cancel is clicked', () => {
     renderMocksView({ mocks: SAMPLE_MOCKS });
     fireEvent.click(screen.getAllByRole('button').find((b) => b.classList.contains('btn-delete')));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.cancel'));
     expect(window.electronAPI.mocks.remove).not.toHaveBeenCalled();
+    expect(screen.queryByText('common.confirm.title')).not.toBeInTheDocument();
   });
 
   it('updates mocks with the result from remove', async () => {
@@ -245,6 +246,7 @@ describe('MocksView — delete', () => {
     const setMocks = vi.fn();
     renderMocksView({ mocks: SAMPLE_MOCKS, setMocks });
     fireEvent.click(screen.getAllByRole('button').find((b) => b.classList.contains('btn-delete')));
+    fireEvent.click(screen.getByText('mappings.table.actions.delete'));
     await waitFor(() => {
       expect(setMocks).toHaveBeenCalledWith(updated);
     });

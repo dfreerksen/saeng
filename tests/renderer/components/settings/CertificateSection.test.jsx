@@ -36,7 +36,6 @@ beforeEach(() => {
       deleteCA: vi.fn().mockResolvedValue({}),
     },
   };
-  vi.spyOn(window, 'confirm').mockReturnValue(true);
 });
 
 describe('CertificateSection — rendering', () => {
@@ -120,28 +119,37 @@ describe('CertificateSection — trust CA', () => {
 });
 
 describe('CertificateSection — regenerate CA', () => {
-  it('calls electronAPI.ssl.regenerateCA when confirmed', async () => {
-    window.confirm.mockReturnValue(true);
+  it('shows a confirm modal instead of calling regenerateCA immediately', () => {
     renderSection();
     fireEvent.click(screen.getByText('settings.cert.actions.regenerate').closest('button'));
+    expect(screen.getByText('common.confirm.title')).toBeInTheDocument();
+    expect(window.electronAPI.ssl.regenerateCA).not.toHaveBeenCalled();
+  });
+
+  it('calls electronAPI.ssl.regenerateCA when the confirm button is clicked', async () => {
+    const { container } = renderSection();
+    fireEvent.click(screen.getByText('settings.cert.actions.regenerate').closest('button'));
+    fireEvent.click(container.querySelector('.btn-confirm'));
     await waitFor(() => {
       expect(window.electronAPI.ssl.regenerateCA).toHaveBeenCalledOnce();
     });
   });
 
-  it('does not call regenerateCA when confirmation is denied', () => {
-    window.confirm.mockReturnValue(false);
-    renderSection();
+  it('does not call regenerateCA and closes the modal when cancel is clicked', () => {
+    const { container } = renderSection();
     fireEvent.click(screen.getByText('settings.cert.actions.regenerate').closest('button'));
+    fireEvent.click(container.querySelector('.btn-cancel'));
     expect(window.electronAPI.ssl.regenerateCA).not.toHaveBeenCalled();
+    expect(screen.queryByText('common.confirm.title')).not.toBeInTheDocument();
   });
 
   it('calls setCaExpiry with the new expiry after regeneration', async () => {
     const newExpiry = new Date(Date.now() + 365 * 86400000).toISOString();
     window.electronAPI.ssl.regenerateCA.mockResolvedValue(newExpiry);
     const setCaExpiry = vi.fn();
-    renderSection({ setCaExpiry });
+    const { container } = renderSection({ setCaExpiry });
     fireEvent.click(screen.getByText('settings.cert.actions.regenerate').closest('button'));
+    fireEvent.click(container.querySelector('.btn-confirm'));
     await waitFor(() => {
       expect(setCaExpiry).toHaveBeenCalledWith(newExpiry);
     });
@@ -149,25 +157,35 @@ describe('CertificateSection — regenerate CA', () => {
 });
 
 describe('CertificateSection — delete CA', () => {
-  it('calls electronAPI.ssl.deleteCA when confirmed', async () => {
+  it('shows a confirm modal instead of calling deleteCA immediately', () => {
     renderSection();
     fireEvent.click(screen.getByText('settings.cert.actions.delete').closest('button'));
+    expect(screen.getByText('common.confirm.title')).toBeInTheDocument();
+    expect(window.electronAPI.ssl.deleteCA).not.toHaveBeenCalled();
+  });
+
+  it('calls electronAPI.ssl.deleteCA when the confirm button is clicked', async () => {
+    const { container } = renderSection();
+    fireEvent.click(screen.getByText('settings.cert.actions.delete').closest('button'));
+    fireEvent.click(container.querySelector('.btn-confirm'));
     await waitFor(() => {
       expect(window.electronAPI.ssl.deleteCA).toHaveBeenCalledOnce();
     });
   });
 
-  it('does not call deleteCA when confirmation is denied', () => {
-    window.confirm.mockReturnValue(false);
-    renderSection();
+  it('does not call deleteCA and closes the modal when cancel is clicked', () => {
+    const { container } = renderSection();
     fireEvent.click(screen.getByText('settings.cert.actions.delete').closest('button'));
+    fireEvent.click(container.querySelector('.btn-cancel'));
     expect(window.electronAPI.ssl.deleteCA).not.toHaveBeenCalled();
+    expect(screen.queryByText('common.confirm.title')).not.toBeInTheDocument();
   });
 
   it('calls setCaExpiry(null) after deleting the CA', async () => {
     const setCaExpiry = vi.fn();
-    renderSection({ setCaExpiry });
+    const { container } = renderSection({ setCaExpiry });
     fireEvent.click(screen.getByText('settings.cert.actions.delete').closest('button'));
+    fireEvent.click(container.querySelector('.btn-confirm'));
     await waitFor(() => {
       expect(setCaExpiry).toHaveBeenCalledWith(null);
     });
@@ -176,8 +194,9 @@ describe('CertificateSection — delete CA', () => {
   it('shows an additional warning toast when the delete result includes one', async () => {
     window.electronAPI.ssl.deleteCA.mockResolvedValue({ warning: 'CA still trusted elsewhere' });
     const showToast = vi.fn();
-    renderSection({ showToast });
+    const { container } = renderSection({ showToast });
     fireEvent.click(screen.getByText('settings.cert.actions.delete').closest('button'));
+    fireEvent.click(container.querySelector('.btn-confirm'));
     await waitFor(() => {
       expect(showToast).toHaveBeenCalledWith('CA still trusted elsewhere', 'info', 6000);
     });

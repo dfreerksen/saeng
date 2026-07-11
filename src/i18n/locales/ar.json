@@ -343,5 +343,6 @@
   "tray.stopProxy": "إيقاف الوكيل",
   "tray.quit": "إنهاء Saeng",
   "tray.tooltip.running": "Saeng - الوكيل قيد التشغيل",
-  "tray.tooltip.stopped": "Saeng - الوكيل متوقف"
+  "tray.tooltip.stopped": "Saeng - الوكيل متوقف",
+  "common.confirm.title": "هل أنت متأكد؟"
 }

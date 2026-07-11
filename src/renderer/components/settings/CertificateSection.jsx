@@ -2,11 +2,32 @@ import { useState } from 'react';
 import { getExpiryInfo } from '../../js/utils.js';
 import { getOS } from '../../js/os.js';
 import Tooltip from '../utilities/Tooltip.jsx';
+import ConfirmModal from '../modals/ConfirmModal.jsx';
 
 export default function CertificateSection({ caPath, caExpiry, setCaExpiry, showToast, t }) {
   const [trustingCA, setTrustingCA] = useState(false);
   const [regeneratingCA, setRegeneratingCA] = useState(false);
   const [deletingCA, setDeletingCA] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+
+  async function handleRegenerate() {
+    setConfirmAction(null);
+    setRegeneratingCA(true);
+    const newExpiry = await window.electronAPI.ssl.regenerateCA();
+    setCaExpiry(newExpiry);
+    setRegeneratingCA(false);
+    showToast(t('flash.ca.regenerated'), 'success', 5000);
+  }
+
+  async function handleDelete() {
+    setConfirmAction(null);
+    setDeletingCA(true);
+    const result = await window.electronAPI.ssl.deleteCA();
+    setCaExpiry(null);
+    setDeletingCA(false);
+    showToast(t('flash.ca.deleted'), 'info', 5000);
+    if (result?.warning) showToast(result.warning, 'info', 6000);
+  }
 
   const expiryInfo = getExpiryInfo(caExpiry);
   const os = getOS();
@@ -63,14 +84,7 @@ export default function CertificateSection({ caPath, caExpiry, setCaExpiry, show
           <button
             className="btn btn-outline-warning"
             disabled={regeneratingCA}
-            onClick={async () => {
-              if (!confirm(t('settings.cert.confirm.regenerate'))) return;
-              setRegeneratingCA(true);
-              const newExpiry = await window.electronAPI.ssl.regenerateCA();
-              setCaExpiry(newExpiry);
-              setRegeneratingCA(false);
-              showToast(t('flash.ca.regenerated'), 'success', 5000);
-            }}
+            onClick={() => setConfirmAction('regenerate')}
           >
             <i className="bi bi-arrow-repeat" />
             <span className="ms-2 d-none d-lg-inline">{t('settings.cert.actions.regenerate')}</span>
@@ -81,15 +95,7 @@ export default function CertificateSection({ caPath, caExpiry, setCaExpiry, show
           <button
             className="btn btn-outline-danger"
             disabled={deletingCA}
-            onClick={async () => {
-              if (!confirm(t('settings.cert.confirm.delete'))) return;
-              setDeletingCA(true);
-              const result = await window.electronAPI.ssl.deleteCA();
-              setCaExpiry(null);
-              setDeletingCA(false);
-              showToast(t('flash.ca.deleted'), 'info', 5000);
-              if (result?.warning) showToast(result.warning, 'info', 6000);
-            }}
+            onClick={() => setConfirmAction('delete')}
           >
             <i className="bi bi-trash" />
             <span className="ms-2 d-none d-lg-inline">{t('settings.cert.actions.delete')}</span>
@@ -98,6 +104,29 @@ export default function CertificateSection({ caPath, caExpiry, setCaExpiry, show
       </div>
 
       <p className="cert-platform-note">{t(`settings.cert.platformNote.${os}`)}</p>
+
+      {confirmAction === 'regenerate' && (
+        <ConfirmModal
+          title={t('common.confirm.title')}
+          message={t('settings.cert.confirm.regenerate')}
+          confirmLabel={t('settings.cert.actions.regenerate')}
+          cancelLabel={t('mappings.modals.manage.buttons.cancel')}
+          confirmVariant="warning"
+          onConfirm={handleRegenerate}
+          onClose={() => setConfirmAction(null)}
+        />
+      )}
+
+      {confirmAction === 'delete' && (
+        <ConfirmModal
+          title={t('common.confirm.title')}
+          message={t('settings.cert.confirm.delete')}
+          confirmLabel={t('settings.cert.actions.delete')}
+          cancelLabel={t('mappings.modals.manage.buttons.cancel')}
+          onConfirm={handleDelete}
+          onClose={() => setConfirmAction(null)}
+        />
+      )}
     </div>
   );
 }

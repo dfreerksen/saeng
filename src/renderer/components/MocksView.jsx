@@ -1,5 +1,6 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import Tooltip from './utilities/Tooltip.jsx';
+import ConfirmModal from './modals/ConfirmModal.jsx';
 
 function buildGroups(mocks, mapById) {
   const groups = new Map();
@@ -13,16 +14,22 @@ function buildGroups(mocks, mapById) {
 }
 
 export default memo(function MocksView({ mocks, mappings, mockableMappings, setMocks, onAdd, onEdit, onExport, onImport, t }) {
+  const [pendingDelete, setPendingDelete] = useState(null);
 
   async function handleToggle(id) {
     const updated = await window.electronAPI.mocks.toggle(id);
     setMocks(updated);
   }
 
-  async function handleDelete(id) {
+  function handleDeleteClick(id) {
     const mock = mocks.find((m) => m.id === id);
     if (!mock) return;
-    if (!confirm(t('mocks.table.actions.confirm.remove'))) return;
+    setPendingDelete(mock);
+  }
+
+  async function confirmDelete() {
+    const id = pendingDelete.id;
+    setPendingDelete(null);
     const updated = await window.electronAPI.mocks.remove(id);
     setMocks(updated);
   }
@@ -126,7 +133,7 @@ export default memo(function MocksView({ mocks, mappings, mockableMappings, setM
                           </button>
                         </Tooltip>
                         <Tooltip title={t('mappings.table.actions.delete')}>
-                          <button className="btn btn-outline-danger btn-delete" onClick={() => handleDelete(mock.id)}>
+                          <button className="btn btn-outline-danger btn-delete" onClick={() => handleDeleteClick(mock.id)}>
                             <i className="bi bi-trash" />
                           </button>
                         </Tooltip>
@@ -140,6 +147,17 @@ export default memo(function MocksView({ mocks, mappings, mockableMappings, setM
           </table>
         )}
       </div>
+
+      {pendingDelete && (
+        <ConfirmModal
+          title={t('common.confirm.title')}
+          message={t('mocks.table.actions.confirm.remove')}
+          confirmLabel={t('mappings.table.actions.delete')}
+          cancelLabel={t('mappings.modals.manage.buttons.cancel')}
+          onConfirm={confirmDelete}
+          onClose={() => setPendingDelete(null)}
+        />
+      )}
     </div>
   );
 });

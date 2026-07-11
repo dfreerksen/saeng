@@ -343,5 +343,6 @@
   "tray.stopProxy": "Dừng Proxy",
   "tray.quit": "Thoát Saeng",
   "tray.tooltip.running": "Saeng - Proxy đang chạy",
-  "tray.tooltip.stopped": "Saeng - Proxy đã dừng"
+  "tray.tooltip.stopped": "Saeng - Proxy đã dừng",
+  "common.confirm.title": "Bạn có chắc chắn không?"
 }

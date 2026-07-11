@@ -343,5 +343,6 @@
   "tray.stopProxy": "หยุดพร็อกซี",
   "tray.quit": "ออกจาก Saeng",
   "tray.tooltip.running": "Saeng - พร็อกซีทำงานอยู่",
-  "tray.tooltip.stopped": "Saeng - พร็อกซีหยุดทำงาน"
+  "tray.tooltip.stopped": "Saeng - พร็อกซีหยุดทำงาน",
+  "common.confirm.title": "คุณแน่ใจหรือไม่?"
 }

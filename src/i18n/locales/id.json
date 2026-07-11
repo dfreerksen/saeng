@@ -343,5 +343,6 @@
   "tray.stopProxy": "Hentikan Proxy",
   "tray.quit": "Keluar dari Saeng",
   "tray.tooltip.running": "Saeng - Proxy berjalan",
-  "tray.tooltip.stopped": "Saeng - Proxy dihentikan"
+  "tray.tooltip.stopped": "Saeng - Proxy dihentikan",
+  "common.confirm.title": "Apakah Anda yakin?"
 }

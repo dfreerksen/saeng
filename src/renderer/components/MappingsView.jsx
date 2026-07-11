@@ -1,6 +1,7 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { splitDomain, compareMappingsByDomain } from '../js/utils.js';
 import Tooltip from './utilities/Tooltip.jsx';
+import ConfirmModal from './modals/ConfirmModal.jsx';
 
 function buildGroups(mappings) {
   const groups = new Map();
@@ -23,6 +24,8 @@ function healthTooltip(health, t) {
 }
 
 export default memo(function MappingsView({ mappings, setMappings, healthStatuses, proxyRunning, settings, onAdd, onEdit, onExport, onImport, showToast, t }) {
+  const [pendingDelete, setPendingDelete] = useState(null);
+
   async function handleToggle(id) {
     const updated = await window.electronAPI.mappings.toggle(id);
     setMappings(updated);
@@ -35,10 +38,15 @@ export default memo(function MappingsView({ mappings, setMappings, healthStatuse
     setMappings(updated);
   }
 
-  async function handleDelete(id) {
+  function handleDeleteClick(id) {
     const mapping = mappings.find((m) => m.id === id);
     if (!mapping) return;
-    if (!confirm(t('mappings.table.actions.confirm.remove', { domain: mapping.domain }))) return;
+    setPendingDelete(mapping);
+  }
+
+  async function confirmDelete() {
+    const id = pendingDelete.id;
+    setPendingDelete(null);
     const updated = await window.electronAPI.mappings.remove(id);
     setMappings(updated);
   }
@@ -186,7 +194,7 @@ export default memo(function MappingsView({ mappings, setMappings, healthStatuse
                             <Tooltip title={t('mappings.table.actions.delete')}>
                               <button
                                 className="btn btn-outline-danger btn-delete"
-                                onClick={() => handleDelete(m.id)}
+                                onClick={() => handleDeleteClick(m.id)}
                               >
                                 <i className="bi bi-trash" />
                               </button>
@@ -202,6 +210,17 @@ export default memo(function MappingsView({ mappings, setMappings, healthStatuse
           </table>
         )}
       </div>
+
+      {pendingDelete && (
+        <ConfirmModal
+          title={t('common.confirm.title')}
+          message={t('mappings.table.actions.confirm.remove', { domain: pendingDelete.domain })}
+          confirmLabel={t('mappings.table.actions.delete')}
+          cancelLabel={t('mappings.modals.manage.buttons.cancel')}
+          onConfirm={confirmDelete}
+          onClose={() => setPendingDelete(null)}
+        />
+      )}
     </div>
   );
 });

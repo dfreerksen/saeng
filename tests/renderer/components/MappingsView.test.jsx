@@ -44,7 +44,6 @@ beforeEach(() => {
     writable: true,
     configurable: true,
   });
-  vi.spyOn(window, 'confirm').mockReturnValue(true);
 });
 
 describe('MappingsView — empty state', () => {
@@ -344,26 +343,28 @@ describe('MappingsView — toggle', () => {
 });
 
 describe('MappingsView — delete', () => {
-  it('calls confirm before deleting', async () => {
+  it('shows a confirm modal before deleting', () => {
     renderMappingsView({ mappings: SAMPLE_MAPPINGS });
     fireEvent.click(screen.getAllByRole('button').find((b) => b.classList.contains('btn-delete')));
-    expect(window.confirm).toHaveBeenCalled();
+    expect(screen.getByText('common.confirm.title')).toBeInTheDocument();
+    expect(window.electronAPI.mappings.remove).not.toHaveBeenCalled();
   });
 
-  it('calls electronAPI.mappings.remove when confirmed', async () => {
-    window.confirm.mockReturnValue(true);
+  it('calls electronAPI.mappings.remove when the confirm button is clicked', async () => {
     renderMappingsView({ mappings: SAMPLE_MAPPINGS });
     fireEvent.click(screen.getAllByRole('button').find((b) => b.classList.contains('btn-delete')));
+    fireEvent.click(screen.getByText('mappings.table.actions.delete'));
     await waitFor(() => {
       expect(window.electronAPI.mappings.remove).toHaveBeenCalledWith('1');
     });
   });
 
-  it('does not call remove when confirmation is denied', () => {
-    window.confirm.mockReturnValue(false);
+  it('does not call remove and closes the modal when cancel is clicked', () => {
     renderMappingsView({ mappings: SAMPLE_MAPPINGS });
     fireEvent.click(screen.getAllByRole('button').find((b) => b.classList.contains('btn-delete')));
+    fireEvent.click(screen.getByText('mappings.modals.manage.buttons.cancel'));
     expect(window.electronAPI.mappings.remove).not.toHaveBeenCalled();
+    expect(screen.queryByText('common.confirm.title')).not.toBeInTheDocument();
   });
 });
 

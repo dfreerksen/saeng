@@ -366,5 +366,7 @@
   "tray.stopProxy": "Stop Proxy",
   "tray.quit": "Quit Saeng",
   "tray.tooltip.running": "Saeng - Proxy running",
-  "tray.tooltip.stopped": "Saeng - Proxy stopped"
+  "tray.tooltip.stopped": "Saeng - Proxy stopped",
+
+  "common.confirm.title": "Are you sure?"
 }

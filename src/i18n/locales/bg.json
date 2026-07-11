@@ -343,5 +343,6 @@
   "tray.stopProxy": "Спри прокси",
   "tray.quit": "Излизане от Saeng",
   "tray.tooltip.running": "Saeng - Прокси работи",
-  "tray.tooltip.stopped": "Saeng - Прокси спряно"
+  "tray.tooltip.stopped": "Saeng - Прокси спряно",
+  "common.confirm.title": "Сигурни ли сте?"
 }

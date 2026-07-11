@@ -343,5 +343,6 @@
   "tray.stopProxy": "프록시 중지",
   "tray.quit": "Saeng 종료",
   "tray.tooltip.running": "Saeng - 프록시 실행 중",
-  "tray.tooltip.stopped": "Saeng - 프록시 중지됨"
+  "tray.tooltip.stopped": "Saeng - 프록시 중지됨",
+  "common.confirm.title": "계속하시겠습니까?"
 }

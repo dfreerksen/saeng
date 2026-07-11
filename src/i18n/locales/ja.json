@@ -343,5 +343,6 @@
   "tray.stopProxy": "プロキシを停止",
   "tray.quit": "Saengを終了",
   "tray.tooltip.running": "Saeng - プロキシ実行中",
-  "tray.tooltip.stopped": "Saeng - プロキシ停止中"
+  "tray.tooltip.stopped": "Saeng - プロキシ停止中",
+  "common.confirm.title": "よろしいですか？"
 }
