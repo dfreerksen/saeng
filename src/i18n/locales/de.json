@@ -344,5 +344,6 @@
   "tray.quit": "Saeng beenden",
   "tray.tooltip.running": "Saeng - Proxy läuft",
   "tray.tooltip.stopped": "Saeng - Proxy gestoppt",
-  "common.confirm.title": "Sind Sie sicher?"
+  "common.confirm.title": "Sind Sie sicher?",
+  "common.loading": "Wird geladen..."
 }

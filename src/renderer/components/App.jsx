@@ -35,6 +35,7 @@ function applyColorMode(mode) {
 }
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
   const [proxyRunning, setProxyRunning] = useState(false);
   const [mappings, setMappings] = useState([]);
   const [mocks, setMocks] = useState([]);
@@ -134,6 +135,8 @@ export default function App() {
       const localeInfo = localeList.find((l) => l.code === currentLocale);
       document.documentElement.lang = currentLocale;
       document.documentElement.dir = localeInfo?.dir ?? 'ltr';
+
+      setIsLoading(false);
     }
 
     init();
@@ -277,6 +280,16 @@ export default function App() {
     if (!mock || mockableMappings.some((m) => m.id === mock.mappingId)) return mockableMappings;
     const current = mappings.find((m) => m.id === mock.mappingId);
     return current ? [...mockableMappings, current] : mockableMappings;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="app app-loading d-flex flex-column align-items-center justify-content-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">{t('common.loading')}</span>
+        </div>
+      </div>
+    );
   }
 
   return (

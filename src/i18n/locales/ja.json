@@ -344,5 +344,6 @@
   "tray.quit": "Saengを終了",
   "tray.tooltip.running": "Saeng - プロキシ実行中",
   "tray.tooltip.stopped": "Saeng - プロキシ停止中",
-  "common.confirm.title": "よろしいですか？"
+  "common.confirm.title": "よろしいですか？",
+  "common.loading": "読み込み中..."
 }

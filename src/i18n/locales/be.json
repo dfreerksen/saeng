@@ -344,5 +344,6 @@
   "tray.quit": "Выйсці з Saeng",
   "tray.tooltip.running": "Saeng - Працуе проксі",
   "tray.tooltip.stopped": "Saeng - Проксі спынены",
-  "common.confirm.title": "Вы ўпэўнены?"
+  "common.confirm.title": "Вы ўпэўнены?",
+  "common.loading": "Загрузка..."
 }

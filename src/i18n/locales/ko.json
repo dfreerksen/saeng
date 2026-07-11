@@ -344,5 +344,6 @@
   "tray.quit": "Saeng 종료",
   "tray.tooltip.running": "Saeng - 프록시 실행 중",
   "tray.tooltip.stopped": "Saeng - 프록시 중지됨",
-  "common.confirm.title": "계속하시겠습니까?"
+  "common.confirm.title": "계속하시겠습니까?",
+  "common.loading": "로딩 중..."
 }

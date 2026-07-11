@@ -344,5 +344,6 @@
   "tray.quit": "Закрити Saeng",
   "tray.tooltip.running": "Saeng - Проксі-сервер працює",
   "tray.tooltip.stopped": "Saeng - Проксі зупинено",
-  "common.confirm.title": "Ви впевнені?"
+  "common.confirm.title": "Ви впевнені?",
+  "common.loading": "Завантаження..."
 }

@@ -344,5 +344,6 @@
   "tray.quit": "Saeng'den Çık",
   "tray.tooltip.running": "Saeng - Proxy çalışıyor",
   "tray.tooltip.stopped": "Saeng - Proxy durduruldu",
-  "common.confirm.title": "Emin misiniz?"
+  "common.confirm.title": "Emin misiniz?",
+  "common.loading": "Yükleniyor..."
 }

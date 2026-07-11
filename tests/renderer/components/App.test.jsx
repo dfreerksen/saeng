@@ -151,6 +151,23 @@ describe('App — initial render', () => {
   });
 });
 
+describe('App — loading state', () => {
+  it('shows a loading spinner while init is still in progress', () => {
+    window.electronAPI = makeElectronAPI({
+      i18n: { getStrings: vi.fn(() => new Promise(() => {})) },
+    });
+    const { container } = render(<App />);
+    expect(container.querySelector('.spinner-border')).toBeInTheDocument();
+    expect(screen.queryByText('mappings.title')).not.toBeInTheDocument();
+  });
+
+  it('hides the spinner and renders the main app once init resolves', async () => {
+    const { container } = await renderApp();
+    expect(container.querySelector('.spinner-border')).not.toBeInTheDocument();
+    expect(container.querySelector('.app')).toBeInTheDocument();
+  });
+});
+
 describe('App — navigation', () => {
   it('shows the mappings view by default when dashboard is disabled', async () => {
     await renderApp();

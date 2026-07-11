@@ -344,5 +344,6 @@
   "tray.quit": "Sair do Saeng",
   "tray.tooltip.running": "Saeng - Proxy em execução",
   "tray.tooltip.stopped": "Saeng - Proxy parado",
-  "common.confirm.title": "Tem certeza?"
+  "common.confirm.title": "Tem certeza?",
+  "common.loading": "Carregando..."
 }

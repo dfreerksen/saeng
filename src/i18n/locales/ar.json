@@ -344,5 +344,6 @@
   "tray.quit": "إنهاء Saeng",
   "tray.tooltip.running": "Saeng - الوكيل قيد التشغيل",
   "tray.tooltip.stopped": "Saeng - الوكيل متوقف",
-  "common.confirm.title": "هل أنت متأكد؟"
+  "common.confirm.title": "هل أنت متأكد؟",
+  "common.loading": "جاري التحميل..."
 }

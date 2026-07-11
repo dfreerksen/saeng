@@ -344,5 +344,6 @@
   "tray.quit": "ออกจาก Saeng",
   "tray.tooltip.running": "Saeng - พร็อกซีทำงานอยู่",
   "tray.tooltip.stopped": "Saeng - พร็อกซีหยุดทำงาน",
-  "common.confirm.title": "คุณแน่ใจหรือไม่?"
+  "common.confirm.title": "คุณแน่ใจหรือไม่?",
+  "common.loading": "กำลังโหลด..."
 }

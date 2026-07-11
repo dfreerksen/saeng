@@ -344,5 +344,6 @@
   "tray.quit": "退出 Saeng",
   "tray.tooltip.running": "Saeng - 代理运行中",
   "tray.tooltip.stopped": "Saeng - 代理已停止",
-  "common.confirm.title": "您确定吗？"
+  "common.confirm.title": "您确定吗？",
+  "common.loading": "加载中..."
 }

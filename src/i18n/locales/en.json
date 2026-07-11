@@ -368,5 +368,6 @@
   "tray.tooltip.running": "Saeng - Proxy running",
   "tray.tooltip.stopped": "Saeng - Proxy stopped",
 
-  "common.confirm.title": "Are you sure?"
+  "common.confirm.title": "Are you sure?",
+  "common.loading": "Loading..."
 }
