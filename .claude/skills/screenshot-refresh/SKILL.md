@@ -1,6 +1,6 @@
 ---
 name: screenshot-refresh
-description: Launches the real Electron app with remote debugging, drives the renderer via the Chrome DevTools Protocol, and captures a PNG per sidebar view (dashboard, mappings, mocks, log, settings, about) in both light and dark themes to use in the README. Use when asked to update/refresh screenshots or take new screenshots of the app.
+description: Launches the real Electron app with remote debugging, drives the renderer via the Chrome DevTools Protocol, and captures a PNG per sidebar view (dashboard, mappings, mocks, log, settings, about) plus the Add Mapping / Add Mock modals, in both light and dark themes, to use in the README. Use when asked to update/refresh screenshots or take new screenshots of the app.
 ---
 
 Run the bundled script to (re)build the renderer and capture fresh screenshots:
@@ -17,21 +17,21 @@ By default this captures `dashboard`, `mappings`, `mocks`, `log`, and `settings`
 2. Launches `electron .` with `--remote-debugging-port=9333` (with `ELECTRON_RUN_AS_NODE` stripped from the env — if that var is inherited from the shell, `electron .` silently runs as a plain Node script instead of the GUI app and CDP never comes up).
 3. Connects to the renderer's page target over the DevTools Protocol using Node's built-in `fetch`/`WebSocket` (no extra deps).
 4. Overrides the viewport via `Emulation.setDeviceMetricsOverride` (so output size doesn't depend on the actual window size/display).
-5. For each theme, sets `data-bs-theme` on `<html>`, then for each requested view clicks the matching `.nav-item` (by its Bootstrap icon class) and calls `Page.captureScreenshot`.
+5. For each theme, sets `data-bs-theme` on `<html>`, then for each requested view clicks the matching `.nav-item` (by its Bootstrap icon class) and calls `Page.captureScreenshot`. `mapping-add`/`mock-add` first navigate to their parent view (`mappings`/`mocks`), click the "+" button to open the modal, wait for `.modal.show` to appear, capture, then close it via a synthetic Escape keypress before moving to the next view.
 6. Kills the Electron process when done.
 
 ## Options
 
 ```bash
 node .claude/skills/screenshot-refresh/capture-screenshots.mjs \
-  --views=dashboard,mappings,mocks,log,settings,about \
+  --views=dashboard,mappings,mocks,log,settings,about,mapping-add,mock-add \
   --width=1356 --height=796 --scale=2 \
   --theme=light,dark \
   --out-dir=assets/screenshots \
   --port=9333
 ```
 
-- `--views` — comma-separated subset of `dashboard`, `mappings`, `mocks`, `log`, `settings`, `about`. `dashboard` injects fake data (mappings, mocks, health statuses, and ~100 log entries spread over 30 minutes) via React fiber manipulation so the charts and stats are populated regardless of real app state. `log` is skipped (with a warning) if `settings.loggingEnabled` is off, since the nav item won't exist.
+- `--views` — comma-separated subset of `dashboard`, `mappings`, `mocks`, `log`, `settings`, `about`, `mapping-add`, `mock-add`. Not included in the default list — pass them explicitly. `mapping-add`/`mock-add` are named `<parent>-add` (not `add-<parent>`) so the output files sort next to their parent view's screenshots. `dashboard` injects fake data (mappings, mocks, health statuses, and ~100 log entries spread over 30 minutes) via React fiber manipulation so the charts and stats are populated regardless of real app state. `log` is skipped (with a warning) if `settings.loggingEnabled` is off, since the nav item won't exist. `mock-add` is skipped (with a warning) if no mapping has mocking enabled, since the "+ Add Mock" button is disabled in that case — enable mocking on at least one mapping first if you need this screenshot.
 - `--theme` — comma-separated subset of `light`, `dark` (default `light,dark`); sets `data-bs-theme` on `<html>` before capturing each. Pass `--theme=` (empty) to do a single pass without overriding the theme (uses whatever the app's current `colorMode` resolves to) and writes legacy `screenshot-<view>.png` names.
 - `--out-dir` — defaults to `assets/screenshots`, matching where the existing `screenshot-*.png` files already live.
 

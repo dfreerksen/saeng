@@ -21,6 +21,16 @@ const NAV_ICONS = {
   about: 'bi-info-circle',
 };
 
+// Views that aren't a sidebar nav item: navigate to a parent view first, then
+// click its "+" button to open the add modal, and capture that instead. Named
+// "<parent>-add" (not "add-<parent>") so the output files sort next to their
+// parent view's screenshots (e.g. screenshot-light-mapping-add.png sorts right
+// before screenshot-light-mappings.png).
+const MODAL_TRIGGERS = {
+  'mapping-add': { parentView: 'mappings' },
+  'mock-add': { parentView: 'mocks' },
+};
+
 const args = process.argv.slice(2);
 function flag(name, fallback) {
   const prefix = `--${name}=`;
@@ -38,9 +48,10 @@ const themes = flag('theme', 'light,dark').split(',').map((t) => t.trim()).filte
 const outDir = path.resolve(root, flag('out-dir', 'assets/screenshots'));
 const port = Number(flag('port', '9333'));
 
+const VALID_VIEWS = [...Object.keys(NAV_ICONS), ...Object.keys(MODAL_TRIGGERS)];
 for (const v of views) {
-  if (!NAV_ICONS[v]) {
-    console.error(`Unknown view "${v}". Valid views: ${Object.keys(NAV_ICONS).join(', ')}`);
+  if (!NAV_ICONS[v] && !MODAL_TRIGGERS[v]) {
+    console.error(`Unknown view "${v}". Valid views: ${VALID_VIEWS.join(', ')}`);
     process.exit(1);
   }
 }
@@ -288,6 +299,53 @@ async function injectFakeDashboardData(ws) {
   return result?.value;
 }
 
+async function clickNavItem(ws, icon) {
+  const { result } = await cdpSend(ws, 'Runtime.evaluate', {
+    expression: `(() => {
+      const icon = document.querySelector('.nav-item i.${icon}');
+      if (!icon) return false;
+      icon.closest('button').click();
+      return true;
+    })()`,
+    returnByValue: true,
+  });
+  return result?.value;
+}
+
+async function openAddModal(ws) {
+  const { result } = await cdpSend(ws, 'Runtime.evaluate', {
+    expression: `(() => {
+      const button = document.querySelector('.btn-primary i.bi-plus')?.closest('button');
+      if (!button) return 'no-button';
+      if (button.disabled) return 'disabled';
+      button.click();
+      return 'ok';
+    })()`,
+    returnByValue: true,
+  });
+  return result?.value;
+}
+
+async function waitForModal(ws, timeoutMs = 5000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const { result } = await cdpSend(ws, 'Runtime.evaluate', {
+      expression: "!!document.querySelector('.modal.show')",
+      returnByValue: true,
+    });
+    if (result?.value) return true;
+    await sleep(100);
+  }
+  return false;
+}
+
+async function closeModal(ws) {
+  await cdpSend(ws, 'Runtime.evaluate', {
+    expression: "document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))",
+  });
+  await sleep(200);
+}
+
 async function main() {
   console.log('Building renderer assets...');
   execSync('npm run sass:build && npm run js:build', { cwd: root, stdio: 'inherit' });
@@ -340,7 +398,10 @@ async function main() {
       }
 
       for (const view of views) {
-        if (view === 'dashboard') {
+        const modalTrigger = MODAL_TRIGGERS[view];
+        const navView = modalTrigger ? modalTrigger.parentView : view;
+
+        if (navView === 'dashboard') {
           const injected = await injectFakeDashboardData(ws);
           if (injected !== 'ok') {
             console.warn(`  Dashboard data injection returned: ${injected}`);
@@ -348,22 +409,13 @@ async function main() {
           await sleep(600);
         }
 
-        const icon = NAV_ICONS[view];
-        const { result } = await cdpSend(ws, 'Runtime.evaluate', {
-          expression: `(() => {
-            const icon = document.querySelector('.nav-item i.${icon}');
-            if (!icon) return false;
-            icon.closest('button').click();
-            return true;
-          })()`,
-          returnByValue: true,
-        });
-        if (!result?.value) {
-          console.warn(`  Skipping "${view}": no .nav-item with icon .${icon} found (is it hidden, e.g. logging disabled?)`);
+        const navigated = await clickNavItem(ws, NAV_ICONS[navView]);
+        if (!navigated) {
+          console.warn(`  Skipping "${view}": no .nav-item with icon .${NAV_ICONS[navView]} found (is it hidden, e.g. logging disabled?)`);
           continue;
         }
 
-        if (view === 'log') {
+        if (navView === 'log') {
           const injected = await injectFakeLogEntries(ws);
           if (injected !== 'ok') {
             console.warn(`  Log entry injection returned: ${injected}`);
@@ -372,11 +424,29 @@ async function main() {
 
         await sleep(500);
 
+        if (modalTrigger) {
+          const opened = await openAddModal(ws);
+          if (opened !== 'ok') {
+            console.warn(`  Skipping "${view}": add button ${opened === 'disabled' ? 'is disabled (no mockable mapping configured?)' : 'not found'}`);
+            continue;
+          }
+          const shown = await waitForModal(ws);
+          if (!shown) {
+            console.warn(`  Skipping "${view}": modal did not appear`);
+            continue;
+          }
+          await sleep(300);
+        }
+
         const { data } = await cdpSend(ws, 'Page.captureScreenshot', { format: 'png' });
         const suffix = themeName ? `-${themeName}` : '';
         const outPath = path.join(outDir, `screenshot${suffix}-${view}.png`);
         fs.writeFileSync(outPath, Buffer.from(data, 'base64'));
         console.log(`  Wrote ${path.relative(root, outPath)}`);
+
+        if (modalTrigger) {
+          await closeModal(ws);
+        }
       }
     }
   } finally {
