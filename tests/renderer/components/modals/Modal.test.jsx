@@ -60,4 +60,26 @@ describe('Modal', () => {
     fireEvent.click(overlay, { target: overlay });
     expect(onClose).not.toHaveBeenCalled();
   });
+
+  it('calls onClose when the Escape key is pressed', () => {
+    const onClose = vi.fn();
+    render(<Modal onClose={onClose}><div>Content</div></Modal>);
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it('does not call onClose for other keys', () => {
+    const onClose = vi.fn();
+    render(<Modal onClose={onClose}><div>Content</div></Modal>);
+    fireEvent.keyDown(document, { key: 'Enter' });
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('removes the keydown listener on unmount', () => {
+    const onClose = vi.fn();
+    const { unmount } = render(<Modal onClose={onClose}><div>Content</div></Modal>);
+    unmount();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onClose).not.toHaveBeenCalled();
+  });
 });

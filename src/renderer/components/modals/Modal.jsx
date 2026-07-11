@@ -8,6 +8,14 @@ export default function Modal({ onClose, children }) {
     return () => document.body.classList.remove('modal-open');
   }, []);
 
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   return (
     <>
       <div
