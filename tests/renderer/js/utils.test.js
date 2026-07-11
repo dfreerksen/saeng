@@ -6,6 +6,7 @@ import {
   getExpiryInfo,
   subdomainRank,
   compareMappingsByDomain,
+  statusBadgeClass,
   DOMAIN_SUFFIXES,
   DEFAULT_SUFFIX,
 } from '../../../src/renderer/js/utils.js';
@@ -140,6 +141,35 @@ describe('compareMappingsByDomain()', () => {
   it('sorts named subdomains alphanumerically', () => {
     const result = [mapping('zebra.myapp.local'), mapping('api.myapp.local')].sort(compareMappingsByDomain);
     expect(result.map((m) => m.domain)).toEqual(['api.myapp.local', 'zebra.myapp.local']);
+  });
+});
+
+// ── statusBadgeClass ───────────────────────────────────────────────
+
+describe('statusBadgeClass()', () => {
+  it('returns the pending class for a null/undefined status', () => {
+    expect(statusBadgeClass(null)).toBe('badge-status-pending');
+    expect(statusBadgeClass(undefined)).toBe('badge-status-pending');
+  });
+
+  it('returns the error class for 5xx statuses', () => {
+    expect(statusBadgeClass(500)).toBe('badge-status-error');
+    expect(statusBadgeClass(503)).toBe('badge-status-error');
+  });
+
+  it('returns the warn class for 4xx statuses', () => {
+    expect(statusBadgeClass(404)).toBe('badge-status-warn');
+    expect(statusBadgeClass(401)).toBe('badge-status-warn');
+  });
+
+  it('returns the redirect class for 3xx statuses', () => {
+    expect(statusBadgeClass(304)).toBe('badge-status-redirect');
+    expect(statusBadgeClass(301)).toBe('badge-status-redirect');
+  });
+
+  it('returns the ok class for 2xx statuses', () => {
+    expect(statusBadgeClass(200)).toBe('badge-status-ok');
+    expect(statusBadgeClass(201)).toBe('badge-status-ok');
   });
 });
 

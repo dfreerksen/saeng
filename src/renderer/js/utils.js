@@ -37,6 +37,14 @@ export function compareMappingsByDomain(a, b) {
   return splitA.subdomain.localeCompare(splitB.subdomain, undefined, { numeric: true });
 }
 
+export function statusBadgeClass(status) {
+  if (status == null) return 'badge-status-pending';
+  if (status >= 500) return 'badge-status-error';
+  if (status >= 400) return 'badge-status-warn';
+  if (status >= 300) return 'badge-status-redirect';
+  return 'badge-status-ok';
+}
+
 export function getExpiryInfo(isoString) {
   if (!isoString) return null;
   const expiry = new Date(isoString);

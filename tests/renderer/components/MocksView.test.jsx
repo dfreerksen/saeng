@@ -127,9 +127,10 @@ describe('MocksView — table with mocks', () => {
     expect(container.querySelector('.log-path-cell code').textContent).toBe('^/api/ping$');
   });
 
-  it('shows the status code', () => {
-    renderMocksView({ mocks: [SAMPLE_MOCKS[0]] });
-    expect(screen.getByText('200')).toBeInTheDocument();
+  it('shows the status code as a status badge', () => {
+    renderMocksView({ mocks: SAMPLE_MOCKS });
+    expect(screen.getByText('200')).toHaveClass('badge-status-ok');
+    expect(screen.getByText('404')).toHaveClass('badge-status-warn');
   });
 
   it('reflects the enabled state in the toggle checkbox', () => {

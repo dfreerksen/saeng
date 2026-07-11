@@ -1,4 +1,5 @@
 import { memo, useMemo, useState } from 'react';
+import { statusBadgeClass } from '../js/utils.js';
 import Tooltip from './utilities/Tooltip.jsx';
 import ConfirmModal from './modals/ConfirmModal.jsx';
 
@@ -113,7 +114,9 @@ export default memo(function MocksView({ mocks, mappings, mockableMappings, setM
                         <span className="badge badge-conditions">{t('mocks.table.conditionsBadge', { count: mock.conditions.length })}</span>
                       )}
                     </td>
-                    <td>{mock.statusCode}</td>
+                    <td>
+                      <span className={`badge ${statusBadgeClass(mock.statusCode)}`}>{mock.statusCode}</span>
+                    </td>
                     <td>
                       <label className="toggle">
                         <input

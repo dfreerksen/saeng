@@ -1,15 +1,8 @@
 import { memo, useState, useMemo } from 'react';
 import { FILTER_TABS, matchesFilter } from '../js/logFilter.js';
+import { statusBadgeClass } from '../js/utils.js';
 import Tooltip from './utilities/Tooltip.jsx';
 import LogDetailPanel from './LogDetailPanel.jsx';
-
-function statusBadgeClass(status) {
-  if (status == null) return 'badge-status-pending';
-  if (status >= 500) return 'badge-status-error';
-  if (status >= 400) return 'badge-status-warn';
-  if (status >= 300) return 'badge-status-redirect';
-  return 'badge-status-ok';
-}
 
 function matchHeaders(headers, q) {
   if (!headers) return false;
