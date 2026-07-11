@@ -56,7 +56,7 @@
     "node-forge": "^1.4.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.4",
+    "@eslint/js": "^9.39.5",
     "@popperjs/core": "^2.11.8",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -64,10 +64,10 @@
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "chart.js": "^4.5.1",
-    "electron": "^43.0.0",
+    "electron": "^43.1.0",
     "electron-builder": "^26.15.3",
     "esbuild": "^0.28.1",
-    "eslint": "^9.39.4",
+    "eslint": "^9.39.5",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.7.0",
@@ -80,7 +80,7 @@
     "stylelint-config-standard": "^40.0.0",
     "stylelint-config-standard-scss": "^17.0.0",
     "stylelint-order": "^8.1.1",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.10"
   },
   "build": {
     "appId": "com.dfreerksen.saeng",
