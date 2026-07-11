@@ -3,7 +3,8 @@
     "allow": [
       "Bash(grep -E \"\\\\.\\(rb|js|jsx|tsx\\)$\")",
       "Bash(python3 -c ' *)",
-      "Bash(node .claude/skills/i18n-add/add-key.mjs '{ *)"
+      "Bash(node .claude/skills/i18n-add/add-key.mjs '{ *)",
+      "Bash([ -f \"$CONFIG\" ])"
     ]
   },
   "hooks": {
