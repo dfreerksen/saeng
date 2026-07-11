@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "Asignaciones deshabilitadas",
   "dashboard.stats.activeMocks": "Mocks activos",
   "dashboard.stats.disabledMocks": "Mocks deshabilitados",
+  "dashboard.charts.empty": "Aún no hay datos de solicitudes",
   "dashboard.charts.requestsPerMin": "Solicitudes / min",
   "dashboard.charts.errorRate": "Tasa de errores (%)",
   "dashboard.charts.latency": "Latencia media (ms)",

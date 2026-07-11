@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "Wyłączone mapowania",
   "dashboard.stats.activeMocks": "Aktywne mocki",
   "dashboard.stats.disabledMocks": "Wyłączone mocki",
+  "dashboard.charts.empty": "Brak jeszcze danych o żądaniach",
   "dashboard.charts.requestsPerMin": "Żądania / min",
   "dashboard.charts.errorRate": "Wskaźnik błędów (%)",
   "dashboard.charts.latency": "Średnie opóźnienie (ms)",

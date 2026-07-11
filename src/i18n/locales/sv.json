@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "Inaktiverade mappningar",
   "dashboard.stats.activeMocks": "Aktiva mockar",
   "dashboard.stats.disabledMocks": "Inaktiverade mockar",
+  "dashboard.charts.empty": "Ingen begärandata än",
   "dashboard.charts.requestsPerMin": "Förfrågningar / min",
   "dashboard.charts.errorRate": "Felfrekvens (%)",
   "dashboard.charts.latency": "Genomsnittlig latens (ms)",

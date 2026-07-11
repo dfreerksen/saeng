@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "การแมปที่ปิดใช้งาน",
   "dashboard.stats.activeMocks": "การจำลองที่ใช้งานอยู่",
   "dashboard.stats.disabledMocks": "การจำลองที่ปิดใช้งาน",
+  "dashboard.charts.empty": "ยังไม่มีข้อมูลคำขอ",
   "dashboard.charts.requestsPerMin": "คำขอ / นาที",
   "dashboard.charts.errorRate": "อัตราข้อผิดพลาด (%)",
   "dashboard.charts.latency": "เวลาตอบสนองเฉลี่ย (มิลลิวินาที)",

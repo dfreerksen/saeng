@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "التعيينات المعطّلة",
   "dashboard.stats.activeMocks": "المحاكاة النشطة",
   "dashboard.stats.disabledMocks": "المحاكاة المعطّلة",
+  "dashboard.charts.empty": "لا توجد بيانات طلبات بعد",
   "dashboard.charts.requestsPerMin": "طلبات / دقيقة",
   "dashboard.charts.errorRate": "معدل الأخطاء (%)",
   "dashboard.charts.latency": "متوسط زمن الاستجابة (مللي ثانية)",

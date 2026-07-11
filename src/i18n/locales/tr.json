@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "Devre dışı eşlemeler",
   "dashboard.stats.activeMocks": "Aktif mocklar",
   "dashboard.stats.disabledMocks": "Devre dışı mocklar",
+  "dashboard.charts.empty": "Henüz istek verisi yok",
   "dashboard.charts.requestsPerMin": "İstek / dk",
   "dashboard.charts.errorRate": "Hata Oranı (%)",
   "dashboard.charts.latency": "Ort. Gecikme (ms)",

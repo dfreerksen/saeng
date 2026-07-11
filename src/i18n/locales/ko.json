@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "비활성 매핑",
   "dashboard.stats.activeMocks": "활성 모의",
   "dashboard.stats.disabledMocks": "비활성 모의",
+  "dashboard.charts.empty": "아직 요청 데이터가 없습니다",
   "dashboard.charts.requestsPerMin": "요청 / 분",
   "dashboard.charts.errorRate": "오류율 (%)",
   "dashboard.charts.latency": "평균 지연 시간 (ms)",

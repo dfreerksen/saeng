@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "Ánh xạ bị tắt",
   "dashboard.stats.activeMocks": "Mock đang hoạt động",
   "dashboard.stats.disabledMocks": "Mock bị tắt",
+  "dashboard.charts.empty": "Chưa có dữ liệu yêu cầu",
   "dashboard.charts.requestsPerMin": "Yêu cầu / phút",
   "dashboard.charts.errorRate": "Tỷ lệ lỗi (%)",
   "dashboard.charts.latency": "Độ trễ TB (ms)",

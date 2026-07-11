@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "Отключённые сопоставления",
   "dashboard.stats.activeMocks": "Активные заглушки",
   "dashboard.stats.disabledMocks": "Отключённые заглушки",
+  "dashboard.charts.empty": "Пока нет данных о запросах",
   "dashboard.charts.requestsPerMin": "Запросов / мин",
   "dashboard.charts.errorRate": "Уровень ошибок (%)",
   "dashboard.charts.latency": "Средняя задержка (мс)",

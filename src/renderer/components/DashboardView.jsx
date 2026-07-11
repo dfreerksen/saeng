@@ -226,19 +226,31 @@ export default memo(function DashboardView({ entries, mappings, mocks, healthSta
           <div className="dashboard-chart-card">
             <div className="dashboard-chart-title">{t('dashboard.charts.requestsPerMin')}</div>
             <div className="dashboard-chart-body">
-              <Line data={requestsChartData} options={chartOptions} />
+              {totalRequests === 0 ? (
+                <div className="dashboard-chart-empty">{t('dashboard.charts.empty')}</div>
+              ) : (
+                <Line data={requestsChartData} options={chartOptions} />
+              )}
             </div>
           </div>
           <div className="dashboard-chart-card">
             <div className="dashboard-chart-title">{t('dashboard.charts.errorRate')}</div>
             <div className="dashboard-chart-body">
-              <Line data={errorChartData} options={chartOptions} />
+              {totalRequests === 0 ? (
+                <div className="dashboard-chart-empty">{t('dashboard.charts.empty')}</div>
+              ) : (
+                <Line data={errorChartData} options={chartOptions} />
+              )}
             </div>
           </div>
           <div className="dashboard-chart-card">
             <div className="dashboard-chart-title">{t('dashboard.charts.latency')}</div>
             <div className="dashboard-chart-body">
-              <Line data={latencyChartData} options={chartOptions} />
+              {totalRequests === 0 ? (
+                <div className="dashboard-chart-empty">{t('dashboard.charts.empty')}</div>
+              ) : (
+                <Line data={latencyChartData} options={chartOptions} />
+              )}
             </div>
           </div>
         </div>

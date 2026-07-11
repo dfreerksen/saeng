@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "已禁用映射",
   "dashboard.stats.activeMocks": "活跃模拟",
   "dashboard.stats.disabledMocks": "已禁用模拟",
+  "dashboard.charts.empty": "暂无请求数据",
   "dashboard.charts.requestsPerMin": "请求 / 分钟",
   "dashboard.charts.errorRate": "错误率 (%)",
   "dashboard.charts.latency": "平均延迟 (ms)",

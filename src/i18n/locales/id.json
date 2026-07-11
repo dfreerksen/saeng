@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "Pemetaan dinonaktifkan",
   "dashboard.stats.activeMocks": "Mock aktif",
   "dashboard.stats.disabledMocks": "Mock dinonaktifkan",
+  "dashboard.charts.empty": "Belum ada data permintaan",
   "dashboard.charts.requestsPerMin": "Permintaan / menit",
   "dashboard.charts.errorRate": "Tingkat Error (%)",
   "dashboard.charts.latency": "Latensi Rata-rata (ms)",

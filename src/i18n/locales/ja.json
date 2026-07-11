@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "無効なマッピング",
   "dashboard.stats.activeMocks": "有効なモック",
   "dashboard.stats.disabledMocks": "無効なモック",
+  "dashboard.charts.empty": "リクエストデータはまだありません",
   "dashboard.charts.requestsPerMin": "リクエスト / 分",
   "dashboard.charts.errorRate": "エラー率 (%)",
   "dashboard.charts.latency": "平均レイテンシ (ms)",

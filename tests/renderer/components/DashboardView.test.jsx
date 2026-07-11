@@ -193,18 +193,29 @@ describe('DashboardView — mapping and mock counts', () => {
 });
 
 describe('DashboardView — charts', () => {
-  it('renders three charts when logging is enabled', () => {
-    const { container } = renderDashboard({ settings: { loggingEnabled: true } });
+  it('renders three charts when logging is enabled and there is request data', () => {
+    const { container } = renderDashboard({ entries: SAMPLE_ENTRIES, settings: { loggingEnabled: true } });
     expect(container.querySelectorAll('[data-testid="chart"]')).toHaveLength(3);
     expect(screen.getByText('dashboard.charts.requestsPerMin')).toBeInTheDocument();
     expect(screen.getByText('dashboard.charts.errorRate')).toBeInTheDocument();
     expect(screen.getByText('dashboard.charts.latency')).toBeInTheDocument();
+    expect(screen.queryByText('dashboard.charts.empty')).not.toBeInTheDocument();
   });
 
   it('hides charts when logging is disabled', () => {
-    const { container } = renderDashboard({ settings: { loggingEnabled: false } });
+    const { container } = renderDashboard({ entries: SAMPLE_ENTRIES, settings: { loggingEnabled: false } });
     expect(container.querySelectorAll('[data-testid="chart"]')).toHaveLength(0);
     expect(screen.queryByText('dashboard.charts.requestsPerMin')).not.toBeInTheDocument();
+  });
+
+  it('shows a "no data yet" placeholder instead of charts when there are no log entries', () => {
+    const { container } = renderDashboard({ entries: [], settings: { loggingEnabled: true } });
+    expect(container.querySelectorAll('[data-testid="chart"]')).toHaveLength(0);
+    expect(screen.getAllByText('dashboard.charts.empty')).toHaveLength(3);
+    // The chart titles still render — only the chart body is replaced.
+    expect(screen.getByText('dashboard.charts.requestsPerMin')).toBeInTheDocument();
+    expect(screen.getByText('dashboard.charts.errorRate')).toBeInTheDocument();
+    expect(screen.getByText('dashboard.charts.latency')).toBeInTheDocument();
   });
 });
 

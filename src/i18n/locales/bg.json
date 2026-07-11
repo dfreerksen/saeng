@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "Деактивирани съпоставяния",
   "dashboard.stats.activeMocks": "Активни макети",
   "dashboard.stats.disabledMocks": "Деактивирани макети",
+  "dashboard.charts.empty": "Все още няма данни за заявки",
   "dashboard.charts.requestsPerMin": "Заявки / мин",
   "dashboard.charts.errorRate": "Процент грешки (%)",
   "dashboard.charts.latency": "Средно забавяне (мс)",

@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "Mappages désactivés",
   "dashboard.stats.activeMocks": "Mocks actifs",
   "dashboard.stats.disabledMocks": "Mocks désactivés",
+  "dashboard.charts.empty": "Aucune donnée de requête pour le moment",
   "dashboard.charts.requestsPerMin": "Requêtes / min",
   "dashboard.charts.errorRate": "Taux d'erreurs (%)",
   "dashboard.charts.latency": "Latence moyenne (ms)",

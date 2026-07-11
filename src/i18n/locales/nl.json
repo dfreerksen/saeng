@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "Uitgeschakelde toewijzingen",
   "dashboard.stats.activeMocks": "Actieve mocks",
   "dashboard.stats.disabledMocks": "Uitgeschakelde mocks",
+  "dashboard.charts.empty": "Nog geen aanvraaggegevens",
   "dashboard.charts.requestsPerMin": "Verzoeken / min",
   "dashboard.charts.errorRate": "Foutpercentage (%)",
   "dashboard.charts.latency": "Gem. latentie (ms)",

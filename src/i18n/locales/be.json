@@ -21,6 +21,7 @@
   "dashboard.stats.disabledMappings": "Адключаныя супастаўленні",
   "dashboard.stats.activeMocks": "Актыўныя імітацыі",
   "dashboard.stats.disabledMocks": "Адключаныя імітацыі",
+  "dashboard.charts.empty": "Пакуль няма дадзеных пра запыты",
   "dashboard.charts.requestsPerMin": "Запытаў / хв",
   "dashboard.charts.errorRate": "Узровень памылак (%)",
   "dashboard.charts.latency": "Сярэдняя затрымка (мс)",
