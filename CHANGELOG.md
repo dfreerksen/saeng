@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.25.0] - 2026-07-11
+
+### Added
+
+- Loading indicator while the app is starting up
+- "No data yet" message on Dashboard charts instead of an empty graph when there are no requests
+- In-app confirmation modals in place of native browser confirmation dialogs for destructive actions
+- Modals can now be closed by pressing Esc
+- Domain group counts shown in the Mappings/Mocks table group headers
+
+### Changed
+
+- Mocks table now uses the same status badge style as the Log view
+- Dashboard stat cards wrap more gracefully on narrow windows
+- Log table columns use fixed widths for a more consistent layout
+
+### Fixed
+
+- Fixed a couple of bugs where tooltips would stop working
+
+[1.25.0]: https://github.com/dfreerksen/saeng/releases/tag/v1.25.0
+
 ## [1.24.0] - 2026-07-02
 
 ### Added
