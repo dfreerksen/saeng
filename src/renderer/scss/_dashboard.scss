@@ -1,7 +1,7 @@
 .dashboard-stats {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   margin-bottom: 20px;
 }
 
@@ -9,6 +9,7 @@
   background: var(--saeng-primary-color);
   border: 1px solid var(--saeng-border);
   border-radius: var(--saeng-radius-md);
+  flex: 1 1 130px;
   padding: 16px;
   text-align: center;
 }
