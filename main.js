@@ -26,6 +26,15 @@ let proxyManager = null;
 let updateChecker = null;
 let isQuitting = false;
 
+function getCertManager() {
+  return CertManager.getInstance(store.getCertDir());
+}
+
+function hasTrayIcon(settings) {
+  const iconMode = settings.iconMode || 'both';
+  return iconMode === 'tray' || iconMode === 'both';
+}
+
 app.setAboutPanelOptions({
   applicationName: pkg.productName,
   applicationVersion: pkg.version,
@@ -62,9 +71,7 @@ function createWindow() {
 
   mainWindow.on('close', (event) => {
     store.setWindowBounds(mainWindow.getBounds());
-    const currentIconMode = store.getSettings().iconMode || 'both';
-    const hasTray = currentIconMode === 'tray' || currentIconMode === 'both';
-    if (hasTray && (process.platform === 'darwin' || process.platform === 'win32') && !isQuitting) {
+    if (hasTrayIcon(store.getSettings()) && (process.platform === 'darwin' || process.platform === 'win32') && !isQuitting) {
       event.preventDefault();
       mainWindow.hide();
     }
@@ -398,15 +405,14 @@ function setupIPC() {
       proxyManager.healthChecker.setTimeoutMs(updated.healthCheckTimeoutMs);
     }
     if ('iconMode' in patch) {
-      const newMode = updated.iconMode;
-      if ((newMode === 'tray' || newMode === 'both') && !tray) {
+      if (hasTrayIcon(updated) && !tray) {
         createTray();
         updateTrayMenu(proxyManager.isRunning());
-      } else if (newMode === 'dock' && tray) {
+      } else if (updated.iconMode === 'dock' && tray) {
         tray.destroy();
         tray = null;
       }
-      if (newMode === 'tray') {
+      if (updated.iconMode === 'tray') {
         app.dock?.hide();
       } else {
         app.dock?.show();
@@ -415,32 +421,22 @@ function setupIPC() {
     return updated;
   });
 
-  ipcMain.handle('ssl:get-ca-expiry', () =>
-    CertManager.getInstance(store.getCertDir()).getCAExpiry()
-  );
+  ipcMain.handle('ssl:get-ca-expiry', () => getCertManager().getCAExpiry());
 
-  ipcMain.handle('ssl:regenerate-ca', () =>
-    CertManager.getInstance(store.getCertDir()).regenerateCA()
-  );
+  ipcMain.handle('ssl:regenerate-ca', () => getCertManager().regenerateCA());
 
   ipcMain.handle('ssl:delete-ca', async () => {
-    const certManager = CertManager.getInstance(store.getCertDir());
+    const certManager = getCertManager();
     const untrustResult = await untrustCA(certManager.getCAPath());
     certManager.deleteCA();
     return { success: true, warning: untrustResult?.success === false ? untrustResult.message : null };
   });
 
-  ipcMain.handle('ssl:get-ca-path', () =>
-    CertManager.getInstance(store.getCertDir()).getCAPath()
-  );
+  ipcMain.handle('ssl:get-ca-path', () => getCertManager().getCAPath());
 
-  ipcMain.handle('ssl:reveal-ca', () =>
-    shell.showItemInFolder(CertManager.getInstance(store.getCertDir()).getCAPath())
-  );
+  ipcMain.handle('ssl:reveal-ca', () => shell.showItemInFolder(getCertManager().getCAPath()));
 
-  ipcMain.handle('ssl:trust-ca', () =>
-    trustCA(CertManager.getInstance(store.getCertDir()).getCAPath())
-  );
+  ipcMain.handle('ssl:trust-ca', () => trustCA(getCertManager().getCAPath()));
 
   ipcMain.handle('app:open-external', (_, url) => shell.openExternal(url));
 
@@ -487,7 +483,7 @@ app.whenReady().then(async () => {
   await clearSystemProxy({ onlyIfUrl: 'http://127.0.0.1:8181/proxy.pac' }).catch(() => {});
 
   // Pre-warm the CA cert so the first HTTPS connection is fast
-  CertManager.getInstance(store.getCertDir());
+  getCertManager();
 
   const nonce = randomBytes(16).toString('base64');
   protocol.handle('app', (request) => {
@@ -506,14 +502,14 @@ app.whenReady().then(async () => {
 
   setupIPC();
 
-  const iconMode = store.getSettings().iconMode || 'both';
-  if (iconMode === 'tray') {
+  const settings = store.getSettings();
+  if (settings.iconMode === 'tray') {
     app.dock?.hide();
   }
 
   createWindow();
 
-  if (iconMode === 'tray' || iconMode === 'both') {
+  if (hasTrayIcon(settings)) {
     createTray();
   }
 
@@ -535,9 +531,7 @@ app.on('activate', () => {
 });
 
 app.on('window-all-closed', () => {
-  const currentIconMode = store.getSettings().iconMode || 'both';
-  const hasTray = currentIconMode === 'tray' || currentIconMode === 'both';
-  if (process.platform === 'linux' || !hasTray) {
+  if (process.platform === 'linux' || !hasTrayIcon(store.getSettings())) {
     app.quit();
   }
 });
