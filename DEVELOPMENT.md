@@ -37,7 +37,7 @@ npm run js:build   # main.jsx -> src/renderer/scripts.js (esbuild)
 - `main.js` — Electron main process entry point; wires all IPC handlers in `setupIPC()`, creates the window/tray, and serves renderer files via a custom `app://` protocol.
 - `preload.cjs` — exposes `window.electronAPI` to the renderer via `contextBridge`. CommonJS by necessity (Electron preload sandbox).
 - `src/store.js` — persistent config (`electron-store`), schema for `mappings`, `mocks`, `windowBounds`, `settings`.
-- `src/proxy/` — `ProxyManager`, `HttpProxy`, `pacServer`, `certManager`, `requestLog`, `healthChecker`, `har`.
+- `src/proxy/` — `ProxyManager`, `HttpProxy` (with `requestUtils`, `mockMatcher`, `mockResponder` split out as sibling helper modules), `pacServer`, `certManager`, `requestLog`, `healthChecker`, `har`.
 - `src/ssl/` — CA trust helpers (`security`/`certutil`).
 - `src/systemProxy.js` — sets/clears the OS auto-proxy (`networksetup` on macOS, registry on Windows).
 - `src/i18n/` — `i18n.js` plus `locales/*.json` (21 languages).
