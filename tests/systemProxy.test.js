@@ -74,10 +74,10 @@ describe('setSystemProxy() on macOS', () => {
     expect(stateCalls[1][1]).toEqual(['-setautoproxystate', 'Ethernet', 'on']);
   });
 
-  it('skips VPN tunnel devices matching utun, ppp, or ipsec', async () => {
+  it('includes VPN tunnel devices (utun, ppp, ipsec) so the PAC applies while a VPN is primary', async () => {
     const output = makeServiceOrderOutput([
-      { index: 1, name: 'Wi-Fi', device: 'en0' },
-      { index: 2, name: 'VPN Cisco', device: 'utun0' },
+      { index: 1, name: 'VPN ExpressVPN', device: 'utun0' },
+      { index: 2, name: 'Wi-Fi', device: 'en0' },
       { index: 3, name: 'PPP Link', device: 'ppp0' },
       { index: 4, name: 'IPSec Tunnel', device: 'ipsec0' },
     ]);
@@ -89,8 +89,8 @@ describe('setSystemProxy() on macOS', () => {
     await setSystemProxy('http://127.0.0.1:8181/proxy.pac');
 
     const urlCalls = execAsyncMock.mock.calls.filter(([, a]) => a[0] === '-setautoproxyurl');
-    expect(urlCalls).toHaveLength(1);
-    expect(urlCalls[0][1][1]).toBe('Wi-Fi');
+    const names = urlCalls.map(([, a]) => a[1]);
+    expect(names).toEqual(['VPN ExpressVPN', 'Wi-Fi', 'PPP Link', 'IPSec Tunnel']);
   });
 
   it('skips disabled network services (prefixed with * in networksetup output)', async () => {
@@ -181,6 +181,42 @@ describe('clearSystemProxy() on macOS', () => {
 
     const stateCalls = execAsyncMock.mock.calls.filter(([, a]) => a[0] === '-setautoproxystate');
     expect(stateCalls).toHaveLength(0);
+  });
+
+  it('clears the VPN service on a targeted clear when its URL matches our PAC', async () => {
+    const PAC_URL = 'http://127.0.0.1:8181/proxy.pac';
+    const output = makeServiceOrderOutput([
+      { index: 1, name: 'VPN ExpressVPN', device: 'utun0' },
+      { index: 2, name: 'Wi-Fi', device: 'en0' },
+    ]);
+    execAsyncMock.mockImplementation(async (cmd, args) => {
+      if (args[0] === '-listnetworkserviceorder') return { stdout: output, stderr: '' };
+      if (args[0] === '-getautoproxyurl') return { stdout: `URL: ${PAC_URL}\nEnabled: Yes\n`, stderr: '' };
+      return { stdout: '', stderr: '' };
+    });
+
+    await clearSystemProxy({ onlyIfUrl: PAC_URL });
+
+    const stateCalls = execAsyncMock.mock.calls.filter(([, a]) => a[0] === '-setautoproxystate');
+    const names = stateCalls.map(([, a]) => a[1]);
+    expect(names).toEqual(expect.arrayContaining(['VPN ExpressVPN', 'Wi-Fi']));
+  });
+
+  it('excludes VPN services from a blind clear (no onlyIfUrl) to avoid disabling a VPN-managed proxy', async () => {
+    const output = makeServiceOrderOutput([
+      { index: 1, name: 'VPN ExpressVPN', device: 'utun0' },
+      { index: 2, name: 'Wi-Fi', device: 'en0' },
+    ]);
+    execAsyncMock.mockImplementation(async (cmd, args) => {
+      if (args[0] === '-listnetworkserviceorder') return { stdout: output, stderr: '' };
+      return { stdout: '', stderr: '' };
+    });
+
+    await clearSystemProxy();
+
+    const stateCalls = execAsyncMock.mock.calls.filter(([, a]) => a[0] === '-setautoproxystate');
+    const names = stateCalls.map(([, a]) => a[1]);
+    expect(names).toEqual(['Wi-Fi']);
   });
 });
 

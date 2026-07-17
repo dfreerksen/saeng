@@ -3,11 +3,21 @@ import { promisify } from 'util';
 
 const execAsync = promisify(execFile);
 
-// VPN tunnel devices — modifying their proxy settings disrupts the VPN connection
+// VPN tunnel devices (e.g. ExpressVPN's utun interface).
 const VPN_DEVICE_RE = /^(utun|ppp|ipsec)/i;
 
-// Returns enabled non-VPN network service names on macOS (e.g. ["Wi-Fi", "Ethernet"])
-async function getMacNetworkServices() {
+// Returns enabled network service names on macOS (e.g. ["Wi-Fi", "Ethernet"]).
+//
+// When a VPN is connected its tunnel service (utun/ppp/ipsec) becomes the OS's
+// *primary* network service, and macOS resolves proxies against the primary
+// service. If we skip that service the PAC is never applied to it, so every
+// request resolves DIRECT while the VPN is up — the app appears to stop working
+// until the VPN is turned off. Pass { includeVpn: true } to set the PAC on the
+// VPN service too. Applying an auto-proxy URL is non-destructive: our PAC only
+// returns PROXY for configured domains and DIRECT for everything else, so VPN
+// traffic is unaffected. VPN services are only excluded from the blind
+// (no-onlyIfUrl) clear, to avoid disabling a proxy the VPN itself manages.
+async function getMacNetworkServices({ includeVpn = false } = {}) {
   try {
     const { stdout } = await execAsync('/usr/sbin/networksetup', ['-listnetworkserviceorder']);
     const services = [];
@@ -18,7 +28,8 @@ async function getMacNetworkServices() {
       const name = nameMatch[2].trim();
       const deviceMatch = (lines[i + 1] || '').match(/Device:\s*(\S+)\)/);
       const device = deviceMatch ? deviceMatch[1] : null;
-      if (!device || !VPN_DEVICE_RE.test(device)) {
+      const isVpn = device && VPN_DEVICE_RE.test(device);
+      if (!isVpn || includeVpn) {
         services.push(name);
       }
     }
@@ -42,7 +53,9 @@ async function getMacAutoproxyUrl(service) {
 
 async function setSystemProxy(pacUrl) {
   if (process.platform === 'darwin') {
-    const services = await getMacNetworkServices();
+    // Include the VPN service so the PAC applies while a VPN is the primary
+    // network service (otherwise mappings stop resolving until the VPN is off).
+    const services = await getMacNetworkServices({ includeVpn: true });
     await Promise.allSettled(
       services.flatMap((service) => [
         execAsync('/usr/sbin/networksetup', ['-setautoproxyurl', service, pacUrl]),
@@ -69,7 +82,11 @@ async function setSystemProxy(pacUrl) {
 
 async function clearSystemProxy({ onlyIfUrl } = {}) {
   if (process.platform === 'darwin') {
-    let services = await getMacNetworkServices();
+    // For a targeted clear (onlyIfUrl) include the VPN service too, so we can
+    // undo the PAC we set on it — this is safe because we only disable services
+    // whose current URL already matches our own PAC. For a blind clear, exclude
+    // VPN services to avoid disabling a proxy the VPN itself manages.
+    let services = await getMacNetworkServices({ includeVpn: Boolean(onlyIfUrl) });
     if (onlyIfUrl) {
       const urls = await Promise.all(services.map((s) => getMacAutoproxyUrl(s)));
       services = services.filter((_, i) => urls[i] === onlyIfUrl);
