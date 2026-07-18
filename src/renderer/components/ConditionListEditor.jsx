@@ -1,7 +1,17 @@
+import { useRef } from 'react';
+
 const CONDITION_TYPES = ['header', 'query', 'body'];
 const CONDITION_OPERATORS = ['equals', 'contains', 'regex', 'exists'];
 
+let rowKeyCounter = 0;
+
 export default function ConditionListEditor({ conditions, onChange, t }) {
+  // Stable per-row keys: row objects are recreated on every edit, so identity
+  // can't be used, and index keys break focus when a middle row is removed.
+  const rowKeys = useRef([]).current;
+  while (rowKeys.length < conditions.length) rowKeys.push(`cond-${++rowKeyCounter}`);
+  if (rowKeys.length > conditions.length) rowKeys.length = conditions.length;
+
   function updateRow(index, field, value) {
     onChange(conditions.map((c, i) => (i === index ? { ...c, [field]: value } : c)));
   }
@@ -11,6 +21,7 @@ export default function ConditionListEditor({ conditions, onChange, t }) {
   }
 
   function removeRow(index) {
+    rowKeys.splice(index, 1);
     onChange(conditions.filter((_, i) => i !== index));
   }
 
@@ -21,7 +32,7 @@ export default function ConditionListEditor({ conditions, onChange, t }) {
         <span className="form-label-hint">{t('mappings.modals.manage.form.optional')}</span>
       </label>
       {conditions.map((condition, index) => (
-        <div className="header-row" key={index}>
+        <div className="header-row" key={rowKeys[index]}>
           <select
             className="form-input flex-1"
             value={condition.type}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const LOG_MAX_ENTRIES_MIN = 100;
 const LOG_MAX_ENTRIES_MAX = 100000;
@@ -18,9 +18,13 @@ export default function RequestLogsSection({ settings, onSettingsChange, showToa
     String(settings.logMaxEntries ?? LOG_MAX_ENTRIES_DEFAULT)
   );
 
-  useEffect(() => {
+  // Re-sync the draft when the setting changes from outside this component
+  // (adjust-state-during-render pattern, in place of a useEffect mirror).
+  const [prevLogMaxEntries, setPrevLogMaxEntries] = useState(settings.logMaxEntries);
+  if (settings.logMaxEntries !== prevLogMaxEntries) {
+    setPrevLogMaxEntries(settings.logMaxEntries);
     setLogMaxEntriesDraft(String(settings.logMaxEntries ?? LOG_MAX_ENTRIES_DEFAULT));
-  }, [settings.logMaxEntries]);
+  }
 
   function commitLogMaxEntries() {
     const clamped = clampLogMaxEntries(logMaxEntriesDraft);

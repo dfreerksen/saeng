@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const HEALTH_CHECK_INTERVAL_MIN_S = 5;
 const HEALTH_CHECK_INTERVAL_MAX_S = 300;
@@ -29,15 +29,21 @@ export default function HealthChecksSection({ settings, onSettingsChange, showTo
     String(settings.healthCheckTimeoutMs ?? HEALTH_CHECK_TIMEOUT_DEFAULT_MS)
   );
 
-  useEffect(() => {
+  // Re-sync drafts when the settings values change from outside this component
+  // (adjust-state-during-render pattern, in place of a useEffect mirror).
+  const [prevIntervalMs, setPrevIntervalMs] = useState(settings.healthCheckIntervalMs);
+  if (settings.healthCheckIntervalMs !== prevIntervalMs) {
+    setPrevIntervalMs(settings.healthCheckIntervalMs);
     setHealthCheckIntervalDraft(
       String(Math.round((settings.healthCheckIntervalMs ?? HEALTH_CHECK_INTERVAL_DEFAULT_S * 1000) / 1000))
     );
-  }, [settings.healthCheckIntervalMs]);
+  }
 
-  useEffect(() => {
+  const [prevTimeoutMs, setPrevTimeoutMs] = useState(settings.healthCheckTimeoutMs);
+  if (settings.healthCheckTimeoutMs !== prevTimeoutMs) {
+    setPrevTimeoutMs(settings.healthCheckTimeoutMs);
     setHealthCheckTimeoutDraft(String(settings.healthCheckTimeoutMs ?? HEALTH_CHECK_TIMEOUT_DEFAULT_MS));
-  }, [settings.healthCheckTimeoutMs]);
+  }
 
   function commitHealthCheckInterval() {
     const clampedSeconds = clampHealthCheckIntervalSeconds(healthCheckIntervalDraft);

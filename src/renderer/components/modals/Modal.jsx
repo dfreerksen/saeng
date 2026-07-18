@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 export default function Modal({ onClose, children }) {
-  const mouseDownOnBackdrop = useRef(false);
+  const mouseDownOnBackdropRef = useRef(false);
 
   useEffect(() => {
     document.body.classList.add('modal-open');
@@ -20,10 +20,10 @@ export default function Modal({ onClose, children }) {
     <>
       <div
         className="modal fade show d-block"
-        onMouseDown={(e) => { mouseDownOnBackdrop.current = e.target === e.currentTarget; }}
+        onMouseDown={(e) => { mouseDownOnBackdropRef.current = e.target === e.currentTarget; }}
         onClick={(e) => {
-          if (mouseDownOnBackdrop.current && e.target === e.currentTarget) onClose();
-          mouseDownOnBackdrop.current = false;
+          if (mouseDownOnBackdropRef.current && e.target === e.currentTarget) onClose();
+          mouseDownOnBackdropRef.current = false;
         }}
       >
         {children}

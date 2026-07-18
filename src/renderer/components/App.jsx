@@ -41,7 +41,7 @@ export default function App() {
   const [mocks, setMocks] = useState([]);
   const [requestLog, setRequestLog] = useState([]);
   const [healthStatuses, setHealthStatuses] = useState({});
-  const [settings, setSettingsState] = useState({});
+  const [settings, setSettings] = useState({});
   const [locales, setLocales] = useState([]);
   const [currentView, setCurrentView] = useState('mappings');
   const [modal, setModal] = useState(null);
@@ -55,24 +55,6 @@ export default function App() {
   const [updateInfo, setUpdateInfo] = useState({ updateAvailable: false, latestVersion: null, url: null });
   const [i18nStrings, setI18nStrings] = useState({});
   const logMaxEntriesRef = useRef(DEFAULT_LOG_MAX_ENTRIES);
-
-  useEffect(() => {
-    const max = settings.logMaxEntries || DEFAULT_LOG_MAX_ENTRIES;
-    logMaxEntriesRef.current = max;
-    setRequestLog((prev) => (prev.length > max ? prev.slice(prev.length - max) : prev));
-  }, [settings.logMaxEntries]);
-
-  useEffect(() => {
-    if (currentView === 'dashboard' && settings.dashboardEnabled === false) {
-      setCurrentView('mappings');
-    }
-  }, [currentView, settings.dashboardEnabled]);
-
-  useEffect(() => {
-    if (currentView === 'log' && settings.loggingEnabled === false) {
-      setCurrentView('mappings');
-    }
-  }, [currentView, settings.loggingEnabled]);
 
   const t = useCallback((key, vars) => {
     let str = i18nStrings[key] ?? key;
@@ -121,7 +103,8 @@ export default function App() {
       setNodeVersion(appInfo.node);
       setCaPath(caPathVal);
       setCaExpiry(caExpiryVal);
-      setSettingsState(settingsData);
+      setSettings(settingsData);
+      logMaxEntriesRef.current = settingsData.logMaxEntries || DEFAULT_LOG_MAX_ENTRIES;
       setLocales(localeList);
       setUpdateInfo(updateStatus);
 
@@ -233,7 +216,18 @@ export default function App() {
 
   const updateSettings = useCallback(async (patch) => {
     await window.electronAPI.settings.set(patch);
-    setSettingsState((prev) => ({ ...prev, ...patch }));
+    setSettings((prev) => ({ ...prev, ...patch }));
+    if ('logMaxEntries' in patch) {
+      const max = patch.logMaxEntries || DEFAULT_LOG_MAX_ENTRIES;
+      logMaxEntriesRef.current = max;
+      setRequestLog((prev) => (prev.length > max ? prev.slice(prev.length - max) : prev));
+    }
+    if (patch.dashboardEnabled === false) {
+      setCurrentView((view) => (view === 'dashboard' ? 'mappings' : view));
+    }
+    if (patch.loggingEnabled === false) {
+      setCurrentView((view) => (view === 'log' ? 'mappings' : view));
+    }
   }, []);
 
   const handleLocaleChange = useCallback(async (locale) => {

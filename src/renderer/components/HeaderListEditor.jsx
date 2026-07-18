@@ -1,4 +1,14 @@
+import { useRef } from 'react';
+
+let rowKeyCounter = 0;
+
 export default function HeaderListEditor({ headers, onChange, label, hint, t }) {
+  // Stable per-row keys: row objects are recreated on every edit, so identity
+  // can't be used, and index keys break focus when a middle row is removed.
+  const rowKeys = useRef([]).current;
+  while (rowKeys.length < headers.length) rowKeys.push(`hdr-${++rowKeyCounter}`);
+  if (rowKeys.length > headers.length) rowKeys.length = headers.length;
+
   function updateRow(index, field, value) {
     onChange(headers.map((h, i) => (i === index ? { ...h, [field]: value } : h)));
   }
@@ -8,6 +18,7 @@ export default function HeaderListEditor({ headers, onChange, label, hint, t }) 
   }
 
   function removeRow(index) {
+    rowKeys.splice(index, 1);
     onChange(headers.filter((_, i) => i !== index));
   }
 
@@ -18,7 +29,7 @@ export default function HeaderListEditor({ headers, onChange, label, hint, t }) 
         <span className="form-label-hint">{t('mappings.modals.manage.form.optional')}</span>
       </label>
       {headers.map((header, index) => (
-        <div className="header-row" key={index}>
+        <div className="header-row" key={rowKeys[index]}>
           <input
             className="form-input flex-1"
             placeholder={t('mappings.modals.manage.form.headers.name.placeholder')}

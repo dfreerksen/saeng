@@ -1,5 +1,5 @@
 import js from "@eslint/js";
-import react from "eslint-plugin-react";
+import eslintReact from "@eslint-react/eslint-plugin";
 import reactHooks from "eslint-plugin-react-hooks";
 import globals from "globals";
 import { defineConfig } from "eslint/config";
@@ -21,9 +21,8 @@ export default defineConfig([
   },
   {
     files: ["**/*.jsx"],
-    plugins: { js, react, "react-hooks": reactHooks },
-    settings: { react: { version: "19" } },
-    extends: ["js/recommended"],
+    plugins: { js, "react-hooks": reactHooks },
+    extends: ["js/recommended", eslintReact.configs.recommended],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -35,8 +34,6 @@ export default defineConfig([
       },
     },
     rules: {
-      "react/jsx-uses-vars": "error",
-      "react/no-unknown-property": "error",
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
     }

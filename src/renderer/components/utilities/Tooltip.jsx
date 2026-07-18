@@ -31,5 +31,9 @@ export default function Tooltip({ title, children }) {
     };
   }, [title]);
 
+  // cloneElement is deliberate here: the Bootstrap tooltip must attach to the
+  // caller's own element. A wrapper node would break tooltip positioning
+  // (Bootstrap reads the target's bounding box) and toolbar/flex layouts.
+  // eslint-disable-next-line @eslint-react/no-clone-element
   return cloneElement(children, { ref });
 }

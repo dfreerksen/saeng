@@ -130,7 +130,15 @@ function ResponseTab({ entry, settings, t }) {
 function QueryParamsTab({ entry, t }) {
   const params = useMemo(() => {
     const queryString = entry.path?.split('?')[1];
-    return queryString ? [...new URLSearchParams(queryString).entries()] : [];
+    if (!queryString) return [];
+    // Key by name=value plus an occurrence counter so repeated pairs stay unique
+    // without falling back to array indexes.
+    const seen = new Map();
+    return [...new URLSearchParams(queryString).entries()].map(([key, value]) => {
+      const occurrence = (seen.get(`${key}=${value}`) ?? 0) + 1;
+      seen.set(`${key}=${value}`, occurrence);
+      return { key, value, id: `${key}=${value}#${occurrence}` };
+    });
   }, [entry.path]);
 
   if (params.length === 0) {
@@ -139,8 +147,8 @@ function QueryParamsTab({ entry, t }) {
   return (
     <table className="log-details-headers">
       <tbody>
-        {params.map(([key, value], i) => (
-          <tr key={`${key}-${i}`}>
+        {params.map(({ key, value, id }) => (
+          <tr key={id}>
             <th scope="row">{key}</th>
             <td>{value}</td>
           </tr>
