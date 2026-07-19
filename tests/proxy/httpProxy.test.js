@@ -361,9 +361,9 @@ describe('HttpProxy request handling', () => {
   });
 });
 
-// _rewritePath()/_applyHeaderOverrides() are now one-line delegates to
-// requestUtils.js, unit-tested in tests/proxy/requestUtils.test.js. The
-// "HttpProxy request handling" suite above covers both wired into a real
+// Path rewriting and header overrides live in requestUtils.js (called
+// directly by HttpProxy), unit-tested in tests/proxy/requestUtils.test.js.
+// The "HttpProxy request handling" suite above covers both wired into a real
 // proxied request (path rewriting, request/response header overrides).
 
 describe('HttpProxy._recordRequest()', () => {

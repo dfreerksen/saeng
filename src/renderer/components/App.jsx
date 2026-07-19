@@ -11,8 +11,6 @@ import Toast from './utilities/Toast.jsx';
 import { getOS } from '../js/os.js';
 import { Tooltip as BsTooltip } from 'bootstrap';
 
-const DEFAULT_LOG_MAX_ENTRIES = 300;
-
 const MOCK_DRAFT_HEADERS = new Set(['content-type', 'content-length']);
 
 function buildMockDraftFromEntry(entry, mappingId) {
@@ -54,7 +52,8 @@ export default function App() {
   const [caExpiry, setCaExpiry] = useState(null);
   const [updateInfo, setUpdateInfo] = useState({ updateAvailable: false, latestVersion: null, url: null });
   const [i18nStrings, setI18nStrings] = useState({});
-  const logMaxEntriesRef = useRef(DEFAULT_LOG_MAX_ENTRIES);
+  // Pre-init fallback; the real value comes from settings once init() resolves.
+  const logMaxEntriesRef = useRef(300);
 
   const t = useCallback((key, vars) => {
     let str = i18nStrings[key] ?? key;
@@ -104,11 +103,11 @@ export default function App() {
       setCaPath(caPathVal);
       setCaExpiry(caExpiryVal);
       setSettings(settingsData);
-      logMaxEntriesRef.current = settingsData.logMaxEntries || DEFAULT_LOG_MAX_ENTRIES;
+      logMaxEntriesRef.current = settingsData.logMaxEntries;
       setLocales(localeList);
       setUpdateInfo(updateStatus);
 
-      if (settingsData.dashboardEnabled !== false) {
+      if (settingsData.dashboardEnabled) {
         setCurrentView('dashboard');
       }
 
@@ -218,7 +217,7 @@ export default function App() {
     await window.electronAPI.settings.set(patch);
     setSettings((prev) => ({ ...prev, ...patch }));
     if ('logMaxEntries' in patch) {
-      const max = patch.logMaxEntries || DEFAULT_LOG_MAX_ENTRIES;
+      const max = patch.logMaxEntries;
       logMaxEntriesRef.current = max;
       setRequestLog((prev) => (prev.length > max ? prev.slice(prev.length - max) : prev));
     }
@@ -293,8 +292,8 @@ export default function App() {
         <Sidebar
           currentView={currentView}
           setCurrentView={setCurrentView}
-          dashboardEnabled={settings.dashboardEnabled !== false}
-          loggingEnabled={settings.loggingEnabled !== false}
+          dashboardEnabled={!!settings.dashboardEnabled}
+          loggingEnabled={!!settings.loggingEnabled}
           onAbout={handleOpenAboutModal}
           t={t}
         />

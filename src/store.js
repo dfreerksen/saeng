@@ -3,8 +3,8 @@ import { randomUUID } from 'crypto';
 import path from 'path';
 import { app } from 'electron';
 import { DEFAULT_INTERVAL_MS as DEFAULT_HEALTH_CHECK_INTERVAL_MS, DEFAULT_TIMEOUT_MS as DEFAULT_HEALTH_CHECK_TIMEOUT_MS } from './proxy/healthChecker.js';
+import { DEFAULT_MAX_ENTRIES as DEFAULT_LOG_MAX_ENTRIES } from './proxy/requestLog.js';
 
-const DEFAULT_LOG_MAX_ENTRIES = 300;
 const MIN_LOG_MAX_ENTRIES = 100;
 const MAX_LOG_MAX_ENTRIES = 100000;
 
@@ -49,6 +49,27 @@ const conditionListSchema = {
       value: { type: 'string' },
     },
   },
+};
+
+// Single source of truth for settings defaults. The electron-store schema
+// default only applies when the whole `settings` key is missing, so
+// getSettings() also merges these over the stored object — keys added in
+// later versions resolve to their default for existing stores instead of
+// being undefined.
+export const DEFAULT_SETTINGS = {
+  httpsEnabled: true,
+  startOnLaunch: true,
+  colorMode: 'auto',
+  locale: 'en',
+  iconMode: 'both',
+  dashboardEnabled: false,
+  logMaxEntries: DEFAULT_LOG_MAX_ENTRIES,
+  loggingEnabled: true,
+  logHeadersEnabled: false,
+  logBodyEnabled: false,
+  healthCheckEnabled: false,
+  healthCheckIntervalMs: DEFAULT_HEALTH_CHECK_INTERVAL_MS,
+  healthCheckTimeoutMs: DEFAULT_HEALTH_CHECK_TIMEOUT_MS,
 };
 
 const schema = {
@@ -106,21 +127,7 @@ const schema = {
   },
   settings: {
     type: 'object',
-    default: {
-      httpsEnabled: true,
-      startOnLaunch: true,
-      colorMode: 'auto',
-      locale: 'en',
-      iconMode: 'both',
-      dashboardEnabled: false,
-      logMaxEntries: DEFAULT_LOG_MAX_ENTRIES,
-      loggingEnabled: true,
-      logHeadersEnabled: false,
-      logBodyEnabled: false,
-      healthCheckEnabled: false,
-      healthCheckIntervalMs: DEFAULT_HEALTH_CHECK_INTERVAL_MS,
-      healthCheckTimeoutMs: DEFAULT_HEALTH_CHECK_TIMEOUT_MS,
-    },
+    default: { ...DEFAULT_SETTINGS },
   },
 };
 
@@ -148,22 +155,12 @@ function sanitizeMockDelayMs(delayMs) {
   return Math.min(MAX_MOCK_DELAY_MS, Math.max(MIN_MOCK_DELAY_MS, parsed));
 }
 
-// Normalizes a path-rewrite prefix: trims whitespace, ensures a leading
-// slash (unless empty — empty means "no rewrite"), and strips a single
-// trailing slash (unless the value is just '/').
-function sanitizePathRewriteFrom(value) {
-  let v = String(value ?? '').trim();
-  if (!v) return '';
-  if (!v.startsWith('/')) v = `/${v}`;
-  if (v.length > 1 && v.endsWith('/')) v = v.slice(0, -1);
-  return v;
-}
-
-// Normalizes a path-rewrite replacement the same way as
-// sanitizePathRewriteFrom, except empty stays empty (a valid "strip the
-// prefix entirely" value, unlike pathRewriteFrom where empty disables
-// rewriting altogether).
-function sanitizePathRewriteTo(value) {
+// Normalizes a path-rewrite value (used for both pathRewriteFrom and
+// pathRewriteTo): trims whitespace, ensures a leading slash, and strips a
+// single trailing slash (unless the value is just '/'). Empty stays empty —
+// for pathRewriteFrom that disables rewriting, for pathRewriteTo it means
+// "strip the prefix entirely".
+function sanitizePathRewrite(value) {
   let v = String(value ?? '').trim();
   if (!v) return '';
   if (!v.startsWith('/')) v = `/${v}`;
@@ -231,8 +228,8 @@ class AppStore {
       requestHeaders: sanitizeHeaders(data.requestHeaders),
       responseHeaders: sanitizeHeaders(data.responseHeaders),
       mocksEnabled: !!data.mocksEnabled,
-      pathRewriteFrom: sanitizePathRewriteFrom(data.pathRewriteFrom),
-      pathRewriteTo: sanitizePathRewriteTo(data.pathRewriteTo),
+      pathRewriteFrom: sanitizePathRewrite(data.pathRewriteFrom),
+      pathRewriteTo: sanitizePathRewrite(data.pathRewriteTo),
     };
     mappings.push(mapping);
     this.store.set('mappings', mappings);
@@ -256,8 +253,8 @@ class AppStore {
         requestHeaders: sanitizeHeaders(data.requestHeaders),
         responseHeaders: sanitizeHeaders(data.responseHeaders),
         mocksEnabled: !!data.mocksEnabled,
-        pathRewriteFrom: sanitizePathRewriteFrom(data.pathRewriteFrom),
-        pathRewriteTo: sanitizePathRewriteTo(data.pathRewriteTo),
+        pathRewriteFrom: sanitizePathRewrite(data.pathRewriteFrom),
+        pathRewriteTo: sanitizePathRewrite(data.pathRewriteTo),
       };
     });
     this.store.set('mappings', mappings);
@@ -436,21 +433,7 @@ class AppStore {
   }
 
   getSettings() {
-    return this.store.get('settings', {
-      httpsEnabled: false,
-      startOnLaunch: false,
-      colorMode: 'auto',
-      locale: 'en',
-      iconMode: 'both',
-      dashboardEnabled: false,
-      logMaxEntries: DEFAULT_LOG_MAX_ENTRIES,
-      loggingEnabled: true,
-      logHeadersEnabled: false,
-      logBodyEnabled: false,
-      healthCheckEnabled: false,
-      healthCheckIntervalMs: DEFAULT_HEALTH_CHECK_INTERVAL_MS,
-      healthCheckTimeoutMs: DEFAULT_HEALTH_CHECK_TIMEOUT_MS,
-    });
+    return { ...DEFAULT_SETTINGS, ...this.store.get('settings', {}) };
   }
 
   setSettings(patch) {

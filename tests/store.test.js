@@ -764,32 +764,41 @@ describe('AppStore.getSettings() / setSettings()', () => {
   it('getSettings() returns the default settings when nothing has been set', () => {
     const settings = store.getSettings();
     expect(settings).toMatchObject({
-      httpsEnabled: false,
-      startOnLaunch: false,
+      httpsEnabled: true,
+      startOnLaunch: true,
       colorMode: 'auto',
       locale: 'en',
     });
   });
 
-  it('setSettings() merges the patch over the current settings', () => {
-    store.setSettings({ httpsEnabled: true });
+  it('getSettings() fills in defaults for keys missing from a stored settings object', () => {
+    // Simulate a store written by an older version that predates newer keys.
+    store.store.set('settings', { locale: 'de' });
     const settings = store.getSettings();
+    expect(settings.locale).toBe('de');
     expect(settings.httpsEnabled).toBe(true);
-    expect(settings.startOnLaunch).toBe(false); // untouched
+    expect(settings.logMaxEntries).toBe(300);
+  });
+
+  it('setSettings() merges the patch over the current settings', () => {
+    store.setSettings({ httpsEnabled: false });
+    const settings = store.getSettings();
+    expect(settings.httpsEnabled).toBe(false);
+    expect(settings.startOnLaunch).toBe(true); // untouched
   });
 
   it('setSettings() returns the merged settings', () => {
     const result = store.setSettings({ locale: 'fr' });
     expect(result.locale).toBe('fr');
-    expect(result.httpsEnabled).toBe(false);
+    expect(result.httpsEnabled).toBe(true);
   });
 
   it('multiple setSettings() calls accumulate correctly', () => {
-    store.setSettings({ httpsEnabled: true });
-    store.setSettings({ startOnLaunch: true });
+    store.setSettings({ httpsEnabled: false });
+    store.setSettings({ startOnLaunch: false });
     const settings = store.getSettings();
-    expect(settings.httpsEnabled).toBe(true);
-    expect(settings.startOnLaunch).toBe(true);
+    expect(settings.httpsEnabled).toBe(false);
+    expect(settings.startOnLaunch).toBe(false);
   });
 
   it('getSettings() defaults logMaxEntries to 300', () => {

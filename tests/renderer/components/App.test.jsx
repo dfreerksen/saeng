@@ -56,7 +56,7 @@ function makeElectronAPI(overrides = {}) {
       ...overrides.health,
     },
     settings: {
-      get: vi.fn().mockResolvedValue({ httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en', healthCheckEnabled: true, dashboardEnabled: false }),
+      get: vi.fn().mockResolvedValue({ httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en', loggingEnabled: true, healthCheckEnabled: true, dashboardEnabled: false }),
       set: vi.fn().mockResolvedValue(undefined),
       ...overrides.settings,
     },
@@ -178,7 +178,7 @@ describe('App — navigation', () => {
   it('shows the dashboard view on init when dashboardEnabled is true', async () => {
     await renderApp({
       settings: {
-        get: vi.fn().mockResolvedValue({ httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en', healthCheckEnabled: true, dashboardEnabled: true }),
+        get: vi.fn().mockResolvedValue({ httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en', loggingEnabled: true, healthCheckEnabled: true, dashboardEnabled: true }),
       },
     });
     expect(document.querySelector('#view-dashboard')).toBeInTheDocument();
@@ -186,7 +186,7 @@ describe('App — navigation', () => {
   });
 
   it('redirects from dashboard to mappings when dashboardEnabled becomes false', async () => {
-    let settingsData = { httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en', healthCheckEnabled: true, dashboardEnabled: true };
+    let settingsData = { httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en', loggingEnabled: true, healthCheckEnabled: true, dashboardEnabled: true };
     const setFn = vi.fn().mockImplementation((patch) => {
       settingsData = { ...settingsData, ...patch };
       return Promise.resolve(settingsData);
@@ -302,7 +302,7 @@ describe('App — request log', () => {
         onEntry: vi.fn((cb) => { pushEntry = cb; }),
       },
       settings: {
-        get: vi.fn().mockResolvedValue({ httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en', logMaxEntries: 1 }),
+        get: vi.fn().mockResolvedValue({ httpsEnabled: true, startOnLaunch: false, colorMode: 'auto', locale: 'en', loggingEnabled: true, logMaxEntries: 1 }),
       },
     });
     fireEvent.click(screen.getByText('nav.log').closest('button'));

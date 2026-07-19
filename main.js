@@ -31,8 +31,7 @@ function getCertManager() {
 }
 
 function hasTrayIcon(settings) {
-  const iconMode = settings.iconMode || 'both';
-  return iconMode === 'tray' || iconMode === 'both';
+  return settings.iconMode === 'tray' || settings.iconMode === 'both';
 }
 
 app.setAboutPanelOptions({

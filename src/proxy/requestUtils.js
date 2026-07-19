@@ -10,6 +10,21 @@ export function applyHeaderOverrides(headers, overrides) {
   return headers;
 }
 
+// For absolute-form proxy request URLs (http://host/path?q=1), returns just
+// the path + query string. Origin-form paths and unparsable URLs are
+// returned unchanged.
+export function toPathWithQuery(url) {
+  if (!url || (!url.startsWith('http://') && !url.startsWith('https://'))) {
+    return url;
+  }
+  try {
+    const parsed = new URL(url);
+    return parsed.pathname + parsed.search;
+  } catch {
+    return url;
+  }
+}
+
 // Rewrites the path portion of `pathWithQuery` by replacing a matched
 // mapping.pathRewriteFrom prefix with mapping.pathRewriteTo, preserving
 // the query string. Only rewrites on an exact match or a `from + '/'`

@@ -71,7 +71,7 @@ export default memo(function DashboardView({ entries, mappings, mocks, healthSta
   const textColor = isDark ? '#a8a29e' : '#57534e';
   const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
 
-  const loggingEnabled = settings.loggingEnabled !== false;
+  const loggingEnabled = !!settings.loggingEnabled;
 
   const timeSeries = useMemo(() => computeTimeSeries(entries), [entries]);
 

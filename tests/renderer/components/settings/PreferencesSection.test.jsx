@@ -89,9 +89,9 @@ describe('PreferencesSection — locale', () => {
 });
 
 describe('PreferencesSection — dashboard toggle', () => {
-  it('is checked when dashboardEnabled is not set (defaults true)', () => {
+  it('is unchecked when dashboardEnabled is not set (defaults false)', () => {
     const { container } = renderSection({ settings: { ...SAMPLE_SETTINGS, dashboardEnabled: undefined } });
-    expect(container.querySelector('.toggle input[type="checkbox"]')).toBeChecked();
+    expect(container.querySelector('.toggle input[type="checkbox"]')).not.toBeChecked();
   });
 
   it('is unchecked when dashboardEnabled is false', () => {

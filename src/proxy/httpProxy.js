@@ -2,7 +2,7 @@ import http from 'http';
 import https from 'https';
 import net from 'net';
 import tls from 'tls';
-import { applyHeaderOverrides, rewritePath } from './requestUtils.js';
+import { applyHeaderOverrides, rewritePath, toPathWithQuery } from './requestUtils.js';
 import { compileMockRules, findMock } from './mockMatcher.js';
 import { serveMock } from './mockResponder.js';
 
@@ -25,7 +25,11 @@ class HttpProxy {
   }
 
   updateMappings(mappings) {
-    const enabled = mappings.filter((m) => m.enabled);
+    // Normalize host once here so the request/tunnel/upgrade handlers don't
+    // each need a `|| '127.0.0.1'` fallback.
+    const enabled = mappings
+      .filter((m) => m.enabled)
+      .map((m) => (m.host ? m : { ...m, host: '127.0.0.1' }));
     this.mappings = new Map(
       enabled.filter((m) => !m.domain.startsWith('*.')).map((m) => [m.domain, m])
     );
@@ -33,14 +37,6 @@ class HttpProxy {
       .filter((m) => m.domain.startsWith('*.'))
       .map((m) => ({ base: m.domain.slice(2), mapping: m }))
       .sort((a, b) => b.base.length - a.base.length);
-  }
-
-  _applyHeaderOverrides(headers, overrides) {
-    return applyHeaderOverrides(headers, overrides);
-  }
-
-  _rewritePath(mapping, pathWithQuery) {
-    return rewritePath(mapping, pathWithQuery);
   }
 
   findMapping(hostname) {
@@ -62,17 +58,6 @@ class HttpProxy {
     const { byMapping, needsBody } = compileMockRules(mocks);
     this.mocks = byMapping;
     this.mocksNeedBody = needsBody;
-  }
-
-  _findMock(mapping, method, pathname, extra = {}) {
-    return findMock(this.mocks, mapping, method, pathname, extra);
-  }
-
-  // `bufferedBody`, when provided, is the request body already drained by
-  // `_readFullBody` (for mappings with a body condition) — reused here
-  // instead of re-reading `req`, whose stream has already ended.
-  _serveMock(mock, req, res, record, match, bufferedBody = null) {
-    serveMock(mock, req, res, record, match, this.requestLog, bufferedBody);
   }
 
   async start(mappings, settings) {
@@ -185,15 +170,7 @@ class HttpProxy {
     if (logBody) this._captureBody(req, record, 'requestBody');
 
     res.on('finish', () => {
-      let reqPath = req.url || '/';
-      if (reqPath.startsWith('http://') || reqPath.startsWith('https://')) {
-        try {
-          const parsed = new URL(reqPath);
-          reqPath = parsed.pathname + parsed.search;
-        } catch {
-          // leave reqPath as the raw URL
-        }
-      }
+      const reqPath = toPathWithQuery(req.url || '/');
 
       this.requestLog.add({
         timestamp: startedAt,
@@ -234,16 +211,7 @@ class HttpProxy {
     }
 
     // For HTTP proxy requests the URL is absolute; extract just the path+query
-    let reqPath = req.url;
-    if (reqPath.startsWith('http://') || reqPath.startsWith('https://')) {
-      try {
-        const parsed = new URL(reqPath);
-        reqPath = parsed.pathname + parsed.search;
-      } catch (err) {
-        console.error(`Failed to parse URL ${reqPath}:`, err);
-        // fall through with original
-      }
-    }
+    const reqPath = toPathWithQuery(req.url);
 
     this._dispatch(req, res, mapping, reqPath || '/', record, true);
   }
@@ -304,17 +272,20 @@ class HttpProxy {
       body: bufferedBody !== null ? bufferedBody.toString('utf8') : undefined,
     };
 
-    const found = this._findMock(mapping, req.method, pathname, extra);
+    // `bufferedBody`, when provided, is the request body already drained by
+    // `_readFullBody` (for mappings with a body condition) — replayed to the
+    // mock/backend instead of re-reading `req`, whose stream has already ended.
+    const found = findMock(this.mocks, mapping, req.method, pathname, extra);
     if (found) {
-      this._serveMock(found.mock, req, res, record, found.match, bufferedBody);
+      serveMock(found.mock, req, res, record, found.match, this.requestLog, bufferedBody);
       return;
     }
 
-    const backendPath = this._rewritePath(mapping, pathWithQuery || '/');
+    const backendPath = rewritePath(mapping, pathWithQuery || '/');
 
     const backendProto = mapping.https ? https : http;
     const options = {
-      hostname: mapping.host || '127.0.0.1',
+      hostname: mapping.host,
       port: mapping.port,
       method: req.method,
       path: backendPath,
@@ -322,10 +293,10 @@ class HttpProxy {
       ...(mapping.https && { rejectUnauthorized: false }),
     };
     if (stripProxyConnectionHeader) delete options.headers['proxy-connection'];
-    this._applyHeaderOverrides(options.headers, mapping.requestHeaders);
+    applyHeaderOverrides(options.headers, mapping.requestHeaders);
 
     const proxyReq = backendProto.request(options, (proxyRes) => {
-      const headers = this._applyHeaderOverrides({ ...proxyRes.headers }, mapping.responseHeaders);
+      const headers = applyHeaderOverrides({ ...proxyRes.headers }, mapping.responseHeaders);
       if (record && this.requestLog.logHeaders) record.responseHeaders = { ...headers };
       if (record && this.requestLog.logBody) this._captureBody(proxyRes, record, 'responseBody');
       res.writeHead(proxyRes.statusCode, headers);
@@ -359,7 +330,7 @@ class HttpProxy {
 
     if (!this.httpsEnabled || !this.internalHttpsPort) {
       // HTTPS not enabled — tunnel raw TCP to the backend (no SSL termination)
-      this._tunnelRaw(clientSocket, head, mapping.port, mapping.host || '127.0.0.1');
+      this._tunnelRaw(clientSocket, head, mapping.port, mapping.host);
       return;
     }
 
@@ -399,10 +370,10 @@ class HttpProxy {
       return;
     }
 
-    const serverSocket = net.connect(mapping.port, mapping.host || '127.0.0.1', () => {
+    const serverSocket = net.connect(mapping.port, mapping.host, () => {
       // Replay the upgrade request to the backend
-      const headers = this._applyHeaderOverrides({ ...req.headers }, mapping.requestHeaders);
-      const backendPath = this._rewritePath(mapping, req.url || '/');
+      const headers = applyHeaderOverrides({ ...req.headers }, mapping.requestHeaders);
+      const backendPath = rewritePath(mapping, req.url || '/');
       let requestLine = `${req.method} ${backendPath} HTTP/${req.httpVersion}\r\n`;
       serverSocket.write(requestLine);
       Object.entries(headers).forEach(([k, v]) => {

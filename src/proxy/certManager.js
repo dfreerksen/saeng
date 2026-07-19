@@ -63,7 +63,8 @@ class CertManager {
     cert.sign(keys.privateKey, forge.md.sha256.create());
 
     fs.writeFileSync(caPath, forge.pki.certificateToPem(cert));
-    fs.writeFileSync(caKeyPath, forge.pki.privateKeyToPem(keys.privateKey));
+    // Private key is MITM signing material — owner read/write only.
+    fs.writeFileSync(caKeyPath, forge.pki.privateKeyToPem(keys.privateKey), { mode: 0o600 });
 
     this.ca = cert;
     this.caKey = keys.privateKey;
@@ -121,7 +122,7 @@ class CertManager {
     const keyPem = forge.pki.privateKeyToPem(keys.privateKey);
 
     fs.writeFileSync(path.join(this.certDir, `${hostname}.crt`), certPem);
-    fs.writeFileSync(path.join(this.certDir, `${hostname}.key`), keyPem);
+    fs.writeFileSync(path.join(this.certDir, `${hostname}.key`), keyPem, { mode: 0o600 });
 
     const result = { cert: certPem, key: keyPem };
     this.cache.set(hostname, result);

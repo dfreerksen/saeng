@@ -47,7 +47,7 @@ export default function PreferencesSection({ settings, locales, onSettingsChange
         <label className="toggle">
           <input
             type="checkbox"
-            checked={settings.dashboardEnabled !== false}
+            checked={!!settings.dashboardEnabled}
             onChange={async (e) => {
               const checked = e.target.checked;
               await onSettingsChange({ dashboardEnabled: checked });
