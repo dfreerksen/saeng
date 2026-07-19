@@ -936,6 +936,30 @@ describe('AppStore.getSettings() / setSettings()', () => {
   });
 });
 
+describe('AppStore.getWindowBounds() / setWindowBounds()', () => {
+  it('getWindowBounds() returns the default size when nothing has been saved', () => {
+    expect(store.getWindowBounds()).toEqual({ width: 940, height: 680 });
+  });
+
+  it('round-trips a saved size', () => {
+    store.setWindowBounds({ width: 1200, height: 800 });
+    expect(store.getWindowBounds()).toEqual({ width: 1200, height: 800 });
+  });
+
+  it('persists only width and height from a full bounds object', () => {
+    // main.js passes mainWindow.getBounds(), which also carries x/y —
+    // position is intentionally not remembered.
+    store.setWindowBounds({ x: 20, y: 40, width: 1024, height: 700 });
+    expect(store.getWindowBounds()).toEqual({ width: 1024, height: 700 });
+  });
+
+  it('overwrites the previously saved size', () => {
+    store.setWindowBounds({ width: 1200, height: 800 });
+    store.setWindowBounds({ width: 900, height: 650 });
+    expect(store.getWindowBounds()).toEqual({ width: 900, height: 650 });
+  });
+});
+
 describe('AppStore.getCertDir()', () => {
   it('returns a path inside the userData directory', () => {
     const certDir = store.getCertDir();

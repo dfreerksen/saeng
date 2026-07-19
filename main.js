@@ -70,7 +70,21 @@ function createWindow() {
 
   mainWindow.once('ready-to-show', () => mainWindow.show());
 
+  // Persist the size as the user resizes (debounced), so the last size
+  // survives even when the app exits without a clean window close
+  // (crash, force-quit). The close handler below still saves as a catch-all.
+  let saveBoundsTimer = null;
+  mainWindow.on('resize', () => {
+    clearTimeout(saveBoundsTimer);
+    saveBoundsTimer = setTimeout(() => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        store.setWindowBounds(mainWindow.getBounds());
+      }
+    }, 500);
+  });
+
   mainWindow.on('close', (event) => {
+    clearTimeout(saveBoundsTimer);
     store.setWindowBounds(mainWindow.getBounds());
     if (hasTrayIcon(store.getSettings()) && (process.platform === 'darwin' || process.platform === 'win32') && !isQuitting) {
       event.preventDefault();
