@@ -10,6 +10,12 @@ import { serveMock } from './mockResponder.js';
 // log, to bound memory use for large uploads/downloads.
 const MAX_BODY_CAPTURE_BYTES = 64 * 1024;
 
+// Cap on how much of a request body is buffered for mock body-condition
+// matching. Bodies larger than this are treated as "no body" for matching
+// (body conditions fail) and are streamed to the backend instead of being
+// buffered whole.
+const MAX_MOCK_BODY_MATCH_BYTES = 1024 * 1024;
+
 class HttpProxy {
   constructor(certManager, requestLog = null) {
     this.certManager = certManager;
@@ -245,15 +251,28 @@ class HttpProxy {
     this._dispatch(req, res, mapping, req.url || '/', record, false);
   }
 
-  // Reads the full request body into a Buffer, resolving once the stream
-  // ends. Used only for mappings with a body-conditioned mock, since the
-  // buffer must be complete to replay to the real backend when no mock
-  // matches (streams can only be consumed once).
-  _readFullBody(req) {
+  // Reads the request body into a Buffer for mock body-condition matching,
+  // up to MAX_MOCK_BODY_MATCH_BYTES. Resolves { body, complete }: when the
+  // cap is hit the stream is paused with `complete: false`, so the caller
+  // can replay the buffered part and pipe the rest to the backend (a
+  // request stream can only be consumed once).
+  _readBodyForMatching(req) {
     return new Promise((resolve) => {
       const chunks = [];
-      req.on('data', (chunk) => chunks.push(chunk));
-      req.on('end', () => resolve(Buffer.concat(chunks)));
+      let total = 0;
+      const onData = (chunk) => {
+        chunks.push(chunk);
+        total += chunk.length;
+        if (total >= MAX_MOCK_BODY_MATCH_BYTES) {
+          req.pause();
+          req.off('data', onData);
+          req.off('end', onEnd);
+          resolve({ body: Buffer.concat(chunks), complete: false });
+        }
+      };
+      const onEnd = () => resolve({ body: Buffer.concat(chunks), complete: true });
+      req.on('data', onData);
+      req.on('end', onEnd);
     });
   }
 
@@ -262,8 +281,8 @@ class HttpProxy {
   // otherwise continues immediately, preserving today's streaming fast path.
   _dispatch(req, res, mapping, pathWithQuery, record, stripProxyConnectionHeader) {
     if (mapping.mocksEnabled && this.mocksNeedBody.has(mapping.id)) {
-      this._readFullBody(req).then((bufferedBody) => {
-        this._continueRequest(req, res, mapping, pathWithQuery, record, stripProxyConnectionHeader, bufferedBody);
+      this._readBodyForMatching(req).then((buffered) => {
+        this._continueRequest(req, res, mapping, pathWithQuery, record, stripProxyConnectionHeader, buffered);
       });
       return;
     }
@@ -272,9 +291,12 @@ class HttpProxy {
 
   // Shared tail of _handleRequest/_handleDecryptedRequest: finds a matching
   // mock (using headers/query/body available at this point) or forwards to
-  // the real backend, replaying `bufferedBody` instead of piping `req` when
-  // the body was already buffered upstream.
-  _continueRequest(req, res, mapping, pathWithQuery, record, stripProxyConnectionHeader, bufferedBody) {
+  // the real backend. `buffered` ({ body, complete }), when provided, is the
+  // request body already read by `_readBodyForMatching` — replayed to the
+  // mock/backend instead of re-reading `req` (a stream can only be consumed
+  // once). An incomplete buffer (body larger than the matching cap) is
+  // treated as "no body" for matching, so body conditions fail.
+  _continueRequest(req, res, mapping, pathWithQuery, record, stripProxyConnectionHeader, buffered) {
     const input = pathWithQuery || '/';
     const qIndex = input.indexOf('?');
     const pathname = qIndex === -1 ? input : input.slice(0, qIndex);
@@ -282,15 +304,17 @@ class HttpProxy {
     const extra = {
       query,
       headers: req.headers,
-      body: bufferedBody !== null ? bufferedBody.toString('utf8') : undefined,
+      body: buffered?.complete ? buffered.body.toString('utf8') : undefined,
     };
 
-    // `bufferedBody`, when provided, is the request body already drained by
-    // `_readFullBody` (for mappings with a body condition) — replayed to the
-    // mock/backend instead of re-reading `req`, whose stream has already ended.
     const found = findMock(this.mocks, mapping, req.method, pathname, extra);
     if (found) {
-      serveMock(found.mock, req, res, record, found.match, this.requestLog, bufferedBody);
+      if (buffered && !buffered.complete) {
+        // A non-body-conditioned mock matched mid-buffer: discard the rest
+        // of the oversized upload (templates see the truncated portion).
+        req.resume();
+      }
+      serveMock(found.mock, req, res, record, found.match, this.requestLog, buffered ? buffered.body : null);
       return;
     }
 
@@ -324,8 +348,15 @@ class HttpProxy {
       }
     });
 
-    if (bufferedBody !== null) {
-      proxyReq.end(bufferedBody);
+    if (buffered !== null) {
+      if (buffered.complete) {
+        proxyReq.end(buffered.body);
+      } else {
+        // Replay the buffered part, then stream the rest (the request was
+        // paused when the matching cap was hit; pipe() resumes it).
+        proxyReq.write(buffered.body);
+        req.pipe(proxyReq);
+      }
     } else {
       req.pipe(proxyReq);
     }
@@ -392,7 +423,11 @@ class HttpProxy {
       let requestLine = `${req.method} ${backendPath} HTTP/${req.httpVersion}\r\n`;
       serverSocket.write(requestLine);
       Object.entries(headers).forEach(([k, v]) => {
-        serverSocket.write(`${k}: ${v}\r\n`);
+        // Multi-value headers arrive as arrays — write one line per value
+        // instead of comma-joining them.
+        for (const value of Array.isArray(v) ? v : [v]) {
+          serverSocket.write(`${k}: ${value}\r\n`);
+        }
       });
       serverSocket.write('\r\n');
       if (head && head.length > 0) serverSocket.write(head);
@@ -439,4 +474,4 @@ class HttpProxy {
   }
 }
 
-export { HttpProxy, MAX_BODY_CAPTURE_BYTES };
+export { HttpProxy, MAX_BODY_CAPTURE_BYTES, MAX_MOCK_BODY_MATCH_BYTES };

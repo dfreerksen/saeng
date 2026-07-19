@@ -32,6 +32,13 @@ describe('UpdateChecker.check()', () => {
     vi.unstubAllGlobals();
   });
 
+  it('passes an abort signal so a hung request times out', async () => {
+    fetch.mockResolvedValue({ ok: false });
+    const checker = new UpdateChecker('1.0.0');
+    await checker.check();
+    expect(fetch.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
+  });
+
   it('reports an update when a newer release is published', async () => {
     fetch.mockResolvedValue({
       ok: true,

@@ -37,6 +37,12 @@ const DEFAULT_MOCK_DELAY_MS = 0;
 const CONDITION_TYPES = ['header', 'query', 'body'];
 const CONDITION_OPERATORS = ['equals', 'contains', 'regex', 'exists'];
 
+const ICON_MODES = ['both', 'tray', 'dock'];
+const COLOR_MODES = ['auto', 'light', 'dark'];
+
+const MIN_PORT = 1;
+const MAX_PORT = 65535;
+
 const conditionListSchema = {
   type: 'array',
   default: [],
@@ -82,7 +88,7 @@ const schema = {
         id: { type: 'string' },
         domain: { type: 'string' },
         host: { type: 'string' },
-        port: { type: 'number' },
+        port: { type: 'number', minimum: MIN_PORT, maximum: MAX_PORT },
         https: { type: 'boolean' },
         enabled: { type: 'boolean' },
         createdAt: { type: 'string' },
@@ -105,10 +111,10 @@ const schema = {
         enabled: { type: 'boolean' },
         method: { type: 'string' },
         pathPattern: { type: 'string' },
-        statusCode: { type: 'number' },
+        statusCode: { type: 'number', minimum: MIN_MOCK_STATUS_CODE, maximum: MAX_MOCK_STATUS_CODE },
         headers: headerListSchema,
         body: { type: 'string' },
-        delayMs: { type: 'number', default: 0 },
+        delayMs: { type: 'number', minimum: MIN_MOCK_DELAY_MS, maximum: MAX_MOCK_DELAY_MS, default: 0 },
         conditions: conditionListSchema,
         createdAt: { type: 'string' },
       },
@@ -127,6 +133,25 @@ const schema = {
   },
   settings: {
     type: 'object',
+    // Per-property constraints back up the sanitizers in setSettings():
+    // setSettings() always coerces/clamps before writing (so IPC calls never
+    // throw), while the schema guards against invalid values reaching the
+    // store some other way (e.g. a hand-edited config.json).
+    properties: {
+      httpsEnabled: { type: 'boolean' },
+      startOnLaunch: { type: 'boolean' },
+      colorMode: { enum: COLOR_MODES },
+      locale: { type: 'string' },
+      iconMode: { enum: ICON_MODES },
+      dashboardEnabled: { type: 'boolean' },
+      logMaxEntries: { type: 'number', minimum: MIN_LOG_MAX_ENTRIES, maximum: MAX_LOG_MAX_ENTRIES },
+      loggingEnabled: { type: 'boolean' },
+      logHeadersEnabled: { type: 'boolean' },
+      logBodyEnabled: { type: 'boolean' },
+      healthCheckEnabled: { type: 'boolean' },
+      healthCheckIntervalMs: { type: 'number', minimum: MIN_HEALTH_CHECK_INTERVAL_MS, maximum: MAX_HEALTH_CHECK_INTERVAL_MS },
+      healthCheckTimeoutMs: { type: 'number', minimum: MIN_HEALTH_CHECK_TIMEOUT_MS, maximum: MAX_HEALTH_CHECK_TIMEOUT_MS },
+    },
     default: { ...DEFAULT_SETTINGS },
   },
 };
@@ -457,11 +482,11 @@ class AppStore {
         ? DEFAULT_HEALTH_CHECK_TIMEOUT_MS
         : Math.min(MAX_HEALTH_CHECK_TIMEOUT_MS, Math.max(MIN_HEALTH_CHECK_TIMEOUT_MS, parsed));
     }
-    if ('iconMode' in patch) {
-      const valid = ['both', 'tray', 'dock'];
-      if (!valid.includes(patch.iconMode)) {
-        updated.iconMode = 'both';
-      }
+    if ('iconMode' in patch && !ICON_MODES.includes(patch.iconMode)) {
+      updated.iconMode = 'both';
+    }
+    if ('colorMode' in patch && !COLOR_MODES.includes(patch.colorMode)) {
+      updated.colorMode = 'auto';
     }
     this.store.set('settings', updated);
     return updated;

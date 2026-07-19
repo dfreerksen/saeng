@@ -915,6 +915,17 @@ describe('AppStore.getSettings() / setSettings()', () => {
     expect(store.setSettings({ iconMode: '' }).iconMode).toBe('both');
   });
 
+  it('setSettings() falls back to "auto" for an invalid colorMode', () => {
+    expect(store.setSettings({ colorMode: 'neon' }).colorMode).toBe('auto');
+    expect(store.setSettings({ colorMode: '' }).colorMode).toBe('auto');
+  });
+
+  it('setSettings() stores a valid colorMode value', () => {
+    expect(store.setSettings({ colorMode: 'dark' }).colorMode).toBe('dark');
+    expect(store.setSettings({ colorMode: 'light' }).colorMode).toBe('light');
+    expect(store.setSettings({ colorMode: 'auto' }).colorMode).toBe('auto');
+  });
+
   it('getSettings() defaults dashboardEnabled to false', () => {
     expect(store.getSettings().dashboardEnabled).toBe(false);
   });

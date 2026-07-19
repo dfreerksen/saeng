@@ -6,7 +6,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { EventEmitter } from 'events';
-import { HttpProxy, MAX_BODY_CAPTURE_BYTES } from '../../src/proxy/httpProxy.js';
+import { HttpProxy, MAX_BODY_CAPTURE_BYTES, MAX_MOCK_BODY_MATCH_BYTES } from '../../src/proxy/httpProxy.js';
 import { CertManager } from '../../src/proxy/certManager.js';
 
 // Helper: build a minimal mock req/res pair for exercising _recordRequest()
@@ -804,6 +804,36 @@ describe('HttpProxy mocked responses — end to end', () => {
     expect(receivedBody).toBe(largeBody);
   });
 
+  it('streams a body larger than the matching cap to the backend instead of buffering it whole', async () => {
+    let receivedLength = 0;
+    backend = await new Promise((resolve) => {
+      const server = http.createServer((req, res) => {
+        let len = 0;
+        req.on('data', (c) => { len += c.length; });
+        req.on('end', () => {
+          receivedLength = len;
+          res.end('from-backend');
+        });
+      });
+      server.listen(0, '127.0.0.1', () => resolve(server));
+    });
+    proxy = new HttpProxy(null);
+    await proxy.start(
+      [{ id: 'm1', domain: 'bodycap.local', host: '127.0.0.1', port: backend.address().port, enabled: true, mocksEnabled: true }],
+      { httpsEnabled: false }
+    );
+    proxy.updateMocks([
+      { mappingId: 'm1', enabled: true, method: 'POST', pathPattern: '^/api$', statusCode: 200, headers: [], body: 'mocked-response', conditions: [{ type: 'body', key: '', operator: 'contains', value: 'needle' }] },
+    ]);
+
+    // The needle sits past the cap: matching must not buffer the whole body,
+    // so the body condition fails and the full body streams to the backend.
+    const oversized = 'x'.repeat(MAX_MOCK_BODY_MATCH_BYTES) + 'needle';
+    const result = await makeRequest(proxy.getPort(), { method: 'POST', host: 'bodycap.local', path: '/api', body: oversized });
+    expect(result.body).toBe('from-backend');
+    expect(receivedLength).toBe(oversized.length);
+  }, 15_000);
+
   it('marks log entries with mocked: true for mocked responses and mocked: false for proxied responses', async () => {
     backend = await startCountingBackend('from-backend');
     const add = vi.fn();
@@ -1107,6 +1137,33 @@ describe('HttpProxy._handleWebSocketUpgrade()', () => {
     await new Promise((r) => process.nextTick(r));
 
     expect(writtenText(serverSocket)).toContain('x-forwarded-proto: wss');
+  });
+
+  it('writes one line per value for multi-value (array) headers when replaying the upgrade', async () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{
+      domain: 'ws.local', port: 9000, host: '127.0.0.1', enabled: true, requestHeaders: [],
+    }]);
+
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockImplementation((port, host, cb) => {
+      process.nextTick(cb);
+      return serverSocket;
+    });
+
+    proxy._handleWebSocketUpgrade(
+      { headers: { host: 'ws.local', 'x-multi': ['one', 'two'] }, method: 'GET', url: '/', httpVersion: '1.1' },
+      clientSocket,
+      Buffer.alloc(0)
+    );
+
+    await new Promise((r) => process.nextTick(r));
+
+    const sent = writtenText(serverSocket);
+    expect(sent).toContain('x-multi: one\r\n');
+    expect(sent).toContain('x-multi: two\r\n');
+    expect(sent).not.toContain('one,two');
   });
 
   it('rewrites req.url when replaying the WebSocket upgrade request line', async () => {
