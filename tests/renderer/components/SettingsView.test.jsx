@@ -169,10 +169,10 @@ describe('SettingsView — icon mode', () => {
 });
 
 describe('SettingsView — dashboard toggle', () => {
-  it('renders the dashboard toggle as checked when dashboardEnabled is not set', () => {
+  it('renders the dashboard toggle as unchecked when dashboardEnabled is not set (defaults false)', () => {
     const { container } = renderSettingsView({ settings: { ...SAMPLE_SETTINGS } });
     const toggles = container.querySelectorAll('.toggle input[type="checkbox"]');
-    expect(toggles[0]).toBeChecked();
+    expect(toggles[0]).not.toBeChecked();
   });
 
   it('renders the dashboard toggle as checked when dashboardEnabled is true', () => {
@@ -189,7 +189,7 @@ describe('SettingsView — dashboard toggle', () => {
 
   it('calls onSettingsChange with dashboardEnabled when toggled off', async () => {
     const onSettingsChange = vi.fn().mockResolvedValue(undefined);
-    const { container } = renderSettingsView({ onSettingsChange });
+    const { container } = renderSettingsView({ onSettingsChange, settings: { ...SAMPLE_SETTINGS, dashboardEnabled: true } });
     const toggle = container.querySelectorAll('.toggle input[type="checkbox"]')[0];
     fireEvent.click(toggle);
     await waitFor(() => {
@@ -200,7 +200,7 @@ describe('SettingsView — dashboard toggle', () => {
   it('shows a toast after toggling dashboard', async () => {
     const onSettingsChange = vi.fn().mockResolvedValue(undefined);
     const showToast = vi.fn();
-    const { container } = renderSettingsView({ onSettingsChange, showToast });
+    const { container } = renderSettingsView({ onSettingsChange, showToast, settings: { ...SAMPLE_SETTINGS, dashboardEnabled: true } });
     const toggle = container.querySelectorAll('.toggle input[type="checkbox"]')[0];
     fireEvent.click(toggle);
     await waitFor(() => {

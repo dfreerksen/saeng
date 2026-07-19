@@ -18,6 +18,11 @@ class HttpProxy {
     this.wildcards = [];
     this.mocks = new Map();
     this.mocksNeedBody = new Set();
+    // Sockets belonging to CONNECT tunnels and WebSocket upgrades. Node
+    // detaches these from the HTTP server when the 'connect'/'upgrade'
+    // event fires, so server.closeAllConnections() doesn't cover them —
+    // stop() destroys them explicitly.
+    this.tunnelSockets = new Set();
     this.httpServer = null;
     this.internalHttpsServer = null;
     this.internalHttpsPort = null;
@@ -37,6 +42,13 @@ class HttpProxy {
       .filter((m) => m.domain.startsWith('*.'))
       .map((m) => ({ base: m.domain.slice(2), mapping: m }))
       .sort((a, b) => b.base.length - a.base.length);
+  }
+
+  _trackTunnelSockets(...sockets) {
+    for (const socket of sockets) {
+      this.tunnelSockets.add(socket);
+      socket.on('close', () => this.tunnelSockets.delete(socket));
+    }
   }
 
   findMapping(hostname) {
@@ -75,20 +87,21 @@ class HttpProxy {
   async _startInternalHttpsServer() {
     // Generate a placeholder cert so https.createServer can start;
     // SNICallback overrides the cert for each actual connection.
-    const defaultCert = this.certManager.getCert('saeng.internal');
+    const defaultCert = await this.certManager.getCert('saeng.internal');
 
     this.internalHttpsServer = https.createServer(
       {
         cert: defaultCert.cert,
         key: defaultCert.key,
         SNICallback: (hostname, cb) => {
-          try {
-            const certData = this.certManager.getCert(hostname);
-            cb(null, tls.createSecureContext({ cert: certData.cert, key: certData.key }));
-          } catch (err) {
-            console.error(`Failed to get cert for ${hostname}:`, err);
-            cb(err);
-          }
+          this.certManager.getCert(hostname)
+            .then((certData) =>
+              cb(null, tls.createSecureContext({ cert: certData.cert, key: certData.key }))
+            )
+            .catch((err) => {
+              console.error(`Failed to get cert for ${hostname}:`, err);
+              cb(err);
+            });
         },
       },
       (req, res) => this._handleDecryptedRequest(req, res)
@@ -342,6 +355,7 @@ class HttpProxy {
       tunnelSocket.pipe(clientSocket);
       clientSocket.pipe(tunnelSocket);
     });
+    this._trackTunnelSockets(clientSocket, tunnelSocket);
 
     tunnelSocket.on('error', () => clientSocket.destroy());
     clientSocket.on('error', () => tunnelSocket.destroy());
@@ -355,6 +369,7 @@ class HttpProxy {
       serverSocket.pipe(clientSocket);
       clientSocket.pipe(serverSocket);
     });
+    this._trackTunnelSockets(clientSocket, serverSocket);
 
     serverSocket.on('error', () => clientSocket.destroy());
     clientSocket.on('error', () => serverSocket.destroy());
@@ -385,15 +400,28 @@ class HttpProxy {
       serverSocket.pipe(clientSocket);
       clientSocket.pipe(serverSocket);
     });
+    this._trackTunnelSockets(clientSocket, serverSocket);
 
     serverSocket.on('error', () => clientSocket.destroy());
     clientSocket.on('error', () => serverSocket.destroy());
   }
 
   stop() {
+    // Destroy open tunnel sockets (CONNECT tunnels, WebSocket upgrades) —
+    // these are detached from the HTTP server, so closeAllConnections()
+    // below doesn't reach them and close() would wait on them forever.
+    for (const socket of this.tunnelSockets) {
+      socket.destroy();
+    }
+    this.tunnelSockets.clear();
+
     const closeServer = (server) =>
       new Promise((resolve) => {
         if (server) {
+          // Destroy remaining request sockets (e.g. keep-alive connections)
+          // so close() resolves immediately instead of waiting for clients
+          // to hang up.
+          server.closeAllConnections();
           server.close(() => resolve());
         } else {
           resolve();

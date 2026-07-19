@@ -420,7 +420,13 @@ function setupIPC() {
     return updated;
   });
 
-  ipcMain.handle('ssl:get-ca-expiry', () => getCertManager().getCAExpiry());
+  ipcMain.handle('ssl:get-ca-expiry', async () => {
+    const certManager = getCertManager();
+    // Wait for the startup pre-warm (or create the CA now if it's missing),
+    // so the renderer's initial query doesn't race CA generation.
+    await certManager.ensureCA();
+    return certManager.getCAExpiry();
+  });
 
   ipcMain.handle('ssl:regenerate-ca', () => getCertManager().regenerateCA());
 
@@ -481,8 +487,9 @@ app.whenReady().then(async () => {
   // settings on other interfaces are left intact.
   await clearSystemProxy({ onlyIfUrl: 'http://127.0.0.1:8181/proxy.pac' }).catch(() => {});
 
-  // Pre-warm the CA cert so the first HTTPS connection is fast
-  getCertManager();
+  // Pre-warm the CA cert so the first HTTPS connection is fast. Generation
+  // runs off the main thread (node:crypto), so this doesn't block startup.
+  getCertManager().ensureCA().catch((err) => console.error('CA pre-warm failed:', err));
 
   const nonce = randomBytes(16).toString('base64');
   protocol.handle('app', (request) => {

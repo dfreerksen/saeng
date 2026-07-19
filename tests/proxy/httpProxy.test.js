@@ -1,8 +1,13 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import http from 'http';
 import net from 'net';
+import tls from 'tls';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 import { EventEmitter } from 'events';
 import { HttpProxy, MAX_BODY_CAPTURE_BYTES } from '../../src/proxy/httpProxy.js';
+import { CertManager } from '../../src/proxy/certManager.js';
 
 // Helper: build a minimal mock req/res pair for exercising _recordRequest()
 // directly, without spinning up a real server. `res` is an EventEmitter so
@@ -124,6 +129,18 @@ describe('HttpProxy.updateMappings()', () => {
     expect(proxy.mappings.has('old.local')).toBe(false);
     expect(proxy.mappings.has('new.local')).toBe(true);
   });
+
+  it('normalizes a missing or empty host to 127.0.0.1', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([
+      { domain: 'nohost.local', port: 3000, enabled: true },
+      { domain: 'emptyhost.local', port: 3001, host: '', enabled: true },
+      { domain: '*.wild.local', port: 3002, enabled: true },
+    ]);
+    expect(proxy.mappings.get('nohost.local').host).toBe('127.0.0.1');
+    expect(proxy.mappings.get('emptyhost.local').host).toBe('127.0.0.1');
+    expect(proxy.wildcards[0].mapping.host).toBe('127.0.0.1');
+  });
 });
 
 // updateMocks()'s compiling logic (regex compilation, condition validation,
@@ -221,6 +238,31 @@ describe('HttpProxy HTTP server lifecycle', () => {
     expect(proxy.internalHttpsServer).toBeNull();
     proxy = null;
   });
+
+  it('stop() resolves while a CONNECT tunnel is still open', async () => {
+    const backend = await startBackend();
+    proxy = new HttpProxy(null);
+    const port = await proxy.start(
+      [{ domain: 'tunnel.local', port: backend.address().port, enabled: true }],
+      { httpsEnabled: false }
+    );
+
+    // Open a raw tunnel and leave it open — server.close() alone would wait
+    // for it; closeAllConnections() in stop() severs it.
+    await new Promise((resolve, reject) => {
+      const req = http.request({ hostname: '127.0.0.1', port, method: 'CONNECT', path: 'tunnel.local:443' });
+      req.on('connect', () => resolve());
+      req.on('error', reject);
+      req.end();
+    });
+
+    await proxy.stop();
+    expect(proxy.httpServer).toBeNull();
+
+    backend.closeAllConnections();
+    await stopBackend(backend);
+    proxy = null;
+  }, 10_000);
 
   it('stop() resolves cleanly when never started', async () => {
     proxy = new HttpProxy(null);
@@ -1179,5 +1221,183 @@ describe('HttpProxy._handleWebSocketUpgrade()', () => {
     clientSocket.emit('error', new Error('client gone'));
 
     expect(serverSocket.destroy).toHaveBeenCalled();
+  });
+});
+
+// End-to-end coverage of the HTTPS MITM path: CONNECT through the proxy,
+// TLS handshake against the internal HTTPS server (whose async SNICallback
+// generates a leaf cert for the requested hostname via CertManager), and the
+// decrypted request proxied to a plain-HTTP backend. Feasible in a test now
+// that keygen is native (node:crypto) instead of node-forge's pure-JS RSA.
+describe('HttpProxy HTTPS MITM (SSL termination)', () => {
+  it('terminates TLS with a per-hostname leaf cert and proxies the decrypted request', async () => {
+    const certDir = fs.mkdtempSync(path.join(os.tmpdir(), 'saeng-proxy-mitm-'));
+    CertManager.instance = null;
+    const certManager = CertManager.getInstance(certDir);
+    const backend = await startBackend('mitm-backend-ok');
+    const proxy = new HttpProxy(certManager);
+    // Mapping intentionally omits `host` to exercise normalization end to end.
+    const proxyPort = await proxy.start(
+      [{ id: 'm1', domain: 'secure.local', port: backend.address().port, enabled: true }],
+      { httpsEnabled: true }
+    );
+
+    try {
+      const { cn, raw } = await new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error('MITM request timed out')), 15_000);
+        const connectReq = http.request({
+          hostname: '127.0.0.1',
+          port: proxyPort,
+          method: 'CONNECT',
+          path: 'secure.local:443',
+        });
+        connectReq.on('connect', (res, socket) => {
+          const tlsSocket = tls.connect(
+            { socket, servername: 'secure.local', rejectUnauthorized: false },
+            () => {
+              const peerCn = tlsSocket.getPeerCertificate().subject.CN;
+              tlsSocket.write('GET / HTTP/1.1\r\nHost: secure.local\r\nConnection: close\r\n\r\n');
+              let data = '';
+              tlsSocket.on('data', (chunk) => (data += chunk));
+              tlsSocket.on('close', () => {
+                clearTimeout(timer);
+                resolve({ cn: peerCn, raw: data });
+              });
+            }
+          );
+          tlsSocket.on('error', reject);
+        });
+        connectReq.on('error', reject);
+        connectReq.end();
+      });
+
+      // The SNICallback served a cert generated for the requested hostname
+      expect(cn).toBe('secure.local');
+      expect(raw).toContain('HTTP/1.1 200');
+      expect(raw).toContain('mitm-backend-ok');
+    } finally {
+      // stop() severs lingering tunnel sockets via closeAllConnections()
+      await proxy.stop();
+      await stopBackend(backend);
+      CertManager.instance = null;
+      fs.rmSync(certDir, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it('stop() resolves while an MITM tunnel with a live TLS session is still open', async () => {
+    const certDir = fs.mkdtempSync(path.join(os.tmpdir(), 'saeng-proxy-mitm-stop-'));
+    CertManager.instance = null;
+    const certManager = CertManager.getInstance(certDir);
+    const backend = await startBackend('still-alive');
+    const proxy = new HttpProxy(certManager);
+    const proxyPort = await proxy.start(
+      [{ id: 'm1', domain: 'secure.local', port: backend.address().port, enabled: true }],
+      { httpsEnabled: true }
+    );
+
+    try {
+      // Complete a request over the tunnel but keep the connection open
+      // (no Connection: close) — stop() must not wait for it.
+      await new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error('MITM request timed out')), 15_000);
+        const connectReq = http.request({
+          hostname: '127.0.0.1',
+          port: proxyPort,
+          method: 'CONNECT',
+          path: 'secure.local:443',
+        });
+        connectReq.on('connect', (res, socket) => {
+          const tlsSocket = tls.connect(
+            { socket, servername: 'secure.local', rejectUnauthorized: false },
+            () => {
+              tlsSocket.write('GET / HTTP/1.1\r\nHost: secure.local\r\n\r\n');
+              let data = '';
+              tlsSocket.on('data', (chunk) => {
+                data += chunk;
+                if (data.includes('still-alive')) {
+                  clearTimeout(timer);
+                  resolve();
+                }
+              });
+            }
+          );
+          tlsSocket.on('error', reject);
+        });
+        connectReq.on('error', reject);
+        connectReq.end();
+      });
+
+      await proxy.stop(); // would previously hang on the open tunnel
+      expect(proxy.httpServer).toBeNull();
+    } finally {
+      backend.closeAllConnections();
+      await stopBackend(backend);
+      CertManager.instance = null;
+      fs.rmSync(certDir, { recursive: true, force: true });
+    }
+  }, 30_000);
+});
+
+describe('HttpProxy tunnel socket tracking', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('tracks both sockets of a raw CONNECT tunnel', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{ domain: 'myapp.local', port: 9000, enabled: true }]);
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockImplementation((port, host, cb) => {
+      process.nextTick(cb);
+      return serverSocket;
+    });
+
+    proxy._handleConnect({ url: 'myapp.local:443' }, clientSocket, Buffer.alloc(0));
+
+    expect(proxy.tunnelSockets.has(clientSocket)).toBe(true);
+    expect(proxy.tunnelSockets.has(serverSocket)).toBe(true);
+  });
+
+  it('tracks both sockets of a WebSocket upgrade and stop() destroys them', async () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{ domain: 'ws.local', port: 9000, enabled: true }]);
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockImplementation((port, host, cb) => {
+      process.nextTick(cb);
+      return serverSocket;
+    });
+
+    proxy._handleWebSocketUpgrade(
+      { headers: { host: 'ws.local' }, method: 'GET', url: '/', httpVersion: '1.1' },
+      clientSocket,
+      Buffer.alloc(0)
+    );
+    expect(proxy.tunnelSockets.has(clientSocket)).toBe(true);
+    expect(proxy.tunnelSockets.has(serverSocket)).toBe(true);
+
+    await proxy.stop();
+
+    expect(clientSocket.destroy).toHaveBeenCalled();
+    expect(serverSocket.destroy).toHaveBeenCalled();
+    expect(proxy.tunnelSockets.size).toBe(0);
+  });
+
+  it('removes a socket from tracking when it closes', () => {
+    const proxy = new HttpProxy(null);
+    proxy.updateMappings([{ domain: 'myapp.local', port: 9000, enabled: true }]);
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockImplementation((port, host, cb) => {
+      process.nextTick(cb);
+      return serverSocket;
+    });
+
+    proxy._handleConnect({ url: 'myapp.local:443' }, clientSocket, Buffer.alloc(0));
+    clientSocket.emit('close');
+
+    expect(proxy.tunnelSockets.has(clientSocket)).toBe(false);
+    expect(proxy.tunnelSockets.has(serverSocket)).toBe(true);
   });
 });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { applyHeaderOverrides, rewritePath } from '../../src/proxy/requestUtils.js';
+import { applyHeaderOverrides, rewritePath, toPathWithQuery } from '../../src/proxy/requestUtils.js';
 
 describe('applyHeaderOverrides()', () => {
   it('sets a new header when it does not already exist', () => {
@@ -100,5 +100,32 @@ describe('rewritePath()', () => {
   it('defaults a nullish pathWithQuery to "/" before matching', () => {
     const mapping = { pathRewriteFrom: '/', pathRewriteTo: '/v2' };
     expect(rewritePath(mapping, null)).toBe('/v2');
+  });
+});
+
+describe('toPathWithQuery()', () => {
+  it('extracts path and query from an absolute-form http URL', () => {
+    expect(toPathWithQuery('http://myapp.local/api/users?page=2')).toBe('/api/users?page=2');
+  });
+
+  it('extracts the path from an absolute-form https URL', () => {
+    expect(toPathWithQuery('https://myapp.local:8443/deep/path')).toBe('/deep/path');
+  });
+
+  it('returns "/" for an absolute-form URL with no path', () => {
+    expect(toPathWithQuery('http://myapp.local')).toBe('/');
+  });
+
+  it('returns origin-form paths unchanged', () => {
+    expect(toPathWithQuery('/api/users?page=2')).toBe('/api/users?page=2');
+  });
+
+  it('returns falsy input unchanged', () => {
+    expect(toPathWithQuery('')).toBe('');
+    expect(toPathWithQuery(undefined)).toBe(undefined);
+  });
+
+  it('returns an unparsable absolute-form URL unchanged', () => {
+    expect(toPathWithQuery('http://')).toBe('http://');
   });
 });
