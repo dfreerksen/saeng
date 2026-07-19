@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.26.0] - 2026-07-19
+
+### Changed
+
+- Window size is now saved as you resize (not just on close), so it survives a crash or force-quit
+- Mock body-condition matching now caps buffering at 1 MB per request, so very large uploads no longer get fully buffered in memory when checking mock conditions
+
+### Fixed
+
+- CA and per-domain HTTPS certificates are now generated off the main thread, preventing the app from freezing briefly on first launch or first HTTPS request to a new domain
+- Raw HTTPS tunnel replay now writes multi-value headers as separate lines instead of losing all but one value
+- Update checks no longer hang indefinitely if GitHub is unreachable — they now time out after 10 seconds
+- An invalid `colorMode` value in the settings store now falls back to `auto` instead of being left as-is
+
+[1.26.0]: https://github.com/dfreerksen/saeng/releases/tag/v1.26.0
+
 ## [1.25.1] - 2026-07-17
 
 ### Fixed
