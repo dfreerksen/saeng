@@ -1,6 +1,8 @@
 import { getOS } from '../../js/os.js';
+import { useI18nT } from '../../js/i18nContext.js';
 
-export default function PreferencesSection({ settings, locales, onSettingsChange, onLocaleChange, onColorModeChange, showToast, t }) {
+export default function PreferencesSection({ settings, locales, onSettingsChange, onLocaleChange, onColorModeChange, showToast }) {
+  const t = useI18nT();
   const os = getOS();
 
   return (

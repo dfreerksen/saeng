@@ -7,6 +7,7 @@ vi.mock('../../../../src/renderer/components/utilities/Tooltip.jsx', () => ({
 }));
 
 import MockRegexHelpPane from '../../../../src/renderer/components/modals/MockRegexHelpPane.jsx';
+import { I18nContext } from '../../../../src/renderer/js/i18nContext.js';
 
 const t = (key, vars) => (vars ? `${key}:${JSON.stringify(vars)}` : key);
 
@@ -16,7 +17,11 @@ beforeEach(() => {
 
 function renderPane(props = {}) {
   const defaults = { showToast: vi.fn(), t };
-  return render(<MockRegexHelpPane {...defaults} {...props} />);
+  return render(
+    <I18nContext value={t}>
+      <MockRegexHelpPane {...defaults} {...props} />
+    </I18nContext>
+  );
 }
 
 describe('MockRegexHelpPane — rendering', () => {

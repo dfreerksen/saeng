@@ -49,6 +49,7 @@ vi.mock('../../../../src/renderer/components/modals/AboutModal.jsx', () => ({
 }));
 
 import AppModals from '../../../../src/renderer/components/modals/AppModals.jsx';
+import { I18nContext } from '../../../../src/renderer/js/i18nContext.js';
 
 const t = (key, vars) => (vars ? `${key}:${JSON.stringify(vars)}` : key);
 
@@ -78,7 +79,11 @@ function renderModals(props = {}) {
     showToast: vi.fn(),
     t,
   };
-  return render(<AppModals {...defaults} {...props} />);
+  return render(
+    <I18nContext value={t}>
+      <AppModals {...defaults} {...props} />
+    </I18nContext>
+  );
 }
 
 beforeEach(() => {

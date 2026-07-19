@@ -1,6 +1,8 @@
 import { memo } from 'react';
+import { useI18nT } from '../../js/i18nContext.js';
 
-export default memo(function Titlebar({ proxyRunning, updateInfo, onProxyToggle, t }) {
+export default memo(function Titlebar({ proxyRunning, updateInfo, onProxyToggle }) {
+  const t = useI18nT();
   return (
     <div className="titlebar">
       <span className="titlebar-title">{t('application.name')}</span>

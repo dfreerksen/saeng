@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import Tooltip from './utilities/Tooltip.jsx';
+import { useI18nT } from '../js/i18nContext.js';
 
 const BODY_CAPTURE_LIMIT_KB = 64;
 
@@ -158,7 +159,8 @@ function QueryParamsTab({ entry, t }) {
   );
 }
 
-export default function LogDetailPanel({ entry, settings, detailTab, setDetailTab, onClose, onConvertToMock, t }) {
+export default function LogDetailPanel({ entry, settings, detailTab, setDetailTab, onClose, onConvertToMock }) {
+  const t = useI18nT();
   const tabs = ['general', 'queryParams', 'headers', 'response'];
   const canConvert = !entry.websocket && entry.status != null;
   return (

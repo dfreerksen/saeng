@@ -7,6 +7,7 @@ vi.mock('../../../src/renderer/components/utilities/Tooltip.jsx', () => ({
 }));
 
 import LogDetailPanel from '../../../src/renderer/components/LogDetailPanel.jsx';
+import { I18nContext } from '../../../src/renderer/js/i18nContext.js';
 
 const t = (key, vars) => (vars ? `${key}:${JSON.stringify(vars)}` : key);
 
@@ -31,7 +32,11 @@ function renderPanel(props = {}) {
     onConvertToMock: vi.fn(),
     t,
   };
-  return render(<LogDetailPanel {...defaults} {...props} />);
+  return render(
+    <I18nContext value={t}>
+      <LogDetailPanel {...defaults} {...props} />
+    </I18nContext>
+  );
 }
 
 describe('LogDetailPanel — tab bar', () => {

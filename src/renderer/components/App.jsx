@@ -9,6 +9,7 @@ import SettingsView from './SettingsView.jsx';
 import AppModals from './modals/AppModals.jsx';
 import Toast from './utilities/Toast.jsx';
 import { getOS } from '../js/os.js';
+import { I18nContext } from '../js/i18nContext.js';
 import { Tooltip as BsTooltip } from 'bootstrap';
 
 const MOCK_DRAFT_HEADERS = new Set(['content-type', 'content-length']);
@@ -286,103 +287,98 @@ export default function App() {
   }
 
   return (
-    <div className="app">
-      <Titlebar proxyRunning={proxyRunning} updateInfo={updateInfo} onProxyToggle={handleProxyToggle} t={t} />
-      <div className="main-layout">
-        <Sidebar
-          currentView={currentView}
-          setCurrentView={setCurrentView}
-          dashboardEnabled={!!settings.dashboardEnabled}
-          loggingEnabled={!!settings.loggingEnabled}
-          onAbout={handleOpenAboutModal}
-          t={t}
+    <I18nContext value={t}>
+      <div className="app">
+        <Titlebar proxyRunning={proxyRunning} updateInfo={updateInfo} onProxyToggle={handleProxyToggle} />
+        <div className="main-layout">
+          <Sidebar
+            currentView={currentView}
+            setCurrentView={setCurrentView}
+            dashboardEnabled={!!settings.dashboardEnabled}
+            loggingEnabled={!!settings.loggingEnabled}
+            onAbout={handleOpenAboutModal}
+          />
+          <main className="content">
+            {currentView === 'dashboard' && (
+              <DashboardView
+                entries={requestLog}
+                mappings={mappings}
+                mocks={mocks}
+                healthStatuses={healthStatuses}
+                settings={settings}
+                proxyRunning={proxyRunning}
+              />
+            )}
+            {currentView === 'mappings' && (
+              <MappingsView
+                mappings={mappings}
+                setMappings={setMappings}
+                healthStatuses={healthStatuses}
+                proxyRunning={proxyRunning}
+                settings={settings}
+                onAdd={handleOpenAddModal}
+                onEdit={handleOpenEditModal}
+                onExport={handleOpenExportModal}
+                onImport={handleImportMappings}
+                showToast={showToast}
+              />
+            )}
+            {currentView === 'mocks' && (
+              <MocksView
+                mocks={mocks}
+                mappings={mappings}
+                mockableMappings={mockableMappings}
+                setMocks={setMocks}
+                onAdd={handleOpenAddMockModal}
+                onEdit={handleOpenEditMockModal}
+                onExport={handleOpenExportMocksModal}
+                onImport={handleImportMocks}
+              />
+            )}
+            {currentView === 'log' && (
+              <LogView
+                entries={requestLog}
+                onClear={handleClearLog}
+                onExportHar={handleExportHar}
+                onConvertToMock={handleConvertToMock}
+                settings={settings}
+              />
+            )}
+            {currentView === 'settings' && (
+              <SettingsView
+                settings={settings}
+                locales={locales}
+                caPath={caPath}
+                caExpiry={caExpiry}
+                setCaExpiry={setCaExpiry}
+                onSettingsChange={updateSettings}
+                onLocaleChange={handleLocaleChange}
+                onColorModeChange={handleColorModeChange}
+                showToast={showToast}
+              />
+            )}
+          </main>
+        </div>
+
+        <AppModals
+          modal={modal}
+          mappings={mappings}
+          setMappings={setMappings}
+          mocks={mocks}
+          setMocks={setMocks}
+          mockModalMappings={mockModalMappings}
+          settings={settings}
+          appVersion={appVersion}
+          electronVersion={electronVersion}
+          nodeVersion={nodeVersion}
+          bootstrapVersion={bootstrapVersion}
+          onClose={handleCloseModal}
+          setModal={setModal}
+          showToast={showToast}
         />
-        <main className="content">
-          {currentView === 'dashboard' && (
-            <DashboardView
-              entries={requestLog}
-              mappings={mappings}
-              mocks={mocks}
-              healthStatuses={healthStatuses}
-              settings={settings}
-              proxyRunning={proxyRunning}
-              t={t}
-            />
-          )}
-          {currentView === 'mappings' && (
-            <MappingsView
-              mappings={mappings}
-              setMappings={setMappings}
-              healthStatuses={healthStatuses}
-              proxyRunning={proxyRunning}
-              settings={settings}
-              onAdd={handleOpenAddModal}
-              onEdit={handleOpenEditModal}
-              onExport={handleOpenExportModal}
-              onImport={handleImportMappings}
-              showToast={showToast}
-              t={t}
-            />
-          )}
-          {currentView === 'mocks' && (
-            <MocksView
-              mocks={mocks}
-              mappings={mappings}
-              mockableMappings={mockableMappings}
-              setMocks={setMocks}
-              onAdd={handleOpenAddMockModal}
-              onEdit={handleOpenEditMockModal}
-              onExport={handleOpenExportMocksModal}
-              onImport={handleImportMocks}
-              t={t}
-            />
-          )}
-          {currentView === 'log' && (
-            <LogView
-              entries={requestLog}
-              onClear={handleClearLog}
-              onExportHar={handleExportHar}
-              onConvertToMock={handleConvertToMock}
-              settings={settings}
-              t={t}
-            />
-          )}
-          {currentView === 'settings' && (
-            <SettingsView
-              settings={settings}
-              locales={locales}
-              caPath={caPath}
-              caExpiry={caExpiry}
-              setCaExpiry={setCaExpiry}
-              onSettingsChange={updateSettings}
-              onLocaleChange={handleLocaleChange}
-              onColorModeChange={handleColorModeChange}
-              showToast={showToast}
-              t={t}
-            />
-          )}
-        </main>
+
+        <Toast toasts={toasts} />
       </div>
-
-      <AppModals
-        modal={modal}
-        mappings={mappings}
-        setMappings={setMappings}
-        mocks={mocks}
-        setMocks={setMocks}
-        mockModalMappings={mockModalMappings}
-        settings={settings}
-        appVersion={appVersion}
-        electronVersion={electronVersion}
-        nodeVersion={nodeVersion}
-        bootstrapVersion={bootstrapVersion}
-        onClose={handleCloseModal}
-        setModal={setModal}
-        showToast={showToast}
-        t={t}
-      />
-
-      <Toast toasts={toasts} />
-    </div>
+    </I18nContext>
   );
 }

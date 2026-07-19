@@ -52,7 +52,7 @@ The project uses **ESM throughout** (`"type": "module"` in `package.json`). The 
 All logic runs in the **main process**. The renderer has no Node.js access.
 
 - `preload.cjs` — exposes `window.electronAPI` via `contextBridge`. All renderer↔main communication goes through this object. Uses `.cjs` because Electron's preload sandbox requires CommonJS.
-- `main.js` — wires all IPC handlers in `setupIPC()`. Every `ipcMain.handle` channel is defined there. Serves renderer files via a custom `app://` protocol with CSP nonce injection.
+- `main.js` — `setupIPC()` registers IPC handlers: the `mappings:*`, `mocks:*`, `proxy:*`/`requestLog:*`/`health:*`, and `ssl:*` channels live in `src/ipc/` modules (`mappingsIpc.js`, `mocksIpc.js`, `proxyIpc.js`, `sslIpc.js`, each exporting a `registerXxxIpc(ctx)` function; `jsonFileDialogs.js` holds the shared JSON export/import save/open-dialog flows used by both mappings and mocks). The `settings:*`, `app:*`, `update:*`, and `i18n:*` handlers stay inline in `main.js` because they touch main-owned state (tray, dock, window). Serves renderer files via a custom `app://` protocol with CSP nonce injection.
 - `src/renderer/main.jsx` — React entry point; mounts `<App />` to `#root`.
 - `src/renderer/components/App.jsx` — root React component, owns all state and dispatches to child views. Shows a full-screen loading spinner (`isLoading` state) until the initial `init()` effect resolves all its parallel IPC calls, so views never briefly render with empty data on launch.
 
@@ -183,7 +183,7 @@ All data is derived from the existing in-memory request log, mappings, mocks, an
 
 ### Internationalisation
 
-`src/i18n/i18n.js` loads locale JSON from `src/i18n/locales/`. Supports 21 languages (`ar`, `be`, `bg`, `de`, `en`, `es`, `fr`, `id`, `it`, `ja`, `ko`, `nl`, `pl`, `pt`, `ru`, `sv`, `th`, `tr`, `uk`, `vi`, `zh`) including RTL (Arabic). The renderer uses a `t(key, vars)` helper in `App.jsx` that mirrors the main-process `i18n.t()`. Locale is persisted in settings and applied to `<html lang>` and `dir` attributes at runtime.
+`src/i18n/i18n.js` loads locale JSON from `src/i18n/locales/`. Supports 21 languages (`ar`, `be`, `bg`, `de`, `en`, `es`, `fr`, `id`, `it`, `ja`, `ko`, `nl`, `pl`, `pt`, `ru`, `sv`, `th`, `tr`, `uk`, `vi`, `zh`) including RTL (Arabic). `App.jsx` builds a `t(key, vars)` helper (mirroring the main-process `i18n.t()`) and provides it to the tree via `I18nContext` (`src/renderer/js/i18nContext.js`); components consume it with the `useI18nT()` hook instead of a `t` prop. The context default is an identity translator (returns the key), which unit tests rendering components without a provider rely on; tests that need a vars-aware stub wrap renders in `<I18nContext value={t}>`. Locale is persisted in settings and applied to `<html lang>` and `dir` attributes at runtime.
 
 ## Tests
 

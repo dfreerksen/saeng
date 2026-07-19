@@ -1,4 +1,7 @@
-export default function ProxySection({ settings, onSettingsChange, showToast, t }) {
+import { useI18nT } from '../../js/i18nContext.js';
+
+export default function ProxySection({ settings, onSettingsChange, showToast }) {
+  const t = useI18nT();
   return (
     <div className="settings-section">
       <div className="settings-section-title">{t('settings.proxy.title')}</div>

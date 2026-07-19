@@ -1,8 +1,10 @@
 import { useRef } from 'react';
+import { useI18nT } from '../js/i18nContext.js';
 
 let rowKeyCounter = 0;
 
-export default function HeaderListEditor({ headers, onChange, label, hint, t }) {
+export default function HeaderListEditor({ headers, onChange, label, hint }) {
+  const t = useI18nT();
   // Stable per-row keys: row objects are recreated on every edit, so identity
   // can't be used, and index keys break focus when a middle row is removed.
   const rowKeys = useRef([]).current;

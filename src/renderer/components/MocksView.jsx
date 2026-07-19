@@ -2,6 +2,7 @@ import { memo, useMemo, useState } from 'react';
 import { statusBadgeClass } from '../js/utils.js';
 import Tooltip from './utilities/Tooltip.jsx';
 import ConfirmModal from './modals/ConfirmModal.jsx';
+import { useI18nT } from '../js/i18nContext.js';
 
 function buildGroups(mocks, mapById) {
   const groups = new Map();
@@ -14,7 +15,8 @@ function buildGroups(mocks, mapById) {
   return groups;
 }
 
-export default memo(function MocksView({ mocks, mappings, mockableMappings, setMocks, onAdd, onEdit, onExport, onImport, t }) {
+export default memo(function MocksView({ mocks, mappings, mockableMappings, setMocks, onAdd, onEdit, onExport, onImport }) {
+  const t = useI18nT();
   const [pendingDelete, setPendingDelete] = useState(null);
 
   async function handleToggle(id) {

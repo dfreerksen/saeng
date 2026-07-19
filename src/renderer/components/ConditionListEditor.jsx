@@ -1,11 +1,13 @@
 import { useRef } from 'react';
+import { useI18nT } from '../js/i18nContext.js';
 
 const CONDITION_TYPES = ['header', 'query', 'body'];
 const CONDITION_OPERATORS = ['equals', 'contains', 'regex', 'exists'];
 
 let rowKeyCounter = 0;
 
-export default function ConditionListEditor({ conditions, onChange, t }) {
+export default function ConditionListEditor({ conditions, onChange }) {
+  const t = useI18nT();
   // Stable per-row keys: row objects are recreated on every edit, so identity
   // can't be used, and index keys break focus when a middle row is removed.
   const rowKeys = useRef([]).current;

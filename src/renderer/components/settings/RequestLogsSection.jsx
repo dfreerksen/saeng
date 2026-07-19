@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useI18nT } from '../../js/i18nContext.js';
 
 const LOG_MAX_ENTRIES_MIN = 100;
 const LOG_MAX_ENTRIES_MAX = 100000;
@@ -13,7 +14,8 @@ function clampLogMaxEntries(value) {
   return Math.min(LOG_MAX_ENTRIES_MAX, Math.max(LOG_MAX_ENTRIES_MIN, parsed));
 }
 
-export default function RequestLogsSection({ settings, onSettingsChange, showToast, t }) {
+export default function RequestLogsSection({ settings, onSettingsChange, showToast }) {
+  const t = useI18nT();
   const [logMaxEntriesDraft, setLogMaxEntriesDraft] = useState(
     String(settings.logMaxEntries ?? LOG_MAX_ENTRIES_DEFAULT)
   );

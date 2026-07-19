@@ -3,6 +3,7 @@ import MappingModal from './MappingModal.jsx';
 import MockModal from './MockModal.jsx';
 import ExportModal from './ExportModal.jsx';
 import AboutModal from './AboutModal.jsx';
+import { useI18nT } from '../../js/i18nContext.js';
 
 export default function AppModals({
   modal,
@@ -19,8 +20,8 @@ export default function AppModals({
   onClose,
   setModal,
   showToast,
-  t,
 }) {
+  const t = useI18nT();
   if (!modal) return null;
 
   switch (modal.type) {
@@ -36,7 +37,6 @@ export default function AppModals({
             setModal(null);
             showToast(t('flash.mapping.added', { domain: data.domain, host: data.host, port: data.port }), 'success');
           }}
-          t={t}
         />
       );
 
@@ -53,7 +53,6 @@ export default function AppModals({
             setModal(null);
             showToast(t('flash.mapping.updated', { domain: data.domain, host: data.host, port: data.port }), 'success');
           }}
-          t={t}
         />
       );
 
@@ -73,7 +72,6 @@ export default function AppModals({
               showToast(t('flash.export.error', { error: result.error }), 'error');
             }
           }}
-          t={t}
         />
       );
 
@@ -92,7 +90,6 @@ export default function AppModals({
             return result;
           }}
           showToast={showToast}
-          t={t}
         />
       );
 
@@ -112,7 +109,6 @@ export default function AppModals({
             return result;
           }}
           showToast={showToast}
-          t={t}
         />
       );
 
@@ -135,7 +131,6 @@ export default function AppModals({
               showToast(t('flash.mocksExport.error', { error: result.error }), 'error');
             }
           }}
-          t={t}
         />
       );
 
@@ -155,7 +150,6 @@ export default function AppModals({
             return result;
           }}
           showToast={showToast}
-          t={t}
         />
       );
 
@@ -168,7 +162,6 @@ export default function AppModals({
           reactVersion={reactVersion}
           bootstrapVersion={bootstrapVersion}
           onClose={onClose}
-          t={t}
         />
       );
 

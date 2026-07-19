@@ -11,6 +11,7 @@ vi.mock('../../../../src/renderer/components/utilities/Tooltip.jsx', () => ({
 }));
 
 import MockModal from '../../../../src/renderer/components/modals/MockModal.jsx';
+import { I18nContext } from '../../../../src/renderer/js/i18nContext.js';
 
 const t = (key, vars) => (vars ? `${key}:${JSON.stringify(vars)}` : key);
 
@@ -43,7 +44,11 @@ function renderAddModal(props = {}) {
     showToast: vi.fn(),
     t,
   };
-  return render(<MockModal {...defaults} {...props} />);
+  return render(
+    <I18nContext value={t}>
+      <MockModal {...defaults} {...props} />
+    </I18nContext>
+  );
 }
 
 function renderEditModal(props = {}) {

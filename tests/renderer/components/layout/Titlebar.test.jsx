@@ -2,6 +2,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Titlebar from '../../../../src/renderer/components/layout/Titlebar.jsx';
+import { I18nContext } from '../../../../src/renderer/js/i18nContext.js';
 
 const t = (key) => key;
 
@@ -17,7 +18,11 @@ describe('Titlebar', () => {
 
   it('delegates the app name to the t() function', () => {
     const customT = vi.fn((key) => `[${key}]`);
-    render(<Titlebar proxyRunning={false} t={customT} />);
+    render(
+      <I18nContext value={customT}>
+        <Titlebar proxyRunning={false} />
+      </I18nContext>
+    );
     expect(customT).toHaveBeenCalledWith('application.name');
     expect(screen.getByText('[application.name]')).toBeInTheDocument();
   });
@@ -56,7 +61,11 @@ describe('Titlebar', () => {
 
   it('delegates status text to the t() function', () => {
     const customT = vi.fn((key) => `[${key}]`);
-    render(<Titlebar proxyRunning={false} t={customT} />);
+    render(
+      <I18nContext value={customT}>
+        <Titlebar proxyRunning={false} />
+      </I18nContext>
+    );
     expect(customT).toHaveBeenCalledWith('proxy.status.stopped');
     expect(screen.getByText('[proxy.status.stopped]')).toBeInTheDocument();
   });

@@ -4,10 +4,12 @@ import HeaderListEditor from '../HeaderListEditor.jsx';
 import ConditionListEditor from '../ConditionListEditor.jsx';
 import MockRegexHelpPane from './MockRegexHelpPane.jsx';
 import { compareMappingsByDomain } from '../../js/utils.js';
+import { useI18nT } from '../../js/i18nContext.js';
 
 const HTTP_METHODS = ['*', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
 
-export default function MockModal({ mock, initialValues, mappings, onClose, onSubmit, showToast, t }) {
+export default function MockModal({ mock, initialValues, mappings, onClose, onSubmit, showToast }) {
+  const t = useI18nT();
   const isEditing = !!mock;
   const init = mock ?? initialValues ?? {};
 
@@ -173,7 +175,7 @@ export default function MockModal({ mock, initialValues, mappings, onClose, onSu
                   {pathError && <div className="form-error visible">{pathError}</div>}
                 </div>
 
-                <ConditionListEditor conditions={conditions} onChange={setConditions} t={t} />
+                <ConditionListEditor conditions={conditions} onChange={setConditions} />
                 {conditionsError && <div className="form-error visible">{conditionsError}</div>}
 
                 <div className="form-group">
@@ -217,7 +219,6 @@ export default function MockModal({ mock, initialValues, mappings, onClose, onSu
                   onChange={setHeaders}
                   label={t('mocks.modals.manage.form.headers.label')}
                   hint={t('mocks.modals.manage.form.headers.hint')}
-                  t={t}
                 />
 
                 <div className="form-group">
@@ -246,7 +247,7 @@ export default function MockModal({ mock, initialValues, mappings, onClose, onSu
               </form>
             </div>
 
-            {showHelp && <MockRegexHelpPane showToast={showToast} t={t} />}
+            {showHelp && <MockRegexHelpPane showToast={showToast} />}
           </div>
         </div>
       </div>

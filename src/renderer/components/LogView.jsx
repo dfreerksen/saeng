@@ -3,6 +3,7 @@ import { FILTER_TABS, matchesFilter } from '../js/logFilter.js';
 import { statusBadgeClass } from '../js/utils.js';
 import Tooltip from './utilities/Tooltip.jsx';
 import LogDetailPanel from './LogDetailPanel.jsx';
+import { useI18nT } from '../js/i18nContext.js';
 
 function matchHeaders(headers, q) {
   if (!headers) return false;
@@ -14,7 +15,8 @@ function matchHeaders(headers, q) {
   return false;
 }
 
-export default memo(function LogView({ entries, onClear, onExportHar, onConvertToMock, settings, t }) {
+export default memo(function LogView({ entries, onClear, onExportHar, onConvertToMock, settings }) {
+  const t = useI18nT();
   const [selectedId, setSelectedId] = useState(null);
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -170,7 +172,6 @@ export default memo(function LogView({ entries, onClear, onExportHar, onConvertT
               setDetailTab={setDetailTab}
               onClose={() => setSelectedId(null)}
               onConvertToMock={onConvertToMock}
-              t={t}
             />
           )}
         </div>

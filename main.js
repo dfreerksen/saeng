@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell, Tray, Menu, nativeImage, protocol, net, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, shell, Tray, Menu, nativeImage, protocol, net } from 'electron';
 import path from 'path';
 import { randomBytes } from 'crypto';
 import { pathToFileURL, fileURLToPath } from 'url';
@@ -8,9 +8,11 @@ import AppStore from './src/store.js';
 import { ProxyManager } from './src/proxy/manager.js';
 import { CertManager } from './src/proxy/certManager.js';
 import { clearSystemProxy } from './src/systemProxy.js';
-import { trustCA, untrustCA } from './src/ssl/trust.js';
 import { UpdateChecker } from './src/updateChecker.js';
-import { buildHar } from './src/proxy/har.js';
+import { registerMappingsIpc } from './src/ipc/mappingsIpc.js';
+import { registerMocksIpc } from './src/ipc/mocksIpc.js';
+import { registerProxyIpc } from './src/ipc/proxyIpc.js';
+import { registerSslIpc } from './src/ipc/sslIpc.js';
 import pkg from './package.json' with { type: 'json' };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -163,221 +165,15 @@ function updateTrayMenu(running) {
 }
 
 function setupIPC() {
-  ipcMain.handle('mappings:list', () => store.getMappings());
+  const ctx = { store, proxyManager, getMainWindow: () => mainWindow };
 
-  ipcMain.handle('mappings:add', (_, data) => {
-    store.addMapping(data);
-    proxyManager.updateMappings(store.getMappings());
-    return store.getMappings();
-  });
+  registerMappingsIpc(ctx);
+  registerMocksIpc(ctx);
+  registerProxyIpc({ ...ctx, appVersion: pkg.version, onProxyStateChange: updateTrayMenu });
+  registerSslIpc({ getCertManager });
 
-  ipcMain.handle('mappings:remove', (_, id) => {
-    store.removeMapping(id);
-    store.removeMocksForMapping(id);
-    proxyManager.updateMappings(store.getMappings());
-    proxyManager.updateMocks(store.getMocks());
-    return store.getMappings();
-  });
-
-  ipcMain.handle('mappings:toggle', (_, id) => {
-    store.toggleMapping(id);
-    proxyManager.updateMappings(store.getMappings());
-    return store.getMappings();
-  });
-
-  ipcMain.handle('mappings:setGroupEnabled', (_, ids, enabled) => {
-    store.setMappingsEnabled(ids, enabled);
-    proxyManager.updateMappings(store.getMappings());
-    return store.getMappings();
-  });
-
-  ipcMain.handle('mappings:update', (_, id, data) => {
-    store.updateMapping(id, data);
-    proxyManager.updateMappings(store.getMappings());
-    return store.getMappings();
-  });
-
-  ipcMain.handle('mappings:export', async (_, ids) => {
-    const data = store.exportMappings(ids);
-    const result = await dialog.showSaveDialog(mainWindow, {
-      title: i18n.t('mappings.modals.export.dialog.title'),
-      defaultPath: 'saeng-mappings.json',
-      filters: [{ name: 'JSON', extensions: ['json'] }],
-    });
-    if (result.canceled || !result.filePath) {
-      return { canceled: true };
-    }
-    try {
-      fs.writeFileSync(result.filePath, JSON.stringify({ mappings: data }, null, 2), 'utf8');
-      return { success: true, path: result.filePath, count: data.length };
-    } catch (err) {
-      return { success: false, error: err.message };
-    }
-  });
-
-  ipcMain.handle('mappings:import', async () => {
-    const result = await dialog.showOpenDialog(mainWindow, {
-      title: i18n.t('mappings.modals.import.dialog.title'),
-      properties: ['openFile'],
-      filters: [{ name: 'JSON', extensions: ['json'] }],
-    });
-    if (result.canceled || !result.filePaths?.length) {
-      return { canceled: true };
-    }
-
-    let parsed;
-    try {
-      parsed = JSON.parse(fs.readFileSync(result.filePaths[0], 'utf8'));
-    } catch (err) {
-      return { success: false, error: i18n.t('mappings.modals.import.error.readFailed', { error: err.message }) };
-    }
-
-    const list = Array.isArray(parsed) ? parsed : parsed?.mappings;
-    if (!Array.isArray(list)) {
-      return { success: false, error: i18n.t('mappings.modals.import.error.invalidFormat') };
-    }
-
-    const { added, skipped } = store.importMappings(list);
-    if (added.length > 0) {
-      proxyManager.updateMappings(store.getMappings());
-    }
-    return { success: true, added: added.length, skipped: skipped.length, mappings: store.getMappings() };
-  });
-
-  ipcMain.handle('mocks:list', () => store.getMocks());
-
-  ipcMain.handle('mocks:add', (_, data) => {
-    try {
-      store.addMock(data);
-      proxyManager.updateMocks(store.getMocks());
-      return { success: true, mocks: store.getMocks() };
-    } catch (err) {
-      return { success: false, error: err.message };
-    }
-  });
-
-  ipcMain.handle('mocks:update', (_, id, data) => {
-    try {
-      store.updateMock(id, data);
-      proxyManager.updateMocks(store.getMocks());
-      return { success: true, mocks: store.getMocks() };
-    } catch (err) {
-      return { success: false, error: err.message };
-    }
-  });
-
-  ipcMain.handle('mocks:remove', (_, id) => {
-    store.removeMock(id);
-    proxyManager.updateMocks(store.getMocks());
-    return store.getMocks();
-  });
-
-  ipcMain.handle('mocks:toggle', (_, id) => {
-    store.toggleMock(id);
-    proxyManager.updateMocks(store.getMocks());
-    return store.getMocks();
-  });
-
-  ipcMain.handle('mocks:export', async (_, ids) => {
-    const data = store.exportMocks(ids);
-    const result = await dialog.showSaveDialog(mainWindow, {
-      title: i18n.t('mocks.modals.export.dialog.title'),
-      defaultPath: 'saeng-mocks.json',
-      filters: [{ name: 'JSON', extensions: ['json'] }],
-    });
-    if (result.canceled || !result.filePath) {
-      return { canceled: true };
-    }
-    try {
-      fs.writeFileSync(result.filePath, JSON.stringify({ mocks: data }, null, 2), 'utf8');
-      return { success: true, path: result.filePath, count: data.length };
-    } catch (err) {
-      return { success: false, error: err.message };
-    }
-  });
-
-  ipcMain.handle('mocks:import', async () => {
-    const result = await dialog.showOpenDialog(mainWindow, {
-      title: i18n.t('mocks.modals.import.dialog.title'),
-      properties: ['openFile'],
-      filters: [{ name: 'JSON', extensions: ['json'] }],
-    });
-    if (result.canceled || !result.filePaths?.length) {
-      return { canceled: true };
-    }
-
-    let parsed;
-    try {
-      parsed = JSON.parse(fs.readFileSync(result.filePaths[0], 'utf8'));
-    } catch (err) {
-      return { success: false, error: i18n.t('mocks.modals.import.error.readFailed', { error: err.message }) };
-    }
-
-    const list = Array.isArray(parsed) ? parsed : parsed?.mocks;
-    if (!Array.isArray(list)) {
-      return { success: false, error: i18n.t('mocks.modals.import.error.invalidFormat') };
-    }
-
-    const { added, skipped } = store.importMocks(list);
-    if (added.length > 0) {
-      proxyManager.updateMocks(store.getMocks());
-    }
-    return { success: true, added: added.length, skipped: skipped.length, mocks: store.getMocks() };
-  });
-
-  ipcMain.handle('proxy:start', async () => {
-    try {
-      await proxyManager.start(store.getMappings(), store.getSettings());
-      updateTrayMenu(true);
-      return { success: true };
-    } catch (err) {
-      return { success: false, error: err.message };
-    }
-  });
-
-  ipcMain.handle('proxy:stop', async () => {
-    try {
-      await proxyManager.stop();
-      updateTrayMenu(false);
-      return { success: true };
-    } catch (err) {
-      return { success: false, error: err.message };
-    }
-  });
-
-  ipcMain.handle('proxy:status', () => ({
-    running: proxyManager.isRunning(),
-    ...proxyManager.getStatus(),
-  }));
-
-  ipcMain.handle('requestLog:list', () => proxyManager.requestLog.list());
-
-  ipcMain.handle('requestLog:clear', () => {
-    proxyManager.requestLog.clear();
-    return [];
-  });
-
-  ipcMain.handle('requestLog:exportHar', async () => {
-    const entries = proxyManager.requestLog.list();
-    const result = await dialog.showSaveDialog(mainWindow, {
-      title: i18n.t('log.exportHar.dialog.title'),
-      defaultPath: 'saeng-requests.har',
-      filters: [{ name: 'HAR', extensions: ['har'] }],
-    });
-    if (result.canceled || !result.filePath) {
-      return { canceled: true };
-    }
-    try {
-      const har = buildHar(entries, pkg.version);
-      fs.writeFileSync(result.filePath, JSON.stringify(har, null, 2), 'utf8');
-      return { success: true, path: result.filePath, count: entries.length };
-    } catch (err) {
-      return { success: false, error: err.message };
-    }
-  });
-
-  ipcMain.handle('health:list', () => proxyManager.healthChecker.getStatuses());
-
+  // The remaining handlers stay here because they touch main.js-owned state
+  // (tray, dock, window) or are trivial one-liners.
   ipcMain.handle('settings:get', () => store.getSettings());
 
   ipcMain.handle('settings:set', (_, patch) => {
@@ -419,29 +215,6 @@ function setupIPC() {
     }
     return updated;
   });
-
-  ipcMain.handle('ssl:get-ca-expiry', async () => {
-    const certManager = getCertManager();
-    // Wait for the startup pre-warm (or create the CA now if it's missing),
-    // so the renderer's initial query doesn't race CA generation.
-    await certManager.ensureCA();
-    return certManager.getCAExpiry();
-  });
-
-  ipcMain.handle('ssl:regenerate-ca', () => getCertManager().regenerateCA());
-
-  ipcMain.handle('ssl:delete-ca', async () => {
-    const certManager = getCertManager();
-    const untrustResult = await untrustCA(certManager.getCAPath());
-    certManager.deleteCA();
-    return { success: true, warning: untrustResult?.success === false ? untrustResult.message : null };
-  });
-
-  ipcMain.handle('ssl:get-ca-path', () => getCertManager().getCAPath());
-
-  ipcMain.handle('ssl:reveal-ca', () => shell.showItemInFolder(getCertManager().getCAPath()));
-
-  ipcMain.handle('ssl:trust-ca', () => trustCA(getCertManager().getCAPath()));
 
   ipcMain.handle('app:open-external', (_, url) => shell.openExternal(url));
 

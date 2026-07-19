@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import Modal from './Modal.jsx';
+import { useI18nT } from '../../js/i18nContext.js';
 
-export default function ExportModal({ items, i18nPrefix, onClose, onSubmit, t }) {
+export default function ExportModal({ items, i18nPrefix, onClose, onSubmit }) {
+  const t = useI18nT();
   const [selected, setSelected] = useState(() => new Set(items.map((i) => i.id)));
   const [submitting, setSubmitting] = useState(false);
 

@@ -2,8 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import Modal from './Modal.jsx';
 import HeaderListEditor from '../HeaderListEditor.jsx';
 import { validateDomainPart, splitDomain, DOMAIN_SUFFIXES, DEFAULT_SUFFIX } from '../../js/utils.js';
+import { useI18nT } from '../../js/i18nContext.js';
 
-export default function MappingModal({ mapping, mappings, httpsEnabled, onClose, onSubmit, t }) {
+export default function MappingModal({ mapping, mappings, httpsEnabled, onClose, onSubmit }) {
+  const t = useI18nT();
   const isEditing = !!mapping;
   const parsed = mapping ? splitDomain(mapping.domain) : { subdomain: '', domain: '', suffix: DEFAULT_SUFFIX };
 
@@ -238,7 +240,6 @@ export default function MappingModal({ mapping, mappings, httpsEnabled, onClose,
                 onChange={setRequestHeaders}
                 label={t('mappings.modals.manage.form.headers.request.label')}
                 hint={t('mappings.modals.manage.form.headers.request.hint')}
-                t={t}
               />
 
               <HeaderListEditor
@@ -246,7 +247,6 @@ export default function MappingModal({ mapping, mappings, httpsEnabled, onClose,
                 onChange={setResponseHeaders}
                 label={t('mappings.modals.manage.form.headers.response.label')}
                 hint={t('mappings.modals.manage.form.headers.response.hint')}
-                t={t}
               />
 
               <div className="modal-footer">

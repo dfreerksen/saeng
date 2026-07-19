@@ -1,4 +1,5 @@
 import Tooltip from '../utilities/Tooltip.jsx';
+import { useI18nT } from '../../js/i18nContext.js';
 
 const REGEX_EXAMPLES = [
   { pattern: '^/api/users$', descriptionKey: 'mocks.modals.manage.help.examples.exact' },
@@ -11,7 +12,8 @@ const REGEX_EXAMPLES = [
   { pattern: '.*', descriptionKey: 'mocks.modals.manage.help.examples.any' },
 ];
 
-export default function MockRegexHelpPane({ showToast, t }) {
+export default function MockRegexHelpPane({ showToast }) {
+  const t = useI18nT();
   function handleCopy(pattern) {
     navigator.clipboard.writeText(pattern);
     showToast(t('flash.copied', { url: pattern }), 'success');

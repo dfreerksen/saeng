@@ -7,6 +7,7 @@ vi.mock('../../../../src/renderer/components/modals/Modal.jsx', () => ({
 }));
 
 import MappingModal from '../../../../src/renderer/components/modals/MappingModal.jsx';
+import { I18nContext } from '../../../../src/renderer/js/i18nContext.js';
 
 const STRINGS = {
   'mappings.modals.manage.form.domain.accessedUsing': 'Accessed using: {url}',
@@ -39,7 +40,11 @@ function renderAddModal(props = {}) {
     onSubmit: vi.fn(),
     t,
   };
-  return render(<MappingModal {...defaults} {...props} />);
+  return render(
+    <I18nContext value={t}>
+      <MappingModal {...defaults} {...props} />
+    </I18nContext>
+  );
 }
 
 function renderEditModal(props = {}) {

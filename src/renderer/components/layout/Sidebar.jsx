@@ -1,6 +1,8 @@
 import { memo } from 'react';
+import { useI18nT } from '../../js/i18nContext.js';
 
-export default memo(function Sidebar({ currentView, setCurrentView, dashboardEnabled, loggingEnabled, onAbout, t }) {
+export default memo(function Sidebar({ currentView, setCurrentView, dashboardEnabled, loggingEnabled, onAbout }) {
+  const t = useI18nT();
   return (
     <nav className="sidebar">
       {dashboardEnabled && (

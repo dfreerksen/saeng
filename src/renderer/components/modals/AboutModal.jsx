@@ -1,7 +1,9 @@
 import Modal from './Modal.jsx';
 import Tooltip from '../utilities/Tooltip.jsx';
+import { useI18nT } from '../../js/i18nContext.js';
 
-export default function AboutModal({ version, electronVersion, nodeVersion, reactVersion, bootstrapVersion, onClose, t }) {
+export default function AboutModal({ version, electronVersion, nodeVersion, reactVersion, bootstrapVersion, onClose }) {
+  const t = useI18nT();
   return (
     <Modal onClose={onClose}>
       <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">

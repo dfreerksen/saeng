@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useI18nT } from '../../js/i18nContext.js';
 
 const HEALTH_CHECK_INTERVAL_MIN_S = 5;
 const HEALTH_CHECK_INTERVAL_MAX_S = 300;
@@ -21,7 +22,8 @@ function clampHealthCheckTimeoutMs(value) {
   return Math.min(HEALTH_CHECK_TIMEOUT_MAX_MS, Math.max(HEALTH_CHECK_TIMEOUT_MIN_MS, parsed));
 }
 
-export default function HealthChecksSection({ settings, onSettingsChange, showToast, t }) {
+export default function HealthChecksSection({ settings, onSettingsChange, showToast }) {
+  const t = useI18nT();
   const [healthCheckIntervalDraft, setHealthCheckIntervalDraft] = useState(
     String(Math.round((settings.healthCheckIntervalMs ?? HEALTH_CHECK_INTERVAL_DEFAULT_S * 1000) / 1000))
   );

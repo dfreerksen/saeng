@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { splitDomain } from '../js/utils.js';
+import { useI18nT } from '../js/i18nContext.js';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ChartTooltip, Filler);
 
@@ -66,7 +67,8 @@ function buildChartOptions(textColor, gridColor) {
   };
 }
 
-export default memo(function DashboardView({ entries, mappings, mocks, healthStatuses, settings, proxyRunning, t }) {
+export default memo(function DashboardView({ entries, mappings, mocks, healthStatuses, settings, proxyRunning }) {
+  const t = useI18nT();
   const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
   const textColor = isDark ? '#a8a29e' : '#57534e';
   const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';

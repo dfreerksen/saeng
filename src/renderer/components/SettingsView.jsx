@@ -4,6 +4,7 @@ import ProxySection from './settings/ProxySection.jsx';
 import RequestLogsSection from './settings/RequestLogsSection.jsx';
 import HealthChecksSection from './settings/HealthChecksSection.jsx';
 import CertificateSection from './settings/CertificateSection.jsx';
+import { useI18nT } from '../js/i18nContext.js';
 
 export default memo(function SettingsView({
   settings,
@@ -15,8 +16,8 @@ export default memo(function SettingsView({
   onLocaleChange,
   onColorModeChange,
   showToast,
-  t,
 }) {
+  const t = useI18nT();
   return (
     <div className="view active" id="view-settings">
       <header className="container-fluid p-0 mb-3">
@@ -38,16 +39,15 @@ export default memo(function SettingsView({
         onLocaleChange={onLocaleChange}
         onColorModeChange={onColorModeChange}
         showToast={showToast}
-        t={t}
       />
 
-      <ProxySection settings={settings} onSettingsChange={onSettingsChange} showToast={showToast} t={t} />
+      <ProxySection settings={settings} onSettingsChange={onSettingsChange} showToast={showToast} />
 
-      <RequestLogsSection settings={settings} onSettingsChange={onSettingsChange} showToast={showToast} t={t} />
+      <RequestLogsSection settings={settings} onSettingsChange={onSettingsChange} showToast={showToast} />
 
-      <HealthChecksSection settings={settings} onSettingsChange={onSettingsChange} showToast={showToast} t={t} />
+      <HealthChecksSection settings={settings} onSettingsChange={onSettingsChange} showToast={showToast} />
 
-      <CertificateSection caPath={caPath} caExpiry={caExpiry} setCaExpiry={setCaExpiry} showToast={showToast} t={t} />
+      <CertificateSection caPath={caPath} caExpiry={caExpiry} setCaExpiry={setCaExpiry} showToast={showToast} />
     </div>
   );
 });

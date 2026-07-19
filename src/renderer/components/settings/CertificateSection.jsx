@@ -3,8 +3,10 @@ import { getExpiryInfo } from '../../js/utils.js';
 import { getOS } from '../../js/os.js';
 import Tooltip from '../utilities/Tooltip.jsx';
 import ConfirmModal from '../modals/ConfirmModal.jsx';
+import { useI18nT } from '../../js/i18nContext.js';
 
-export default function CertificateSection({ caPath, caExpiry, setCaExpiry, showToast, t }) {
+export default function CertificateSection({ caPath, caExpiry, setCaExpiry, showToast }) {
+  const t = useI18nT();
   const [trustingCA, setTrustingCA] = useState(false);
   const [regeneratingCA, setRegeneratingCA] = useState(false);
   const [deletingCA, setDeletingCA] = useState(false);
