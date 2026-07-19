@@ -70,17 +70,29 @@ function walkExposed(obj, prefix) {
 
 walkExposed(exposedAPI, '');
 
-// --- 2. Scan main.js for ipcMain.handle() and webContents.send() channels ---
+// --- 2. Scan main.js and src/ipc/*.js for ipcMain.handle() and webContents.send()
+// channels. Some channels are registered directly in main.js (settings:*, app:*,
+// update:*, i18n:*); others live in src/ipc/ modules invoked via registerXxxIpc(ctx). ---
 
 const mainSrc = fs.readFileSync(path.join(root, 'main.js'), 'utf8');
 
+const ipcDir = path.join(root, 'src/ipc');
+const ipcModuleFiles = fs.existsSync(ipcDir)
+  ? fs.readdirSync(ipcDir).filter((f) => f.endsWith('.js'))
+  : [];
+const ipcSrc = ipcModuleFiles
+  .map((f) => fs.readFileSync(path.join(ipcDir, f), 'utf8'))
+  .join('\n');
+
+const combinedSrc = `${mainSrc}\n${ipcSrc}`;
+
 const handledChannels = new Set();
-for (const m of mainSrc.matchAll(/ipcMain\.handle\(\s*['"]([^'"]+)['"]/g)) {
+for (const m of combinedSrc.matchAll(/ipcMain\.handle\(\s*['"]([^'"]+)['"]/g)) {
   handledChannels.add(m[1]);
 }
 
 const sentChannels = new Set();
-for (const m of mainSrc.matchAll(/webContents\.send\(\s*['"]([^'"]+)['"]/g)) {
+for (const m of combinedSrc.matchAll(/webContents\.send\(\s*['"]([^'"]+)['"]/g)) {
   sentChannels.add(m[1]);
 }
 
