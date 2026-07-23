@@ -35,6 +35,7 @@ function applyColorMode(mode) {
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingFadingOut, setIsLoadingFadingOut] = useState(false);
   const [proxyRunning, setProxyRunning] = useState(false);
   const [mappings, setMappings] = useState([]);
   const [mocks, setMocks] = useState([]);
@@ -119,7 +120,7 @@ export default function App() {
       document.documentElement.lang = currentLocale;
       document.documentElement.dir = localeInfo?.dir ?? 'ltr';
 
-      setIsLoading(false);
+      setIsLoadingFadingOut(true);
     }
 
     init();
@@ -278,7 +279,13 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div className="app app-loading d-flex flex-column align-items-center justify-content-center vh-100">
+      <div
+        className={`app app-loading d-flex flex-column align-items-center justify-content-center vh-100${isLoadingFadingOut ? ' app-loading-exit' : ''}`}
+        onTransitionEnd={(e) => {
+          if (e.target === e.currentTarget && e.propertyName === 'opacity') setIsLoading(false);
+        }}
+      >
+        <img src="images/loading.svg" className="app-loading-logo" alt="" />
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">{t('common.loading')}</span>
         </div>

@@ -114,6 +114,15 @@ async function renderApp(overrides = {}) {
   await act(async () => {
     result = render(<App />);
   });
+  // init() fades the loading screen out (CSS transition) before swapping to
+  // the main app, gated on a transitionend event — fire it synthetically
+  // since jsdom doesn't run real CSS transitions.
+  const loadingEl = result.container.querySelector('.app-loading');
+  if (loadingEl) {
+    await act(async () => {
+      fireEvent.transitionEnd(loadingEl, { propertyName: 'opacity' });
+    });
+  }
   return result;
 }
 
@@ -165,6 +174,24 @@ describe('App — loading state', () => {
     const { container } = await renderApp();
     expect(container.querySelector('.spinner-border')).not.toBeInTheDocument();
     expect(container.querySelector('.app')).toBeInTheDocument();
+  });
+
+  it('fades the loading screen out before swapping to the main app', async () => {
+    window.electronAPI = makeElectronAPI();
+    let container;
+    await act(async () => {
+      ({ container } = render(<App />));
+    });
+    // Still mounted (fading), main app not yet shown.
+    const loadingEl = container.querySelector('.app-loading');
+    expect(loadingEl).toHaveClass('app-loading-exit');
+    expect(container.querySelector('.spinner-border')).toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.transitionEnd(loadingEl, { propertyName: 'opacity' });
+    });
+    expect(container.querySelector('.app-loading')).not.toBeInTheDocument();
+    expect(container.querySelector('.spinner-border')).not.toBeInTheDocument();
   });
 });
 
