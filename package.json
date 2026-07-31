@@ -65,7 +65,7 @@
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "chart.js": "^4.5.1",
-    "electron": "^43.1.1",
+    "electron": "^43.2.0",
     "electron-builder": "^26.15.3",
     "esbuild": "^0.28.1",
     "eslint": "^10.7.0",
