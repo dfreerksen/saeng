@@ -1,19 +1,19 @@
-@import 'bootstrap/dist/css/bootstrap';
+@use 'bootstrap/dist/css/bootstrap';
 
 $bootstrap-icons-font-dir: "./fonts";
 
-@import 'bootstrap-icons/font/bootstrap-icons';
-@import 'global';
-@import 'root';
-@import 'body';
-@import 'layout';
-@import 'sidebar';
-@import 'content';
-@import 'header';
-@import 'table';
-@import 'dashboard';
-@import 'form';
-@import 'modal';
-@import 'settings';
-@import 'toast';
-@import 'scrollbar';
+@use 'bootstrap-icons/font/bootstrap-icons';
+@use 'global';
+@use 'root';
+@use 'body';
+@use 'layout';
+@use 'sidebar';
+@use 'content';
+@use 'header';
+@use 'table';
+@use 'dashboard';
+@use 'form';
+@use 'modal';
+@use 'settings';
+@use 'toast';
+@use 'scrollbar';
