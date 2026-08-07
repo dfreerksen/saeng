@@ -70,7 +70,7 @@
     "esbuild": "^0.28.1",
     "eslint": "^10.8.0",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "globals": "^17.8.0",
+    "globals": "^17.9.0",
     "jsdom": "^30.0.0",
     "react": "^19.2.8",
     "react-chartjs-2": "^5.3.1",
