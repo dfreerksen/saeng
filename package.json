@@ -67,7 +67,7 @@
     "chart.js": "^4.5.1",
     "electron": "^43.2.0",
     "electron-builder": "^26.15.3",
-    "esbuild": "^0.28.1",
+    "esbuild": "^0.28.2",
     "eslint": "^10.8.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.8.0",
