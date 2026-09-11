@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.27.0] - 2026-09-11
+
+### Added
+
+- Configurable HTTP proxy port (default 8282) — set a fixed, persistent port instead of an OS-assigned one, so `curl`/scripts that don't honour the OS auto-proxy can rely on a stable address
+- New "CLI Access" settings section with copyable `http_proxy`/`https_proxy` env var snippets, CA bundle path exports, and an example `curl` command
+- Privacy documentation describing what stays local and the only external network call Saeng makes (the periodic GitHub release check)
+
+### Changed
+
+- Loading screen now fades out smoothly into the app instead of disappearing abruptly
+
+[1.27.0]: https://github.com/dfreerksen/saeng/releases/tag/v1.27.0
+
 ## [1.26.0] - 2026-07-19
 
 ### Changed
