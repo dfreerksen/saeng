@@ -4,7 +4,7 @@ This document is for contributors working on Saeng itself. For what the app does
 
 ## Prerequisites
 
-* Node `>=24.11.1`
+* Node `>=24.21.0`
   * [nvm](https://github.com/nvm-sh/nvm) is recommended
 * npm `>=11.6.2`
 * Xcode `>= 26.0` (to create local Mac build)
