@@ -40,7 +40,7 @@
   },
   "scripts": {
     "start": "npm run sass:build && npm run js:build && electron .",
-    "build": "npm run sass:build && npm run js:build && electron-builder",
+    "build": "npm run sass:build && npm run js:build && electron-builder --publish=never",
     "pack": "npm run sass:build && npm run js:build && electron-builder --dir",
     "fonts:copy": "node -e \"const fs=require('fs');fs.mkdirSync('src/renderer/fonts',{recursive:true});['woff','woff2'].forEach(e=>fs.copyFileSync('node_modules/bootstrap-icons/font/fonts/bootstrap-icons.'+e,'src/renderer/fonts/bootstrap-icons.'+e))\"",
     "sass:build": "sass src/renderer/scss:src/renderer --no-source-map --load-path=node_modules",
