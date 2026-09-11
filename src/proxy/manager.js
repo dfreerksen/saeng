@@ -5,7 +5,7 @@ import { RequestLog } from './requestLog.js';
 import { HealthChecker } from './healthChecker.js';
 import { setSystemProxy, clearSystemProxy } from '../systemProxy.js';
 
-const PAC_PORT = 8181;
+export const PAC_PORT = 8181;
 
 class ProxyManager {
   constructor(store) {

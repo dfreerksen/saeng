@@ -4,6 +4,7 @@ import ProxySection from './settings/ProxySection.jsx';
 import RequestLogsSection from './settings/RequestLogsSection.jsx';
 import HealthChecksSection from './settings/HealthChecksSection.jsx';
 import CertificateSection from './settings/CertificateSection.jsx';
+import CliAccessSection from './settings/CliAccessSection.jsx';
 import { useI18nT } from '../js/i18nContext.js';
 
 export default memo(function SettingsView({
@@ -48,6 +49,8 @@ export default memo(function SettingsView({
       <HealthChecksSection settings={settings} onSettingsChange={onSettingsChange} showToast={showToast} />
 
       <CertificateSection caPath={caPath} caExpiry={caExpiry} setCaExpiry={setCaExpiry} showToast={showToast} />
+
+      <CliAccessSection settings={settings} caPath={caPath} showToast={showToast} />
     </div>
   );
 });

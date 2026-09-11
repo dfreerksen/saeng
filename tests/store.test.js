@@ -900,6 +900,36 @@ describe('AppStore.getSettings() / setSettings()', () => {
     expect(store.setSettings({ healthCheckTimeoutMs: 'banana' }).healthCheckTimeoutMs).toBe(2000);
   });
 
+  it('getSettings() defaults proxyPort to 8282', () => {
+    expect(store.getSettings().proxyPort).toBe(8282);
+  });
+
+  it('setSettings() stores a valid proxyPort value', () => {
+    const result = store.setSettings({ proxyPort: 9000 });
+    expect(result.proxyPort).toBe(9000);
+    expect(store.getSettings().proxyPort).toBe(9000);
+  });
+
+  it('setSettings() clamps proxyPort below the minimum to 1', () => {
+    expect(store.setSettings({ proxyPort: 0 }).proxyPort).toBe(1);
+    expect(store.setSettings({ proxyPort: -50 }).proxyPort).toBe(1);
+  });
+
+  it('setSettings() clamps proxyPort above the maximum to 65535', () => {
+    expect(store.setSettings({ proxyPort: 100000 }).proxyPort).toBe(65535);
+  });
+
+  it('setSettings() falls back to the default when proxyPort is not a number', () => {
+    expect(store.setSettings({ proxyPort: 'banana' }).proxyPort).toBe(8282);
+  });
+
+  it('setSettings() rejects a proxyPort equal to the PAC server port and keeps the previous value', () => {
+    store.setSettings({ proxyPort: 9000 });
+    const result = store.setSettings({ proxyPort: 8181 });
+    expect(result.proxyPort).toBe(9000);
+    expect(store.getSettings().proxyPort).toBe(9000);
+  });
+
   it('getSettings() defaults iconMode to "both"', () => {
     expect(store.getSettings().iconMode).toBe('both');
   });

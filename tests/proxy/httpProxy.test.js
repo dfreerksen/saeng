@@ -220,6 +220,18 @@ describe('HttpProxy.getPort()', () => {
     expect(proxy.getPort()).toBeGreaterThan(0);
     await proxy.stop();
   });
+
+  it('listens on settings.proxyPort when given, instead of an OS-assigned port', async () => {
+    const probe = new HttpProxy(null);
+    await probe.start([], { httpsEnabled: false });
+    const freePort = probe.getPort();
+    await probe.stop();
+
+    const proxy = new HttpProxy(null);
+    await proxy.start([], { httpsEnabled: false, proxyPort: freePort });
+    expect(proxy.getPort()).toBe(freePort);
+    await proxy.stop();
+  });
 });
 
 describe('HttpProxy HTTP server lifecycle', () => {

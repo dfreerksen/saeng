@@ -86,7 +86,7 @@ class HttpProxy {
       await this._startInternalHttpsServer();
     }
 
-    await this._startHttpServer();
+    await this._startHttpServer(settings.proxyPort);
     return this.httpServer.address().port;
   }
 
@@ -126,7 +126,9 @@ class HttpProxy {
     });
   }
 
-  async _startHttpServer() {
+  // `port` defaults to 0 (OS-assigned) when not given, e.g. in tests that
+  // don't care which port they land on.
+  async _startHttpServer(port = 0) {
     this.httpServer = http.createServer((req, res) =>
       this._handleRequest(req, res)
     );
@@ -140,7 +142,7 @@ class HttpProxy {
     );
 
     return new Promise((resolve, reject) => {
-      this.httpServer.listen(0, '127.0.0.1', () => resolve());
+      this.httpServer.listen(port, '127.0.0.1', () => resolve());
       this.httpServer.on('error', reject);
     });
   }

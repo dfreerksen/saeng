@@ -4,6 +4,7 @@ import path from 'path';
 import { app } from 'electron';
 import { DEFAULT_INTERVAL_MS as DEFAULT_HEALTH_CHECK_INTERVAL_MS, DEFAULT_TIMEOUT_MS as DEFAULT_HEALTH_CHECK_TIMEOUT_MS } from './proxy/healthChecker.js';
 import { DEFAULT_MAX_ENTRIES as DEFAULT_LOG_MAX_ENTRIES } from './proxy/requestLog.js';
+import { PAC_PORT } from './proxy/manager.js';
 
 const MIN_LOG_MAX_ENTRIES = 100;
 const MAX_LOG_MAX_ENTRIES = 100000;
@@ -43,6 +44,8 @@ const COLOR_MODES = ['auto', 'light', 'dark'];
 const MIN_PORT = 1;
 const MAX_PORT = 65535;
 
+const DEFAULT_PROXY_PORT = 8282;
+
 const conditionListSchema = {
   type: 'array',
   default: [],
@@ -65,6 +68,7 @@ const conditionListSchema = {
 export const DEFAULT_SETTINGS = {
   httpsEnabled: true,
   startOnLaunch: true,
+  proxyPort: DEFAULT_PROXY_PORT,
   colorMode: 'auto',
   locale: 'en',
   iconMode: 'both',
@@ -140,6 +144,7 @@ const schema = {
     properties: {
       httpsEnabled: { type: 'boolean' },
       startOnLaunch: { type: 'boolean' },
+      proxyPort: { type: 'number', minimum: MIN_PORT, maximum: MAX_PORT },
       colorMode: { enum: COLOR_MODES },
       locale: { type: 'string' },
       iconMode: { enum: ICON_MODES },
@@ -464,6 +469,15 @@ class AppStore {
   setSettings(patch) {
     const current = this.getSettings();
     const updated = { ...current, ...patch };
+    if ('proxyPort' in patch) {
+      const parsed = parseInt(patch.proxyPort, 10);
+      const clamped = Number.isNaN(parsed)
+        ? DEFAULT_PROXY_PORT
+        : Math.min(MAX_PORT, Math.max(MIN_PORT, parsed));
+      // The PAC server always owns PAC_PORT — refuse to let the HTTP proxy
+      // collide with it, since both must run at once.
+      updated.proxyPort = clamped === PAC_PORT ? current.proxyPort : clamped;
+    }
     if ('logMaxEntries' in patch) {
       const parsed = parseInt(patch.logMaxEntries, 10);
       updated.logMaxEntries = Number.isNaN(parsed)
