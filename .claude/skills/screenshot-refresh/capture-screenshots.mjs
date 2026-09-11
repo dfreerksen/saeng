@@ -146,10 +146,10 @@ async function injectFakeLogEntries(ws) {
       const appFiber = findAppFiber(root[containerKey]);
       if (!appFiber) return 'no-app';
 
-      // requestLog is the 5th useState hook (index 4) in App.jsx:
-      // isLoading, proxyRunning, mappings, mocks, requestLog, ...
+      // requestLog is the 6th useState hook (index 5) in App.jsx:
+      // isLoading, isLoadingFadingOut, proxyRunning, mappings, mocks, requestLog, ...
       let hook = appFiber.memoizedState;
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 5; i++) {
         if (!hook) return 'hook-' + i;
         hook = hook.next;
       }
@@ -262,31 +262,31 @@ async function injectFakeDashboardData(ws) {
       }
 
       // Hook indices below mirror App.jsx's useState() declaration order:
-      // 0 isLoading, 1 proxyRunning, 2 mappings, 3 mocks, 4 requestLog,
-      // 5 healthStatuses, 6 settings. Update these if that order changes.
+      // 0 isLoading, 1 isLoadingFadingOut, 2 proxyRunning, 3 mappings, 4 mocks,
+      // 5 requestLog, 6 healthStatuses, 7 settings. Update these if that order changes.
 
-      // Hook 1: proxyRunning — true so health stats show
-      const proxyHook = getHook(1);
+      // Hook 2: proxyRunning — true so health stats show
+      const proxyHook = getHook(2);
       if (proxyHook?.queue?.dispatch) proxyHook.queue.dispatch(true);
 
-      // Hook 2: mappings
-      const mappingsHook = getHook(2);
+      // Hook 3: mappings
+      const mappingsHook = getHook(3);
       if (mappingsHook?.queue?.dispatch) mappingsHook.queue.dispatch(mappings);
 
-      // Hook 3: mocks
-      const mocksHook = getHook(3);
+      // Hook 4: mocks
+      const mocksHook = getHook(4);
       if (mocksHook?.queue?.dispatch) mocksHook.queue.dispatch(mocks);
 
-      // Hook 4: requestLog
-      const logHook = getHook(4);
+      // Hook 5: requestLog
+      const logHook = getHook(5);
       if (logHook?.queue?.dispatch) logHook.queue.dispatch(entries);
 
-      // Hook 5: healthStatuses
-      const healthHook = getHook(5);
+      // Hook 6: healthStatuses
+      const healthHook = getHook(6);
       if (healthHook?.queue?.dispatch) healthHook.queue.dispatch(healthStatuses);
 
-      // Hook 6: settings — enable dashboard and health checks
-      const settingsHook = getHook(6);
+      // Hook 7: settings — enable dashboard and health checks
+      const settingsHook = getHook(7);
       if (settingsHook?.queue?.dispatch) {
         const current = settingsHook.memoizedState || {};
         settingsHook.queue.dispatch({ ...current, dashboardEnabled: true, healthCheckEnabled: true });
