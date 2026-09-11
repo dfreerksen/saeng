@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.27.1] - 2026-09-11
+
+### Fixed
+
+- When a client connects directly through the HTTP proxy (via `http_proxy`/`https_proxy` env vars) and requests a domain with no mapping — or a disabled mapping — the proxy now relays the request straight to its real destination instead of returning a 502
+
+[1.27.1]: https://github.com/dfreerksen/saeng/releases/tag/v1.27.1
+
 ## [1.27.0] - 2026-09-11
 
 ### Added
