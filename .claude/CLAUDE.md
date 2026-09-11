@@ -37,6 +37,16 @@ The project uses **ESM throughout** (`"type": "module"` in `package.json`). The 
    - WebSocket upgrades: replays the `Upgrade` request directly to the backend host/port
 5. On proxy start/stop, `src/systemProxy.js` calls `networksetup` (macOS) or PowerShell registry writes (Windows) to set/clear the system auto-proxy URL
 
+### Passthrough for unmapped hosts
+
+The PAC file only ever sends *mapped* domains to Saeng's proxy — everything else gets `DIRECT` from the browser itself, so unmapped traffic never used to reach `HttpProxy` at all. But a client pointed at the proxy directly via `http_proxy`/`https_proxy` env vars (the workflow `CliAccessSection.jsx` walks through) has no such filtering — it sends *every* request through `127.0.0.1:<proxyPort>`, mapped or not. To keep that safe, `HttpProxy` relays any request/tunnel/upgrade for a host with no mapping straight to its real destination instead of rejecting it — the proxy's own equivalent of `DIRECT`:
+
+- `_handleRequest` (plain HTTP): `_relayDirect()` forwards the request to the literal `Host` header's `host:port` (default port 80) and pipes the response back, instead of returning `502`.
+- `_handleConnect` (HTTPS `CONNECT`): tunnels raw TCP straight to the CONNECT target's `host:port` (default port 443) via the existing `_tunnelRaw()` helper — never MITM'd, since Saeng has no business decrypting traffic it isn't managing.
+- `_handleWebSocketUpgrade`: `_relayWebSocketUpgrade()` connects to the literal `Host` header's `host:port` (default port 80) and replays the upgrade via the shared `_replayUpgrade()` helper (also used by the mapped path).
+
+A disabled mapping is excluded from `findMapping()`'s lookup table the same way an unmapped domain is, so requests to it are relayed to the literal `Host` header too, not to the disabled mapping's configured backend. Relayed plain-HTTP requests still go through `_recordRequest()` and appear in the request log like any mapped request (`_handleRequest` calls it before the mapping check); raw CONNECT tunnels are never logged, mapped or not, same as before this behavior existed.
+
 ### Ports
 
 - **8181** — PAC file server (fixed). Serves `/proxy.pac` dynamically from current mappings.

@@ -226,8 +226,7 @@ class HttpProxy {
     const record = this._recordRequest(req, res, hostname, false);
 
     if (!mapping) {
-      res.writeHead(502, { 'Content-Type': 'text/plain' });
-      res.end(`Saeng: no mapping for ${hostname}`);
+      this._relayDirect(req, res, rawHost, record);
       return;
     }
 
@@ -235,6 +234,43 @@ class HttpProxy {
     const reqPath = toPathWithQuery(req.url);
 
     this._dispatch(req, res, mapping, reqPath || '/', record, true);
+  }
+
+  // Relays a plain-HTTP request straight to its real destination when
+  // there's no mapping for the host — the equivalent of the PAC file's
+  // DIRECT fallback for browsers, but needed here too because a client
+  // pointed at this proxy via http_proxy/https_proxy sends *all* of its
+  // traffic through it, not just mapped domains.
+  _relayDirect(req, res, rawHost, record) {
+    const [hostname, portStr] = rawHost.split(':');
+    const port = parseInt(portStr, 10) || 80;
+    const reqPath = toPathWithQuery(req.url) || '/';
+
+    const options = {
+      hostname,
+      port,
+      method: req.method,
+      path: reqPath,
+      headers: { ...req.headers },
+    };
+    delete options.headers['proxy-connection'];
+
+    const proxyReq = http.request(options, (proxyRes) => {
+      if (record && this.requestLog.logHeaders) record.responseHeaders = { ...proxyRes.headers };
+      if (record && this.requestLog.logBody) this._captureBody(proxyRes, record, 'responseBody');
+      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      proxyRes.pipe(res);
+    });
+
+    proxyReq.on('error', (err) => {
+      res.proxyError = err.message;
+      if (!res.headersSent) {
+        res.writeHead(502, { 'Content-Type': 'text/plain' });
+        res.end(`Saeng: upstream error - ${err.message}`);
+      }
+    });
+
+    req.pipe(proxyReq);
   }
 
   // Handles decrypted HTTPS requests forwarded from the internal TLS server
@@ -365,12 +401,15 @@ class HttpProxy {
   }
 
   _handleConnect(req, clientSocket, head) {
-    const hostname = req.url.split(':')[0].toLowerCase();
+    const [rawHost, rawPort] = req.url.split(':');
+    const hostname = rawHost.toLowerCase();
     const mapping = this.findMapping(hostname);
 
     if (!mapping) {
-      clientSocket.write('HTTP/1.1 502 Bad Gateway\r\n\r\n');
-      clientSocket.end();
+      // No mapping for this host — tunnel raw TCP straight to the real
+      // destination instead of rejecting (see _relayDirect). No MITM here:
+      // Saeng has no business decrypting traffic it isn't managing.
+      this._tunnelRaw(clientSocket, head, parseInt(rawPort, 10) || 443, rawHost);
       return;
     }
 
@@ -414,33 +453,54 @@ class HttpProxy {
     const mapping = this.findMapping(hostname);
 
     if (!mapping) {
-      clientSocket.end();
+      this._relayWebSocketUpgrade(req, clientSocket, head, rawHost);
       return;
     }
 
     const serverSocket = net.connect(mapping.port, mapping.host, () => {
-      // Replay the upgrade request to the backend
       const headers = applyHeaderOverrides({ ...req.headers }, mapping.requestHeaders);
       const backendPath = rewritePath(mapping, req.url || '/');
-      let requestLine = `${req.method} ${backendPath} HTTP/${req.httpVersion}\r\n`;
-      serverSocket.write(requestLine);
-      Object.entries(headers).forEach(([k, v]) => {
-        // Multi-value headers arrive as arrays — write one line per value
-        // instead of comma-joining them.
-        for (const value of Array.isArray(v) ? v : [v]) {
-          serverSocket.write(`${k}: ${value}\r\n`);
-        }
-      });
-      serverSocket.write('\r\n');
-      if (head && head.length > 0) serverSocket.write(head);
-
-      serverSocket.pipe(clientSocket);
-      clientSocket.pipe(serverSocket);
+      this._replayUpgrade(serverSocket, clientSocket, req, headers, backendPath, head);
     });
     this._trackTunnelSockets(clientSocket, serverSocket);
 
     serverSocket.on('error', () => clientSocket.destroy());
     clientSocket.on('error', () => serverSocket.destroy());
+  }
+
+  // Relays a WebSocket upgrade straight to its real destination when
+  // there's no mapping for the host, mirroring _relayDirect for plain HTTP.
+  _relayWebSocketUpgrade(req, clientSocket, head, rawHost) {
+    const [hostname, portStr] = rawHost.split(':');
+    const port = parseInt(portStr, 10) || 80;
+
+    const serverSocket = net.connect(port, hostname, () => {
+      this._replayUpgrade(serverSocket, clientSocket, req, req.headers, req.url || '/', head);
+    });
+    this._trackTunnelSockets(clientSocket, serverSocket);
+
+    serverSocket.on('error', () => clientSocket.destroy());
+    clientSocket.on('error', () => serverSocket.destroy());
+  }
+
+  // Writes the upgrade request line + headers to `serverSocket` and pipes
+  // the connection through. Shared by the mapped and passthrough WebSocket
+  // paths, which differ only in the headers/path/target they've resolved.
+  _replayUpgrade(serverSocket, clientSocket, req, headers, path, head) {
+    const requestLine = `${req.method} ${path} HTTP/${req.httpVersion}\r\n`;
+    serverSocket.write(requestLine);
+    Object.entries(headers).forEach(([k, v]) => {
+      // Multi-value headers arrive as arrays — write one line per value
+      // instead of comma-joining them.
+      for (const value of Array.isArray(v) ? v : [v]) {
+        serverSocket.write(`${k}: ${value}\r\n`);
+      }
+    });
+    serverSocket.write('\r\n');
+    if (head && head.length > 0) serverSocket.write(head);
+
+    serverSocket.pipe(clientSocket);
+    clientSocket.pipe(serverSocket);
   }
 
   stop() {

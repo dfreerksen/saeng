@@ -291,22 +291,40 @@ describe('HttpProxy request handling', () => {
     proxy = null;
   });
 
-  it('returns 502 and error text for an unmapped hostname', async () => {
+  it('relays directly to the real destination for an unmapped hostname (passthrough)', async () => {
+    const backend = await startBackend('direct-backend');
+    const backendPort = backend.address().port;
     proxy = new HttpProxy(null);
     await proxy.start([], { httpsEnabled: false });
-    const { statusCode, body } = await makeRequest(proxy.getPort(), { host: 'unknown.local' });
-    expect(statusCode).toBe(502);
-    expect(body).toContain('unknown.local');
+    const { statusCode, body } = await makeRequest(proxy.getPort(), { host: `127.0.0.1:${backendPort}` });
+    expect(statusCode).toBe(200);
+    expect(body).toBe('direct-backend');
+    await stopBackend(backend);
   });
 
-  it('returns 502 for a mapped-but-disabled hostname (not in Map)', async () => {
+  it('relays a disabled mapping to its literal Host, ignoring the mapping config', async () => {
+    const backend = await startBackend('direct-backend');
+    const backendPort = backend.address().port;
     proxy = new HttpProxy(null);
+    // The disabled mapping's own backend (port 9999) is never listening —
+    // if the request were routed there instead of the literal Host header,
+    // this would fail with a connection error rather than 200.
     await proxy.start(
       [{ domain: 'disabled.local', port: 9999, enabled: false }],
       { httpsEnabled: false }
     );
-    const { statusCode } = await makeRequest(proxy.getPort(), { host: 'disabled.local' });
+    const { statusCode, body } = await makeRequest(proxy.getPort(), { host: `127.0.0.1:${backendPort}` });
+    expect(statusCode).toBe(200);
+    expect(body).toBe('direct-backend');
+    await stopBackend(backend);
+  });
+
+  it('returns 502 when the passthrough destination refuses the connection', async () => {
+    proxy = new HttpProxy(null);
+    await proxy.start([], { httpsEnabled: false });
+    const { statusCode, body } = await makeRequest(proxy.getPort(), { host: '127.0.0.1:1' });
     expect(statusCode).toBe(502);
+    expect(body).toContain('Saeng: upstream error');
   });
 
   it('routes to mapping.host when an explicit host is provided', async () => {
@@ -326,8 +344,7 @@ describe('HttpProxy request handling', () => {
   it('strips the port from the Host header when resolving the mapping', async () => {
     proxy = new HttpProxy(null);
     // Map myapp.local but send Host: myapp.local:3000 — should still find it
-    proxy.updateMappings([{ domain: 'myapp.local', port: 3000, enabled: true }]);
-    await proxy.start([], { httpsEnabled: false });
+    await proxy.start([{ domain: 'myapp.local', port: 3000, enabled: true }], { httpsEnabled: false });
     // We expect a 502 here (backend isn't listening), NOT a connection error thrown
     // The important thing is that the proxy attempted to connect, not that it rejected the host
     const { statusCode } = await makeRequest(proxy.getPort(), { host: 'myapp.local:3000' });
@@ -956,14 +973,35 @@ describe('HttpProxy mocked responses — end to end', () => {
 describe('HttpProxy._handleConnect()', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('writes 502 Bad Gateway and closes the socket for an unmapped hostname', () => {
+  it('tunnels raw TCP to the real destination for an unmapped hostname (passthrough)', async () => {
     const proxy = new HttpProxy(null);
-    const socket = makeMockSocket();
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockImplementation((port, host, cb) => {
+      process.nextTick(cb);
+      return serverSocket;
+    });
 
-    proxy._handleConnect({ url: 'unknown.local:443' }, socket, Buffer.alloc(0));
+    proxy._handleConnect({ url: 'unknown.local:443' }, clientSocket, Buffer.alloc(0));
 
-    expect(writtenText(socket)).toContain('502 Bad Gateway');
-    expect(socket.end).toHaveBeenCalled();
+    expect(net.connect).toHaveBeenCalledWith(443, 'unknown.local', expect.any(Function));
+    expect(writtenText(clientSocket)).toContain('200 Connection Established');
+
+    await new Promise((r) => process.nextTick(r));
+
+    expect(serverSocket.pipe).toHaveBeenCalledWith(clientSocket);
+    expect(clientSocket.pipe).toHaveBeenCalledWith(serverSocket);
+  });
+
+  it('defaults the passthrough port to 443 when the CONNECT target omits one', () => {
+    const proxy = new HttpProxy(null);
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockReturnValue(serverSocket);
+
+    proxy._handleConnect({ url: 'unknown.local' }, clientSocket, Buffer.alloc(0));
+
+    expect(net.connect).toHaveBeenCalledWith(443, 'unknown.local', expect.any(Function));
   });
 
   it('opens a raw TCP tunnel when httpsEnabled is false', async () => {
@@ -1078,17 +1116,44 @@ describe('HttpProxy._handleConnect()', () => {
 describe('HttpProxy._handleWebSocketUpgrade()', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('closes the socket immediately for an unmapped hostname', () => {
+  it('relays the upgrade to the real destination for an unmapped hostname (passthrough)', async () => {
     const proxy = new HttpProxy(null);
-    const socket = makeMockSocket();
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockImplementation((port, host, cb) => {
+      process.nextTick(cb);
+      return serverSocket;
+    });
 
     proxy._handleWebSocketUpgrade(
-      { headers: { host: 'unknown.local' }, method: 'GET', url: '/', httpVersion: '1.1' },
-      socket,
+      { headers: { host: 'unknown.local:8080' }, method: 'GET', url: '/chat', httpVersion: '1.1' },
+      clientSocket,
       Buffer.alloc(0)
     );
 
-    expect(socket.end).toHaveBeenCalled();
+    expect(net.connect).toHaveBeenCalledWith(8080, 'unknown.local', expect.any(Function));
+
+    await new Promise((r) => process.nextTick(r));
+
+    const sent = writtenText(serverSocket);
+    expect(sent).toContain('GET /chat HTTP/1.1');
+    expect(serverSocket.pipe).toHaveBeenCalledWith(clientSocket);
+    expect(clientSocket.pipe).toHaveBeenCalledWith(serverSocket);
+  });
+
+  it('defaults the passthrough WebSocket port to 80 when the Host header omits one', () => {
+    const proxy = new HttpProxy(null);
+    const clientSocket = makeMockSocket();
+    const serverSocket = makeMockSocket();
+    vi.spyOn(net, 'connect').mockReturnValue(serverSocket);
+
+    proxy._handleWebSocketUpgrade(
+      { headers: { host: 'unknown.local' }, method: 'GET', url: '/', httpVersion: '1.1' },
+      clientSocket,
+      Buffer.alloc(0)
+    );
+
+    expect(net.connect).toHaveBeenCalledWith(80, 'unknown.local', expect.any(Function));
   });
 
   it('connects to the backend and replays the HTTP upgrade request', async () => {
