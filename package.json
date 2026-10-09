@@ -76,7 +76,7 @@
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.3.0",
     "sass": "^1.105.0",
-    "stylelint": "^17.15.0",
+    "stylelint": "^17.16.0",
     "stylelint-config-standard": "^40.0.0",
     "stylelint-config-standard-scss": "^17.0.0",
     "stylelint-order": "^8.1.1",
