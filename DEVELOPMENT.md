@@ -87,7 +87,7 @@ npm run pack  # electron-builder --dir, unpacked output in dist/
 npm run build # full installers via electron-builder
 ```
 
-Build targets (see `package.json` `build` section): macOS (`dmg`, arm64 + x64), Windows (`nsis`), Linux (`AppImage`, `deb`).
+Build targets (see `package.json` `build` section): macOS (`dmg`, arm64 only), Windows (`nsis`), Linux (`AppImage`, `deb`).
 
 ## Debugging tips
 

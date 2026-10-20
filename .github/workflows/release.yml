@@ -39,8 +39,6 @@ jobs:
           files: |
             dist/Saeng-*.dmg
             dist/Saeng-*.dmg.blockmap
-            dist/Saeng-*-mac.zip
-            dist/Saeng-*-mac.zip.blockmap
             dist/latest-mac.yml
 
   release-win:

@@ -30,7 +30,7 @@ HTTPS works by intercepting `CONNECT` tunnel requests and terminating TLS using 
 
 All releases are available from [Github](https://github.com/dfreerksen/saeng/releases/).
 
-If you are on an Intel chip (x86_64) Mac, you want the x64 dmg. If you are on a Apple Silicon chip (M1/M2/M3/etc.) Mac, you want the arm64 dmg.
+The macOS build supports Apple Silicon (M1/M2/M3/etc.) Macs only. Intel Macs are not supported.
 
 For now, the app is not signed. If this becomes a problem in macOS, bypass Gatekeeper to allow opening it by running
 
