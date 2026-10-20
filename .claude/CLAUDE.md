@@ -10,6 +10,7 @@ npm run build      # Build assets then package for distribution via electron-bui
 npm run pack       # Build assets then electron-builder --dir (no installer, outputs to dist/)
 npm run sass:build # Compile SCSS → src/renderer/styles.css
 npm run js:build   # Bundle src/renderer/main.jsx → src/renderer/scripts.js via esbuild
+npm run fonts:copy # Copy bootstrap-icons .woff/.woff2 from node_modules → src/renderer/fonts/
 npm run lint       # Run both JS (eslint) and CSS (stylelint) linters
 npm run lint:js    # ESLint only
 npm run lint:css   # Stylelint only (SCSS files)
@@ -68,7 +69,7 @@ All logic runs in the **main process**. The renderer has no Node.js access.
 
 ### Renderer
 
-The renderer is a **React 19** app bundled by **esbuild**. SCSS is compiled by **Sass** from `src/renderer/scss/` → `src/renderer/styles.css`. Bootstrap 5 + Bootstrap Icons are used for UI. **chart.js** and **react-chartjs-2** provide the time-series charts on the Dashboard view. Source files in `src/renderer/components/` are `.jsx`; utility modules in `src/renderer/js/` are plain `.js`.
+The renderer is a **React 19** app bundled by **esbuild**. SCSS is compiled by **Sass** from `src/renderer/scss/` → `src/renderer/styles.css`. Bootstrap 5 + Bootstrap Icons are used for UI. **chart.js** and **react-chartjs-2** provide the time-series charts on the Dashboard view. Source files in `src/renderer/components/` are `.jsx`; utility modules in `src/renderer/js/` are plain `.js` (e.g. `os.js`'s `getOS()` maps `electronAPI.platform` to `mac`/`windows`/`linux`, used for per-OS body classes and platform-specific settings text). `src/renderer/color-mode.js` is Bootstrap's color-mode toggler, loaded as a plain `<script>` in `index.html` (outside the esbuild bundle) to set `data-bs-theme` before React mounts.
 
 `src/renderer/components/` is organized into subdirectories by role: `layout/` (`Sidebar.jsx`, `Titlebar.jsx`), `modals/` (`Modal.jsx` — Escape-to-close plus backdrop-click-to-close, `ConfirmModal.jsx` — generic confirm/cancel dialog used for destructive actions in place of native `confirm()`, `MappingModal.jsx`, `MockModal.jsx`, `MockRegexHelpPane.jsx`, `AboutModal.jsx`, `ExportModal.jsx`, `AppModals.jsx` — renders the set of modals owned by `App.jsx`), `settings/` (`ProxySection.jsx`, `CertificateSection.jsx`, `RequestLogsSection.jsx`, `HealthChecksSection.jsx`, `PreferencesSection.jsx`, `CliAccessSection.jsx` — one-time setup instructions (proxy env vars, CA trust) for curl/scripts/API clients that don't honour the OS auto-proxy setting — extracted sections rendered by `SettingsView.jsx`), and `utilities/` (`Toast.jsx`, `Tooltip.jsx`). View-level components (`App.jsx`, `DashboardView.jsx`, `MappingsView.jsx`, `MocksView.jsx`, `LogView.jsx`, `LogDetailPanel.jsx`, `SettingsView.jsx`, `ConditionListEditor.jsx`, `HeaderListEditor.jsx`) live directly under `components/`.
 
@@ -93,7 +94,7 @@ The renderer is a **React 19** app bundled by **esbuild**. SCSS is compiled by *
 | `update:get-status` | Read the current update-checker status (current/latest version, update availability, release URL) |
 | `i18n:get-strings/get-locales/set-locale` | Internationalisation |
 
-The main process also pushes `proxy:status` events to the renderer when proxy state changes (from the tray menu), `health:update` events whenever a backend health check completes, and `update:status` events whenever the update checker re-polls GitHub.
+The main process also pushes `proxy:status` events to the renderer when proxy state changes (from the tray menu), `requestLog:entry` events for each new request-log entry (consumed via `requestLog.onEntry` in `App.jsx`), `health:update` events whenever a backend health check completes, and `update:status` events whenever the update checker re-polls GitHub.
 
 ### HTTPS / SSL
 
@@ -103,7 +104,7 @@ The user must install the CA cert into the OS trust store once — `src/ssl/trus
 
 ### Persistence
 
-`src/store.js` wraps **electron-store v11** (ESM). The store file is `config.json` in `app.getPath('userData')`. The schema has four top-level keys: `mappings` (array), `mocks` (array), `windowBounds` (object), and `settings` (object).
+`src/store.js` wraps **electron-store v12** (ESM). The store file is `config.json` in `app.getPath('userData')`. The schema has four top-level keys: `mappings` (array), `mocks` (array), `windowBounds` (object), and `settings` (object).
 
 Mapping shape:
 ```js
