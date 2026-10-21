@@ -1,4 +1,4 @@
-![Saeng](./assets/logo.png "Saeng")
+# ![Saeng](./assets/logo.png "Saeng")
 
 Local reverse proxy that maps custom development domains to localhost ports.
 
@@ -10,7 +10,7 @@ Saeng means "light," "radiance," or "glow" in Thai.
 
 ![Saeng Mappings](./assets/screenshots/screenshot-dark-mappings.png "Saeng Mappings")
 
-|  | Dashboard | Mappings | Add Mapping | Mocks | Add Mock | Logs | Settings |
+| | Dashboard | Mappings | Add Mapping | Mocks | Add Mock | Logs | Settings |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | Dark | [![Saeng Dashboard](./assets/screenshots/screenshot-dark-dashboard.png "Saeng Dashboard")](./assets/screenshots/screenshot-dark-dashboard.png) | [![Saeng Mappings](./assets/screenshots/screenshot-dark-mappings.png "Saeng Mappings")](./assets/screenshots/screenshot-dark-mappings.png) | [![Saeng Add Mapping](./assets/screenshots/screenshot-dark-mapping-add.png "Saeng Add Mapping")](./assets/screenshots/screenshot-dark-mapping-add.png) | [![Saeng Mocks](./assets/screenshots/screenshot-dark-mocks.png "Saeng Mocks")](./assets/screenshots/screenshot-dark-mocks.png) | [![Saeng Add Mock](./assets/screenshots/screenshot-dark-mock-add.png "Saeng Add Mock")](./assets/screenshots/screenshot-dark-mock-add.png) | [![Saeng Log](./assets/screenshots/screenshot-dark-log.png "Saeng Log")](./assets/screenshots/screenshot-dark-log.png) | [![Saeng Settings](./assets/screenshots/screenshot-dark-settings.png "Saeng Settings")](./assets/screenshots/screenshot-dark-settings.png) |
 | Light | [![Saeng Dashboard](./assets/screenshots/screenshot-light-dashboard.png "Saeng Dashboard")](./assets/screenshots/screenshot-light-dashboard.png) | [![Saeng Mappings](./assets/screenshots/screenshot-light-mappings.png "Saeng Mappings")](./assets/screenshots/screenshot-light-mappings.png) | [![Saeng Add Mapping](./assets/screenshots/screenshot-light-mapping-add.png "Saeng Add Mapping")](./assets/screenshots/screenshot-light-mapping-add.png) | [![Saeng Mocks](./assets/screenshots/screenshot-light-mocks.png "Saeng Mocks")](./assets/screenshots/screenshot-light-mocks.png) | [![Saeng Add Mock](./assets/screenshots/screenshot-light-mock-add.png "Saeng Add Mock")](./assets/screenshots/screenshot-light-mock-add.png) | [![Saeng Log](./assets/screenshots/screenshot-light-log.png "Saeng Log")](./assets/screenshots/screenshot-light-log.png) | [![Saeng Settings](./assets/screenshots/screenshot-light-settings.png "Saeng Settings")](./assets/screenshots/screenshot-light-settings.png) |
@@ -24,7 +24,7 @@ Saeng means "light," "radiance," or "glow" in Thai.
 
 HTTPS works by intercepting `CONNECT` tunnel requests and terminating TLS using a locally generated CA certificate. You install that CA cert into your OS trust store once; Saeng handles per-domain leaf certificates automatically.
 
-> NOTE: Saeng may not work for you straight out the box. Your application may still need to be updated to accept the domain as an available host
+> NOTE: Saeng may not work for you straight out the box. Your application may still need to be updated to accept the domain as an available host. See [Using Saeng with your framework](./docs/Frameworks.md) for setup guides covering Rails, Django, Laravel, Phoenix, .NET, Express.js, React, Vue.js, Angular, Next.js, Vite, Jekyll, and webpack.
 
 ## Download & Install
 
@@ -55,6 +55,7 @@ xattr -cr /Applications/Saeng.app
 * Optional backend health checks with live status indicators per mapping
 * Notifies you in the titlebar when a newer version is available on GitHub
 * Remembers the window size between launches
+* Built-in **Help** section with the full documentation — setup, errors, troubleshooting, and framework guides — available offline
 
 ### Dashboard
 
@@ -91,9 +92,18 @@ Each mock can also specify a **response delay** (0–30 000 ms) to simulate netw
 
 Choose where the Saeng icon appears via the **Icon Mode** setting in Settings:
 
-- **Both** (default) — the app appears in the system tray/menu bar and the dock/taskbar.
-- **Tray only** — the app runs in the system tray/menu bar only; the dock/taskbar icon is hidden (macOS).
-- **Dock only** — the app appears in the dock/taskbar only; no system tray icon. Closing the window quits the app since there is no tray to keep it alive.
+* **Both** (default) — the app appears in the system tray/menu bar and the dock/taskbar.
+* **Tray only** — the app runs in the system tray/menu bar only; the dock/taskbar icon is hidden (macOS).
+* **Dock only** — the app appears in the dock/taskbar only; no system tray icon. Closing the window quits the app since there is no tray to keep it alive.
+
+## Documentation
+
+Full documentation lives in [`docs/`](./docs/README.md), and the same docs are built into the app under **Help** in the sidebar:
+
+* **Using Saeng** — [Mappings](./docs/Mappings.md), [Mocks](./docs/Mocks.md), [Logs](./docs/Logs.md), [Dashboard](./docs/Dashboard.md), [Settings](./docs/Settings.md), [Privacy](./docs/Privacy.md)
+* **Platform setup** — [macOS](./docs/Mac.md), [Windows](./docs/Windows.md), [Linux](./docs/Linux.md)
+* **Errors and troubleshooting** — [Errors](./docs/Errors.md), [Troubleshooting](./docs/Troubleshooting.md)
+* **Framework guides** — [General](./docs/Frameworks.md), [Angular](./docs/frameworks/Angular.md), [Django](./docs/frameworks/Django.md), [.NET](./docs/frameworks/DotNet.md), [Express.js](./docs/frameworks/Express.md), [Jekyll](./docs/frameworks/Jekyll.md), [Laravel](./docs/frameworks/Laravel.md), [Next.js](./docs/frameworks/NextJS.md), [Phoenix](./docs/frameworks/Phoenix.md), [React](./docs/frameworks/React.md), [Ruby on Rails](./docs/frameworks/Rails.md), [Vite](./docs/frameworks/Vite.md), [Vue.js](./docs/frameworks/Vue.md), [webpack-dev-server](./docs/frameworks/Webpack.md)
 
 ## Development
 

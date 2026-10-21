@@ -30,12 +30,14 @@ To proxy HTTPS traffic without browser warnings, install Saeng's root CA certifi
 2. Import the CA into your system trust store or browser:
 
 **System-wide (Debian/Ubuntu):**
+
 ```bash
 sudo cp /path/to/ca.crt /usr/local/share/ca-certificates/saeng.crt
 sudo update-ca-certificates
 ```
 
 **System-wide (Fedora/RHEL):**
+
 ```bash
 sudo cp /path/to/ca.crt /etc/pki/ca-trust/source/anchors/saeng.crt
 sudo update-ca-trust

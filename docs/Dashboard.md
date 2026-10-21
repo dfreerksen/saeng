@@ -13,7 +13,7 @@ To disable it again, toggle the setting off. If you are currently viewing the Da
 The top of the Dashboard shows at-a-glance counters:
 
 | Card | Description |
-|---|---|
+| --- | --- |
 | **Total Requests** | Number of requests recorded in the current log (up to the log max). Requires logging to be enabled. |
 | **Error Rate** | Percentage of requests that resulted in an error. Requires logging to be enabled. |
 | **Avg Latency** | Mean response time across all logged requests. Requires logging to be enabled. |

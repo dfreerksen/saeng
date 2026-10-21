@@ -11,6 +11,7 @@
   "nav.mocks": "Mocks",
   "nav.log": "Log",
   "nav.settings": "Settings",
+  "nav.help": "Help",
   "nav.about": "About",
 
   "dashboard.title": "Dashboard",
@@ -317,6 +318,19 @@
   "settings.cli.step2.altLabel": "Alternative: if your curl build ignores the system certificate store (common with Homebrew), point it at the CA file directly instead:",
   "settings.cli.example.title": "Example",
   "settings.cli.copy": "Copy",
+
+  "help.title": "Help",
+  "help.subtitle": "Guides, troubleshooting, and framework setup",
+  "help.back": "Back",
+  "help.openOnGitHub": "View on GitHub",
+  "help.englishOnly": "Help articles are currently available in English only.",
+  "help.search.placeholder": "Search help",
+  "help.search.noResults": "No articles match your search.",
+  "help.group.overview": "Overview",
+  "help.group.using": "Using Saeng",
+  "help.group.platform": "Platform setup",
+  "help.group.troubleshooting": "Errors & troubleshooting",
+  "help.group.frameworks": "Framework guides",
 
   "about.desc": "A local reverse proxy for routing local domains to localhost ports.",
   "about.github": "This application is open source and can be found on GitHub:",

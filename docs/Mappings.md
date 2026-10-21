@@ -7,7 +7,7 @@ A mapping tells Saeng how to route a local domain to a backend service running o
 Saeng supports the following domain suffixes:
 
 | Suffix | Example |
-|---|---|
+| --- | --- |
 | `.local` | `myapp.local` |
 | `.test` | `myapp.test` |
 | `.localhost` | `myapp.localhost` |

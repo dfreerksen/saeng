@@ -6,6 +6,7 @@ import MappingsView from './MappingsView.jsx';
 import MocksView from './MocksView.jsx';
 import LogView from './LogView.jsx';
 import SettingsView from './SettingsView.jsx';
+import HelpView from './HelpView.jsx';
 import AppModals from './modals/AppModals.jsx';
 import Toast from './utilities/Toast.jsx';
 import { getOS } from '../js/os.js';
@@ -146,6 +147,8 @@ export default function App() {
     });
 
     function handleExternalLinks(e) {
+      // A view that already handled the click (e.g. HelpView's in-app doc links) wins.
+      if (e.defaultPrevented) return;
       const anchor = e.target.closest('a[href]');
       if (!anchor) return;
       const url = anchor.href;
@@ -364,6 +367,7 @@ export default function App() {
                 showToast={showToast}
               />
             )}
+            {currentView === 'help' && <HelpView locale={settings.locale} />}
           </main>
         </div>
 

@@ -27,7 +27,7 @@ Click any row to expand it and see full details, including request/response head
 A tab bar above the log lets you filter entries by type:
 
 | Tab | Shows |
-|---|---|
+| --- | --- |
 | All | Every entry |
 | HTTP | Plain HTTP requests |
 | HTTPS | Requests proxied over HTTPS |

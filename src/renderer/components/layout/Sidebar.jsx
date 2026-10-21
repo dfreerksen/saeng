@@ -44,6 +44,13 @@ export default memo(function Sidebar({ currentView, setCurrentView, dashboardEna
         <i className="bi bi-gear-wide-connected" />
         <span>{t('nav.settings')}</span>
       </button>
+      <button
+        className={`nav-item${currentView === 'help' ? ' active' : ''}`}
+        onClick={() => setCurrentView('help')}
+      >
+        <i className="bi bi-question-circle" />
+        <span>{t('nav.help')}</span>
+      </button>
       <button className="nav-item" onClick={onAbout}>
         <i className="bi bi-info-circle" />
         <span>{t('nav.about')}</span>

@@ -32,7 +32,7 @@ The **Path Pattern** is a JavaScript regular expression tested against the reque
 Click the **?** help button in the mock form to open the regex help pane, which shows common examples with a copy-to-clipboard button:
 
 | Pattern | Matches |
-|---|---|
+| --- | --- |
 | `^/api/users$` | Exactly `/api/users` |
 | `^/api/users/\d+$` | `/api/users/123`, `/api/users/456` |
 | `^/api/` | Any path starting with `/api/` |
@@ -45,7 +45,7 @@ If the pattern is invalid regex, the form will show an error before saving.
 The response body supports template variables rendered at request time. Use `{{variableName}}` syntax:
 
 | Variable | Value |
-|---|---|
+| --- | --- |
 | `{{timestamp}}` | Current Unix timestamp in milliseconds |
 | `{{isodate}}` | Current date/time in ISO 8601 format |
 | `{{uuid}}` | A randomly generated UUID v4 |
@@ -64,6 +64,7 @@ Unrecognized variables are left as-is in the output. Template rendering is skipp
 Path pattern: `^/api/users/(\d+)$`
 Response Headers: `Content-Type: application/json`
 Body:
+
 ```json
 {
   "id": {{match.1}},
@@ -73,6 +74,7 @@ Body:
 ```
 
 A request to `/api/users/42` would return:
+
 ```json
 {
   "id": 42,

@@ -251,6 +251,13 @@ describe('App — navigation', () => {
     expect(document.querySelector('#view-mappings')).toBeInTheDocument();
   });
 
+  it('switches to the help view when the help nav item is clicked', async () => {
+    await renderApp();
+    fireEvent.click(screen.getByText('nav.help').closest('button'));
+    expect(document.querySelector('#view-help')).toBeInTheDocument();
+    expect(document.querySelector('#view-mappings')).not.toBeInTheDocument();
+  });
+
   it('switches to the log view when the log nav item is clicked', async () => {
     await renderApp();
     fireEvent.click(screen.getByText('nav.log').closest('button'));

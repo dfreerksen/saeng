@@ -52,6 +52,23 @@ describe('Sidebar', () => {
     expect(screen.getByText('nav.settings')).toBeInTheDocument();
   });
 
+  it('renders the help nav item', () => {
+    renderSidebar();
+    expect(screen.getByText('nav.help')).toBeInTheDocument();
+  });
+
+  it('calls setCurrentView with help when the help nav item is clicked', () => {
+    const setCurrentView = vi.fn();
+    renderSidebar({ setCurrentView });
+    fireEvent.click(screen.getByText('nav.help').closest('button'));
+    expect(setCurrentView).toHaveBeenCalledWith('help');
+  });
+
+  it('applies active class to the help button when currentView is help', () => {
+    renderSidebar({ currentView: 'help' });
+    expect(screen.getByText('nav.help').closest('button')).toHaveClass('active');
+  });
+
   it('renders the about nav item', () => {
     renderSidebar();
     expect(screen.getByText('nav.about')).toBeInTheDocument();
