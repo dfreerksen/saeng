@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.29.0] - 2026-10-20
+
+### Added
+
+- In-app Help view (new sidebar item) that renders Saeng's documentation offline, with search, grouped articles, and Back navigation between linked pages
+- Troubleshooting guide and expanded error reference
+- Framework setup guides for Angular, Django, .NET, Express, Jekyll, Laravel, Next.js, Phoenix, Rails, React, Vite, Vue, and Webpack
+
+[1.29.0]: https://github.com/dfreerksen/saeng/releases/tag/v1.29.0
+
 ## [1.28.0] - 2026-10-20
 
 ### Removed
