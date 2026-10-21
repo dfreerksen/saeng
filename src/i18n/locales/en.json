@@ -239,7 +239,7 @@
   "log.detail.enableBody": "Enable body logging in Settings to capture response bodies.",
 
   "settings.title": "Settings",
-  "settings.subtitle": "Configure proxy behaviour and SSL certificates",
+  "settings.subtitle": "Configure proxy behavior and SSL certificates",
 
   "settings.preferences.title": "Preferences",
   "settings.preferences.colorMode.label": "Color Mode",
