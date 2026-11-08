@@ -23,6 +23,16 @@ async function generateForgeKeyPair() {
   return { privateKey: forgePrivateKey, publicKey: forgePublicKey };
 }
 
+// A random positive serial number (hex). RFC 5280 requires serials to be
+// positive, and a fresh one per CA means a regenerated CA never shares its
+// issuer name *and* serial with one that's still in a trust store.
+function randomSerial(bytes = 16) {
+  const serial = randomBytes(bytes);
+  serial[0] &= 0x7f; // clear the sign bit so the DER INTEGER stays positive
+  if (serial[0] === 0) serial[0] = 0x01; // and keep it free of a leading zero byte
+  return serial.toString('hex');
+}
+
 class CertManager {
   static instance = null;
 
@@ -85,7 +95,7 @@ class CertManager {
     const cert = forge.pki.createCertificate();
 
     cert.publicKey = keys.publicKey;
-    cert.serialNumber = '01';
+    cert.serialNumber = randomSerial();
     cert.validity.notBefore = new Date();
     cert.validity.notAfter = new Date();
     cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + CA_LIFETIME_YEARS);
@@ -124,23 +134,61 @@ class CertManager {
       return this.pending.get(hostname);
     }
 
-    const certPath = path.join(this.certDir, `${hostname}.crt`);
-    const keyPath = path.join(this.certDir, `${hostname}.key`);
-
-    if (fs.existsSync(certPath) && fs.existsSync(keyPath)) {
-      const result = {
-        cert: fs.readFileSync(certPath, 'utf8'),
-        key: fs.readFileSync(keyPath, 'utf8'),
-      };
-      this.cache.set(hostname, result);
-      return result;
-    }
-
-    const promise = this._generateCert(hostname).finally(() => {
+    const promise = this._loadOrGenerateCert(hostname).finally(() => {
       this.pending.delete(hostname);
     });
     this.pending.set(hostname, promise);
     return promise;
+  }
+
+  async _loadOrGenerateCert(hostname) {
+    await this.ensureCA();
+
+    return this._loadCertFromDisk(hostname) ?? this._generateCert(hostname);
+  }
+
+  // A leaf cert saved by an earlier run, or null when there's none or it can't
+  // be used any more (see _isCurrentLeaf) and has to be generated again.
+  _loadCertFromDisk(hostname) {
+    const certPath = path.join(this.certDir, `${hostname}.crt`);
+    const keyPath = path.join(this.certDir, `${hostname}.key`);
+
+    if (!fs.existsSync(certPath) || !fs.existsSync(keyPath)) return null;
+
+    const result = {
+      cert: fs.readFileSync(certPath, 'utf8'),
+      key: fs.readFileSync(keyPath, 'utf8'),
+    };
+    if (!this._isCurrentLeaf(result.cert)) return null;
+
+    this.cache.set(hostname, result);
+    return result;
+  }
+
+  // Whether a saved leaf cert was signed by the current CA, hasn't expired, and
+  // names the CA's key in its Authority Key Identifier. Leaves written before
+  // that identifier was filled in carry an empty one, which RFC 5280 doesn't
+  // allow and certificate verifiers may reject, so those are replaced too.
+  _isCurrentLeaf(certPem) {
+    try {
+      const leaf = forge.pki.certificateFromPem(certPem);
+      const authorityKeyId = leaf.getExtension('authorityKeyIdentifier');
+
+      return this.ca.verify(leaf) &&
+        leaf.validity.notAfter > new Date() &&
+        Boolean(authorityKeyId?.value?.includes(this._caKeyIdentifier()));
+    } catch {
+      return false;
+    }
+  }
+
+  // The CA's key identifier (its Subject Key Identifier), as forge bytes
+  _caKeyIdentifier() {
+    const ski = this.ca.getExtension('subjectKeyIdentifier');
+
+    return ski?.subjectKeyIdentifier
+      ? forge.util.hexToBytes(ski.subjectKeyIdentifier)
+      : this.ca.generateSubjectKeyIdentifier().getBytes();
   }
 
   async _generateCert(hostname) {
@@ -150,7 +198,7 @@ class CertManager {
     const cert = forge.pki.createCertificate();
 
     cert.publicKey = keys.publicKey;
-    cert.serialNumber = randomBytes(16).toString('hex');
+    cert.serialNumber = randomSerial();
     cert.validity.notBefore = new Date();
     cert.validity.notAfter = new Date();
     cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 2);
@@ -168,7 +216,10 @@ class CertManager {
         name: 'subjectAltName',
         altNames: [{ type: 2, value: hostname }],
       },
-      { name: 'authorityKeyIdentifier' },
+      { name: 'subjectKeyIdentifier' },
+      // Names the CA's key so verifiers can match this cert to its issuer.
+      // Without keyIdentifier, forge writes an empty extension.
+      { name: 'authorityKeyIdentifier', keyIdentifier: this._caKeyIdentifier() },
     ]);
 
     cert.sign(this.caKey, forge.md.sha256.create());

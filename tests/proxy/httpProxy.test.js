@@ -342,13 +342,17 @@ describe('HttpProxy request handling', () => {
   });
 
   it('strips the port from the Host header when resolving the mapping', async () => {
+    // Use a real backend on an OS-assigned port so the test doesn't depend on
+    // whatever happens to be listening on a fixed port (e.g. a dev server on 3000)
+    const backend = await startBackend('from-mapped-backend');
+    const backendPort = backend.address().port;
     proxy = new HttpProxy(null);
-    // Map myapp.local but send Host: myapp.local:3000 — should still find it
-    await proxy.start([{ domain: 'myapp.local', port: 3000, enabled: true }], { httpsEnabled: false });
-    // We expect a 502 here (backend isn't listening), NOT a connection error thrown
-    // The important thing is that the proxy attempted to connect, not that it rejected the host
-    const { statusCode } = await makeRequest(proxy.getPort(), { host: 'myapp.local:3000' });
-    expect(statusCode).toBe(502);
+    await proxy.start([{ domain: 'myapp.local', port: backendPort, enabled: true }], { httpsEnabled: false });
+    // Host header carries a port; the mapping should still be found and used
+    const { statusCode, body } = await makeRequest(proxy.getPort(), { host: 'myapp.local:3000' });
+    expect(statusCode).toBe(200);
+    expect(body).toBe('from-mapped-backend');
+    await stopBackend(backend);
   });
 
   it('applies mapping.requestHeaders to the request forwarded to the backend', async () => {

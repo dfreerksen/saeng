@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, afterAll } from 'vitest';
 import { CertManager } from '../../src/proxy/certManager.js';
+import forge from 'node-forge';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -97,6 +98,101 @@ describe('CertManager.getCert()', () => {
       manager.getCert('concurrent.local'),
     ]);
     expect(b).toBe(a);
+  }, 30_000);
+});
+
+describe('CertManager leaf certificates', () => {
+  const HOST = 'leaf-check.local';
+  let leaf;
+
+  beforeAll(async () => {
+    leaf = forge.pki.certificateFromPem((await manager.getCert(HOST)).cert);
+  }, 30_000);
+
+  // Raw DER of an extension's value, as a hex string
+  const extensionHex = (cert, name) => forge.util.bytesToHex(cert.getExtension(name).value);
+
+  it('is signed by the CA', () => {
+    expect(manager.ca.verify(leaf)).toBe(true);
+  });
+
+  it("names the CA's key in its Authority Key Identifier", () => {
+    const caKeyId = manager.ca.getExtension('subjectKeyIdentifier').subjectKeyIdentifier;
+
+    // SEQUENCE { [0] keyIdentifier }, not an empty SEQUENCE (3000)
+    expect(extensionHex(leaf, 'authorityKeyIdentifier')).toBe(`30168014${caKeyId}`);
+  });
+
+  it('has its own Subject Key Identifier', () => {
+    expect(leaf.getExtension('subjectKeyIdentifier')).toBeTruthy();
+  });
+
+  it('has a positive serial number', () => {
+    expect(parseInt(leaf.serialNumber.slice(0, 2), 16)).toBeLessThan(0x80);
+  });
+
+  it('gives the CA a random serial number, not 01', () => {
+    expect(manager.ca.serialNumber).not.toBe('01');
+    expect(manager.ca.serialNumber).toHaveLength(32);
+  });
+});
+
+describe('CertManager saved leaf certificates', () => {
+  const HOST = 'saved-leaf.local';
+  const certPath = () => path.join(certDir, `${HOST}.crt`);
+  const keyPath = () => path.join(certDir, `${HOST}.key`);
+
+  // Writes a leaf for HOST, signed by the CA but with extensions of our choosing, as an older Saeng saved them
+  function writeLeaf(extensions) {
+    const keys = forge.pki.rsa.generateKeyPair(1024);
+    const cert = forge.pki.createCertificate();
+    cert.publicKey = keys.publicKey;
+    cert.serialNumber = '01';
+    cert.validity.notBefore = new Date();
+    cert.validity.notAfter = new Date(Date.now() + 86_400_000);
+    cert.setSubject([ { name: 'commonName', value: HOST } ]);
+    cert.setIssuer(manager.ca.subject.attributes);
+    cert.setExtensions(extensions);
+    cert.sign(manager.caKey, forge.md.sha256.create());
+    fs.writeFileSync(certPath(), forge.pki.certificateToPem(cert));
+    fs.writeFileSync(keyPath(), forge.pki.privateKeyToPem(keys.privateKey));
+    return forge.pki.certificateToPem(cert);
+  }
+
+  beforeEach(() => manager.purgeCert(HOST));
+
+  it('keeps a saved leaf that names the current CA', async () => {
+    const caKeyId = forge.util.hexToBytes(manager.ca.getExtension('subjectKeyIdentifier').subjectKeyIdentifier);
+    const saved = writeLeaf([ { name: 'authorityKeyIdentifier', keyIdentifier: caKeyId } ]);
+
+    expect((await manager.getCert(HOST)).cert).toBe(saved);
+  }, 30_000);
+
+  it('replaces a saved leaf with an empty Authority Key Identifier', async () => {
+    const saved = writeLeaf([ { name: 'authorityKeyIdentifier' } ]);
+    const result = await manager.getCert(HOST);
+
+    expect(result.cert).not.toBe(saved);
+    expect(fs.readFileSync(certPath(), 'utf8')).toBe(result.cert);
+  }, 30_000);
+
+  it('replaces a saved leaf signed by another CA', async () => {
+    const otherDir = fs.mkdtempSync(path.join(os.tmpdir(), 'saeng-cert-other-'));
+    const other = new CertManager(otherDir);
+    await other.ensureCA();
+    const foreign = await other.getCert(HOST);
+    fs.writeFileSync(certPath(), foreign.cert);
+    fs.writeFileSync(keyPath(), foreign.key);
+
+    expect((await manager.getCert(HOST)).cert).not.toBe(foreign.cert);
+    fs.rmSync(otherDir, { recursive: true, force: true });
+  }, 30_000);
+
+  it('replaces a saved leaf that isn\'t a certificate', async () => {
+    fs.writeFileSync(certPath(), 'not a certificate');
+    fs.writeFileSync(keyPath(), 'not a key');
+
+    expect((await manager.getCert(HOST)).cert).toMatch(/^-----BEGIN CERTIFICATE-----/);
   }, 30_000);
 });
 
