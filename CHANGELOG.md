@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.31.0] - 2026-11-07
+
+### Fixed
+
+- HTTPS certificates for local domains now name Saeng's CA in their Authority Key Identifier. They were written with an empty one, which RFC 5280 doesn't allow and which browsers may reject as `NET::ERR_CERT_AUTHORITY_INVALID`. Certificates saved by earlier versions, and any no longer signed by the current CA, are replaced automatically the next time the domain is used; there's no need to regenerate or re-trust the CA
+- New CA certificates get a random serial number instead of always `01`, so a regenerated CA can't be mistaken for an old one still in a trust store. Per-domain certificates' random serial numbers are now always positive, as RFC 5280 requires
+
+[1.31.0]: https://github.com/dfreerksen/saeng/releases/tag/v1.31.0
+
 ## [1.30.0] - 2026-10-21
 
 ### Security
