@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Titlebar from './layout/Titlebar.jsx';
 import Sidebar from './layout/Sidebar.jsx';
+import LoadingScreen from './layout/LoadingScreen.jsx';
 import DashboardView from './DashboardView.jsx';
 import MappingsView from './MappingsView.jsx';
 import MocksView from './MocksView.jsx';
@@ -282,17 +283,9 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div
-        className={`app app-loading d-flex flex-column align-items-center justify-content-center vh-100${isLoadingFadingOut ? ' app-loading-exit' : ''}`}
-        onTransitionEnd={(e) => {
-          if (e.target === e.currentTarget && e.propertyName === 'opacity') setIsLoading(false);
-        }}
-      >
-        <img src="images/loading.svg" className="app-loading-logo" alt="" />
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">{t('common.loading')}</span>
-        </div>
-      </div>
+      <I18nContext value={t}>
+        <LoadingScreen fadingOut={isLoadingFadingOut} onExited={() => setIsLoading(false)} />
+      </I18nContext>
     );
   }
 
