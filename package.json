@@ -72,7 +72,7 @@
     "eslint-plugin-markdownlint": "^1.0.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.13.0",
-    "jsdom": "^30.1.2",
+    "jsdom": "^31.0.0",
     "markdownlint": "^0.42.0",
     "marked": "^18.1.2",
     "react": "^19.3.0",
