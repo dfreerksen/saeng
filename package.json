@@ -61,7 +61,7 @@
     "@popperjs/core": "^2.11.8",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
-    "@testing-library/user-event": "^14.6.7",
+    "@testing-library/user-event": "^14.6.9",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.2",
     "chart.js": "^4.6.1",
