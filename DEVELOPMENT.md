@@ -4,7 +4,7 @@ This document is for contributors working on Saeng itself. For what the app does
 
 ## Prerequisites
 
-* Node `>=24.22.2`
+* Node `>=24.22.3` (matches the Node version bundled with `electron`).
   * [nvm](https://github.com/nvm-sh/nvm) is recommended
 * npm `>=11.6.2`
 * Xcode `>= 26.0` (to create local Mac build)
@@ -29,7 +29,8 @@ This compiles the SCSS and bundles the renderer JS before launching Electron. Th
 
 ```bash
 npm run sass:build # SCSS -> src/renderer/styles.css
-npm run js:build   # main.jsx -> src/renderer/scripts.js (esbuild)
+npm run js:build # main.jsx -> src/renderer/scripts.js (esbuild)
+npm run js:build:prod # same, minified with React's production build (used by pack/build)
 ```
 
 ## Project structure
@@ -88,6 +89,10 @@ npm run build # full installers via electron-builder
 ```
 
 Build targets (see `package.json` `build` section): macOS (`dmg`, arm64 only), Windows (`nsis`), Linux (`AppImage`, `deb`).
+
+`pack` and `build` bundle the renderer with `js:build:prod` (minified, React production mode); `npm start` keeps the unminified development build so React's dev warnings still show.
+
+The `build.files` list in `package.json` is an allowlist, kept small to reduce download size: only `assets/icons/about/` and `assets/icons/tray/` are packaged (dock icons and the DMG background are read by electron-builder at build time, README screenshots are never shipped), and renderer sources already bundled into `scripts.js` (`components/`, `js/`, `main.jsx`, SCSS) plus the unused `.woff` font fallback are excluded. If you add an asset or file the app loads at runtime, add it to `build.files` too, and check it in the `npm run pack` output.
 
 ## Debugging tips
 
