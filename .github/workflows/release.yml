@@ -96,5 +96,5 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           files: |
             dist/Saeng-*.AppImage
-            dist/Saeng-*.deb
+            dist/*.deb
             dist/latest-linux.yml

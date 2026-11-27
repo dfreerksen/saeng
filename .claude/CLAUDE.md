@@ -5,21 +5,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm start          # Build assets (Sass + JS) then run in development (opens the Electron window)
-npm run build      # Build assets then package for distribution via electron-builder
-npm run pack       # Build assets then electron-builder --dir (no installer, outputs to dist/)
-npm run sass:build # Compile SCSS → src/renderer/styles.css
-npm run js:build   # Bundle src/renderer/main.jsx → src/renderer/scripts.js via esbuild
-npm run fonts:copy # Copy bootstrap-icons .woff/.woff2 from node_modules → src/renderer/fonts/
-npm run lint       # Run both JS (eslint) and CSS (stylelint) linters
-npm run lint:js    # ESLint only
-npm run lint:css   # Stylelint only (SCSS files)
-npm test           # Run vitest in watch mode
-npm run test:run   # Run vitest once (CI mode)
-node --check <file>  # Syntax-check a file without running it
+npm start             # Build assets (Sass + JS) then run in development (opens the Electron window)
+npm run build         # Build assets then package for distribution via electron-builder
+npm run pack          # Build assets then electron-builder --dir (no installer, outputs to dist/)
+npm run sass:build    # Compile SCSS → src/renderer/styles.css
+npm run js:build      # Bundle src/renderer/main.jsx → src/renderer/scripts.js via esbuild
+npm run js:build:prod # Same, plus --minify (esbuild then also sets NODE_ENV=production → React prod build); used by build/pack
+npm run fonts:copy    # Copy bootstrap-icons .woff/.woff2 from node_modules → src/renderer/fonts/
+npm run lint          # Run both JS (eslint) and CSS (stylelint) linters
+npm run lint:js       # ESLint only
+npm run lint:css      # Stylelint only (SCSS files)
+npm test              # Run vitest in watch mode
+npm run test:run      # Run vitest once (CI mode)
+node --check <file>   # Syntax-check a file without running it
 ```
 
-`sass:build` and `js:build` must run before `electron .` because the renderer loads the compiled `styles.css` and `scripts.js`. The `start`/`build`/`pack` scripts do this automatically.
+`sass:build` and `js:build` must run before `electron .` because the renderer loads the compiled `styles.css` and `scripts.js`. The `start`/`build`/`pack` scripts do this automatically (`start` uses `js:build`; `build`/`pack` use `js:build:prod`).
+
+`build.files` in `package.json` is a size-trimmed allowlist: only `assets/icons/about/**` and `assets/icons/tray/**` ship (the paths `main.js` loads; dock icons and the DMG background are build-time inputs), and `src/renderer/components/**`, `src/renderer/js/**`, `src/renderer/main.jsx`, SCSS sources, and `src/renderer/fonts/*.woff` (woff2 is always used) are excluded since they're bundled or unused at runtime. Any new runtime-loaded asset or renderer file outside those must be added to `build.files`. `compression` is set to `maximum`.
 
 ## Architecture
 

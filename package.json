@@ -35,16 +35,17 @@
   "type": "module",
   "main": "main.js",
   "engines": {
-    "node": ">=24.22.2",
+    "node": ">=24.22.3",
     "npm": ">=11.6.2"
   },
   "scripts": {
     "start": "npm run sass:build && npm run js:build && electron .",
-    "build": "npm run sass:build && npm run js:build && electron-builder --publish=never",
-    "pack": "npm run sass:build && npm run js:build && electron-builder --dir",
+    "build": "npm run sass:build && npm run js:build:prod && electron-builder --publish=never",
+    "pack": "npm run sass:build && npm run js:build:prod && electron-builder --dir",
     "fonts:copy": "node -e \"const fs=require('fs');fs.mkdirSync('src/renderer/fonts',{recursive:true});['woff','woff2'].forEach(e=>fs.copyFileSync('node_modules/bootstrap-icons/font/fonts/bootstrap-icons.'+e,'src/renderer/fonts/bootstrap-icons.'+e))\"",
     "sass:build": "sass src/renderer/scss:src/renderer --no-source-map --load-path=node_modules",
     "js:build": "esbuild src/renderer/main.jsx --bundle --outfile=src/renderer/scripts.js --loader:.jsx=jsx --loader:.md=text --jsx=automatic",
+    "js:build:prod": "esbuild src/renderer/main.jsx --bundle --outfile=src/renderer/scripts.js --loader:.jsx=jsx --loader:.md=text --jsx=automatic --minify",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:js": "eslint .",
     "lint:css": "stylelint \"src/renderer/scss/**/*.scss\"",
@@ -91,12 +92,18 @@
     "electronLanguages": [
       "en-US"
     ],
+    "compression": "maximum",
     "files": [
       "main.js",
       "preload.cjs",
-      "assets/**",
+      "assets/icons/about/**",
+      "assets/icons/tray/**",
       "src/**",
-      "!src/renderer/scss/**/*.scss"
+      "!src/renderer/scss/**/*.scss",
+      "!src/renderer/components/**",
+      "!src/renderer/js/**",
+      "!src/renderer/main.jsx",
+      "!src/renderer/fonts/*.woff"
     ],
     "dmg": {
       "background": "assets/backgrounds/mac/background.png"

@@ -2,11 +2,23 @@
 
 ## Installation
 
+Saeng is available as an AppImage, which runs on most distributions, and as a `.deb` package for Debian, Ubuntu, and other Debian-based distributions. Both are built for 64-bit x86 (`amd64`) only.
+
+### AppImage
+
 1. Download the latest `.AppImage` from the [releases page](https://github.com/dfreerksen/saeng/releases).
 2. Make it executable: `chmod +x Saeng-*.AppImage`
 3. Run it: `./Saeng-*.AppImage`
 
 Some distributions require `libfuse2` for AppImage support. Install it with your package manager if the AppImage fails to launch (e.g. `sudo apt install libfuse2` on Ubuntu/Debian).
+
+### Debian / Ubuntu (`.deb`)
+
+1. Download the latest `.deb` (named like `saeng_<version>_amd64.deb`) from the [releases page](https://github.com/dfreerksen/saeng/releases).
+2. Install it: `sudo apt install ./saeng_*_amd64.deb`
+3. Launch **Saeng** from your applications menu.
+
+Installing with `apt` (rather than `dpkg -i`) also installs any missing dependencies. To update, download the newer `.deb` and install it the same way. To uninstall, run `sudo apt remove saeng`.
 
 ## How it works
 
